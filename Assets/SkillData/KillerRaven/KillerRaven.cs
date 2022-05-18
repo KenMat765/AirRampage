@@ -60,7 +60,7 @@ public class KillerRaven : SkillAttack
 
                 // Send Rpc to your clones.
                 string targetNoCode = TargetNosEncoder(targets);
-                ActivatorServerRpc(OwnerClientId, targetNoCode);
+                attack.SkillActivatorServerRpc(OwnerClientId, skillNo, targetNoCode);
             }
             else
             {

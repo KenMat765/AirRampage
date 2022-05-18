@@ -37,7 +37,7 @@ public class Shuriken : SkillAttack
         if (BattleInfo.isMulti && attack.IsOwner)
         {
             // Send Rpc to your clones.
-            ActivatorServerRpc(OwnerClientId);
+            attack.SkillActivatorServerRpc(OwnerClientId, skillNo);
         }
     }
 }

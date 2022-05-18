@@ -7,6 +7,13 @@ using Unity.Netcode;
 // 派生クラスの名前 ＝ SkillData.skillName
 public abstract class Skill : NetworkBehaviour
 {
+    /// <Summary>
+    /// Indicates what number (0 ~ GameInfo.max_skill_count) this skill is.
+    /// </Summary>
+    // Assigned from ParticipantManager.
+    // Used to identify which skill to activate when received skill activator RPCs.
+    public int skillNo {get; set;}
+
     protected virtual void Update() { Charger(); }
 
     public float charge_time {get; set;}
@@ -66,19 +73,6 @@ public abstract class Skill : NetworkBehaviour
         if(!isCharged || attack.fighterCondition.isDead) return;
         isCharged = false;
         ready2Charge = false;
-    }
-
-    [ServerRpc]
-    protected void ActivatorServerRpc(ulong senderId, string infoCode = null)
-    {
-        ActivatorClientRpc(senderId, infoCode);
-    }
-
-    [ClientRpc]
-    protected void ActivatorClientRpc(ulong senderId, string infoCode = null)
-    {
-        if(NetworkManager.Singleton.LocalClientId == senderId) return;
-        Activator(infoCode);
     }
 
     void Charger()

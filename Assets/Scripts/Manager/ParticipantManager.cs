@@ -176,22 +176,23 @@ public class ParticipantManager : NetworkBehaviour
                 fighter.name = battleData.name;
 
                 // Setup Skills
-                for (int skillNum = 0; skillNum < GameInfo.max_skill_count; skillNum++)
+                for (int skillNo = 0; skillNo < GameInfo.max_skill_count; skillNo++)
                 {
-                    int? skillId_nullable = battleData.skillIds[skillNum];
+                    int? skillId_nullable = battleData.skillIds[skillNo];
                     if (skillId_nullable.HasValue)
                     {
                         int skillId = (int)skillId_nullable;
-                        int skillLevel = (int)battleData.skillLevels[skillNum];
+                        int skillLevel = (int)battleData.skillLevels[skillNo];
                         Skill skill_origin = SkillDatabase.I.SearchSkillById(skillId).GetScript();
                         LevelData level_data = SkillLevelDatabase.I.SearchSkillById(skillId).GetLevelData(skillLevel);
-                        attack.skills[skillNum] = (Skill)body.AddComponent(skill_origin.GetType());
-                        attack.skills[skillNum].LevelDataSetter(level_data);
-                        attack.skills[skillNum].Generator();
+                        attack.skills[skillNo] = (Skill)body.AddComponent(skill_origin.GetType());
+                        attack.skills[skillNo].LevelDataSetter(level_data);
+                        attack.skills[skillNo].Generator();
+                        attack.skills[skillNo].skillNo = skillNo;
                     }
                     else
                     {
-                        attack.skills[skillNum] = null;
+                        attack.skills[skillNo] = null;
                     }
                 }
             }

@@ -33,7 +33,7 @@ public class SpiralStorm : SkillDisturb
 
                 // Send Rpc to your clones.
                 string targetNoCode = TargetNosEncoder(target);
-                ActivatorServerRpc(OwnerClientId, targetNoCode);
+                attack.SkillActivatorServerRpc(OwnerClientId, skillNo, targetNoCode);
             }
             else
             {
