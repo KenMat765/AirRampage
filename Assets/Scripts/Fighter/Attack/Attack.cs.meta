@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: ebce4f5ccee51ae4b9b5dd3c06e81471
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - blastImpact: {instanceID: 0}
+  - blastSound: {instanceID: 0}
+  - skillDatabase: {fileID: 11400000, guid: 29946140c87d543448c2ad16b5b9835b, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

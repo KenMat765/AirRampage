@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a3a424fb66c24646aef30ac8f987be3, type: 3}
+  m_Name: SpiralStorm
+  m_EditorClassIdentifier: 
+  skillName: SpiralStorm
+  skillNameJp: "\u30B9\u30D1\u30A4\u30E9\u30EB\u30B9\u30C8\u30FC\u30E0"
+  skillId: 5
+  skillType: 3
+  skillColor: {r: 0.55, g: 0, b: 1, a: 1}
+  skillSprite: {fileID: 21300000, guid: 394c2105065c41e41b304690d864e97c, type: 3}
+  skillPrefabRed: {fileID: 5613718625986941779, guid: 2b95a7b9495c343e2bed673e6d10b219, type: 3}
+  skillPrefabBlue: {fileID: 8269067930228738635, guid: 2915f9d1204924b6fa48e115aca647cc, type: 3}
+  skillScript: {fileID: 5071728378287198796, guid: ee3772f1d07194748aad263e78b874ab, type: 3}
+  skillInformation: 

@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a3a424fb66c24646aef30ac8f987be3, type: 3}
+  m_Name: Shuriken
+  m_EditorClassIdentifier: 
+  skillName: Shuriken
+  skillNameJp: "\u30B7\u30E5\u30EA\u30B1\u30F3"
+  skillId: 11
+  skillSprite: {fileID: 21300000, guid: d6005269057804ea59c976caf35c2ce3, type: 3}
+  skillColor: {r: 1, g: 0, b: 0, a: 1}
+  skillPrefabRed: {fileID: 1588079050117656121, guid: 306936fbb9eec48e5b9ec9c129130c4e, type: 3}
+  skillPrefabBlue: {fileID: 2196127432211435588, guid: c4c7b10b5eb6c4ede8dc02ee013354e1, type: 3}
+  skillScript: {fileID: 3078515944989789901, guid: 71b8cc405d77a42d5877225dac414bc4, type: 3}
+  skillInformation: 
+  skillType: 0

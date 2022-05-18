@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a3a424fb66c24646aef30ac8f987be3, type: 3}
+  m_Name: Shield
+  m_EditorClassIdentifier: 
+  skillName: Shield
+  skillNameJp: "\u30B7\u30FC\u30EB\u30C9"
+  skillId: 4
+  skillSprite: {fileID: 21300000, guid: 8e7ed6e076a994568971bcd897981df1, type: 3}
+  skillColor: {r: 0, g: 0.14901961, b: 1, a: 1}
+  skillPrefabRed: {fileID: 6469998242396099355, guid: 7e53204cc37b8437482961a31c105e1c, type: 3}
+  skillPrefabBlue: {fileID: 4937875629945146425, guid: 827c2986ce509c241ab3879f2ac97a3c, type: 3}
+  skillScript: {fileID: 1273100762769375016, guid: 67564f1642fc147beaa8e93bbd59d522, type: 3}
+  skillInformation: 
+  skillType: 2

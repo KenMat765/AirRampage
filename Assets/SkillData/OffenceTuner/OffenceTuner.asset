@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a3a424fb66c24646aef30ac8f987be3, type: 3}
+  m_Name: OffenceTuner
+  m_EditorClassIdentifier: 
+  skillName: OffenceTuner
+  skillNameJp: "\u30AA\u30D5\u30A7\u30F3\u30B9\u30C1\u30E5\u30FC\u30CA"
+  skillId: 7
+  skillSprite: {fileID: 21300000, guid: b72084a9d4c814b32b7fd2c0e254d1a7, type: 3}
+  skillColor: {r: 0, g: 0.14901961, b: 1, a: 1}
+  skillPrefabRed: {fileID: 4530704219661545942, guid: 1e1ecb45da96b4a06be4a07d71e2b95a, type: 3}
+  skillPrefabBlue: {fileID: 4530704219661545942, guid: 1e1ecb45da96b4a06be4a07d71e2b95a, type: 3}
+  skillScript: {fileID: 4310564539533291669, guid: cc9234f53312043819c7de53dc22804f, type: 3}
+  skillInformation: 
+  skillType: 2

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d941ea264b908ec469cfe92372c844b2
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - redPlayerPrefab: {fileID: 4347130980699420148, guid: 7dd0f8594cd7b444e8d7a9104b5f05d1, type: 3}
+  - bluePlayerPrefab: {fileID: 4931354932594086780, guid: df2950df2bd5a4b0baf4f647f8617d00, type: 3}
+  - redAiPrefab: {fileID: 3038540050042964189, guid: 6246719449302d44ab2db86eeb41e460, type: 3}
+  - blueAiPrefab: {fileID: 6681231137684292613, guid: 0ef355e69f62e8140b5bd6867f27bc41, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
