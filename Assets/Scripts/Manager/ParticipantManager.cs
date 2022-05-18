@@ -213,8 +213,8 @@ public class ParticipantManager : NetworkBehaviour
                 }
             }
 
-            // Set body name to fighterNo for easier reference to fighterNo.
-            body.name = no.ToString();
+            // Set fighter name to fighterNo for easier reference to fighterNo.
+            fighter.name = no.ToString();
 
 
 

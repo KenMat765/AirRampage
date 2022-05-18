@@ -53,6 +53,7 @@ public abstract class Attack : NetworkBehaviour, IFighter
 
     // Lock On ///////////////////////////////////////////////////////////////////////////////////////////////////////
     public List<GameObject> homingTargets;    // homingTargets = ボディ or シールド。 プロパティにするとおかしくなる(?)。
+    public List<int> homingTargetNos;
     public abstract float homingAngle {get; set;}    // Abilityで変化
     public abstract float homingDist {get; set;}    // Abilityで変化
     LayerMask enemy_mask;    // enemy_layer = ボディ + シールド
@@ -62,42 +63,65 @@ public abstract class Attack : NetworkBehaviour, IFighter
 
     // Only used for normal bullets, as attack skills send fighter number through RPC everytime the owner activates it.
     // Set -1 if no targets were detected.
-    protected NetworkVariable<int> targetNo = new NetworkVariable<int>(-1);
+    protected NetworkVariable<int> targetNoForNormalBlast = new NetworkVariable<int>(-1);
 
     [ServerRpc]
     protected void SetIsBlastingServerRpc(bool value) => isBlasting.Value = value;
 
     void SetLayerInteggers()
     {
-        if(fighterCondition.team == Team.Red) enemy_mask = (1 << 12) + (1 << 14);
-        else if(fighterCondition.team == Team.Blue) enemy_mask = (1 << 9) + (1 << 11);
-        else Debug.LogError("AttackにTeamが割り当てられていません。ParticipantManagerでAttackにTeamが割り当てられているか確認してください。");
+        // Set Fighter-Root's layer to enemy_mask.
+        if(fighterCondition.team == Team.Red) enemy_mask = 1 << 18;
+        else if(fighterCondition.team == Team.Blue) enemy_mask = 1 << 17;
+        else Debug.LogError("Team not set at FighterCondition");
     }
 
     void SetHomingTargets()
     {
+        // Detect Fighter-Root GameObject in order to detect target regardless of oponents shield activation.
         Collider[] colliders = Physics.OverlapSphere(BPos, homingDist, enemy_mask);
+
+        // Detect targets, and set them to homingTargetNos.
         if(colliders.Length > 0)
         {
             LayerMask terrain = LayerMask.GetMask("Default");
             var possibleTargets = colliders.Select(t => t.gameObject);
-            homingTargets = possibleTargets.Where(p => 
+            // Get fighter number of targets.
+            homingTargetNos = possibleTargets.Where(p => 
+                // Check if target is inside homing range.
                 Vector3.Angle(transform.forward, p.transform.position - MyPos) < homingAngle && 
-                !Physics.Raycast(MyPos, p.transform.position - MyPos, Vector3.Magnitude(p.transform.position - MyPos), terrain)).ToList();
+                // Check if there are no obstacles (terrain) between self and target.
+                !Physics.Raycast(MyPos, p.transform.position - MyPos, Vector3.Magnitude(p.transform.position - MyPos), terrain))
+                // Get fighter number of target from its name.
+                .Select(r => int.Parse(r.name))
+                .ToList();
+
+            // If multiplayer, set the first targets fighter number to targetNo, in order to link homing target in normal blast.
+            // Only the server should set targetNo.
+            if (BattleInfo.isMulti && IsHost)
+            {
+                // If there are homing targets, get the first targets fighter number.
+                if (homingTargetNos.Count > 0) targetNoForNormalBlast.Value = homingTargetNos[0];
+                // If there are no homing targets, set targetNo to -1, in order to declare that there are no targets.
+                else targetNoForNormalBlast.Value = -1;
+            }
         }
         else
         {
-            homingTargets.Clear();
+            // Clean up list.
+            homingTargetNos.Clear();
         }
 
-        // If multiplayer, as homingTargets is referenced in skills, every clones need to set homingTargets
-        // Though, only the server needs to convert homingTargets[0] to targetNo.
-        if(BattleInfo.isMulti && IsHost)
+        // Convert numbers to fighter-body if there are any homing-targets.
+        // As homingTargets is referenced in skills, every clones need to set homingTargets
+        if(homingTargetNos.Count > 0)
         {
-            // If there are homing targets, get the first targets fighter number from its name, and set it to targetNo.
-            if (homingTargets.Count > 0) targetNo.Value = int.Parse(homingTargets[0].name);
-            // If there are no homing targets, set targetNo to -1, in order to declare that there are no targets.
-            else targetNo.Value = -1;
+            homingTargets = homingTargetNos.Select(n => ParticipantManager.I.fighterInfos[n].body).ToList();
+        }
+        else
+        {
+            // Clean up list.
+            homingTargets.Clear();
         }
     }
 
@@ -150,7 +174,7 @@ public abstract class Attack : NetworkBehaviour, IFighter
             // If multiplayer, convert targetNo to fighter-body-object, and set it to target.
             if(BattleInfo.isMulti)
             {
-                if(targetNo.Value != -1) target = ParticipantManager.I.fighterInfos[targetNo.Value].body;
+                if(targetNoForNormalBlast.Value != -1) target = ParticipantManager.I.fighterInfos[targetNoForNormalBlast.Value].body;
             }
             // If soloplayer, set homingTargets[0] directly to target.
             else

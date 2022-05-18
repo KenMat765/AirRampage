@@ -405,7 +405,7 @@ GameObject:
   - component: {fileID: 2540564821840111222}
   - component: {fileID: 6228536302007779510}
   - component: {fileID: 7022050344888811808}
-  m_Layer: 8
+  m_Layer: 17
   m_Name: Player Red
   m_TagString: Player
   m_Icon: {fileID: 0}

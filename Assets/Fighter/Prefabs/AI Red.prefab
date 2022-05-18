@@ -146,7 +146,7 @@ GameObject:
   - component: {fileID: 8289665774568996677}
   - component: {fileID: 6902768645886462258}
   - component: {fileID: -6297452301505997166}
-  m_Layer: 8
+  m_Layer: 17
   m_Name: AI Red
   m_TagString: AI
   m_Icon: {fileID: 0}

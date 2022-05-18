@@ -122,7 +122,7 @@ GameObject:
   - component: {fileID: 4157289608228579134}
   - component: {fileID: 2566622339331981701}
   - component: {fileID: 6282073338423947083}
-  m_Layer: 8
+  m_Layer: 18
   m_Name: AI Blue
   m_TagString: AI
   m_Icon: {fileID: 0}
