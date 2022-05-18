@@ -30,8 +30,35 @@ public class AiAttack : Attack
         // Set homing targets
         base.FixedUpdate();
 
-        // Blast normal bullets
-        if(homingTargets.Count > 0) NormalBlast();
+        // Set isBlasting true if there are targets.
+        // When multiplayer, only the owner set its own isBlasting true, and send a RPC to set isBlasting true at every other clones.
+        if(homingTargets.Count > 0)
+        {
+            if(BattleInfo.isMulti)
+            {
+                if(IsOwner) SetIsBlastingServerRpc(true);
+            }
+            else
+            {
+                isBlasting.Value = true;
+            }
+        }
+        // Set isBlasting false if there are no targets.
+        // When multiplayer, only the owner set its own isBlasting false, and send a RPC to set isBlasting false at every other clones.
+        else
+        {
+            if(BattleInfo.isMulti)
+            {
+                if(IsOwner) SetIsBlastingServerRpc(false);
+            }
+            else
+            {
+                isBlasting.Value = false;
+            }
+        }
+
+        // Blast normal bullets if isBlasting is true.
+        if(isBlasting.Value) NormalBlast();
         
         // Activate Skills
         // Only the host activates skills

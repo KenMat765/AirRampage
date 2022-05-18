@@ -55,8 +55,17 @@ public abstract class Attack : NetworkBehaviour, IFighter
     public List<GameObject> homingTargets;    // homingTargets = ボディ or シールド。 プロパティにするとおかしくなる(?)。
     public abstract float homingAngle {get; set;}    // Abilityで変化
     public abstract float homingDist {get; set;}    // Abilityで変化
-
     LayerMask enemy_mask;    // enemy_layer = ボディ + シールド
+
+    // NetworkVariables necessary for linking normal blast between clones.
+    protected NetworkVariable<bool> isBlasting = new NetworkVariable<bool>(false);
+
+    // Only used for normal bullets, as attack skills send fighter number through RPC everytime the owner activates it.
+    // Set -1 if no targets were detected.
+    protected NetworkVariable<int> targetNo = new NetworkVariable<int>(-1);
+
+    [ServerRpc]
+    protected void SetIsBlastingServerRpc(bool value) => isBlasting.Value = value;
 
     void SetLayerInteggers()
     {
@@ -79,6 +88,16 @@ public abstract class Attack : NetworkBehaviour, IFighter
         else
         {
             homingTargets.Clear();
+        }
+
+        // If multiplayer, as homingTargets is referenced in skills, every clones need to set homingTargets
+        // Though, only the server needs to convert homingTargets[0] to targetNo.
+        if(BattleInfo.isMulti && IsHost)
+        {
+            // If there are homing targets, get the first targets fighter number from its name, and set it to targetNo.
+            if (homingTargets.Count > 0) targetNo.Value = int.Parse(homingTargets[0].name);
+            // If there are no homing targets, set targetNo to -1, in order to declare that there are no targets.
+            else targetNo.Value = -1;
         }
     }
 
@@ -128,9 +147,15 @@ public abstract class Attack : NetworkBehaviour, IFighter
         {
             Weapon bullet = normalWeapons[GetNormalBulletIndex()];
             GameObject target = null;
-            if(homingTargets.Count > 0)
+            // If multiplayer, convert targetNo to fighter-body-object, and set it to target.
+            if(BattleInfo.isMulti)
             {
-                target = homingTargets[0];
+                if(targetNo.Value != -1) target = ParticipantManager.I.fighterInfos[targetNo.Value].body;
+            }
+            // If soloplayer, set homingTargets[0] directly to target.
+            else
+            {
+                if(homingTargets.Count > 0) target = homingTargets[0];
             }
             bullet.Activate(target);
             normalElapsedTime = 0;

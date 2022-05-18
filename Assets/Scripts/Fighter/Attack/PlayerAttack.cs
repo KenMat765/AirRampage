@@ -5,12 +5,39 @@ using Unity.Netcode;
 
 public class PlayerAttack : Attack
 {
-    protected NetworkVariable<bool> blasting = new NetworkVariable<bool>();
-
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
-        if(uGUIMannager.onBlast) NormalBlast();
+
+        // Set isBlasting true if pressing blast button.
+        // When multiplayer, only the owner set its own isBlasting true, and send a RPC to set isBlasting true at every other clones.
+        if(uGUIMannager.onBlast)
+        {
+            if(BattleInfo.isMulti)
+            {
+                if(IsOwner) SetIsBlastingServerRpc(true);
+            }
+            else
+            {
+                isBlasting.Value = true;
+            }
+        }
+        // Set isBlasting false if not pressing blast button.
+        // When multiplayer, only the owner set its own isBlasting false, and send a RPC to set isBlasting false at every other clones.
+        else
+        {
+            if(BattleInfo.isMulti)
+            {
+                if(IsOwner) SetIsBlastingServerRpc(false);
+            }
+            else
+            {
+                isBlasting.Value = false;
+            }
+        }
+
+        // Blast normal bullets if isBlasting is true.
+        if(isBlasting.Value) NormalBlast();
     }
 
     public override void OnDeath()
