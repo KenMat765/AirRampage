@@ -32,11 +32,12 @@ class Crown : SkillAttack
         GeneratePrefabs(crown_count);
     }
 
-    public override void Activator(string infoCode = null)
+    public override void Activator(int[] received_targetNos = null)
     {
         base.Activator();
         MeterDecreaser(interval * crown_count * 2);
 
+        // Target objects necessary to activate this skill.
         GameObject[] targets = new GameObject[crown_count];
 
         // Multi Players.
@@ -44,27 +45,39 @@ class Crown : SkillAttack
         {
             if(attack.IsOwner)
             {
+                // Owner of this skill pack target fighter's number to this array.
+                int[] target_nos = new int[crown_count];
+                for(int k = 0; k < target_nos.Length; k ++) target_nos[k] = -1;
+
                 // Activate your own skill.
                 if(attack.homingCount > 0)
                 {
                     for(int k = 0; k < crown_count; k ++)
                     {
-                        int targetNo = attack.homingTargetNos.RandomChoice();
-                        targets[k] = ParticipantManager.I.fighterInfos[targetNo].body;
+                        int target_no = attack.homingTargetNos.RandomChoice();
+
+                        // Pack target fighters to array to activate your skill.
+                        targets[k] = ParticipantManager.I.fighterInfos[target_no].body;
+
+                        // Pack target fighter's number to array.
+                        target_nos[k] = target_no;
                     }
                 }
                 StartCoroutine(activator(targets));
 
                 // Send Rpc to your clones.
-                string targetNoCode = TargetNosEncoder(targets);
-                attack.SkillActivatorServerRpc(OwnerClientId, skillNo, targetNoCode);
+                attack.SkillActivatorServerRpc(OwnerClientId, skillNo, target_nos);
             }
             else
             {
                 // Receive Rpc from the owner.
-                if(infoCode != null)
+                for (int k = 0; k < crown_count; k++)
                 {
-                    targets = TargetNosDecoder(infoCode);
+                    // Convert received target numbers to fighter-body.
+                    if (received_targetNos[k] != -1)
+                    {
+                        targets[k] = ParticipantManager.I.fighterInfos[(int)received_targetNos[k]].body;
+                    }
                 }
                 StartCoroutine(activator(targets));
             }
@@ -78,8 +91,8 @@ class Crown : SkillAttack
             {
                 for(int k = 0; k < crown_count; k ++)
                 {
-                    int targetNo = attack.homingTargetNos.RandomChoice();
-                    targets[k] = ParticipantManager.I.fighterInfos[targetNo].body;
+                    int target_no = attack.homingTargetNos.RandomChoice();
+                    targets[k] = ParticipantManager.I.fighterInfos[target_no].body;
                 }
             }
             StartCoroutine(activator(targets));

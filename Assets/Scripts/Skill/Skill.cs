@@ -68,7 +68,7 @@ public abstract class Skill : NetworkBehaviour
         ParameterUpdater();
     }
 
-    public virtual void Activator(string infoCode = null)
+    public virtual void Activator(int[] transfer = null)
     {
         if(!isCharged || attack.fighterCondition.isDead) return;
         isCharged = false;
@@ -211,39 +211,5 @@ public abstract class Skill : NetworkBehaviour
         }
         
         return generated_prefabs;
-    }
-
-
-    // For Multi Players ///////////////////////////////////////////////////////////////////////////////////////////////
-    // For Attack & Disturb skills.
-    protected string TargetNosEncoder(params GameObject[] targets)
-    {
-        string code = "";
-        for(int k = 0; k < targets.Length; k ++)
-        {
-            code += targets[k].name + "/";
-        }
-        return code;
-    }
-    protected GameObject[] TargetNosDecoder(string NosCode)
-    {
-        string NoString = "";
-        List<GameObject> targets = new List<GameObject>();
-        for(int k = 0; k < NosCode.Length; k ++)
-        {
-            char word = NosCode[k];
-            if(word == '/')
-            {
-                int No = int.Parse(NoString);
-                NoString = "";
-                GameObject target = ParticipantManager.I.fighterInfos[No].body;
-                targets.Add(target);
-            }
-            else
-            {
-                NoString += word;
-            }
-        }
-        return targets.ToArray();
     }
 }

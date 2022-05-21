@@ -27,7 +27,7 @@ public class Shield : SkillAssist
         hit_detector = prefabs[0].GetComponent<ShieldHitDetector>();
     }
 
-    public override void Activator(string infoCode = null)
+    public override void Activator(int[] transfer = null)
     {
         base.Activator();
         col.enabled = false;

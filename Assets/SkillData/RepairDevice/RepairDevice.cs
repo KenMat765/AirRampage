@@ -23,7 +23,7 @@ public class RepairDevice : SkillHeal
         effect = prefabs[0].GetComponent<ParticleSystem>();
     }
 
-    public override void Activator(string infoCode = null)
+    public override void Activator(int[] transfer = null)
     {
         base.Activator();
         MeterDecreaser();

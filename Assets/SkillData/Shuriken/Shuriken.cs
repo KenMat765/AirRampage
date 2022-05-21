@@ -23,7 +23,7 @@ public class Shuriken : SkillAttack
         GeneratePrefabs(shuriken_count);
     }
 
-    public override void Activator(string infoCode = null)
+    public override void Activator(int[] transfer = null)
     {
         base.Activator();
         MeterDecreaser(lifespan);

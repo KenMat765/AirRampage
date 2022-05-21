@@ -174,15 +174,15 @@ public abstract class Attack : NetworkBehaviour, IFighter
 
     // Declared here because Skill cannnot call RPCs. (they are attached AFTER fighters are spawned)
     [ServerRpc]
-    public void SkillActivatorServerRpc(ulong senderId, int skillNo, string infoCode = null)
+    public void SkillActivatorServerRpc(ulong senderId, int skillNo, int[] targetNos = null)
     {
-        SkillActivatorClientRpc(senderId, skillNo, infoCode);
+        SkillActivatorClientRpc(senderId, skillNo, targetNos);
     }
 
     [ClientRpc]
-    public void SkillActivatorClientRpc(ulong senderId, int skillNo, string infoCode = null)
+    public void SkillActivatorClientRpc(ulong senderId, int skillNo, int[] targetNos = null)
     {
         if(NetworkManager.Singleton.LocalClientId == senderId) return;
-        skills[skillNo].Activator(infoCode);
+        skills[skillNo].Activator(targetNos);
     }
 }

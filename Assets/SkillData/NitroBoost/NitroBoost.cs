@@ -34,7 +34,7 @@ class NitroBoost : SkillAssist
         if(playerMovement != null) cameraController = playerMovement.cameraController;
     }
 
-    public override void Activator(string infoCode = null)
+    public override void Activator(int[] transfer = null)
     {
         base.Activator();
         MeterDecreaser(boost_duration, EndProccess);

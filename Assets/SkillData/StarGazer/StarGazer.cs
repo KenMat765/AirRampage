@@ -48,7 +48,7 @@ public class StarGazer : SkillAttack
         for(int k = 0; k < gazer_default_count; k++) GeneratePrefab(gazer_root.transform);
     }
 
-    public override void Activator(string infoCode = null)
+    public override void Activator(int[] transfer = null)
     {
         base.Activator();
         MeterDecreaser(startup_time + generate_time);
