@@ -96,11 +96,11 @@ public abstract class Weapon : Utilities
 
 
     // Skillからセット //////////////////////////////////////////////////////////////////////////////////////////////////
-    public GameObject owner {get; private set;}    // owner is figherbody, not Fighter
+    public GameObject owner;    // owner is figherbody, not Fighter
     public string skill_name {get; private set;}
     System.Func<float> StayMotion = null;
     Attack attack;
-    GameObject targetObject = null;
+    [SerializeField] GameObject targetObject = null;
     
     
     int enemy_body_layer, enemy_shield_layer;
@@ -272,8 +272,8 @@ public abstract class Weapon : Utilities
     public void Activate(GameObject target)
     {
         power_temp = power * attack.fighterCondition.power.Value;
-        gameObject.SetActive(true);
         targetObject = target;
+        gameObject.SetActive(true);
     }
 
     public void TerminateWeapon()

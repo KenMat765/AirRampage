@@ -4,42 +4,43 @@ using UnityEngine;
 
 public class ZakoAttack : Attack
 {
+    public override float homingAngle {get; set;} = 10;
+    public override float homingDist {get; set;} = 20;
+    protected override float setInterval {get; set;} = 1;
+    protected override int rapidCount {get; set;} = 1;
+
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
 
-        // Set isBlasting true if there are targets.
-        // When multiplayer, only the owner set its own isBlasting true, and send a RPC to set isBlasting true at every other clones.
-        if(homingTargets.Count > 0)
+
+        // Only the owner (= host) executes the following processes.
+        if(BattleInfo.isMulti && !IsHost) return;
+
+
+        // Normal Blast. ////////////////////////////////////////////////////////////////////////////////////////
+        if(homingCount > 0)
         {
-            if(BattleInfo.isMulti)
+            blastTimer -= Time.deltaTime;
+            if(blastTimer < 0)
             {
-                if(IsOwner) SetIsBlastingServerRpc(true);
-            }
-            else
-            {
-                isBlasting.Value = true;
+                // Set timer.
+                blastTimer = setInterval;
+
+                // Determine target.
+                int targetNo = homingTargetNos[0];
+                GameObject target = ParticipantManager.I.fighterInfos[targetNo].body;
+
+                // Blast normal bullets for yourself.
+                NormalRapid(target, rapidCount);
+
+                // If multiplayer, send to all clones to blast bullets.
+                if(BattleInfo.isMulti) NormalRapidServerRpc(OwnerClientId, targetNo, rapidCount);
             }
         }
-        // Set isBlasting false if there are no targets.
-        // When multiplayer, only the owner set its own isBlasting false, and send a RPC to set isBlasting false at every other clones.
         else
         {
-            if(BattleInfo.isMulti)
-            {
-                if(IsOwner) SetIsBlastingServerRpc(false);
-            }
-            else
-            {
-                isBlasting.Value = false;
-            }
+            blastTimer = 0;
         }
-
-        // Blast normal bullets if isBlasting is true.
-        if(isBlasting.Value) NormalBlast();
     }
-
-    public override float homingAngle {get; set;} = 10;
-    public override float homingDist {get; set;} = 20;
-    protected override float normalInterval {get; set;} = 0.75f;
 }

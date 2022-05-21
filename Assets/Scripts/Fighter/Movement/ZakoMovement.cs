@@ -28,9 +28,11 @@ public class ZakoMovement : Movement
 
         if(fighterCondition.isDead) return;
 
-        if(zakoAttack.homingTargets.Count > 0)
+        if(zakoAttack.homingCount > 0)
         {
-            Vector3 target = zakoAttack.homingTargets[0].transform.position;
+            int targetNo = zakoAttack.homingTargetNos[0];
+            GameObject targetCraft = ParticipantManager.I.fighterInfos[targetNo].body;
+            Vector3 target = targetCraft.transform.position;
             TargetSetter(target, true);
         }
         else

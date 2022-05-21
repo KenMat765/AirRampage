@@ -45,11 +45,12 @@ class Crown : SkillAttack
             if(attack.IsOwner)
             {
                 // Activate your own skill.
-                if(attack.homingTargets.Count > 0)
+                if(attack.homingCount > 0)
                 {
                     for(int k = 0; k < crown_count; k ++)
                     {
-                        targets[k] = attack.homingTargets.RandomChoice();
+                        int targetNo = attack.homingTargetNos.RandomChoice();
+                        targets[k] = ParticipantManager.I.fighterInfos[targetNo].body;
                     }
                 }
                 StartCoroutine(activator(targets));
@@ -73,11 +74,12 @@ class Crown : SkillAttack
         else
         {
             // Activate your own skill.
-            if(attack.homingTargets.Count > 0)
+            if(attack.homingCount > 0)
             {
                 for(int k = 0; k < crown_count; k ++)
                 {
-                    targets[k] = attack.homingTargets.RandomChoice();
+                    int targetNo = attack.homingTargetNos.RandomChoice();
+                    targets[k] = ParticipantManager.I.fighterInfos[targetNo].body;
                 }
             }
             StartCoroutine(activator(targets));

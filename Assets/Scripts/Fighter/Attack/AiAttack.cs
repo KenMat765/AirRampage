@@ -5,6 +5,19 @@ using UnityEngine;
 
 public class AiAttack : Attack
 {
+    public override float homingAngle {get; set;} = 30;
+    public override float homingDist {get; set;} = 30;
+    protected override float setInterval {get; set;} = 0.6f;
+    protected override int rapidCount {get; set;} = 3;
+
+    // Must be called on every clients.
+    public override void OnDeath()
+    {
+        foreach(Skill skill in skills) if(skill != null) skill.ForceTermination();
+    }
+
+
+    // For Skills. ////////////////////////////////////////////////////////////////////////////////////////////////
     SkillData[] skillDatas;
     float[] elapsed_times, wait_times;
     const float min_wait_time = 0, max_wait_time = 15;
@@ -27,43 +40,40 @@ public class AiAttack : Attack
 
     protected override void FixedUpdate()
     {
-        // Set homing targets
         base.FixedUpdate();
 
-        // Set isBlasting true if there are targets.
-        // When multiplayer, only the owner set its own isBlasting true, and send a RPC to set isBlasting true at every other clones.
-        if(homingTargets.Count > 0)
-        {
-            if(BattleInfo.isMulti)
-            {
-                if(IsOwner) SetIsBlastingServerRpc(true);
-            }
-            else
-            {
-                isBlasting.Value = true;
-            }
-        }
-        // Set isBlasting false if there are no targets.
-        // When multiplayer, only the owner set its own isBlasting false, and send a RPC to set isBlasting false at every other clones.
-        else
-        {
-            if(BattleInfo.isMulti)
-            {
-                if(IsOwner) SetIsBlastingServerRpc(false);
-            }
-            else
-            {
-                isBlasting.Value = false;
-            }
-        }
 
-        // Blast normal bullets if isBlasting is true.
-        if(isBlasting.Value) NormalBlast();
-        
-        // Activate Skills
-        // Only the host activates skills
+        // Only the owner (= host) executes the following processes.
         if(BattleInfo.isMulti && !IsHost) return;
 
+
+        // Normal Blast. ////////////////////////////////////////////////////////////////////////////////////////
+        if(homingCount > 0)
+        {
+            blastTimer -= Time.deltaTime;
+            if(blastTimer < 0)
+            {
+                // Set timer.
+                blastTimer = setInterval;
+
+                // Determine target.
+                int targetNo = homingTargetNos[0];
+                GameObject target = ParticipantManager.I.fighterInfos[targetNo].body;
+
+                // Blast normal bullets for yourself.
+                NormalRapid(target, rapidCount);
+
+                // If multiplayer, send to all clones to blast bullets.
+                if(BattleInfo.isMulti) NormalRapidServerRpc(OwnerClientId, targetNo, rapidCount);
+            }
+        }
+        else
+        {
+            blastTimer = 0;
+        }
+
+
+        // Activate Skills. /////////////////////////////////////////////////////////////////////////////////////
         for(int skill_num = 0; skill_num < skills.Length; skill_num ++)
         {
             Skill skill = skills[skill_num];
@@ -82,7 +92,7 @@ public class AiAttack : Attack
                 {
                     case SkillType.attack :
                     // 標的がtarget_thresh機以上だったらスキル発動
-                    if(homingTargets.Count >= target_thresh)
+                    if(homingCount >= target_thresh)
                     {
                         skillToActivate = skill;
                         elapsed_times[skill_num] = 0;
@@ -110,7 +120,7 @@ public class AiAttack : Attack
 
                     case SkillType.disturb :
                     // 標的がtarget_thresh機以上だったらスキル発動
-                    if(homingTargets.Count >= target_thresh)
+                    if(homingCount >= target_thresh)
                     {
                         skillToActivate = skill;
                         elapsed_times[skill_num] = 0;
@@ -121,17 +131,5 @@ public class AiAttack : Attack
                 if(skillToActivate != null) skillToActivate.Activator();
             }
         }
-    }
-
-
-
-    public override float homingAngle {get; set;} = 30;
-    public override float homingDist {get; set;} = 30;
-    protected override float normalInterval {get; set;} = 0.16f;
-
-    // Must be called on every clients.
-    public override void OnDeath()
-    {
-        foreach(Skill skill in skills) if(skill != null) skill.ForceTermination();
     }
 }

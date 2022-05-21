@@ -25,9 +25,10 @@ public class SpiralStorm : SkillDisturb
             if(attack.IsOwner)
             {
                 // Activate your own skill.
-                if(attack.homingTargets.Count > 0)
+                if(attack.homingCount > 0)
                 {
-                    target = attack.homingTargets[0];
+                    int targetNo = attack.homingTargetNos[0];
+                    target = ParticipantManager.I.fighterInfos[targetNo].body;
                 }
                 weapons[GetPrefabIndex()].Activate(target);
 
@@ -50,9 +51,10 @@ public class SpiralStorm : SkillDisturb
         else
         {
             // Activate your own skill.
-            if(attack.homingTargets.Count > 0)
+            if(attack.homingCount > 0)
             {
-                target = attack.homingTargets[0];
+                int targetNo = attack.homingTargetNos[0];
+                target = ParticipantManager.I.fighterInfos[targetNo].body;
             }
             weapons[GetPrefabIndex()].Activate(target);
         }

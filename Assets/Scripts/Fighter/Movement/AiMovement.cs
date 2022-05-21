@@ -160,10 +160,14 @@ public class AiMovement : Movement
         // 攻撃されていない時
         else
         {
-            if(aiAttack.homingTargets.Count > 0)
+            if(aiAttack.homingCount > 0)
             {
                 condition = Conditions.attack;
-                if(targetCraft == null) targetCraft = aiAttack.homingTargets[0];
+                if(targetCraft == null)
+                {
+                    int targetNo = aiAttack.homingTargetNos[0];
+                    targetCraft = ParticipantManager.I.fighterInfos[targetNo].body;
+                }
             }
             else
             {

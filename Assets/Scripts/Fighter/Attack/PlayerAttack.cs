@@ -1,51 +1,49 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.Netcode;
 
 public class PlayerAttack : Attack
 {
+    public override float homingAngle {get; set;} = 20;
+    public override float homingDist {get; set;} = 20;
+    protected override float setInterval {get; set;} = 0.6f;
+    protected override int rapidCount {get; set;} = 3;
+
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
 
-        // Set isBlasting true if pressing blast button.
-        // When multiplayer, only the owner set its own isBlasting true, and send a RPC to set isBlasting true at every other clones.
+        if(BattleInfo.isMulti && !IsOwner) return;
+
         if(uGUIMannager.onBlast)
         {
-            if(BattleInfo.isMulti)
+            blastTimer -= Time.deltaTime;
+            if(blastTimer < 0)
             {
-                if(IsOwner) SetIsBlastingServerRpc(true);
-            }
-            else
-            {
-                isBlasting.Value = true;
+                // Set timer.
+                blastTimer = setInterval;
+
+                // Determine target.
+                int? targetNo = null;
+                if(homingCount > 0) targetNo = homingTargetNos[0];
+                GameObject target = null;
+                if(targetNo.HasValue) target = ParticipantManager.I.fighterInfos[(int)targetNo].body;
+
+                // Blast normal bullets for yourself.
+                NormalRapid(target, rapidCount);
+
+                // If multiplayer, send to all clones to blast bullets.
+                if(BattleInfo.isMulti) NormalRapidServerRpc(OwnerClientId, (int)targetNo, rapidCount);
             }
         }
-        // Set isBlasting false if not pressing blast button.
-        // When multiplayer, only the owner set its own isBlasting false, and send a RPC to set isBlasting false at every other clones.
         else
         {
-            if(BattleInfo.isMulti)
-            {
-                if(IsOwner) SetIsBlastingServerRpc(false);
-            }
-            else
-            {
-                isBlasting.Value = false;
-            }
+            blastTimer = 0;
         }
-
-        // Blast normal bullets if isBlasting is true.
-        if(isBlasting.Value) NormalBlast();
     }
 
     public override void OnDeath()
     {
         foreach(Skill skill in skills) if(skill != null) skill.ForceTermination();
     }
-
-    public override float homingAngle {get; set;} = 20;
-    public override float homingDist {get; set;} = 20;
-    protected override float normalInterval {get; set;} = 0.16f;
 }

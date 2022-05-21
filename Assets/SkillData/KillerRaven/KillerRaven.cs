@@ -46,11 +46,12 @@ public class KillerRaven : SkillAttack
             if(attack.IsOwner)
             {
                 // Activate your own skill.
-                if(attack.homingTargets.Count > 0)
+                if(attack.homingCount > 0)
                 {
                     for(int k = 0; k < raven_count; k ++)
                     {
-                        targets[k] = attack.homingTargets.RandomChoice();
+                        int targetNo = attack.homingTargetNos.RandomChoice();
+                        targets[k] = ParticipantManager.I.fighterInfos[targetNo].body;
                     }
                 }
                 for (int k = 0; k < raven_count; k++)
@@ -80,11 +81,12 @@ public class KillerRaven : SkillAttack
         else
         {
             // Activate your own skill.
-            if (attack.homingTargets.Count > 0)
+            if (attack.homingCount > 0)
             {
                 for (int k = 0; k < raven_count; k++)
                 {
-                    targets[k] = attack.homingTargets.RandomChoice();
+                    int targetNo = attack.homingTargetNos.RandomChoice();
+                    targets[k] = ParticipantManager.I.fighterInfos[targetNo].body;
                 }
             }
             for (int k = 0; k < raven_count; k++)
