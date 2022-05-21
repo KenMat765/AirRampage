@@ -18,7 +18,7 @@ TagManager:
   - UI
   - Terrain
   - SubTarget
-  - Fighter
+  - 
   - RedBody
   - RedBullet
   - RedShield
@@ -27,8 +27,8 @@ TagManager:
   - BlueShield
   - 
   - RadarIcon
-  - 
-  - 
+  - RedFighter
+  - BlueFighter
   - 
   - 
   - 

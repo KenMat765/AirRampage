@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 1251917258261534581}
   - component: {fileID: 4125669331119289531}
   - component: {fileID: 274759092648019185}
-  m_Layer: 8
+  m_Layer: 18
   m_Name: Zako_Blue
   m_TagString: Zako
   m_Icon: {fileID: 0}
@@ -14874,7 +14874,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8052bb9cc6cfd6b4fa3d7c53912c62f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  homingTargets: []
+  homingTargetNos: 
   originalNormalBullet: {fileID: 1373495303151039945}
 --- !u!1001 &1681973692953773609
 PrefabInstance:

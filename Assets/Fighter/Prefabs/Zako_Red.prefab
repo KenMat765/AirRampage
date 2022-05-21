@@ -41,7 +41,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8052bb9cc6cfd6b4fa3d7c53912c62f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  homingTargets: []
+  homingTargetNos: 
   originalNormalBullet: {fileID: 1496223579248026356}
 --- !u!114 &7257167450971413554
 MonoBehaviour:
@@ -9772,7 +9772,7 @@ GameObject:
   - component: {fileID: 7900035918258363030}
   - component: {fileID: 5909817349209890913}
   - component: {fileID: 7835139984554340424}
-  m_Layer: 8
+  m_Layer: 17
   m_Name: Zako_Red
   m_TagString: Zako
   m_Icon: {fileID: 0}
