@@ -38,7 +38,14 @@ public class SpiralStorm : SkillDisturb
                 weapons[GetPrefabIndex()].Activate(target);
 
                 // Send Rpc to your clones.
-                attack.SkillActivatorServerRpc(OwnerClientId, skillNo, target_no);
+                if(IsHost)
+                {
+                    attack.SkillActivatorClientRpc(OwnerClientId, skillNo, target_no);
+                }
+                else
+                {
+                    attack.SkillActivatorServerRpc(OwnerClientId, skillNo, target_no);
+                }
             }
             else
             {

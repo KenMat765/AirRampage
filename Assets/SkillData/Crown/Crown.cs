@@ -66,7 +66,14 @@ class Crown : SkillAttack
                 StartCoroutine(activator(targets));
 
                 // Send Rpc to your clones.
-                attack.SkillActivatorServerRpc(OwnerClientId, skillNo, target_nos);
+                if(IsHost)
+                {
+                    attack.SkillActivatorClientRpc(OwnerClientId, skillNo, target_nos);
+                }
+                else
+                {
+                    attack.SkillActivatorServerRpc(OwnerClientId, skillNo, target_nos);
+                }
             }
             else
             {

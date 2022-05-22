@@ -77,7 +77,14 @@ public class StarGazer : SkillAttack
         if (BattleInfo.isMulti && attack.IsOwner)
         {
             // Send Rpc to your clones.
-            attack.SkillActivatorServerRpc(OwnerClientId, skillNo);
+            if(IsHost)
+            {
+                attack.SkillActivatorClientRpc(OwnerClientId, skillNo);
+            }
+            else
+            {
+                attack.SkillActivatorServerRpc(OwnerClientId, skillNo);
+            }
         }
     }
 

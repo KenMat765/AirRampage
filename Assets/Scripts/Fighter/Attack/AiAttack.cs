@@ -64,7 +64,7 @@ public class AiAttack : Attack
                 NormalRapid(target, rapidCount);
 
                 // If multiplayer, send to all clones to blast bullets.
-                if(BattleInfo.isMulti) NormalRapidServerRpc(OwnerClientId, targetNo, rapidCount);
+                if(BattleInfo.isMulti) NormalRapidClientRpc(OwnerClientId, targetNo, rapidCount);
             }
         }
         else
