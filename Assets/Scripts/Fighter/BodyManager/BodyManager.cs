@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BodyManager : MonoBehaviour, IFighter
+public class BodyManager : MonoBehaviour
 {
     public FighterCondition fighterCondition {get; set;}
 

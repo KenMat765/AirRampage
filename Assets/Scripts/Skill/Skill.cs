@@ -136,8 +136,8 @@ public abstract class Skill : NetworkBehaviour
     /// </Summary>
     protected GameObject TeamPrefabGetter()
     {
-        if(attack.fighterCondition.team == Team.Red) return SkillDatabase.I.SearchSkillByName(this.GetType().Name).GetPrefabRed();
-        else if(attack.fighterCondition.team == Team.Blue) return SkillDatabase.I.SearchSkillByName(this.GetType().Name).GetPrefabBlue();
+        if(attack.fighterCondition.fighterTeam.Value == Team.Red) return SkillDatabase.I.SearchSkillByName(this.GetType().Name).GetPrefabRed();
+        else if(attack.fighterCondition.fighterTeam.Value == Team.Blue) return SkillDatabase.I.SearchSkillByName(this.GetType().Name).GetPrefabBlue();
         else
         {
             Debug.LogError("AttackにTeamが割り当てられていません。ParticipantManagerでAttackにTeamが割り当てられているか確認してください。");

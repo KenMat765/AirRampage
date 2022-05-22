@@ -77,27 +77,27 @@ public abstract class Weapon : Utilities
 
 
     // Receiverに受け渡す要素 /////////////////////////////////////////////////////////////////////////////////////////////
-    public float power_temp {get; protected set;}
+    protected float power_temp {get; private set;}
 
-    public bool speedDown {get; protected set;}
-    public float speedProbability {get; protected set;}
-    public int speedGrade {get; protected set;}
-    public float speedDuration {get; protected set;}
+    protected bool speedDown {get; private set;}
+    protected float speedProbability {get; private set;}
+    protected int speedGrade {get; private set;}
+    protected float speedDuration {get; private set;}
 
-    public bool powerDown {get; protected set;}
-    public float powerProbability {get; protected set;}
-    public int powerGrade {get; protected set;}
-    public float powerDuration {get; protected set;}
+    protected bool powerDown {get; private set;}
+    protected float powerProbability {get; private set;}
+    protected int powerGrade {get; private set;}
+    protected float powerDuration {get; private set;}
 
-    public bool defenceDown {get; protected set;}
-    public float defenceProbability {get; protected set;}
-    public int defenceGrade {get; protected set;}
-    public float defenceDuration {get; protected set;}
+    protected bool defenceDown {get; private set;}
+    protected float defenceProbability {get; private set;}
+    protected int defenceGrade {get; private set;}
+    protected float defenceDuration {get; private set;}
 
 
     // Skillからセット //////////////////////////////////////////////////////////////////////////////////////////////////
-    public GameObject owner;    // owner is figherbody, not Fighter
-    public string skill_name {get; private set;}
+    GameObject owner;    // owner is figherbody, not Fighter
+    string skill_name;
     System.Func<float> StayMotion = null;
     Attack attack;
     [SerializeField] GameObject targetObject = null;
@@ -130,14 +130,14 @@ public abstract class Weapon : Utilities
 
         parent = transform.parent;
 
-        if(attack.fighterCondition.team == Team.Red)
+        if(attack.fighterCondition.fighterTeam.Value == Team.Red)
         {
             gameObject.layer = LayerMask.NameToLayer("RedBullet");
             enemy_body_layer = LayerMask.NameToLayer("BlueBody");
             enemy_shield_layer = LayerMask.NameToLayer("BlueShield");
             enemy_mask = (1 << 12) + (1 << 14);
         }
-        else if(attack.fighterCondition.team == Team.Blue)
+        else if(attack.fighterCondition.fighterTeam.Value == Team.Blue)
         {
             gameObject.layer = LayerMask.NameToLayer("BlueBullet");
             enemy_body_layer = LayerMask.NameToLayer("RedBody");
@@ -218,6 +218,9 @@ public abstract class Weapon : Utilities
             // ヒット：シールド
             if(hit_obj.layer == enemy_shield_layer)
             {
+                // 
+                // 
+                // 
                 hit_obj.GetComponent<ShieldHitDetector>().DecreaseDurability(power_temp);
             }
 
@@ -225,7 +228,36 @@ public abstract class Weapon : Utilities
             // ヒット：ボディ
             else if(hit_obj.layer == enemy_body_layer)
             {
-                hit_obj.GetComponent<Receiver>().Damage(this);
+                // 
+                // 
+                // 
+
+                // Get fighter's Receiver.
+                Receiver receiver = hit_obj.GetComponent<Receiver>();
+
+                // All weapons call this.
+                receiver.ExplosionEffectPlayer();
+
+                if(BattleInfo.isMulti)
+                {
+                    // Only the owner of this weapon requests to server to change parameters.
+                    if (attack.IsOwner)
+                    {
+                        receiver.HPDownServerRpc(power_temp);
+                        if (speedDown) receiver.SpeedDownServerRpc(speedGrade, speedDuration, speedProbability);
+                        if (powerDown) receiver.PowerDownServerRpc(powerGrade, powerDuration, powerProbability);
+                        if (defenceDown) receiver.DefenceDownServerRpc(defenceGrade, defenceDuration, defenceProbability);
+                        if (hit_obj.transform.parent.tag != "Zako") receiver.OnWeaponHitActionServerRpc(attack.fighterCondition.fighterNo.Value, skill_name);
+                    }
+                }
+                else
+                {
+                    receiver.HPDown(power_temp);
+                    if (speedDown) receiver.SpeedDown(speedGrade, speedDuration, speedProbability);
+                    if (powerDown) receiver.PowerDown(powerGrade, powerDuration, powerProbability);
+                    if (defenceDown) receiver.DefenceDown(defenceGrade, defenceDuration, defenceProbability);
+                    if (hit_obj.transform.parent.tag != "Zako") receiver.OnWeaponHitAction(attack.fighterCondition.fighterNo.Value, skill_name);
+                }
             }
         }
 
@@ -271,7 +303,7 @@ public abstract class Weapon : Utilities
 
     public void Activate(GameObject target)
     {
-        power_temp = power * attack.fighterCondition.power.Value;
+        power_temp = power * attack.fighterCondition.power;
         targetObject = target;
         gameObject.SetActive(true);
     }
@@ -408,6 +440,9 @@ public abstract class Weapon : Utilities
                 {
                     if(!alreadyBombed.Contains(hit_obj))
                     {
+                        // 
+                        // 
+                        // 
                         hit_obj.GetComponent<ShieldHitDetector>().DecreaseDurability(power_temp);
                         alreadyBombed.Add(hit.gameObject);
                         alreadyBombed.Add(hit.transform.parent.gameObject);
@@ -421,9 +456,34 @@ public abstract class Weapon : Utilities
                     // まだダメージを与えていない敵だった場合
                     if(!alreadyBombed.Contains(hit_obj))
                     {
-                        Receiver receiver = hit_obj.GetComponent<Receiver>();
-                        receiver.Damage(this);
                         alreadyBombed.Add(hit.gameObject);
+
+                        // Get fighter's Receiver.
+                        Receiver receiver = hit_obj.GetComponent<Receiver>();
+
+                        // All weapons call this.
+                        receiver.ExplosionEffectPlayer();
+
+                        if (BattleInfo.isMulti)
+                        {
+                            // Only the owner of this weapon requests to server to change parameters.
+                            if (attack.IsOwner)
+                            {
+                                receiver.HPDownServerRpc(power_temp);
+                                if (speedDown) receiver.SpeedDownServerRpc(speedGrade, speedDuration, speedProbability);
+                                if (powerDown) receiver.PowerDownServerRpc(powerGrade, powerDuration, powerProbability);
+                                if (defenceDown) receiver.DefenceDownServerRpc(defenceGrade, defenceDuration, defenceProbability);
+                                if (hit_obj.transform.parent.tag != "Zako") receiver.OnWeaponHitActionServerRpc(attack.fighterCondition.fighterNo.Value, skill_name);
+                            }
+                        }
+                        else
+                        {
+                            receiver.HPDown(power_temp);
+                            if (speedDown) receiver.SpeedDown(speedGrade, speedDuration, speedProbability);
+                            if (powerDown) receiver.PowerDown(powerGrade, powerDuration, powerProbability);
+                            if (defenceDown) receiver.DefenceDown(defenceGrade, defenceDuration, defenceProbability);
+                            if (hit_obj.transform.parent.tag != "Zako") receiver.OnWeaponHitAction(attack.fighterCondition.fighterNo.Value, skill_name);
+                        }
                     }
                 }
             }

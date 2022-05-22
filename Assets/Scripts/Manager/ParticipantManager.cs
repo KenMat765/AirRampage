@@ -168,10 +168,6 @@ public class ParticipantManager : NetworkBehaviour
                 // Get battle data at fighterNo.
                 BattleInfo.ParticipantBattleData battleData = BattleInfo.battleDatas[no];
 
-                // Setup fighter condition.
-                fighterCondition.team = battleData.team;
-                // attack.fighterCondition = fighterCondition;    // SkillのGeneratorで使用するが、AttackのStartが遅いため、ParticipantManagerから各Attackに配布する
-
                 // Name fighter
                 fighter.name = battleData.name;
 
@@ -194,22 +190,6 @@ public class ParticipantManager : NetworkBehaviour
                     {
                         attack.skills[skillNo] = null;
                     }
-                }
-            }
-
-            // Only for Zakos
-            else
-            {
-                attack.fighterCondition = fighterCondition;
-                if(no < GameInfo.max_player_count + zakoCount)
-                {
-                    fighterCondition.team = Team.Red;
-                    fighter.name = "ZakoRed" + no.ToString();
-                }
-                else
-                {
-                    fighterCondition.team = Team.Blue;
-                    fighter.name = "ZakoBlue" + no.ToString();
                 }
             }
 
@@ -271,8 +251,11 @@ public class ParticipantManager : NetworkBehaviour
                     fighter = Instantiate(bluePlayerPrefab);
                 }
 
-                // Set fighterNo at fighter condition.
-                fighter.GetComponent<FighterCondition>().fighterNo.Value = battleData.fighterNo;
+                // Set fighterNo & fighterName at fighter condition.
+                FighterCondition fighterCondition = fighter.GetComponent<FighterCondition>();
+                fighterCondition.fighterNo.Value = battleData.fighterNo;
+                fighterCondition.fighterName.Value = battleData.name;
+                fighterCondition.fighterTeam.Value = battleData.team;
 
                 // Spawn fighter.
                 NetworkObject networkObject = fighter.GetComponent<NetworkObject>();
@@ -294,8 +277,11 @@ public class ParticipantManager : NetworkBehaviour
                     fighter = Instantiate(blueAiPrefab);
                 }
 
-                // Set fighterNo at fighter condition.
-                fighter.GetComponent<FighterCondition>().fighterNo.Value = battleData.fighterNo;
+                // Set fighterNo at fighter & team condition.
+                FighterCondition fighterCondition = fighter.GetComponent<FighterCondition>();
+                fighterCondition.fighterNo.Value = battleData.fighterNo;
+                fighterCondition.fighterName.Value = battleData.name;
+                fighterCondition.fighterTeam.Value = battleData.team;
 
                 // Spawn fighter.
                 NetworkObject networkObject = fighter.GetComponent<NetworkObject>();
@@ -316,17 +302,29 @@ public class ParticipantManager : NetworkBehaviour
             // Create fighter.
             GameObject red;
             red = Instantiate(redZakoPrefab);
-            // Set fighterNo at fighter condition.
-            red.GetComponent<FighterCondition>().fighterNo.Value = GameInfo.max_player_count + k;
+
+            // Set fighterNo & fighterName at fighter condition.
+            FighterCondition redCondition = red.GetComponent<FighterCondition>();
+            redCondition.fighterNo.Value = GameInfo.max_player_count + k;
+            redCondition.fighterName.Value = "ZakoRed" + (k + 1);
+            redCondition.fighterTeam.Value = Team.Red;
+
             // Spawn fighter.
             NetworkObject redNet = red.GetComponent<NetworkObject>();
             redNet.Spawn();
 
+
             // Create fighter.
             GameObject blue;
             blue = Instantiate(blueZakoPrefab);
-            // Set fighterNo at fighter condition.
-            blue.GetComponent<FighterCondition>().fighterNo.Value = GameInfo.max_player_count + k + zakoCount;
+
+            // Set fighterNo & fighterName & team at fighter condition.
+            FighterCondition blueCondition = blue.GetComponent<FighterCondition>();
+            blueCondition.fighterNo.Value = GameInfo.max_player_count + k + zakoCount;
+            blueCondition.fighterName.Value = "ZakoBlue" + (k + 1);
+            blueCondition.fighterTeam.Value = Team.Blue;
+
+
             // Spawn fighter.
             NetworkObject blueNet = blue.GetComponent<NetworkObject>();
             blueNet.Spawn();

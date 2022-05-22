@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using Unity.Netcode;
-using NaughtyAttributes;
+using Unity.Collections;
 
 // Fighterの状態を保持するクラス
 // このクラスのプロパティをもとに、Movement、Attack、Receiverを動かす
@@ -15,14 +15,46 @@ public abstract class FighterCondition : NetworkBehaviour
         deadEffect = explosionDead_obj.GetComponent<ParticleSystem>();
         deadSound = explosionDead_obj.GetComponent<AudioSource>();
 
-        // Only the owner of this fighter initializes variables,
-        // because HP & power is linked among clones, and speed & defence is not reffered by clones.
-        if(BattleInfo.isMulti && !IsOwner) return;
+        if(BattleInfo.isMulti)
+        {
+            // HP is NetworkVariable, which means only the server can change its value.
+            if(IsHost)
+            {
+                HPResetter();
+            }
 
-        HPResetter();
-        SpeedResetter();
-        PowerResetter();
-        DefenceResetter();
+            // Only the owner refers to speed, defence, and power.
+            if(IsOwner)
+            {
+                SpeedResetter();
+                PowerResetter();
+                DefenceResetter();
+            }
+        }
+        else
+        {
+            HPResetter();
+            SpeedResetter();
+            PowerResetter();
+            DefenceResetter();
+        }
+    }
+
+    void Start()
+    {
+        HP.OnValueChanged += OnHPChangedAction;
+    }
+
+    private void OnHPChangedAction(float previousValue, float newValue)
+    {
+        if(gameObject.tag == "Zako") return;
+        uGUIMannager.I.HPDecreaser_UI(fighterNo.Value, newValue.Normalize(0, default_HP));
+    }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+        if(HP.OnValueChanged != null) HP.OnValueChanged -= OnHPChangedAction;
     }
 
     void Update()
@@ -61,8 +93,9 @@ public abstract class FighterCondition : NetworkBehaviour
 
 
     // ParticipantManagerからセット ///////////////////////////////////////////////////////////////////////////////////
-    public NetworkVariable<int> fighterNo = new NetworkVariable<int>();   // How many participant is this fighter (0 ~ 7)
-    public Team team {get; set;}
+    public NetworkVariable<int> fighterNo = new NetworkVariable<int>();   // How many participant is this fighter.
+    public NetworkVariable<FixedString32Bytes> fighterName = new NetworkVariable<FixedString32Bytes>();
+    public NetworkVariable<Team> fighterTeam = new NetworkVariable<Team>();
 
 
 
@@ -77,7 +110,7 @@ public abstract class FighterCondition : NetworkBehaviour
 
     // Decreaser is called only from the owner.
     // Only the owner of this fighter should call this in Repair Device.
-    public virtual void HPDecreaser(float deltaHP)    // HPを増加させたい場合は、deltaHP < 0 とする
+    public void HPDecreaser(float deltaHP)    // HPを増加させたい場合は、deltaHP < 0 とする
     {
         HP.Value -= deltaHP;
         HP.Value = Mathf.Clamp(HP.Value, 0, default_HP);
@@ -89,7 +122,7 @@ public abstract class FighterCondition : NetworkBehaviour
     // Only reffered by owner. (Movement)
     public float speed {get; private set;}
     // Reffered in every clients. (Weapon.Activate)
-    public NetworkVariable<float> power {get; private set;} = new NetworkVariable<float>();
+    public float power {get; private set;}
     // Only reffered by owner. (Receiver.Damage)
     public float defence {get; private set;}
 
@@ -170,7 +203,7 @@ public abstract class FighterCondition : NetworkBehaviour
     }
     void PowerResetter()
     {
-        power.Value = defaultPower;
+        power = defaultPower;
         pausing_power = false;
         power_grade = 0;
         power_duration = 0;
@@ -240,7 +273,7 @@ public abstract class FighterCondition : NetworkBehaviour
         float end_speed = defaultSpeed * magnif;
         DOTween.To(() => speed, (x) => speed = x, end_speed, duration);
     }
-    void PowerMultiplier(float magnif) => power.Value = defaultPower * magnif;
+    void PowerMultiplier(float magnif) => power = defaultPower * magnif;
     void DefenceMultiplier(float magnif) => defence = defaultDefence * magnif;
 
 
@@ -302,7 +335,7 @@ public abstract class FighterCondition : NetworkBehaviour
     {
         if(BattleInfo.isMulti && !IsOwner) return;
         pausing_power = true;
-        power.Value = power_temp;
+        power = power_temp;
     }
     public void ResumeGradingPower()
     {
@@ -332,14 +365,14 @@ public abstract class FighterCondition : NetworkBehaviour
     AudioSource deadSound;
     
     // Should be called on every clients.
-    protected virtual void Death()
+    protected virtual void Death(int destroyerNo, string destroyerSkillName)
     {
         deadEffect.Play();
         deadSound.Play();
 
         movement.OnDeath();
         attack.OnDeath();
-        receiver.OnDeath();
+        receiver.OnDeath(destroyerNo, destroyerSkillName);
         bodyManager.OnDeath();
     }
 
@@ -351,26 +384,39 @@ public abstract class FighterCondition : NetworkBehaviour
         receiver.OnRevival();
         bodyManager.OnRevival();
 
-        // Only the owner of this fighter needs to initializes variables.
-        if(BattleInfo.isMulti && !IsOwner) return;
-
-        HPResetter();
-        SpeedResetter();
-        PowerResetter();
-        DefenceResetter();
+        if(BattleInfo.isMulti)
+        {
+            if(IsHost)
+            {
+                HPResetter();
+            }
+            if (IsOwner)
+            {
+                SpeedResetter();
+                PowerResetter();
+                DefenceResetter();
+            }
+        }
+        else
+        {
+            HPResetter();
+            SpeedResetter();
+            PowerResetter();
+            DefenceResetter();
+        }
     }
 
     [ServerRpc]
-    void DeathServerRpc(ulong senderId)
+    void DeathServerRpc(ulong senderId, int destroyerNo, string destroyerSkillName)
     {
-        DeathClientRpc(senderId);
+        DeathClientRpc(senderId, destroyerNo, destroyerSkillName);
     }
 
     [ClientRpc]
-    void DeathClientRpc(ulong senderId)
+    void DeathClientRpc(ulong senderId, int destroyerNo, string destroyerSkillName)
     {
         if(NetworkManager.Singleton.LocalClientId == senderId) return;
-        Death();
+        Death(destroyerNo, destroyerSkillName);
     }
 
     [ServerRpc]
@@ -395,11 +441,11 @@ public abstract class FighterCondition : NetworkBehaviour
             if(!isDead)
             {
                 isDead = true;
-                Death();
+                Death(receiver.lastShooterNo, receiver.lastSkillName);
                 if(BattleInfo.isMulti)
                 {
-                    if(IsHost) DeathClientRpc(OwnerClientId);
-                    else DeathServerRpc(OwnerClientId);
+                    if(IsHost) DeathClientRpc(OwnerClientId, receiver.lastShooterNo, receiver.lastSkillName);
+                    else DeathServerRpc(OwnerClientId, receiver.lastShooterNo, receiver.lastSkillName);
                 }
             }
             else

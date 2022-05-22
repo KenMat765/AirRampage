@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using Unity.Netcode;
 
-public abstract class Attack : NetworkBehaviour, IFighter
+public abstract class Attack : NetworkBehaviour
 {
     // 各武器の生成時に値を追加していく
     // ゲーム中に動的に生成される武器も存在するので、Attackからまとめて取得することはしない
@@ -61,8 +61,8 @@ public abstract class Attack : NetworkBehaviour, IFighter
     void SetLayerInteggers()
     {
         // Set Fighter-Root's layer to enemy_mask.
-        if(fighterCondition.team == Team.Red) enemy_mask = 1 << 18;
-        else if(fighterCondition.team == Team.Blue) enemy_mask = 1 << 17;
+        if(fighterCondition.fighterTeam.Value == Team.Red) enemy_mask = 1 << 18;
+        else if(fighterCondition.fighterTeam.Value == Team.Blue) enemy_mask = 1 << 17;
         else Debug.LogError("Team not set at FighterCondition");
     }
 

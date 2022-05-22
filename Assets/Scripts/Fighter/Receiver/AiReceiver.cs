@@ -36,18 +36,18 @@ public class AiReceiver : Receiver
 
 
     // Must be called on every clients.
-    public override void OnDeath()
+    public override void OnDeath(int destroyerNo, string destroyerSkillName)
     {
-        string destroyer_name = lastShooterName.Value.ToString();
-        string my_name = gameObject.transform.parent.name;
+        string destroyer_name = ParticipantManager.I.fighterInfos[destroyerNo].fighter.name;
+        string my_name = fighterCondition.fighterName.Value.ToString();
 
         Color arrowColor;
-        if(fighterCondition.team == Team.Red) arrowColor = Color.blue;
+        if(fighterCondition.fighterTeam.Value == Team.Red) arrowColor = Color.blue;
         else arrowColor = Color.red;
 
         Sprite skill_sprite;
-        if(lastSkillName.Value == "NormalBlast") skill_sprite = null;
-        else skill_sprite = SkillDatabase.I.SearchSkillByName(lastSkillName.Value.ToString()).GetSprite();
+        if(destroyerSkillName == "NormalBlast") skill_sprite = null;
+        else skill_sprite = SkillDatabase.I.SearchSkillByName(destroyerSkillName.ToString()).GetSprite();
 
         uGUIMannager.I.BookRepo(destroyer_name, my_name, arrowColor, skill_sprite);
 
@@ -56,22 +56,9 @@ public class AiReceiver : Receiver
 
 
     // Damage ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Link these strings, because all clients uses these to show destroy repo when killed.
-    NetworkVariable<FixedString32Bytes> lastShooterName = new NetworkVariable<FixedString32Bytes>();
-    NetworkVariable<FixedString32Bytes> lastSkillName = new NetworkVariable<FixedString32Bytes>();
-
-    // Damage is called only from every clones.
-    // Filtering is neccesarry in order to be called only from the owner of this fighter (= Host).
-    public override void Damage(Weapon weapon)
+    public override void OnWeaponHitAction(int fighterNo, string skillName)
     {
-        base.Damage(weapon);
-
-        if(BattleInfo.isMulti && !IsHost) return;
-
-        lastShooterName.Value = weapon.owner.transform.root.name;
-        lastSkillName.Value = weapon.skill_name;
-
-        // Shooterを検知
+        base.OnWeaponHitAction(fighterNo, skillName);
         if(!underAttack)
         {
             hitTimer = 5;
@@ -79,7 +66,7 @@ public class AiReceiver : Receiver
             if(hitBulletCount > 10)
             {
                 underAttack = true;
-                currentShooter = weapon.owner;
+                currentShooter = ParticipantManager.I.fighterInfos[fighterNo].body;
                 hitTimer = 7;
             }
         }
@@ -89,7 +76,6 @@ public class AiReceiver : Receiver
             hitTimer = 7;
         }
     }
-
 
 
     // Detect Shooter ///////////////////////////////////////////////////////////////////////////////////////////////

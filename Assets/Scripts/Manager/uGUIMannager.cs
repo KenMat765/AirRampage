@@ -87,7 +87,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
         Image[] team_icons = HP_objects.Select(h => h.transform.Find("Team").GetComponent<Image>()).ToArray();
         for(int id = 0; id < GameInfo.max_player_count; id++)
         {
-            Team team = ParticipantManager.I.fighterInfos[id].fighterCondition.team;
+            Team team = ParticipantManager.I.fighterInfos[id].fighterCondition.fighterTeam.Value;
             if(team == Team.Red) team_icons[id].color = Color.red;
             else if(team == Team.Blue) team_icons[id].color = Color.blue;
             else Debug.LogError("fighterinfoにTeam情報が入っていません");

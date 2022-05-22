@@ -5,7 +5,7 @@ using UnityEngine;
 using Unity.Netcode;
 
 // 機体を動かすクラス
-public abstract class Movement : NetworkBehaviour, IFighter
+public abstract class Movement : NetworkBehaviour
 {
     public FighterCondition fighterCondition {get; set;}
 
