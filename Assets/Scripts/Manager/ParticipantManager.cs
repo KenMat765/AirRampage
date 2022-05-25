@@ -201,10 +201,11 @@ public class ParticipantManager : NetworkBehaviour
             // 
             // 
             // 
-            if(no == 3)
-            {
-                fighter.transform.Find("Kari Camera").gameObject.SetActive(true);
-            }
+            // For AI Debug.
+            // if(no == 3)
+            // {
+            //     fighter.transform.Find("Kari Camera").gameObject.SetActive(true);
+            // }
         }
 
 

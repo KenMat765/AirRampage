@@ -14,7 +14,10 @@ public abstract class FighterCondition : NetworkBehaviour
         GameObject explosionDead_obj = transform.Find("ExplosionDead").gameObject;
         deadEffect = explosionDead_obj.GetComponent<ParticleSystem>();
         deadSound = explosionDead_obj.GetComponent<AudioSource>();
+    }
 
+    protected virtual void Start()
+    {
         if(BattleInfo.isMulti)
         {
             // HP is NetworkVariable, which means only the server can change its value.
@@ -38,10 +41,6 @@ public abstract class FighterCondition : NetworkBehaviour
             PowerResetter();
             DefenceResetter();
         }
-    }
-
-    void Start()
-    {
         HP.OnValueChanged += OnHPChangedAction;
     }
 
@@ -120,11 +119,11 @@ public abstract class FighterCondition : NetworkBehaviour
 
     // Speed, Power, Defence ////////////////////////////////////////////////////////////////////////////////////////
     // Only reffered by owner. (Movement)
-    public float speed {get; private set;}
+    public float speed;
     // Reffered in every clients. (Weapon.Activate)
-    public float power {get; private set;}
+    public float power;
     // Only reffered by owner. (Receiver.Damage)
-    public float defence {get; private set;}
+    public float defence;
 
     // Only reffered by owner.
     public int speed_grade {get; private set;}

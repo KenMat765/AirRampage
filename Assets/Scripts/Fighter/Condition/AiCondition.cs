@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class AiCondition : FighterCondition
 {
-    void Start()
+    protected override void Start()
     {
+        base.Start();
         uGUIMannager.I.ResetHP_UI(fighterNo.Value);
     }
     

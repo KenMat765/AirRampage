@@ -59,7 +59,7 @@ public abstract class Movement : NetworkBehaviour
 
     protected virtual void UpdateTrans() { myPos = transform.position; myRot = transform.rotation; }
 
-    void MoveForward()
+    protected void MoveForward()
     {
         float speed = fighterCondition.speed;
         transform.position = Vector3.MoveTowards(

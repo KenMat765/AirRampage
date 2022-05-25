@@ -16,6 +16,21 @@ public class PlayerMovement : Movement
         rollTime = rac.animationClips.Where(a => a.name == "RightRole").Select(b => b.length).ToArray()[0];
     }
 
+    protected override void FixedUpdate()
+    {
+        UpdateTrans();
+
+        // Only the owner can controll fighter.
+        if(BattleInfo.isMulti && !IsOwner) return;
+
+        // Don't move when dead.
+        if(fighterCondition.isDead) return;
+
+        MoveForward();
+        Rotate();
+        FourActionExe();
+    }
+
 
 
     public override void OnRevival()
