@@ -25,18 +25,22 @@ public class RepairDevice : SkillHeal
 
     public override void Activator(int[] transfer = null)
     {
-        base.Activator();
-        MeterDecreaser();
         effect.Play();
 
         // Decreaser must be called from the owner of this fighter only, because HP is linked among all clients.
         if(BattleInfo.isMulti && !attack.IsOwner) return;
+
+        base.Activator();
+        MeterDecreaser();
         attack.fighterCondition.HPDecreaser(-repair_amount);
     }
 
     public override void ForceTermination()
     {
-        base.ForceTermination();
         effect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+
+        if(BattleInfo.isMulti && !attack.IsOwner) return;
+
+        base.ForceTermination();
     }
 }

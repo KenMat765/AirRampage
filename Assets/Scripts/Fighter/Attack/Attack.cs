@@ -174,6 +174,7 @@ public abstract class Attack : NetworkBehaviour
 
     // Declared here because Skill cannnot call RPCs. (they are attached AFTER fighters are spawned)
     [ServerRpc]
+    /// <Param name="targetNos">Used for attack & disturb skills to send target fighter numbers.</Param>
     public void SkillActivatorServerRpc(ulong senderId, int skillNo, int[] targetNos = null)
     {
         SkillActivatorClientRpc(senderId, skillNo, targetNos);
@@ -184,5 +185,18 @@ public abstract class Attack : NetworkBehaviour
     {
         if(NetworkManager.Singleton.LocalClientId == senderId) return;
         skills[skillNo].Activator(targetNos);
+    }
+
+    [ServerRpc]
+    public void SkillEndProccessServerRpc(ulong senderId, int skillNo)
+    {
+        SkillEndProccessClientRpc(senderId, skillNo);
+    }
+
+    [ClientRpc]
+    public void SkillEndProccessClientRpc(ulong senderId, int skillNo)
+    {
+        if(NetworkManager.Singleton.LocalClientId == senderId) return;
+        skills[skillNo].EndProccess();
     }
 }

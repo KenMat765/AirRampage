@@ -27,18 +27,22 @@ public class OffenceTuner : SkillAssist
 
     public override void Activator(int[] transfer = null)
     {
-        base.Activator();
-        MeterDecreaser(duration);
         effect.Play();
 
         // Grader must be called from the owner of this fighter only.
         if(BattleInfo.isMulti && !attack.IsOwner) return;
+
+        base.Activator();
+        MeterDecreaser(duration);
         attack.fighterCondition.PowerGrader(power_grade, duration);
     }
 
     public override void ForceTermination()
     {
-        base.ForceTermination();
         effect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+
+        if(BattleInfo.isMulti && !attack.IsOwner) return;
+
+        base.ForceTermination();
     }
 }

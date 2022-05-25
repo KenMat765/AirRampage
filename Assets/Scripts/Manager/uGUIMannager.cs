@@ -341,7 +341,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
                 skill_btns[k].onClick.AddListener(() =>
                 {
                     skill_btns[m].interactable = false;
-                    playerInfo.attack.skills[m].Activator(null);
+                    playerInfo.attack.skills[m].Activator();
                 });
             }
         }
