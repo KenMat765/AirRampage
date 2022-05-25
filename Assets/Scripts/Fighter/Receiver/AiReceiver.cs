@@ -56,9 +56,9 @@ public class AiReceiver : Receiver
 
 
     // Damage ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    public override void OnWeaponHitAction(int fighterNo, string skillName)
+    public override void LastShooterDetector(int fighterNo, string skillName)
     {
-        base.OnWeaponHitAction(fighterNo, skillName);
+        base.LastShooterDetector(fighterNo, skillName);
         if(!underAttack)
         {
             hitTimer = 5;

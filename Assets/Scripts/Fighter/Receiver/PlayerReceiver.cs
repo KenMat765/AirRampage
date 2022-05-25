@@ -20,9 +20,9 @@ public class PlayerReceiver : Receiver
         uGUIMannager.I.BookRepo(destroyer_name, my_name, arrowColor, skill_sprite);
     }
 
-    public override void OnWeaponHitAction(int fighterNo, string skillName)
+    public override void LastShooterDetector(int fighterNo, string skillName)
     {
-        base.OnWeaponHitAction(fighterNo, skillName);
+        base.LastShooterDetector(fighterNo, skillName);
         uGUIMannager.I.ScreenColorSetter(new Color(1,0,0,0.1f));
     }
 }

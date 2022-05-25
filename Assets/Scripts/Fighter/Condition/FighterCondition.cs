@@ -20,19 +20,12 @@ public abstract class FighterCondition : NetworkBehaviour
     {
         if(BattleInfo.isMulti)
         {
-            // HP is NetworkVariable, which means only the server can change its value.
-            if(IsHost)
-            {
-                HPResetter();
-            }
-
-            // Only the owner refers to speed, defence, and power.
-            if(IsOwner)
-            {
-                SpeedResetter();
-                PowerResetter();
-                DefenceResetter();
-            }
+            // Only the owner refers to HP, speed, defence, and power.
+            if(!IsOwner) return;
+            HPResetter();
+            SpeedResetter();
+            PowerResetter();
+            DefenceResetter();
         }
         else
         {
@@ -41,19 +34,12 @@ public abstract class FighterCondition : NetworkBehaviour
             PowerResetter();
             DefenceResetter();
         }
-        HP.OnValueChanged += OnHPChangedAction;
     }
 
     private void OnHPChangedAction(float previousValue, float newValue)
     {
         if(gameObject.tag == "Zako") return;
         uGUIMannager.I.HPDecreaser_UI(fighterNo.Value, newValue.Normalize(0, default_HP));
-    }
-
-    public override void OnDestroy()
-    {
-        base.OnDestroy();
-        if(HP.OnValueChanged != null) HP.OnValueChanged -= OnHPChangedAction;
     }
 
     void Update()
@@ -99,20 +85,33 @@ public abstract class FighterCondition : NetworkBehaviour
 
 
     // HP ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // HP link is neccesarry, because each clones must update its own HP Bar UI.
-    public NetworkVariable<float> HP = new NetworkVariable<float>();
+    // Only the owner of this fighter knows HP.
+    public float HP;
     public abstract float default_HP {get; set;}
     public bool isDead {get; private set;}
 
     // Only the owner of this fighter initializes HP, because HP is linked among all clones.
-    void HPResetter() => HP.Value = default_HP;
+    void HPResetter() => HP = default_HP;
 
     // Decreaser is called only from the owner.
     // Only the owner of this fighter should call this in Repair Device.
-    public void HPDecreaser(float deltaHP)    // HPを増加させたい場合は、deltaHP < 0 とする
+    public virtual void HPDecreaser(float deltaHP)    // HPを増加させたい場合は、deltaHP < 0 とする
     {
-        HP.Value -= deltaHP;
-        HP.Value = Mathf.Clamp(HP.Value, 0, default_HP);
+        HP -= deltaHP;
+        HP = Mathf.Clamp(HP, 0, default_HP);
+    }
+
+    [ServerRpc]
+    public void HpDecreaser_UIServerRPC(float curHp)
+    {
+        float normHp = curHp.Normalize(0, default_HP);
+        HpDecreaser_UIClientRPC(normHp);
+    }
+
+    [ClientRpc]
+    public void HpDecreaser_UIClientRPC(float normHp)
+    {
+        uGUIMannager.I.HPDecreaser_UI(fighterNo.Value, normHp);
     }
 
 
@@ -434,8 +433,7 @@ public abstract class FighterCondition : NetworkBehaviour
     // Only the owner should call this.
     void DeathJudger()
     {
-        // HP is linked among all clients.
-        if(HP.Value <= 0)
+        if(HP <= 0)
         {
             if(!isDead)
             {

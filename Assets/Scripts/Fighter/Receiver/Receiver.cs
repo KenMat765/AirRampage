@@ -36,21 +36,24 @@ public class Receiver : NetworkBehaviour
     public int lastShooterNo {get; private set;}
     public string lastSkillName {get; private set;}
 
-    public virtual void OnWeaponHitAction(int fighterNo, string skillName)
+    public virtual void LastShooterDetector(int fighterNo, string skillName)
     {
         lastShooterNo = fighterNo;
         lastSkillName = skillName;
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void OnWeaponHitActionServerRpc(int fighterNo, string skillName)
+    public void LastShooterDetectorServerRpc(int fighterNo, string skillName)
     {
-        if(IsOwner) OnWeaponHitAction(fighterNo, skillName);
-        else OnWeaponHitActionClientRpc(fighterNo, skillName);
+        if(IsOwner) LastShooterDetector(fighterNo, skillName);
+        else LastShooterDetectorClientRpc(fighterNo, skillName);
     }
 
     [ClientRpc]
-    void OnWeaponHitActionClientRpc(int fighterNo, string skillName) { if(IsOwner) OnWeaponHitAction(fighterNo, skillName); }
+    void LastShooterDetectorClientRpc(int fighterNo, string skillName)
+    {
+        if(IsOwner) LastShooterDetector(fighterNo, skillName);
+    }
 
 
     // HPDown is always called from weapon.
@@ -80,7 +83,11 @@ public class Receiver : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void HPDownServerRpc(float power) => HPDown(power);
+    public void HPDownServerRpc(float power)
+    {
+        if(IsOwner) HPDown(power);
+        else HPDownClientRpc(power);
+    }
 
     [ServerRpc(RequireOwnership = false)]
     public void SpeedDownServerRpc(int speedGrade, float speedDuration, float speedProbability)
@@ -102,6 +109,9 @@ public class Receiver : NetworkBehaviour
         if(IsOwner) DefenceDown(defenceGrade, defenceDuration, defenceProbability);
         else DefenceDownClientRpc(defenceGrade, defenceDuration, defenceProbability);
     }
+
+    [ClientRpc]
+    public void HPDownClientRpc(float power) { if(IsOwner) HPDown(power); }
 
     [ClientRpc]
     public void SpeedDownClientRpc(int speedGrade, float speedDuration, float speedProbability) { if(IsOwner) SpeedDown(speedGrade, speedDuration, speedProbability); }

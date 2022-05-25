@@ -111,7 +111,7 @@ public class AiAttack : Attack
                     // 自分の状態に応じて分岐
                     if(skillData.GetName() == "RepairDevice")
                     {
-                        if(fighterCondition.HP.Value < fighterCondition.default_HP/2)
+                        if(fighterCondition.HP < fighterCondition.default_HP/2)
                         {
                             skillToActivate = skill;
                             acitivateInCloneImmediate = true;

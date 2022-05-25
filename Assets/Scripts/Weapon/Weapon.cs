@@ -241,7 +241,7 @@ public abstract class Weapon : Utilities
                         if (speedDown) receiver.SpeedDownServerRpc(speedGrade, speedDuration, speedProbability);
                         if (powerDown) receiver.PowerDownServerRpc(powerGrade, powerDuration, powerProbability);
                         if (defenceDown) receiver.DefenceDownServerRpc(defenceGrade, defenceDuration, defenceProbability);
-                        if (hit_obj.transform.parent.tag != "Zako") receiver.OnWeaponHitActionServerRpc(attack.fighterCondition.fighterNo.Value, skill_name);
+                        if (hit_obj.transform.parent.tag != "Zako") receiver.LastShooterDetectorServerRpc(attack.fighterCondition.fighterNo.Value, skill_name);
                     }
                 }
                 else
@@ -250,7 +250,7 @@ public abstract class Weapon : Utilities
                     if (speedDown) receiver.SpeedDown(speedGrade, speedDuration, speedProbability);
                     if (powerDown) receiver.PowerDown(powerGrade, powerDuration, powerProbability);
                     if (defenceDown) receiver.DefenceDown(defenceGrade, defenceDuration, defenceProbability);
-                    if (hit_obj.transform.parent.tag != "Zako") receiver.OnWeaponHitAction(attack.fighterCondition.fighterNo.Value, skill_name);
+                    if (hit_obj.transform.parent.tag != "Zako") receiver.LastShooterDetector(attack.fighterCondition.fighterNo.Value, skill_name);
                 }
             }
         }
@@ -465,7 +465,7 @@ public abstract class Weapon : Utilities
                                 if (speedDown) receiver.SpeedDownServerRpc(speedGrade, speedDuration, speedProbability);
                                 if (powerDown) receiver.PowerDownServerRpc(powerGrade, powerDuration, powerProbability);
                                 if (defenceDown) receiver.DefenceDownServerRpc(defenceGrade, defenceDuration, defenceProbability);
-                                if (hit_obj.transform.parent.tag != "Zako") receiver.OnWeaponHitActionServerRpc(attack.fighterCondition.fighterNo.Value, skill_name);
+                                if (hit_obj.transform.parent.tag != "Zako") receiver.LastShooterDetectorServerRpc(attack.fighterCondition.fighterNo.Value, skill_name);
                             }
                         }
                         else
@@ -474,7 +474,7 @@ public abstract class Weapon : Utilities
                             if (speedDown) receiver.SpeedDown(speedGrade, speedDuration, speedProbability);
                             if (powerDown) receiver.PowerDown(powerGrade, powerDuration, powerProbability);
                             if (defenceDown) receiver.DefenceDown(defenceGrade, defenceDuration, defenceProbability);
-                            if (hit_obj.transform.parent.tag != "Zako") receiver.OnWeaponHitAction(attack.fighterCondition.fighterNo.Value, skill_name);
+                            if (hit_obj.transform.parent.tag != "Zako") receiver.LastShooterDetector(attack.fighterCondition.fighterNo.Value, skill_name);
                         }
                     }
                 }
