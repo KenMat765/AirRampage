@@ -6,7 +6,7 @@ public class PlayerReceiver : Receiver
 {
     public override void OnDeath(int destroyerNo, string destroyerSkillName)
     {
-        string destroyer_name = ParticipantManager.I.fighterInfos[destroyerNo].fighter.name;
+        string destroyer_name = ParticipantManager.I.fighterInfos[destroyerNo].fighterCondition.fighterName.Value.ToString();
         string my_name = fighterCondition.fighterName.Value.ToString();
 
         Color arrowColor;

@@ -159,6 +159,7 @@ public abstract class Attack : NetworkBehaviour
     }
 
     [ServerRpc]
+    /// <Param name="targetNo">Send -1 if there is no target.</Param>
     protected void NormalRapidServerRpc(ulong senderId, int targetNo, int rapidCount)
     {
         NormalRapidClientRpc(senderId, targetNo, rapidCount);
@@ -168,7 +169,8 @@ public abstract class Attack : NetworkBehaviour
     protected void NormalRapidClientRpc(ulong senderId, int targetNo, int bulletCount)
     {
         if(NetworkManager.Singleton.LocalClientId == senderId) return;
-        GameObject target = ParticipantManager.I.fighterInfos[targetNo].body;
+        GameObject target = null;
+        if(targetNo != -1) target = ParticipantManager.I.fighterInfos[targetNo].body;
         NormalRapid(target, bulletCount);
     }
 

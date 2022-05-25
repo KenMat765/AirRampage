@@ -24,16 +24,17 @@ public class PlayerAttack : Attack
                 blastTimer = setInterval;
 
                 // Determine target.
-                int? targetNo = null;
+                int targetNo = -1;
                 if(homingCount > 0) targetNo = homingTargetNos[0];
+
                 GameObject target = null;
-                if(targetNo.HasValue) target = ParticipantManager.I.fighterInfos[(int)targetNo].body;
+                if(targetNo != -1) target = ParticipantManager.I.fighterInfos[targetNo].body;
 
                 // Blast normal bullets for yourself.
                 NormalRapid(target, rapidCount);
 
                 // If multiplayer, send to all clones to blast bullets.
-                if(BattleInfo.isMulti) NormalRapidServerRpc(OwnerClientId, (int)targetNo, rapidCount);
+                if(BattleInfo.isMulti) NormalRapidServerRpc(OwnerClientId, targetNo, rapidCount);
             }
         }
         else

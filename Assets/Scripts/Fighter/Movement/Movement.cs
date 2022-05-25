@@ -12,9 +12,16 @@ public abstract class Movement : NetworkBehaviour
     // Only the owner needs to call this.
     public virtual void OnDeath()
     {
+        ready4action = false;
+        StartCoroutine(ReturnToStartPos());
+    }
+
+    IEnumerator ReturnToStartPos()
+    {
+        // 1.6f : effect play time of explosion dead.
+        yield return new WaitForSeconds(1.6f);
         transform.position = start_pos;
         transform.rotation = start_rot;
-        ready4action = false;
     }
 
     // Must be called on every clients.

@@ -384,12 +384,9 @@ public abstract class FighterCondition : NetworkBehaviour
 
         if(BattleInfo.isMulti)
         {
-            if(IsHost)
-            {
-                HPResetter();
-            }
             if (IsOwner)
             {
+                HPResetter();
                 SpeedResetter();
                 PowerResetter();
                 DefenceResetter();
