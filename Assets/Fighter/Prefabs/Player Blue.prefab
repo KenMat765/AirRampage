@@ -89,8 +89,47 @@ MonoBehaviour:
   bodyManager: {fileID: 4584923100492789350}
   fighterNo:
     m_InternalValue: 0
-  HP:
+  fighterName:
+    m_InternalValue:
+      utf8LengthInBytes: 0
+      bytes:
+        offset0000:
+          byte0000: 0
+          byte0001: 0
+          byte0002: 0
+          byte0003: 0
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        byte0016: 0
+        byte0017: 0
+        byte0018: 0
+        byte0019: 0
+        byte0020: 0
+        byte0021: 0
+        byte0022: 0
+        byte0023: 0
+        byte0024: 0
+        byte0025: 0
+        byte0026: 0
+        byte0027: 0
+        byte0028: 0
+        byte0029: 0
+  fighterTeam:
     m_InternalValue: 0
+  HP: 0
+  speed: 0
+  power: 0
+  defence: 0
   defaultSpeed: 5
   defaultPower: 1
   defaultDefence: 1
@@ -350,7 +389,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b9cb073dcc284db081efaa20e28b6df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  homingTargets: []
+  homingTargetNos: 
   originalNormalBullet: {fileID: 7330483647436428063}
 --- !u!114 &4584923100492789350
 MonoBehaviour:
@@ -434,7 +473,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8663709310248609906
 Transform:
   m_ObjectHideFlags: 0

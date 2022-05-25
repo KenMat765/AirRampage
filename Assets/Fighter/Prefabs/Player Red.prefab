@@ -18,7 +18,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1620561658
 Transform:
   m_ObjectHideFlags: 0
@@ -516,8 +516,10 @@ MonoBehaviour:
         byte0029: 0
   fighterTeam:
     m_InternalValue: 0
-  HP:
-    m_InternalValue: 0
+  HP: 0
+  speed: 0
+  power: 0
+  defence: 0
   defaultSpeed: 5
   defaultPower: 1
   defaultDefence: 1

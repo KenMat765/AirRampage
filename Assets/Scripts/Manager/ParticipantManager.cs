@@ -144,6 +144,8 @@ public class ParticipantManager : NetworkBehaviour
         cameraRoot.SetActive(true);
         uGUIMannager.I.SetPlayerCamera(playerCam);
         CameraManager.SetupCameraInScene();
+        GameObject cameraRadar = myPlayer.transform.Find("CameraRadar").gameObject;
+        cameraRadar.SetActive(true);
 
 
         // Process for all fighters /////////////////////////////////////////////////////////////////////////
