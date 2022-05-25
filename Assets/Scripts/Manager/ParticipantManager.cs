@@ -101,7 +101,8 @@ public class ParticipantManager : NetworkBehaviour
         else
         {
             // Generate your fighter
-            myPlayer = Instantiate(redPlayerPrefab);
+            SpawnPoint myPoint = SpawnPoints.GetSpawnPoint(0);
+            myPlayer = Instantiate(redPlayerPrefab, myPoint.transform.position, myPoint.transform.rotation);
             allFighters[0] = myPlayer;
             myPlayer.GetComponent<FighterCondition>().fighterNo.Value = 0;
             myFighterNo = 0;
@@ -109,27 +110,47 @@ public class ParticipantManager : NetworkBehaviour
             // Generate AIs
             for(int no = 1; no < GameInfo.max_player_count; no ++)
             {
+                Team team = GameInfo.GetTeamFromNo(no);
+                SpawnPoint point = SpawnPoints.GetSpawnPoint(no);
                 GameObject aiFighter;
-                if(no < GameInfo.max_player_count/2 - 1)
+                if(team == Team.Red)
                 {
-                    aiFighter = Instantiate(redAiPrefab);
+                    aiFighter = Instantiate(redAiPrefab, point.transform.position, point.transform.rotation);
                 }
                 else
                 {
-                    aiFighter = Instantiate(blueAiPrefab);
+                    aiFighter = Instantiate(blueAiPrefab, point.transform.position, point.transform.rotation);
                 }
                 allFighters[no] = aiFighter;
                 aiFighter.GetComponent<FighterCondition>().fighterNo.Value = no;
             }
 
             // Generate Zakos
+            int red_pointNo = 0, blue_pointNo = 0;
+            SpawnPoint redPoint = SpawnPoints.GetSpawnPointZako(Team.Red, red_pointNo);
+            SpawnPoint bluePoint = SpawnPoints.GetSpawnPointZako(Team.Blue, blue_pointNo); ;
+            int red_current_spawned = 0, blue_current_spawned = 0;
             for(int no = 0; no < SpawnPoints.zakoCountPerTeam; no ++)
             {
+                if (red_current_spawned == redPoint.zakoCount)
+                {
+                    red_pointNo++;
+                    redPoint = SpawnPoints.GetSpawnPointZako(Team.Red, red_pointNo);
+                    red_current_spawned = 0;
+                }
+                red_current_spawned++;
                 GameObject redZako;
                 redZako = Instantiate(redZakoPrefab);
                 allFighters[GameInfo.max_player_count + no] = redZako;
                 redZako.GetComponent<FighterCondition>().fighterNo.Value = GameInfo.max_player_count + no;
 
+                if (blue_current_spawned == bluePoint.zakoCount)
+                {
+                    blue_pointNo++;
+                    bluePoint = SpawnPoints.GetSpawnPointZako(Team.Blue, blue_pointNo);
+                    blue_current_spawned = 0;
+                }
+                blue_current_spawned++;
                 GameObject blueZako;
                 blueZako = Instantiate(blueZakoPrefab);
                 allFighters[GameInfo.max_player_count + no + SpawnPoints.zakoCountPerTeam] = blueZako;

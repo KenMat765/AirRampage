@@ -81,26 +81,14 @@ public class AiMovement : Movement
             if(relativeYAngle >= -60 && relativeYAngle <= -45)
             {
                 LeftRole(3);
-                if(BattleInfo.isMulti)
-                {
-                    LeftRoleClientRpc(OwnerClientId, 3);
-                }
             }
             else if(relativeYAngle >= 45 && relativeYAngle <= 60)
             {
                 RightRole(3);
-                if(BattleInfo.isMulti)
-                {
-                    RightRoleClientRpc(OwnerClientId, 3);
-                }
             }
             else if(relativeYAngle <= -135 || relativeYAngle >= 135)
             {
                 Uturn();
-                if(BattleInfo.isMulti)
-                {
-                    UturnClientRpc(OwnerClientId);
-                }
             }
             else return;
         }
@@ -109,10 +97,6 @@ public class AiMovement : Movement
             if(relativeYAngle <= -135 || relativeYAngle >= 135)
             {
                 Uturn();
-                if(BattleInfo.isMulti)
-                {
-                    UturnClientRpc(OwnerClientId);
-                }
             }
             else return;
         }
@@ -213,10 +197,6 @@ public class AiMovement : Movement
 
             case Conditions.flip:
                 Flip();
-                if(BattleInfo.isMulti)
-                {
-                    FlipClientRpc(OwnerClientId);
-                }
             break;
 
             case Conditions.counter:

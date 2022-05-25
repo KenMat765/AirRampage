@@ -505,6 +505,7 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
             PlayerInfo.SkillIdGetter(deck_num, out skillIds);
             PlayerInfo.SkillLevelGetter(deck_num, out skillLevels);
             BattleInfo.ParticipantBattleData battleData = new BattleInfo.ParticipantBattleData(0, true, null, "Player", Team.Red, skillIds, skillLevels);
+            BattleInfo.battleDatas[0] = battleData;
         }
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

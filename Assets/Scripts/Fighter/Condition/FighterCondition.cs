@@ -36,12 +36,6 @@ public abstract class FighterCondition : NetworkBehaviour
         }
     }
 
-    private void OnHPChangedAction(float previousValue, float newValue)
-    {
-        if(gameObject.tag == "Zako") return;
-        uGUIMannager.I.HPDecreaser_UI(fighterNo.Value, newValue.Normalize(0, default_HP));
-    }
-
     void Update()
     {
         // Only the owner of this fighter calls Update().

@@ -87,6 +87,8 @@ public class PlayerMovement : Movement
     {
         StartCoroutine(base.uTurn());
 
+        if(BattleInfo.isMulti && !IsOwner) yield break;
+
         yield return new WaitForSeconds(0.33f);
 
         cameraController.CameraTurn(uTurndirection);
@@ -95,6 +97,9 @@ public class PlayerMovement : Movement
     protected override IEnumerator flip()
     {
         StartCoroutine(base.flip());
+
+        if(BattleInfo.isMulti && !IsOwner) yield break;
+
         can_rotate = false;
         cameraController.CameraLookUp(-90*uTurndirection, flipTime/2);
         float speed_temp = fighterCondition.speed;

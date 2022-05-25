@@ -88,7 +88,11 @@ public abstract class Movement : NetworkBehaviour
     
     bool ready4action = true;
 
-    protected void Uturn() { if(ready4action) StartCoroutine(uTurn()); }
+    protected void Uturn()
+    {
+        if(ready4action) StartCoroutine(uTurn());
+        if(BattleInfo.isMulti && IsOwner) UturnServerRpc(OwnerClientId);
+    }
     protected virtual IEnumerator uTurn()
     {
         ready4action = false;
@@ -104,7 +108,11 @@ public abstract class Movement : NetworkBehaviour
         ready4action = true;
     }
 
-    protected void Flip() { if(ready4action) StartCoroutine(flip()); }
+    protected void Flip()
+    {
+        if(ready4action) StartCoroutine(flip());
+        if(BattleInfo.isMulti && IsOwner) FlipServerRpc(OwnerClientId);
+    }
     protected virtual IEnumerator flip()
     {
         ready4action = false;
@@ -123,7 +131,11 @@ public abstract class Movement : NetworkBehaviour
     int rollDirection = 1;   //right:1 left:-1
     float rollSpeed;
 
-    protected void LeftRole(float delay) { if(ready4action && rollReady) StartCoroutine(leftrole(delay)); }
+    protected void LeftRole(float delay)
+    {
+        if(ready4action && rollReady) StartCoroutine(leftrole(delay));
+        if(BattleInfo.isMulti && IsOwner) LeftRoleServerRpc(OwnerClientId, delay);
+    }
     protected virtual IEnumerator leftrole(float delay)
     {
         ready4action = false;
@@ -143,7 +155,11 @@ public abstract class Movement : NetworkBehaviour
         rollReady = true;
     }
 
-    protected void RightRole(float delay) { if(ready4action && rollReady) StartCoroutine(rightrole(delay)); }
+    protected void RightRole(float delay)
+    {
+        if(ready4action && rollReady) StartCoroutine(rightrole(delay));
+        if(BattleInfo.isMulti && IsOwner) RightRoleServerRpc(OwnerClientId, delay);
+    }
     protected virtual IEnumerator rightrole(float delay)
     {
         ready4action = false;
@@ -166,33 +182,33 @@ public abstract class Movement : NetworkBehaviour
     protected virtual void FourActionExe() {}
 
     [ServerRpc]
-    protected void FlipServerRpc(ulong senderId) => FlipClientRpc(senderId);
+    void FlipServerRpc(ulong senderId) => FlipClientRpc(senderId);
     [ServerRpc]
-    protected void UturnServerRpc(ulong senderId) => UturnClientRpc(senderId);
+    void UturnServerRpc(ulong senderId) => UturnClientRpc(senderId);
     [ServerRpc]
-    protected void LeftRoleServerRpc(ulong senderId, float delay) => LeftRoleClientRpc(senderId, delay);
+    void LeftRoleServerRpc(ulong senderId, float delay) => LeftRoleClientRpc(senderId, delay);
     [ServerRpc]
-    protected void RightRoleServerRpc(ulong senderId, float delay) => RightRoleClientRpc(senderId, delay);
+    void RightRoleServerRpc(ulong senderId, float delay) => RightRoleClientRpc(senderId, delay);
     [ClientRpc]
-    protected void FlipClientRpc(ulong senderId)
+    void FlipClientRpc(ulong senderId)
     {
         if(NetworkManager.Singleton.LocalClientId == senderId) return;
         Flip();
     }
     [ClientRpc]
-    protected void UturnClientRpc(ulong senderId)
+    void UturnClientRpc(ulong senderId)
     {
         if(NetworkManager.Singleton.LocalClientId == senderId) return;
         Uturn();
     }
     [ClientRpc]
-    protected void LeftRoleClientRpc(ulong senderId, float delay)
+    void LeftRoleClientRpc(ulong senderId, float delay)
     {
         if(NetworkManager.Singleton.LocalClientId == senderId) return;
         LeftRole(delay);
     }
     [ClientRpc]
-    protected void RightRoleClientRpc(ulong senderId, float delay)
+    void RightRoleClientRpc(ulong senderId, float delay)
     {
         if(NetworkManager.Singleton.LocalClientId == senderId) return;
         RightRole(delay);
