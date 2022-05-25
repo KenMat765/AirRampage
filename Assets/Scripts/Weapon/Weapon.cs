@@ -514,13 +514,14 @@ public abstract class Weapon : Utilities
         else targetPosition = targetObject.transform.position;
         Vector3 relativePos = targetPosition - transform.position;
 
+        // Disable this for now ...
         // homingAngle圏内にいない場合、またはtargetが既に死んでいる(非アクティブ)場合は、targetを見失う
-        float currentAngle = Vector3.Angle(transform.forward, relativePos);
-        if(currentAngle > homingAngle || !targetObject.activeSelf)
-        {
-            targetObject = null;
-            return;
-        }
+        // float currentAngle = Vector3.Angle(transform.forward, relativePos);
+        // if(currentAngle > homingAngle || !targetObject.activeSelf)
+        // {
+        //     targetObject = null;
+        //     return;
+        // }
 
         transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(relativePos), homingAccuracy);
     }
