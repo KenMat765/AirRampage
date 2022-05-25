@@ -87,21 +87,13 @@ public class AiAttack : Attack
                 if(elapsed_times[skill_num] < wait_times[skill_num]) return;
 
                 // 待機時間を過ぎていて、かつType毎の条件を満たしていればスキルを発動
-                Skill skillToActivate = null;
-
-                // Boolean which determines whether to activate skill immediately in clones when the owner has activated.
-                // For attack & disturb skills, clones must receive target fighter from owner, so we should not activate immediately when the owner has activated.
-                // For heal & assist skills, there are no messages clones need to receive from the owner, so we can enable clones to activate skills immediately.
-                bool acitivateInCloneImmediate = false;
-
                 switch(skillData.GetSkillType())
                 {
                     case SkillType.attack :
                     // 標的がtarget_thresh機以上だったらスキル発動
                     if(homingCount >= target_thresh)
                     {
-                        skillToActivate = skill;
-                        acitivateInCloneImmediate = false;
+                        skill.Activator();
                         elapsed_times[skill_num] = 0;
                         wait_times[skill_num] = Random.Range(min_wait_time, max_wait_time);
                     }
@@ -113,16 +105,14 @@ public class AiAttack : Attack
                     {
                         if(fighterCondition.HP < fighterCondition.default_HP/2)
                         {
-                            skillToActivate = skill;
-                            acitivateInCloneImmediate = true;
+                            skill.Activator();
                         }
                     }
                     break;
 
                     case SkillType.assist :
                     // 無条件に起動 
-                    skillToActivate = skill;
-                    acitivateInCloneImmediate = true;
+                    skill.Activator();
                     elapsed_times[skill_num] = 0;
                     wait_times[skill_num] = Random.Range(min_wait_time, max_wait_time);
                     break;
@@ -131,30 +121,11 @@ public class AiAttack : Attack
                     // 標的がtarget_thresh機以上だったらスキル発動
                     if(homingCount >= target_thresh)
                     {
-                        skillToActivate = skill;
-                        acitivateInCloneImmediate = false;
+                        skill.Activator();
                         elapsed_times[skill_num] = 0;
                         wait_times[skill_num] = Random.Range(min_wait_time, max_wait_time);
                     }
                     break;
-                }
-
-                if(BattleInfo.isMulti)
-                {
-                    if (skillToActivate != null)
-                    {
-                        // Owner Activate its own skill.
-                        skillToActivate.Activator();
-                        if (acitivateInCloneImmediate)
-                        {
-                            // Owner send RPC to clones to tell them to Activate their own skills.
-                            SkillActivatorClientRpc(OwnerClientId, skillToActivate.skillNo);
-                        }
-                    }
-                }
-                else
-                {
-                    if (skillToActivate != null) skillToActivate.Activator();
                 }
             }
         }

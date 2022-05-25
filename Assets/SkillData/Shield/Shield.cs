@@ -37,6 +37,11 @@ public class Shield : SkillAssist
         if(BattleInfo.isMulti && !attack.IsOwner) return;
 
         base.Activator();
+        if(BattleInfo.isMulti)
+        {
+            if (IsHost) attack.SkillActivatorClientRpc(OwnerClientId, skillNo);
+            else attack.SkillActivatorServerRpc(OwnerClientId, skillNo);
+        }
     }
 
     public override void EndProccess()

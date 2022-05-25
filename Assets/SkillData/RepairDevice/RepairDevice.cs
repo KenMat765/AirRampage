@@ -33,6 +33,11 @@ public class RepairDevice : SkillHeal
         base.Activator();
         MeterDecreaser();
         attack.fighterCondition.HPDecreaser(-repair_amount);
+        if(BattleInfo.isMulti)
+        {
+            if (IsHost) attack.SkillActivatorClientRpc(OwnerClientId, skillNo);
+            else attack.SkillActivatorServerRpc(OwnerClientId, skillNo);
+        }
     }
 
     public override void ForceTermination()

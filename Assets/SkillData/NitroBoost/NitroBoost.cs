@@ -48,6 +48,11 @@ class NitroBoost : SkillAssist
         MeterDecreaser(boost_duration, EndProccess);
         attack.fighterCondition.PauseGradingSpeed(attack.fighterCondition.defaultSpeed * speed_magnif, accel_duration);
         if(cameraController != null) cameraController.ViewChanger(90, accel_duration);
+        if(BattleInfo.isMulti)
+        {
+            if (IsHost) attack.SkillActivatorClientRpc(OwnerClientId, skillNo);
+            else attack.SkillActivatorServerRpc(OwnerClientId, skillNo);
+        }
     }
 
     public override void EndProccess()
