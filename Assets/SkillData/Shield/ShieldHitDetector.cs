@@ -12,14 +12,13 @@ public class ShieldHitDetector : MonoBehaviour
     // Shieldクラスからセット
     float shield_durability;
 
-    // This is called from every clones.
-    // Filtering is neccesarry in order to be called only from the owner of this shield.
     public void DecreaseDurability(float damage)
     {
-        // Filtering is neccesarry ...
-        // if(BattleInfo.isMulti && )
+        // Only the owner get damage to shield.
+        if(BattleInfo.isMulti && !shield.IsOwner) return;
         shield_durability -= damage;
     }
+
     float exhaust_speed;
 
     Shield shield;
@@ -29,7 +28,6 @@ public class ShieldHitDetector : MonoBehaviour
     int enemy_bullet_layer;
 
     Tweener activate_tweener;
-
 
 
     void Awake()
@@ -66,18 +64,11 @@ public class ShieldHitDetector : MonoBehaviour
         // 破壊処理
         if(shield_durability <= 0)
         {
-            // 弾丸を透過
-            spr_collider.enabled = false;
-
             // Shieldから起動する際に毎回初期化されるので、0< のfloatなら何でも良い(if文を抜けるため)
             shield_durability = 1;
 
             // 破壊処理
             shield.EndProccess();
-
-            // 破壊演出
-            if(activate_tweener.IsActive()) activate_tweener.Kill(true);
-            mat.DOFloat(-1, property_Id, activate_duration).OnComplete(() => {gameObject.SetActive(false);});
         }
     }
 
@@ -112,6 +103,7 @@ public class ShieldHitDetector : MonoBehaviour
     }
 
     // Shieldクラスから起動
+    // Called on every clones.
     public void ShieldActivator(float shield_durability, float exhaust_speed)
     {
         this.shield_durability = shield_durability;
@@ -119,9 +111,20 @@ public class ShieldHitDetector : MonoBehaviour
         spr_collider.enabled = true;
         gameObject.SetActive(true);
 
-        // 起動演出
+        // Play effect.
         mat.SetFloat(property_Id, -1);    // 破壊された瞬間に起動した時
         activate_tweener = mat.DOFloat(2, property_Id, activate_duration);
+    }
+    
+    // Called from Shield.EndProccess().
+    public void DestroyShield()
+    {
+        // Disable collider.
+        spr_collider.enabled = false;
+
+        // Play effect.
+        if (activate_tweener.IsActive()) activate_tweener.Kill(true);
+        mat.DOFloat(-1, property_Id, activate_duration).OnComplete(() => { gameObject.SetActive(false); });
     }
 
     public void TerminateShield()

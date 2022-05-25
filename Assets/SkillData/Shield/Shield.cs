@@ -29,16 +29,25 @@ public class Shield : SkillAssist
 
     public override void Activator(int[] transfer = null)
     {
+        col.enabled = false;
+
         // Activate shield.
         hit_detector.ShieldActivator(shield_durability, exhaust_speed);
 
         if(BattleInfo.isMulti && !attack.IsOwner) return;
 
         base.Activator();
-        col.enabled = false;
     }
 
-    public override void EndProccess() => col.enabled = true;
+    public override void EndProccess()
+    {
+        col.enabled = true;
+
+        // Destroy shield.
+        hit_detector.DestroyShield();
+
+        if(BattleInfo.isMulti && attack.IsOwner) attack.SkillEndProccessServerRpc(OwnerClientId, skillNo);
+    }
 
     public override void ForceTermination()
     {

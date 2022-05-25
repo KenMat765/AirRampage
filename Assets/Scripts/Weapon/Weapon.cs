@@ -218,9 +218,7 @@ public abstract class Weapon : Utilities
             // ヒット：シールド
             if(hit_obj.layer == enemy_shield_layer)
             {
-                // 
-                // 
-                // 
+                // Call this on every clones.
                 hit_obj.GetComponent<ShieldHitDetector>().DecreaseDurability(power_temp);
             }
 
@@ -228,10 +226,6 @@ public abstract class Weapon : Utilities
             // ヒット：ボディ
             else if(hit_obj.layer == enemy_body_layer)
             {
-                // 
-                // 
-                // 
-
                 // Get fighter's Receiver.
                 Receiver receiver = hit_obj.GetComponent<Receiver>();
 
@@ -440,9 +434,7 @@ public abstract class Weapon : Utilities
                 {
                     if(!alreadyBombed.Contains(hit_obj))
                     {
-                        // 
-                        // 
-                        // 
+                        // Call this on every clones.
                         hit_obj.GetComponent<ShieldHitDetector>().DecreaseDurability(power_temp);
                         alreadyBombed.Add(hit.gameObject);
                         alreadyBombed.Add(hit.transform.parent.gameObject);
