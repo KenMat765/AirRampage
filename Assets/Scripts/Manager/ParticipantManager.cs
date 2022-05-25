@@ -246,11 +246,11 @@ public class ParticipantManager : NetworkBehaviour
                 SpawnPoint point = SpawnPoints.GetSpawnPoint(no);
                 if(battleData.team == Team.Red)
                 {
-                    fighter = Instantiate(redPlayerPrefab, point.pos, point.rot);
+                    fighter = Instantiate(redPlayerPrefab, point.transform.position, point.transform.rotation);
                 }
                 else
                 {
-                    fighter = Instantiate(bluePlayerPrefab, point.pos, point.rot);
+                    fighter = Instantiate(bluePlayerPrefab, point.transform.position, point.transform.rotation);
                 }
 
                 // Set fighterNo & fighterName at fighter condition.
@@ -273,11 +273,11 @@ public class ParticipantManager : NetworkBehaviour
                 SpawnPoint point = SpawnPoints.GetSpawnPoint(no);
                 if(battleData.team == Team.Red)
                 {
-                    fighter = Instantiate(redAiPrefab, point.pos, point.rot);
+                    fighter = Instantiate(redAiPrefab, point.transform.position, point.transform.rotation);
                 }
                 else
                 {
-                    fighter = Instantiate(blueAiPrefab, point.pos, point.rot);
+                    fighter = Instantiate(blueAiPrefab, point.transform.position, point.transform.rotation);
                 }
 
                 // Set fighterNo at fighter & team condition.
@@ -317,7 +317,7 @@ public class ParticipantManager : NetworkBehaviour
 
             // Create fighter.
             GameObject red;
-            red = Instantiate(redZakoPrefab, redPoint.pos, redPoint.rot);
+            red = Instantiate(redZakoPrefab, redPoint.transform.position, redPoint.transform.rotation);
 
             // Set fighterNo & fighterName at fighter condition.
             FighterCondition redCondition = red.GetComponent<FighterCondition>();
@@ -341,7 +341,7 @@ public class ParticipantManager : NetworkBehaviour
 
             // Create fighter.
             GameObject blue;
-            blue = Instantiate(blueZakoPrefab, bluePoint.pos, bluePoint.rot);
+            blue = Instantiate(blueZakoPrefab, bluePoint.transform.position, bluePoint.transform.rotation);
 
             // Set fighterNo & fighterName & team at fighter condition.
             FighterCondition blueCondition = blue.GetComponent<FighterCondition>();
