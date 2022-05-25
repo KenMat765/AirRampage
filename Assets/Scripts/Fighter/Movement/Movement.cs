@@ -12,14 +12,14 @@ public abstract class Movement : NetworkBehaviour
     // Only the owner needs to call this.
     public virtual void OnDeath()
     {
+        transform.position = start_pos;
+        transform.rotation = start_rot;
         ready4action = false;
     }
 
     // Must be called on every clients.
     public virtual void OnRevival()
     {
-        transform.position = start_pos;
-        transform.rotation = start_rot;
         StartCoroutine(Enable4Actions());
     }
 
