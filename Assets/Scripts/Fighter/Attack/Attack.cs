@@ -74,7 +74,7 @@ public abstract class Attack : NetworkBehaviour
         // Detect targets, and set them to homingTargetNos.
         if(colliders.Length > 0)
         {
-            LayerMask terrain = LayerMask.GetMask("Default");
+            LayerMask terrain = LayerMask.GetMask("Terrain");
             var possibleTargets = colliders.Select(t => t.gameObject);
 
             // Get fighter number of targets.
