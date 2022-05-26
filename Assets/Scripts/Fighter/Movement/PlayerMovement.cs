@@ -39,6 +39,9 @@ public class PlayerMovement : Movement
         if(uTurndirection == -1)
         {
             uTurndirection = 1;
+
+            if(BattleInfo.isMulti && ! IsOwner) return;
+
             cameraController.CameraTurn(uTurndirection);
         }
     }

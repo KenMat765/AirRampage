@@ -140,7 +140,7 @@ public class ParticipantManager : NetworkBehaviour
                 }
                 red_current_spawned++;
                 GameObject redZako;
-                redZako = Instantiate(redZakoPrefab);
+                redZako = Instantiate(redZakoPrefab, redPoint.transform.position, redPoint.transform.rotation);
                 allFighters[GameInfo.max_player_count + no] = redZako;
                 redZako.GetComponent<FighterCondition>().fighterNo.Value = GameInfo.max_player_count + no;
 
@@ -152,7 +152,7 @@ public class ParticipantManager : NetworkBehaviour
                 }
                 blue_current_spawned++;
                 GameObject blueZako;
-                blueZako = Instantiate(blueZakoPrefab);
+                blueZako = Instantiate(blueZakoPrefab, bluePoint.transform.position, bluePoint.transform.rotation);
                 allFighters[GameInfo.max_player_count + no + SpawnPoints.zakoCountPerTeam] = blueZako;
                 blueZako.GetComponent<FighterCondition>().fighterNo.Value = GameInfo.max_player_count + no + SpawnPoints.zakoCountPerTeam;
             }
@@ -191,8 +191,13 @@ public class ParticipantManager : NetworkBehaviour
                 // Get battle data at fighterNo.
                 BattleInfo.ParticipantBattleData battleData = BattleInfo.battleDatas[no];
 
-                // Name fighter
-                fighter.name = battleData.name;
+                if(!BattleInfo.isMulti)
+                {
+                    // Setup fighterCondition by battle data.
+                    fighterCondition.fighterNo.Value = battleData.fighterNo;
+                    fighterCondition.fighterName.Value = battleData.name;
+                    fighterCondition.fighterTeam.Value = battleData.team;
+                }
 
                 // Setup Skills
                 for (int skillNo = 0; skillNo < GameInfo.max_skill_count; skillNo++)
@@ -212,6 +217,25 @@ public class ParticipantManager : NetworkBehaviour
                     else
                     {
                         attack.skills[skillNo] = null;
+                    }
+                }
+            }
+
+            // Only for Zakos.
+            else
+            {
+                if(!BattleInfo.isMulti)
+                {
+                    fighterCondition.fighterNo.Value = no;
+                    if (fighter.layer == LayerMask.NameToLayer("RedFighter"))
+                    {
+                        fighterCondition.fighterName.Value = "ZakoRed";
+                        fighterCondition.fighterTeam.Value = Team.Red;
+                    }
+                    else
+                    {
+                        fighterCondition.fighterName.Value = "ZakoBlue";
+                        fighterCondition.fighterTeam.Value = Team.Blue;
                     }
                 }
             }
@@ -345,7 +369,8 @@ public class ParticipantManager : NetworkBehaviour
             // Set fighterNo & fighterName at fighter condition.
             FighterCondition redCondition = red.GetComponent<FighterCondition>();
             redCondition.fighterNo.Value = GameInfo.max_player_count + k;
-            redCondition.fighterName.Value = "ZakoRed" + (k + 1);
+            // redCondition.fighterName.Value = "ZakoRed" + (k + 1);
+            redCondition.fighterName.Value = "ZakoRed";
             redCondition.fighterTeam.Value = Team.Red;
 
             // Spawn fighter.
@@ -369,7 +394,8 @@ public class ParticipantManager : NetworkBehaviour
             // Set fighterNo & fighterName & team at fighter condition.
             FighterCondition blueCondition = blue.GetComponent<FighterCondition>();
             blueCondition.fighterNo.Value = GameInfo.max_player_count + k + SpawnPoints.zakoCountPerTeam;
-            blueCondition.fighterName.Value = "ZakoBlue" + (k + 1);
+            // blueCondition.fighterName.Value = "ZakoBlue" + (k + 1);
+            blueCondition.fighterName.Value = "ZakoBlue";
             blueCondition.fighterTeam.Value = Team.Blue;
 
 

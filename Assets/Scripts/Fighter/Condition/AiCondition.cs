@@ -16,7 +16,8 @@ public class AiCondition : FighterCondition
     public override void HPDecreaser(float deltaHP)
     {
         base.HPDecreaser(deltaHP);
-        HpDecreaser_UIServerRPC(HP);
+        if(BattleInfo.isMulti) HpDecreaser_UIServerRPC(HP);
+        else uGUIMannager.I.HPDecreaser_UI(fighterNo.Value, HP.Normalize(0, default_HP));
     }
     
     public override float revivalTime {get; set;} = 7;

@@ -164,7 +164,7 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
                 // Generate & Send battle data to BattleInfo.
                 int aiNo = GameInfo.GetNoFromTeam(Team.Red, 1 + red);
                 string aiName = "AIRed" + (red + 1).ToString();
-                BattleInfo.ParticipantBattleData battleData = new BattleInfo.ParticipantBattleData(aiNo, false, null, aiName, Team.Blue, aiSkillIds, aiSkillLevels);
+                BattleInfo.ParticipantBattleData battleData = new BattleInfo.ParticipantBattleData(aiNo, false, null, aiName, Team.Red, aiSkillIds, aiSkillLevels);
                 BattleInfo.battleDatas[aiNo] = battleData;
             }
 

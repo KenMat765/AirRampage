@@ -76,7 +76,7 @@ public class SpawnPoints : MonoBehaviour
         SpawnPoint result = null;
         foreach(SpawnPoint point in spawnPoints)
         {
-            if(point.team == team && point.pointNo == pointNo)
+            if(point.spawnZako && point.team == team && point.pointNo == pointNo)
             {
                 result = point;
                 break;
