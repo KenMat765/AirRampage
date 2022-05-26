@@ -91,23 +91,12 @@ public class LobbyFighter : Singleton<LobbyFighter>
 
     IEnumerator sortieAllFighters(Team team, Action callback)
     {
-        if(team == Team.Red)
+        int[] nos = GameInfo.GetNosFromTeam(team);
+        SortieFighter(nos[0]);
+        for (int k = 1; k < nos.Length; k++)
         {
-            SortieFighter(0);
-            for (int k = 1; k < fighters.Length / 2; k++)
-            {
-                yield return new WaitForSeconds(interval);
-                SortieFighter(k);
-            }
-        }
-        else
-        {
-            SortieFighter(fighters.Length / 2);
-            for (int k = (fighters.Length / 2) + 1; k < fighters.Length; k++)
-            {
-                yield return new WaitForSeconds(interval);
-                SortieFighter(k);
-            }
+            yield return new WaitForSeconds(interval);
+            SortieFighter(nos[k]);
         }
         if(callback != null) callback();
     }
