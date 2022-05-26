@@ -60,7 +60,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 186feea41400f4fc486edadd1d771da3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  homingTargets: []
+  homingTargetNos: 
   originalNormalBullet: {fileID: 3347054721799987993}
 --- !u!114 &3356181387992044975
 MonoBehaviour:
@@ -74,7 +74,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb3a4602b65124d13b5d99603c33c486, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &7801730975446419243
+--- !u!114 &8117021413689131787
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -83,7 +83,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 456771366102461643}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 258c85936b80040e58cef2c3d9ee3711, type: 3}
+  m_Script: {fileID: 11500000, guid: 24c91fdcebc64406fa1497bdcc06588c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &3038540049911670340
@@ -216,11 +216,50 @@ MonoBehaviour:
   movement: {fileID: 8289665774568996677}
   attack: {fileID: 3305929700487578374}
   receiver: {fileID: 3356181387992044975}
-  bodyManager: {fileID: 7801730975446419243}
+  bodyManager: {fileID: 0}
   fighterNo:
     m_InternalValue: 0
-  HP:
+  fighterName:
+    m_InternalValue:
+      utf8LengthInBytes: 0
+      bytes:
+        offset0000:
+          byte0000: 0
+          byte0001: 0
+          byte0002: 0
+          byte0003: 0
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        byte0016: 0
+        byte0017: 0
+        byte0018: 0
+        byte0019: 0
+        byte0020: 0
+        byte0021: 0
+        byte0022: 0
+        byte0023: 0
+        byte0024: 0
+        byte0025: 0
+        byte0026: 0
+        byte0027: 0
+        byte0028: 0
+        byte0029: 0
+  fighterTeam:
     m_InternalValue: 0
+  HP: 0
+  speed: 0
+  power: 0
+  defence: 0
   defaultSpeed: 5
   defaultPower: 1
   defaultDefence: 1

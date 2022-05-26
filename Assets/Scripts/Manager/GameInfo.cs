@@ -11,22 +11,24 @@ public class GameInfo : MonoBehaviour
     public static Team GetTeamFromNo(int No)
     {
         // If No is even, team is Red.
-        // if(No % 2 == 0) return Team.Red;
-        // else return Team.Blue;
-        
-        if(No < 4) return Team.Red;
+        if(No % 2 == 0) return Team.Red;
         else return Team.Blue;
+        
+        // if(No < 4) return Team.Red;
+        // else return Team.Blue;
     }
     public static int[] GetNosFromTeam(Team team)
     {
         if(team == Team.Red)
         {
-            int[] Nos = {0, 1, 2, 3};
+            int[] Nos = {0, 2, 4, 6};
+            // int[] Nos = {0, 1, 2, 3};
             return Nos;
         }
         else
         {
-            int[] Nos = {4, 5, 6, 7};
+            int[] Nos = {1, 3, 5, 7};
+            // int[] Nos = {4, 5, 6, 7};
             return Nos;
         }
     }
@@ -34,12 +36,14 @@ public class GameInfo : MonoBehaviour
     {
         if(team == Team.Red)
         {
-            int[] Nos = {0, 1, 2, 3};
+            int[] Nos = {0, 2, 4, 6};
+            // int[] Nos = {0, 1, 2, 3};
             return Nos[number];
         }
         else
         {
-            int[] Nos = {4, 5, 6, 7};
+            int[] Nos = {1, 3, 5, 7};
+            // int[] Nos = {4, 5, 6, 7};
             return Nos[number];
         }
     }

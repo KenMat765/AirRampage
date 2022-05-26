@@ -3251,12 +3251,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fighters:
   - {fileID: 63015713}
-  - {fileID: 178207937}
-  - {fileID: 1963239167}
-  - {fileID: 1893079324}
   - {fileID: 2116679360}
+  - {fileID: 178207937}
   - {fileID: 1932197664}
+  - {fileID: 1963239167}
   - {fileID: 1423601302}
+  - {fileID: 1893079324}
   - {fileID: 1894466511}
 --- !u!4 &468133515
 Transform:
