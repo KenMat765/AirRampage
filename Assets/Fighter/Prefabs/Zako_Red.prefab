@@ -9844,9 +9844,48 @@ MonoBehaviour:
   bodyManager: {fileID: 9153855459787766978}
   fighterNo:
     m_InternalValue: 0
-  HP:
+  fighterName:
+    m_InternalValue:
+      utf8LengthInBytes: 0
+      bytes:
+        offset0000:
+          byte0000: 0
+          byte0001: 0
+          byte0002: 0
+          byte0003: 0
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        byte0016: 0
+        byte0017: 0
+        byte0018: 0
+        byte0019: 0
+        byte0020: 0
+        byte0021: 0
+        byte0022: 0
+        byte0023: 0
+        byte0024: 0
+        byte0025: 0
+        byte0026: 0
+        byte0027: 0
+        byte0028: 0
+        byte0029: 0
+  fighterTeam:
     m_InternalValue: 0
-  defaultSpeed: 5
+  HP: 0
+  speed: 0
+  power: 0
+  defence: 0
+  defaultSpeed: 2.5
   defaultPower: 1
   defaultDefence: 1
 --- !u!114 &7900035918258363030

@@ -9,11 +9,12 @@ using Unity.Collections;
 // このクラスのプロパティをもとに、Movement、Attack、Receiverを動かす
 public abstract class FighterCondition : NetworkBehaviour
 {
-    protected virtual void Awake()
+    void Awake()
     {
         GameObject explosionDead_obj = transform.Find("ExplosionDead").gameObject;
         deadEffect = explosionDead_obj.GetComponent<ParticleSystem>();
         deadSound = explosionDead_obj.GetComponent<AudioSource>();
+        col = GetComponent<Collider>();
     }
 
     protected virtual void Start()
@@ -70,6 +71,7 @@ public abstract class FighterCondition : NetworkBehaviour
 
     // HP ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Only the owner of this fighter knows HP.
+    [Header("Current Status")]
     public float HP;
     public abstract float default_HP {get; set;}
     public bool isDead {get; private set;}
@@ -128,7 +130,7 @@ public abstract class FighterCondition : NetworkBehaviour
     bool pausing_power;
     bool pausing_defence;
 
-    [Header("Default Params")]
+    [Header("Default Status")]
     public float defaultSpeed = 5f;
     public float defaultPower = 1f;
     public float defaultDefence = 1f;
@@ -345,12 +347,17 @@ public abstract class FighterCondition : NetworkBehaviour
     public float revive_timer {get; private set;}
     ParticleSystem deadEffect;
     AudioSource deadSound;
+
+    // Collider needs to be disabled, in order not to be detected by other fighter as homing target.
+    Collider col;
     
     // Should be called on every clients.
     protected virtual void Death(int destroyerNo, string destroyerSkillName)
     {
         deadEffect.Play();
         deadSound.Play();
+        
+        col.enabled = false;
 
         movement.OnDeath();
         attack.OnDeath();
@@ -365,6 +372,8 @@ public abstract class FighterCondition : NetworkBehaviour
         attack.OnRevival();
         receiver.OnRevival();
         bodyManager.OnRevival();
+
+        col.enabled = true;
 
         if(BattleInfo.isMulti)
         {

@@ -121,6 +121,8 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
             stageObject.transform.DOScaleX(0, 0);
             stageObject.SetActive(true);
             titleText.text = "Stage";
+            arrows[0].SetActive(true);
+            for(int k = 1; k < arrows.Length; k ++) arrows[k].SetActive(false);
             DOVirtual.DelayedCall(0.5f, () =>
             {
                 menuRect.DOScaleY(1, tweenDuration)

@@ -56,7 +56,7 @@ public abstract class Attack : NetworkBehaviour
     public int homingCount { get { return homingTargetNos.Count; } }
     public abstract float homingAngle {get; set;}    // Abilityで変化
     public abstract float homingDist {get; set;}    // Abilityで変化
-    LayerMask enemy_mask;    // enemy_layer = ボディ + シールド
+    LayerMask enemy_mask;    // enemy_layer = Fighter-Root
 
     void SetLayerInteggers()
     {
@@ -145,7 +145,7 @@ public abstract class Attack : NetworkBehaviour
 
     protected void NormalRapid(GameObject target, int bulletCount)
     {
-        const float interval = 0.1f;
+        const float interval = 0.05f;
         IEnumerator normalRapid(GameObject target, int bulletCount)
         {
             NormalBlast(target);
