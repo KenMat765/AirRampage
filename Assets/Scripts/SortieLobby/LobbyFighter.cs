@@ -63,23 +63,12 @@ public class LobbyFighter : Singleton<LobbyFighter>
 
     IEnumerator prepareAllFighters(Team team, Action callback)
     {
-        if(team == Team.Red)
+        int[] nos = GameInfo.GetNosFromTeam(team);
+        PrepareFighter(nos[0]);
+        for (int k = 1; k < nos.Length; k++)
         {
-            PrepareFighter(0);
-            for (int k = 1; k < fighters.Length / 2; k++)
-            {
-                yield return new WaitForSeconds(interval);
-                PrepareFighter(k);
-            }
-        }
-        else
-        {
-            PrepareFighter(fighters.Length / 2);
-            for (int k = (fighters.Length / 2) + 1; k < fighters.Length; k++)
-            {
-                yield return new WaitForSeconds(interval);
-                PrepareFighter(k);
-            }
+            yield return new WaitForSeconds(interval);
+            PrepareFighter(nos[k]);
         }
         if(callback != null) callback();
     }
