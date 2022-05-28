@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using TMPro;
 
 public class uGUIMannager : Singleton<uGUIMannager>
 {
@@ -85,12 +86,14 @@ public class uGUIMannager : Singleton<uGUIMannager>
         HPs = HP_objects.Select(h => h.transform.Find("HP").GetComponent<Image>()).ToArray();
         HPs_white = HP_objects.Select(h => h.transform.Find("HP_white").GetComponent<Image>()).ToArray();
         Image[] team_icons = HP_objects.Select(h => h.transform.Find("Team").GetComponent<Image>()).ToArray();
-        for(int id = 0; id < GameInfo.max_player_count; id++)
+        TextMeshProUGUI[] name_icons = HP_objects.Select(h => h.transform.Find("Name").GetComponent<TextMeshProUGUI>()).ToArray();
+        for(int no = 0; no < GameInfo.max_player_count; no++)
         {
-            Team team = ParticipantManager.I.fighterInfos[id].fighterCondition.fighterTeam.Value;
-            if(team == Team.Red) team_icons[id].color = Color.red;
-            else if(team == Team.Blue) team_icons[id].color = Color.blue;
-            else Debug.LogError("fighterinfoにTeam情報が入っていません");
+            Team team = ParticipantManager.I.fighterInfos[no].fighterCondition.fighterTeam.Value;
+            if(team == Team.Red) team_icons[no].color = Color.red;
+            else team_icons[no].color = Color.blue;
+            string name = ParticipantManager.I.fighterInfos[no].fighterCondition.fighterName.Value.ToString();
+            name_icons[no].text = name;
         }
 
         for(int k = 0; k < GameInfo.max_skill_count; k++)

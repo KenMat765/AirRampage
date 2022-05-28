@@ -72,9 +72,9 @@ public class LobbyLinkedData : NetworkBehaviour
 
     public int? GetUnusedNumber()
     {
-        int counter = 0;
         for(int k = 0; k < GameInfo.max_player_count; k++)
         {
+            int counter = 0;
             foreach(LobbyParticipantData data in participantDatas)
             {
                 if(data.number == k) break;

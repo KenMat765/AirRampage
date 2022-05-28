@@ -368,7 +368,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b84c2d8dfe509a34fb59e2b81f8e1319, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MessageBufferSize: 5120
+  MessageBufferSize: 65535
   MaxConnections: 8
   MaxSentMessageQueueSize: 128
   ConnectAddress: 192.168.11.30
