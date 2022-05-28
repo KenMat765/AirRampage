@@ -261,12 +261,6 @@ public abstract class FighterCondition : NetworkBehaviour
     void DefenceMultiplier(float magnif) => defence = defaultDefence * magnif;
 
 
-    // Owner of this fighter sets default values.
-    public void DefaultSpeedSetter(float default_speed) => this.defaultSpeed = default_speed;
-    public void DefaultPowerSetter(float default_power) => this.defaultPower = default_power;
-    public void DefaultDefenceSetter(float default_defence) => this.defaultDefence = default_defence;
-
-
     // Only the owner of this fighter needs to call Graders.
     public void SpeedGrader(int delta_grade, float new_duration)
     {
