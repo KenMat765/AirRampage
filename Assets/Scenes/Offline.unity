@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.018052813, g: 0.05355297, b: 0.12829056, a: 1}
+  m_IndirectSpecularColor: {r: 0.0126117235, g: 0.038500063, b: 0.10424448, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -586,8 +586,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -185, y: -185}
-  m_SizeDelta: {x: 350, y: 350}
+  m_AnchoredPosition: {x: -120, y: -120}
+  m_SizeDelta: {x: 187, y: 187}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &93701830
 MonoBehaviour:
@@ -896,8 +896,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pointNo: 0
-  pos: {x: -15, y: 0, z: 20}
-  rot: {x: -0, y: -0, z: -0, w: 1}
   team: 1
   spawnZako: 1
   zakoCount: 10
@@ -1058,8 +1056,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pointNo: 3
-  pos: {x: 15, y: 0, z: 30}
-  rot: {x: -0, y: 1, z: -0, w: 0}
   team: 1
   spawnZako: 0
   zakoCount: 0
@@ -1764,8 +1760,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pointNo: 1
-  pos: {x: -5, y: 0, z: 30}
-  rot: {x: -0, y: 1, z: -0, w: 0}
   team: 1
   spawnZako: 0
   zakoCount: 0
@@ -2389,8 +2383,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pointNo: 3
-  pos: {x: 15, y: 0, z: -20}
-  rot: {x: -0, y: -0, z: -0, w: 1}
   team: 0
   spawnZako: 1
   zakoCount: 10
@@ -2581,8 +2573,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pointNo: 2
-  pos: {x: 5, y: 0, z: 30}
-  rot: {x: -0, y: 1, z: -0, w: 0}
   team: 1
   spawnZako: 0
   zakoCount: 0
@@ -3312,8 +3302,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pointNo: 0
-  pos: {x: -15, y: 0, z: -20}
-  rot: {x: -0, y: -0, z: -0, w: 1}
   team: 0
   spawnZako: 1
   zakoCount: 10
@@ -3768,8 +3756,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -185, y: -185}
-  m_SizeDelta: {x: 350, y: 350}
+  m_AnchoredPosition: {x: -120, y: -120}
+  m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &691638258
 MonoBehaviour:
@@ -3946,8 +3934,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pointNo: 1
-  pos: {x: -5, y: 0, z: 20}
-  rot: {x: -0, y: -0, z: -0, w: 1}
   team: 1
   spawnZako: 1
   zakoCount: 10
@@ -4085,7 +4071,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6826ac132388c4ce590a6682e6dbbfce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ZakoCountAll: 80
 --- !u!4 &795591711
 Transform:
   m_ObjectHideFlags: 0
@@ -5859,8 +5844,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pointNo: 0
-  pos: {x: -15, y: 0, z: -30}
-  rot: {x: -0, y: -0, z: -0, w: 1}
   team: 0
   spawnZako: 0
   zakoCount: 0
@@ -5938,8 +5921,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pointNo: 2
-  pos: {x: 5, y: 0, z: -20}
-  rot: {x: -0, y: -0, z: -0, w: 1}
   team: 0
   spawnZako: 1
   zakoCount: 10
@@ -6682,10 +6663,10 @@ RectTransform:
   m_Father: {fileID: 1743356361}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 320, y: 320}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1332497705
 MonoBehaviour:
@@ -7250,8 +7231,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pointNo: 0
-  pos: {x: -15, y: 0, z: 30}
-  rot: {x: -0, y: 1, z: -0, w: 0}
   team: 1
   spawnZako: 0
   zakoCount: 0
@@ -9094,8 +9073,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -185, y: -185}
-  m_SizeDelta: {x: 320, y: 320}
+  m_AnchoredPosition: {x: -120, y: -120}
+  m_SizeDelta: {x: 185, y: 185}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1743356362
 MonoBehaviour:
@@ -9372,8 +9351,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pointNo: 1
-  pos: {x: -5, y: 0, z: -30}
-  rot: {x: -0, y: -0, z: -0, w: 1}
   team: 0
   spawnZako: 0
   zakoCount: 0
@@ -9751,8 +9728,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pointNo: 3
-  pos: {x: 15, y: 0, z: -30}
-  rot: {x: -0, y: -0, z: -0, w: 1}
   team: 0
   spawnZako: 0
   zakoCount: 0
@@ -10434,8 +10409,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pointNo: 3
-  pos: {x: 15, y: 0, z: 20}
-  rot: {x: -0, y: -0, z: -0, w: 1}
   team: 1
   spawnZako: 1
   zakoCount: 10
@@ -10483,8 +10456,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pointNo: 2
-  pos: {x: 5, y: 0, z: 20}
-  rot: {x: -0, y: -0, z: -0, w: 1}
   team: 1
   spawnZako: 1
   zakoCount: 10
@@ -10952,8 +10923,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pointNo: 1
-  pos: {x: -5, y: 0, z: -20}
-  rot: {x: -0, y: -0, z: -0, w: 1}
   team: 0
   spawnZako: 1
   zakoCount: 10
@@ -11115,8 +11084,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pointNo: 2
-  pos: {x: 5, y: 0, z: -30}
-  rot: {x: -0, y: -0, z: -0, w: 1}
   team: 0
   spawnZako: 0
   zakoCount: 0

@@ -192,7 +192,7 @@ MonoBehaviour:
   movement: {fileID: 4157289608228579134}
   attack: {fileID: 6430466612862958651}
   receiver: {fileID: 5974251860006924882}
-  bodyManager: {fileID: 0}
+  bodyManager: {fileID: 1746892645481258240}
   fighterNo:
     m_InternalValue: 0
   fighterName:
@@ -494,6 +494,18 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &1746892645481258240
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9083876564289613353}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24c91fdcebc64406fa1497bdcc06588c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &5974251860006924882
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -520,18 +532,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   homingTargetNos: 
   originalNormalBullet: {fileID: 6404313046706013988}
---- !u!114 &1746892645481258240
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9083876564289613353}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 24c91fdcebc64406fa1497bdcc06588c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &3292364993170336353
 PrefabInstance:
   m_ObjectHideFlags: 0

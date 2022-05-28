@@ -216,7 +216,7 @@ MonoBehaviour:
   movement: {fileID: 8289665774568996677}
   attack: {fileID: 3305929700487578374}
   receiver: {fileID: 3356181387992044975}
-  bodyManager: {fileID: 0}
+  bodyManager: {fileID: 8117021413689131787}
   fighterNo:
     m_InternalValue: 0
   fighterName:

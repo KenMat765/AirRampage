@@ -18,22 +18,12 @@ public abstract class FighterCondition : NetworkBehaviour
 
     protected virtual void Start()
     {
-        if(BattleInfo.isMulti)
-        {
-            // Only the owner refers to HP, speed, defence, and power.
-            if(!IsOwner) return;
-            HPResetter();
-            SpeedResetter();
-            PowerResetter();
-            DefenceResetter();
-        }
-        else
-        {
-            HPResetter();
-            SpeedResetter();
-            PowerResetter();
-            DefenceResetter();
-        }
+        // Only the owner refers to HP, speed, defence, and power.
+        if(BattleInfo.isMulti && !IsOwner) return;
+        HPResetter();
+        SpeedResetter();
+        PowerResetter();
+        DefenceResetter();
     }
 
     void Update()
