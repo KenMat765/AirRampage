@@ -8,14 +8,14 @@ using Unity.Netcode;
 
 public class LobbyFighter : Singleton<LobbyFighter>
 {
-    protected override bool dont_destroy_on_load {get; set;} = false;
+    protected override bool dont_destroy_on_load { get; set; } = false;
     public GameObject[] fighters;
     GameObject[] afterburners;
     TextMeshProUGUI[] nameTexts;
     const float prepareDuration = 0.3f, sortieDuration = 0.35f;
     const float interval = 0.1f;
-    public bool listChanged {get; set;}
-    public static bool selectedMulti=true;
+    public bool listChanged { get; set; }
+    public static bool selectedMulti = true;
 
 
 
@@ -23,17 +23,17 @@ public class LobbyFighter : Singleton<LobbyFighter>
     {
         afterburners = new GameObject[fighters.Length];
         nameTexts = new TextMeshProUGUI[fighters.Length];
-        foreach(GameObject fighter in fighters)
+        foreach (GameObject fighter in fighters)
         {
             fighter.transform.DOMoveZ(-5.5f, 0);
-            if(fighter.activeSelf) fighter.SetActive(false);
+            if (fighter.activeSelf) fighter.SetActive(false);
             afterburners[Array.IndexOf(fighters, fighter)] = fighter.transform.Find("AfterBurners").gameObject;
             TextMeshProUGUI textMeshPro = fighter.transform.Find("Canvas/Text (TMP)").GetComponent<TextMeshProUGUI>();
             textMeshPro.text = "";
             nameTexts[Array.IndexOf(fighters, fighter)] = textMeshPro;
         }
 
-        if(!selectedMulti) return;
+        if (!selectedMulti) return;
         RefreshFighterPreparation();
     }
 
@@ -70,7 +70,7 @@ public class LobbyFighter : Singleton<LobbyFighter>
             yield return new WaitForSeconds(interval);
             PrepareFighter(nos[k]);
         }
-        if(callback != null) callback();
+        if (callback != null) callback();
     }
 
     public void SortieAllFighters(Team team, Action callback = null)
@@ -87,19 +87,19 @@ public class LobbyFighter : Singleton<LobbyFighter>
             yield return new WaitForSeconds(interval);
             SortieFighter(nos[k]);
         }
-        if(callback != null) callback();
+        if (callback != null) callback();
     }
 
     public void RefreshFighterPreparation()
     {
         LobbyParticipantData myData = LobbyLinkedData.I.GetParticipantDataByClientId(NetworkManager.Singleton.LocalClientId).Value;
         Team myTeam = myData.team;
-        foreach(LobbyParticipantData data in LobbyLinkedData.I.participantDatas)
+        foreach (LobbyParticipantData data in LobbyLinkedData.I.participantDatas)
         {
             if (data.team != myTeam) continue;
-            if(fighters[data.number].activeSelf) continue;
+            if (fighters[data.number].activeSelf) continue;
             PrepareFighter(data.number);
-            nameTexts[data.number].text = data.name.ToString();
+            nameTexts[data.number].text = data.name.Value.ToString();
         }
     }
 
