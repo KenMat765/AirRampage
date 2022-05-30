@@ -29,9 +29,10 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
     Team myTeam;
 
 
-
     void Start()
     {
+        transform.Find("JoinCode").GetComponent<TextMeshProUGUI>().text = RelayAllocation.joinCode;
+
         menuRect = transform.Find("Menu").GetComponent<RectTransform>();
         returnRect = transform.Find("Return").GetComponent<RectTransform>();
         returnButton = returnRect.GetComponent<Button>();

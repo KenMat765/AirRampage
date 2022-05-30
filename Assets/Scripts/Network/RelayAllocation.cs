@@ -153,6 +153,7 @@ public class RelayAllocation : MonoBehaviour
         }
         if (clientRelayUtilityTask.Status == UniTaskStatus.Faulted)
         {
+            // When join code is wrong, this part is called.
             Debug.LogError("Exception thrown when attempting to connect to Relay Server. Exception.");
             yield break;
         }
