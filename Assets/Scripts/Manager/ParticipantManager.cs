@@ -57,7 +57,7 @@ public class ParticipantManager : NetworkBehaviour
         // Multi Players ///////////////////////////////////////////////////////////////////////////////
         if (BattleInfo.isMulti)
         {
-            if (IsHost)
+            if (NetworkManager.Singleton.IsHost)
             {
                 // Generate Players and AIs.
                 SpawnAllFighters();
