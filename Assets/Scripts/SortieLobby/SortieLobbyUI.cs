@@ -66,7 +66,7 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
             myClientId = NetworkManager.Singleton.LocalClientId;
             LobbyParticipantData myData = (LobbyParticipantData)LobbyLinkedData.I.GetParticipantDataByClientId(NetworkManager.Singleton.LocalClientId);
             myNumber = myData.number;
-            myName = myData.name.Value.ToString();
+            myName = myData.name.ToString();
             myTeam = myData.team;
 
             if (selectedHost)
@@ -479,7 +479,7 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
         {
             isReady = !isReady;
             LobbyParticipantData old_data = (LobbyParticipantData)LobbyLinkedData.I.GetParticipantDataByClientId(myClientId);
-            LobbyParticipantData new_data = new LobbyParticipantData(myNumber, myName, myClientId, myTeam, isReady, old_data.skillCode.Value.Value);
+            LobbyParticipantData new_data = new LobbyParticipantData(myNumber, myName, myClientId, myTeam, isReady, old_data.skillCode.ToString());
             LobbyLinkedData.I.SetParticipantDataServerRpc(myClientId, new_data);
             if (isReady)
             {

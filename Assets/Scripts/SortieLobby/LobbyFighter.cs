@@ -99,7 +99,7 @@ public class LobbyFighter : Singleton<LobbyFighter>
             if (data.team != myTeam) continue;
             if (fighters[data.number].activeSelf) continue;
             PrepareFighter(data.number);
-            nameTexts[data.number].text = data.name.Value.ToString();
+            nameTexts[data.number].text = data.name.ToString();
         }
     }
 

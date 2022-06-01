@@ -159,22 +159,20 @@ public class LobbyLinkedData : NetworkBehaviour
 public struct LobbyParticipantData : INetworkSerializable, IEquatable<LobbyParticipantData>
 {
     public int number;
-    public ForceNetworkSerializeByMemcpy<FixedString32Bytes> name;
+    public FixedString32Bytes name;
     public ulong clientId;
     public Team team;
     public bool isReady;
-    public ForceNetworkSerializeByMemcpy<FixedString32Bytes> skillCode;
+    public FixedString32Bytes skillCode;
 
     public LobbyParticipantData(int number, string name, ulong clientId, Team team, bool isReady, string skillCode)
     {
-        ForceNetworkSerializeByMemcpy<FixedString32Bytes> Name = new ForceNetworkSerializeByMemcpy<FixedString32Bytes>(name);
-        ForceNetworkSerializeByMemcpy<FixedString32Bytes> SkillCode = new ForceNetworkSerializeByMemcpy<FixedString32Bytes>(skillCode);
         this.number = number;
-        this.name = Name;
+        this.name = name;
         this.clientId = clientId;
         this.team = team;
         this.isReady = isReady;
-        this.skillCode = SkillCode;
+        this.skillCode = skillCode;
     }
 
     void INetworkSerializable.NetworkSerialize<T>(BufferSerializer<T> serializer)
