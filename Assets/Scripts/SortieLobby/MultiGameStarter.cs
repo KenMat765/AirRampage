@@ -10,17 +10,17 @@ public class MultiGameStarter : NetworkBehaviour
     {
         get
         {
-            if(instance == null)
+            if (instance == null)
             {
                 instance = FindObjectOfType<MultiGameStarter>();
-                if(instance == null) {instance = new GameObject(typeof(MultiGameStarter).ToString()).AddComponent<MultiGameStarter>();}
+                if (instance == null) { instance = new GameObject(typeof(MultiGameStarter).ToString()).AddComponent<MultiGameStarter>(); }
             }
             return instance;
         }
     }
     void Awake()
     {
-        if(this != I)
+        if (this != I)
         {
             Destroy(this.gameObject);
             return;
@@ -56,7 +56,7 @@ public class MultiGameStarter : NetworkBehaviour
         int redAICounter = 0, blueAICounter = 0;
 
         // Set battle data to BattleInfo.
-        for(int no = 0; no < GameInfo.max_player_count; no ++)
+        for (int no = 0; no < GameInfo.max_player_count; no++)
         {
             // Define necessary variables.
             int?[] skillIds, skillLevels;
@@ -65,7 +65,7 @@ public class MultiGameStarter : NetworkBehaviour
             LobbyParticipantData? data_nullable = LobbyLinkedData.I.GetParticipantDataByNo(no);
 
             // If there is a player.
-            if(data_nullable.HasValue)
+            if (data_nullable.HasValue)
             {
                 LobbyParticipantData data = (LobbyParticipantData)data_nullable;
                 LobbyParticipantData.SkillCodeDecoder(data.skillCode.ToString(), out skillIds, out skillLevels);
@@ -76,7 +76,7 @@ public class MultiGameStarter : NetworkBehaviour
             else
             {
                 // Only the host creates AIs.
-                if(IsHost)
+                if (IsHost)
                 {
                     // Create AI battle data.
                     string aiName; Team aiTeam; string aiSkillCode;
@@ -87,14 +87,14 @@ public class MultiGameStarter : NetworkBehaviour
                     // Determine AI name.
                     if (aiTeam == Team.Red)
                     {
-                        redAICounter ++;
+                        redAICounter++;
                         aiName = "AIRed" + redAICounter.ToString();
                     }
 
                     // Generate AI name & team. (Blue Team)
                     else
                     {
-                        blueAICounter ++;
+                        blueAICounter++;
                         aiName = "AIBlue" + blueAICounter.ToString();
                     }
 
@@ -113,7 +113,7 @@ public class MultiGameStarter : NetworkBehaviour
                 }
 
                 // Do not execute these for enemy AIs.
-                if(GameInfo.GetTeamFromNo(no) != myTeam) continue;
+                if (GameInfo.GetTeamFromNo(no) != myTeam) continue;
 
                 // Prepare this AI fighter at each clients.
                 LobbyFighter.I.PrepareFighter(no);
@@ -125,7 +125,7 @@ public class MultiGameStarter : NetworkBehaviour
         bool sortied = false;
         LobbyFighter.I.SortieAllFighters(myTeam, () => sortied = true);
 
-        if(IsHost)
+        if (IsHost)
         {
             yield return new WaitUntil(() => sortied);
 
@@ -138,7 +138,7 @@ public class MultiGameStarter : NetworkBehaviour
     [ClientRpc]
     void SendAIBattleDataClientRpc(int no, string aiName, Team team, string skillCode)
     {
-        int?[] skillIds, skillLevels; 
+        int?[] skillIds, skillLevels;
         LobbyParticipantData.SkillCodeDecoder(skillCode, out skillIds, out skillLevels);
         BattleInfo.battleDatas[no] = new BattleInfo.ParticipantBattleData(no, false, null, aiName, team, skillIds, skillLevels);
     }
@@ -153,12 +153,12 @@ public class MultiGameStarter : NetworkBehaviour
     void SkillUIUpdateRequestClientRpc(int fighterNo, int deck_id, string skillCode)
     {
         // Do not read if enemy team.
-        if(GameInfo.GetTeamFromNo(fighterNo) != myTeam) return;
+        if (GameInfo.GetTeamFromNo(fighterNo) != myTeam) return;
         int?[] skillIds, skillLevels;
         LobbyParticipantData.SkillCodeDecoder(skillCode, out skillIds, out skillLevels);
-        for(int k = 0; k < GameInfo.max_skill_count; k ++)
+        for (int k = 0; k < GameInfo.max_skill_count; k++)
         {
-            if(skillIds[k].HasValue)
+            if (skillIds[k].HasValue)
             {
                 int skillId = (int)skillIds[k];
                 SkillData skillData = SkillDatabase.I.SearchSkillById(skillId);
@@ -177,7 +177,7 @@ public class MultiGameStarter : NetworkBehaviour
     void NameUIUpdateRequestClientRpc(int fighterNo, int blockNo, string name)
     {
         // Do not read if enemy team.
-        if(GameInfo.GetTeamFromNo(fighterNo) != myTeam) return;
+        if (GameInfo.GetTeamFromNo(fighterNo) != myTeam) return;
         LobbyFighter.I.NameFighter(fighterNo, name);
         SortieLobbyUI.I.NameUISetter(blockNo, name);
     }

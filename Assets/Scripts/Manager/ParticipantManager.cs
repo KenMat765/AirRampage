@@ -12,10 +12,10 @@ public class ParticipantManager : NetworkBehaviour
     {
         get
         {
-            if(instance == null)
+            if (instance == null)
             {
                 instance = FindObjectOfType<ParticipantManager>();
-                if(instance == null) {instance = new GameObject(typeof(ParticipantManager).ToString()).AddComponent<ParticipantManager>();}
+                if (instance == null) { instance = new GameObject(typeof(ParticipantManager).ToString()).AddComponent<ParticipantManager>(); }
             }
             return instance;
         }
@@ -25,17 +25,17 @@ public class ParticipantManager : NetworkBehaviour
 
     // 外部から参照可能なプロバティ
     // All fighters' information in scene (Player + AI + Zako)
-    public FighterInfo[] fighterInfos {get; private set;}
+    public FighterInfo[] fighterInfos { get; private set; }
     NetworkVariable<bool> allSpawnComplete = new NetworkVariable<bool>(false);
-    public int myFighterNo {get; private set;}
-    public bool infoSetComplete {get; private set;} = false;
+    public int myFighterNo { get; private set; }
+    public bool infoSetComplete { get; private set; } = false;
     [SerializeField] GameObject redPlayerPrefab, bluePlayerPrefab, redAiPrefab, blueAiPrefab;
 
 
 
     void Awake()
     {
-        if(this != I)
+        if (this != I)
         {
             Destroy(this.gameObject);
             return;
@@ -55,9 +55,9 @@ public class ParticipantManager : NetworkBehaviour
 
 
         // Multi Players ///////////////////////////////////////////////////////////////////////////////
-        if(BattleInfo.isMulti)
+        if (BattleInfo.isMulti)
         {
-            if (IsHost)
+            if (NetworkManager.Singleton.IsHost)
             {
                 // Generate Players and AIs.
                 SpawnAllFighters();
@@ -73,23 +73,23 @@ public class ParticipantManager : NetworkBehaviour
 
             // Get generated fighters on each client.
             GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-            foreach(GameObject player in players)
+            foreach (GameObject player in players)
             {
                 int fighterNo = player.GetComponent<FighterCondition>().fighterNo.Value;
                 allFighters[fighterNo] = player;
-                if(player == myPlayer)
+                if (player == myPlayer)
                 {
                     myFighterNo = fighterNo;
                 }
             }
             GameObject[] ais = GameObject.FindGameObjectsWithTag("AI");
-            foreach(GameObject ai in ais)
+            foreach (GameObject ai in ais)
             {
                 int fighterNo = ai.GetComponent<FighterCondition>().fighterNo.Value;
                 allFighters[fighterNo] = ai;
             }
             GameObject[] zakos = GameObject.FindGameObjectsWithTag("Zako");
-            foreach(GameObject zako in zakos)
+            foreach (GameObject zako in zakos)
             {
                 int fighterNo = zako.GetComponent<FighterCondition>().fighterNo.Value;
                 allFighters[fighterNo] = zako;
@@ -108,12 +108,12 @@ public class ParticipantManager : NetworkBehaviour
             myFighterNo = 0;
 
             // Generate AIs
-            for(int no = 1; no < GameInfo.max_player_count; no ++)
+            for (int no = 1; no < GameInfo.max_player_count; no++)
             {
                 Team team = GameInfo.GetTeamFromNo(no);
                 SpawnPoint point = SpawnPoints.GetSpawnPoint(no);
                 GameObject aiFighter;
-                if(team == Team.Red)
+                if (team == Team.Red)
                 {
                     aiFighter = Instantiate(redAiPrefab, point.transform.position, point.transform.rotation);
                 }
@@ -130,7 +130,7 @@ public class ParticipantManager : NetworkBehaviour
             SpawnPoint redPoint = SpawnPoints.GetSpawnPointZako(Team.Red, red_pointNo);
             SpawnPoint bluePoint = SpawnPoints.GetSpawnPointZako(Team.Blue, blue_pointNo); ;
             int red_current_spawned = 0, blue_current_spawned = 0;
-            for(int no = 0; no < SpawnPoints.zakoCountPerTeam; no ++)
+            for (int no = 0; no < SpawnPoints.zakoCountPerTeam; no++)
             {
                 if (red_current_spawned == redPoint.zakoCount)
                 {
@@ -170,7 +170,7 @@ public class ParticipantManager : NetworkBehaviour
 
 
         // Process for all fighters /////////////////////////////////////////////////////////////////////////
-        for(int no = 0; no < GameInfo.max_player_count + (SpawnPoints.zakoCountAll); no++)
+        for (int no = 0; no < GameInfo.max_player_count + (SpawnPoints.zakoCountAll); no++)
         {
             // Get necessary components.
             GameObject fighter = allFighters[no];
@@ -186,12 +186,12 @@ public class ParticipantManager : NetworkBehaviour
             fighterInfos[no] = info;
 
             // Only for Players & AIs
-            if(no < GameInfo.max_player_count)
+            if (no < GameInfo.max_player_count)
             {
                 // Get battle data at fighterNo.
                 BattleInfo.ParticipantBattleData battleData = BattleInfo.battleDatas[no];
 
-                if(!BattleInfo.isMulti)
+                if (!BattleInfo.isMulti)
                 {
                     // Setup fighterCondition by battle data.
                     fighterCondition.fighterNo.Value = battleData.fighterNo;
@@ -224,7 +224,7 @@ public class ParticipantManager : NetworkBehaviour
             // Only for Zakos.
             else
             {
-                if(!BattleInfo.isMulti)
+                if (!BattleInfo.isMulti)
                 {
                     fighterCondition.fighterNo.Value = no;
                     if (fighter.layer == LayerMask.NameToLayer("RedFighter"))
@@ -265,10 +265,10 @@ public class ParticipantManager : NetworkBehaviour
     // Only the host calls this method.
     void SpawnAllFighters()
     {
-        for(int no = 0; no < GameInfo.max_player_count; no ++)
+        for (int no = 0; no < GameInfo.max_player_count; no++)
         {
             BattleInfo.ParticipantBattleData? battleData_nullable = BattleInfo.GetBattleDataByFighterNo(no);
-            if(!battleData_nullable.HasValue)
+            if (!battleData_nullable.HasValue)
             {
                 Debug.LogError($"BattleData not set at fighterNo : {no}");
                 continue;
@@ -277,11 +277,11 @@ public class ParticipantManager : NetworkBehaviour
 
 
             // If Player ////////////////////////////////////////////////////////////////////////
-            if(battleData.isPlayer)
+            if (battleData.isPlayer)
             {
                 // Get client id.
                 ulong? clientId_nullable = battleData.clientId;
-                if(!clientId_nullable.HasValue)
+                if (!clientId_nullable.HasValue)
                 {
                     Debug.LogError($"ClientId not set at fighterNo : {no}");
                     continue;
@@ -291,7 +291,7 @@ public class ParticipantManager : NetworkBehaviour
                 // Create fighter.
                 GameObject fighter;
                 SpawnPoint point = SpawnPoints.GetSpawnPoint(no);
-                if(battleData.team == Team.Red)
+                if (battleData.team == Team.Red)
                 {
                     fighter = Instantiate(redPlayerPrefab, point.transform.position, point.transform.rotation);
                 }
@@ -318,7 +318,7 @@ public class ParticipantManager : NetworkBehaviour
                 // Create fighter.
                 GameObject fighter;
                 SpawnPoint point = SpawnPoints.GetSpawnPoint(no);
-                if(battleData.team == Team.Red)
+                if (battleData.team == Team.Red)
                 {
                     fighter = Instantiate(redAiPrefab, point.transform.position, point.transform.rotation);
                 }
@@ -348,19 +348,19 @@ public class ParticipantManager : NetworkBehaviour
     {
         int red_pointNo = 0, blue_pointNo = 0;
         SpawnPoint redPoint = SpawnPoints.GetSpawnPointZako(Team.Red, red_pointNo);
-        SpawnPoint bluePoint = SpawnPoints.GetSpawnPointZako(Team.Blue, blue_pointNo);;
+        SpawnPoint bluePoint = SpawnPoints.GetSpawnPointZako(Team.Blue, blue_pointNo); ;
         int red_current_spawned = 0, blue_current_spawned = 0;
 
-        for(int k = 0; k < SpawnPoints.zakoCountPerTeam; k ++)
+        for (int k = 0; k < SpawnPoints.zakoCountPerTeam; k++)
         {
-            if(red_current_spawned == redPoint.zakoCount)
+            if (red_current_spawned == redPoint.zakoCount)
             {
-                red_pointNo ++;
+                red_pointNo++;
                 redPoint = SpawnPoints.GetSpawnPointZako(Team.Red, red_pointNo);
                 red_current_spawned = 0;
             }
 
-            red_current_spawned ++;
+            red_current_spawned++;
 
             // Create fighter.
             GameObject red;
@@ -378,14 +378,14 @@ public class ParticipantManager : NetworkBehaviour
             redNet.Spawn();
 
 
-            if(blue_current_spawned == bluePoint.zakoCount)
+            if (blue_current_spawned == bluePoint.zakoCount)
             {
-                blue_pointNo ++;
+                blue_pointNo++;
                 bluePoint = SpawnPoints.GetSpawnPointZako(Team.Blue, blue_pointNo);
                 blue_current_spawned = 0;
             }
 
-            blue_current_spawned ++;
+            blue_current_spawned++;
 
             // Create fighter.
             GameObject blue;
@@ -412,7 +412,7 @@ public class ParticipantManager : NetworkBehaviour
     // Activate (or unactivate) all fighters.
     public void AllFightersActivationHandler(bool activate)
     {
-        foreach(FighterInfo info in fighterInfos)
+        foreach (FighterInfo info in fighterInfos)
         {
             info.fighterCondition.enabled = activate;
             info.movement.enabled = activate;
@@ -437,11 +437,11 @@ public struct FighterInfo
         this.receiver = receiver;
     }
 
-    public GameObject fighter {get; private set;}
-    public GameObject body {get; private set;}
-    public BodyManager bodyManager {get; private set;}
-    public FighterCondition fighterCondition {get; private set;}
-    public Movement movement {get; private set;}
-    public Attack attack {get; private set;}
-    public Receiver receiver {get; private set;}
+    public GameObject fighter { get; private set; }
+    public GameObject body { get; private set; }
+    public BodyManager bodyManager { get; private set; }
+    public FighterCondition fighterCondition { get; private set; }
+    public Movement movement { get; private set; }
+    public Attack attack { get; private set; }
+    public Receiver receiver { get; private set; }
 }
