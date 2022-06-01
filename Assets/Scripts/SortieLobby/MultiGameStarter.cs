@@ -129,7 +129,7 @@ public class MultiGameStarter : NetworkBehaviour
         {
             yield return new WaitUntil(() => sortied);
 
-            NetworkManager.Singleton.SceneManager.LoadScene("Offline", UnityEngine.SceneManagement.LoadSceneMode.Single);
+            NetworkManager.SceneManager.LoadScene("Offline", UnityEngine.SceneManagement.LoadSceneMode.Single);
         }
     }
 

@@ -8,39 +8,39 @@ public class SpawnPoints : MonoBehaviour
 {
     public static SpawnPoint[] spawnPoints { get; private set; }
     public static int zakoCountAll { get; private set; }
-    public static int zakoCountPerTeam { get { return zakoCountAll / 2;} }
+    public static int zakoCountPerTeam { get { return zakoCountAll / 2; } }
 
     [ContextMenu("Distribute Point Numbers")]
     void DistributePointNumbers()
     {
         spawnPoints = GetComponentsInChildren<SpawnPoint>();
         int red = 0, blue = 0, redZako = 0, blueZako = 0;
-        foreach(SpawnPoint point in spawnPoints)
+        foreach (SpawnPoint point in spawnPoints)
         {
-            if(point.spawnZako)
+            if (point.spawnZako)
             {
-                if(point.team == Team.Red)
+                if (point.team == Team.Red)
                 {
                     point.pointNo = redZako;
-                    redZako ++;
+                    redZako++;
                 }
                 else
                 {
                     point.pointNo = blueZako;
-                    blueZako ++;
+                    blueZako++;
                 }
             }
             else
             {
-                if(point.team == Team.Red)
+                if (point.team == Team.Red)
                 {
                     point.pointNo = red;
-                    red ++;
+                    red++;
                 }
                 else
                 {
                     point.pointNo = blue;
-                    blue ++;
+                    blue++;
                 }
             }
         }
@@ -49,9 +49,9 @@ public class SpawnPoints : MonoBehaviour
     void Awake()
     {
         spawnPoints = GetComponentsInChildren<SpawnPoint>();
-        foreach(SpawnPoint point in spawnPoints)
+        foreach (SpawnPoint point in spawnPoints)
         {
-            if(point.spawnZako) zakoCountAll += point.zakoCount;
+            if (point.spawnZako) zakoCountAll += point.zakoCount;
         }
     }
 
@@ -60,9 +60,9 @@ public class SpawnPoints : MonoBehaviour
         SpawnPoint result = null;
         Team team = GameInfo.GetTeamFromNo(fighterNo);
         int blockNo = GameInfo.GetBlockNoFromNo(fighterNo);
-        foreach(SpawnPoint point in spawnPoints)
+        foreach (SpawnPoint point in spawnPoints)
         {
-            if(point.team == team && point.pointNo == blockNo)
+            if (point.team == team && point.pointNo == blockNo)
             {
                 result = point;
                 break;
@@ -74,9 +74,9 @@ public class SpawnPoints : MonoBehaviour
     public static SpawnPoint GetSpawnPointZako(Team team, int pointNo)
     {
         SpawnPoint result = null;
-        foreach(SpawnPoint point in spawnPoints)
+        foreach (SpawnPoint point in spawnPoints)
         {
-            if(point.spawnZako && point.team == team && point.pointNo == pointNo)
+            if (point.spawnZako && point.team == team && point.pointNo == pointNo)
             {
                 result = point;
                 break;

@@ -6,6 +6,7 @@ using DG.Tweening;
 using TMPro;
 using System.Text;
 using Unity.Netcode;
+using Cysharp.Threading.Tasks;
 
 public class OnlineLobbyUI : MonoBehaviour
 {
@@ -25,13 +26,15 @@ public class OnlineLobbyUI : MonoBehaviour
         page = next;
         pageChanged = true;
     }
-    
+
     bool selectedHost;
 
 
 
-    void Start()
+    async void Start()
     {
+        await RelayAllocation.SignInPlayerAsync();
+
         menuRect = transform.Find("Menu").GetComponent<RectTransform>();
         returnRect = transform.Find("Return").GetComponent<RectTransform>();
         returnButton = returnRect.GetComponent<Button>();
@@ -73,10 +76,10 @@ public class OnlineLobbyUI : MonoBehaviour
 
     void Update()
     {
-        if(!pageChanged) return;
+        if (!pageChanged) return;
 
         Sequence sequence = DOTween.Sequence();
-        switch(page)
+        switch (page)
         {
             case Page.hostClient:
                 sequence.Append(titleText.DOFade(0, tweenDuration).OnComplete(() => titleText.text = "Multi"));
@@ -87,7 +90,7 @@ public class OnlineLobbyUI : MonoBehaviour
 
                 returnButton.onClick.RemoveAllListeners();
                 returnButton.onClick.AddListener(ExitLobby);
-            break;
+                break;
 
             case Page.passwordName:
                 sequence.Append(titleText.DOFade(0, tweenDuration)
@@ -103,7 +106,7 @@ public class OnlineLobbyUI : MonoBehaviour
 
                 returnButton.onClick.RemoveAllListeners();
                 returnButton.onClick.AddListener(() => SetPage(Page.hostClient));
-            break;
+                break;
         }
         sequence.Join(titleText.DOFade(0.7f, tweenDuration));
         sequence.Play();
@@ -131,18 +134,20 @@ public class OnlineLobbyUI : MonoBehaviour
 
     public void Confirm()
     {
-        if(selectedHost)
+        if (selectedHost)
         {
-            GameNetPortal.I.SetPassword(passwordInputField.text);
+            // GameNetPortal.I.SetPassword(passwordInputField.text);
             string skillCode;
             int?[] skillIds, skillLevels;
             PlayerInfo.SkillIdGetter(0, out skillIds);
             PlayerInfo.SkillLevelGetter(0, out skillLevels);
             LobbyParticipantData.SkillCodeEncoder(skillIds, skillLevels, out skillCode);
-            string payloadJSON = JsonUtility.ToJson(new ConnectionPayload(passwordInputField.text, nameInputField.text, skillCode));
+            // string payloadJSON = JsonUtility.ToJson(new ConnectionPayload(passwordInputField.text, nameInputField.text, skillCode));
+            string payloadJSON = JsonUtility.ToJson(new ConnectionPayload(nameInputField.text, skillCode));
             byte[] payloadBytes = Encoding.ASCII.GetBytes(payloadJSON);
             NetworkManager.Singleton.NetworkConfig.ConnectionData = payloadBytes;
-            GameNetPortal.I.StartHost();
+            // GameNetPortal.I.StartHost();
+            RelayAllocation.AllocateRelayAndConfigureTransportAsHost(this, GameInfo.max_player_count - 1);
         }
         else
         {
@@ -151,10 +156,12 @@ public class OnlineLobbyUI : MonoBehaviour
             PlayerInfo.SkillIdGetter(0, out skillIds);
             PlayerInfo.SkillLevelGetter(0, out skillLevels);
             LobbyParticipantData.SkillCodeEncoder(skillIds, skillLevels, out skillCode);
-            var payloadJSON = JsonUtility.ToJson(new ConnectionPayload(passwordInputField.text, nameInputField.text, skillCode));
+            // var payloadJSON = JsonUtility.ToJson(new ConnectionPayload(passwordInputField.text, nameInputField.text, skillCode));
+            var payloadJSON = JsonUtility.ToJson(new ConnectionPayload(nameInputField.text, skillCode));
             byte[] payloadBytes = Encoding.ASCII.GetBytes(payloadJSON);
             NetworkManager.Singleton.NetworkConfig.ConnectionData = payloadBytes;
-            GameNetPortal.I.StartClient();
+            // GameNetPortal.I.StartClient();
+            RelayAllocation.ConfigureTransportAsClient(this, passwordInputField.text);
         }
     }
 
@@ -172,7 +179,7 @@ public class OnlineLobbyUI : MonoBehaviour
 
     public void OnValueChangedInputField()
     {
-        if(passwordInputField.text == "" || nameInputField.text == "")
+        if (passwordInputField.text == "" || nameInputField.text == "")
         {
             confirmButton.interactable = false;
             confirmButtonText.color = new Color(0, 0.96f, 1, 0.3f);

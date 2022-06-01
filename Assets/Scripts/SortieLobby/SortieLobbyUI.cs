@@ -8,8 +8,8 @@ using UnityEngine.UI;
 
 public class SortieLobbyUI : Singleton<SortieLobbyUI>
 {
-    protected override bool dont_destroy_on_load {get; set;} = false;
-    public static bool selectedMulti=true, selectedHost;
+    protected override bool dont_destroy_on_load { get; set; } = false;
+    public static bool selectedMulti = true, selectedHost;
     const float tweenDuration = 0.1f, tweenInterval = 0.8f;
     GameObject stageObject, ruleObject, participantObject;
     RectTransform menuRect, returnRect;
@@ -29,9 +29,10 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
     Team myTeam;
 
 
-
     void Start()
     {
+        transform.Find("JoinCode").GetComponent<TextMeshProUGUI>().text = RelayAllocation.joinCode;
+
         menuRect = transform.Find("Menu").GetComponent<RectTransform>();
         returnRect = transform.Find("Return").GetComponent<RectTransform>();
         returnButton = returnRect.GetComponent<Button>();
@@ -57,18 +58,18 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
 
         BattleInfo.isMulti = selectedMulti;
         BattleInfo.isHost = selectedHost;
-        
+
         // Multi //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if(selectedMulti)
+        if (selectedMulti)
         {
             // 不変の値を取得
             myClientId = NetworkManager.Singleton.LocalClientId;
             LobbyParticipantData myData = (LobbyParticipantData)LobbyLinkedData.I.GetParticipantDataByClientId(NetworkManager.Singleton.LocalClientId);
             myNumber = myData.number;
-            myName = myData.name.ToString();
+            myName = myData.name.Value.ToString();
             myTeam = myData.team;
 
-            if(selectedHost)
+            if (selectedHost)
             {
                 titleText.text = "Stage";
                 stageObject.transform.DOScaleX(0, 0);
@@ -122,7 +123,7 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
             stageObject.SetActive(true);
             titleText.text = "Stage";
             arrows[0].SetActive(true);
-            for(int k = 1; k < arrows.Length; k ++) arrows[k].SetActive(false);
+            for (int k = 1; k < arrows.Length; k++) arrows[k].SetActive(false);
             DOVirtual.DelayedCall(0.5f, () =>
             {
                 menuRect.DOScaleY(1, tweenDuration)
@@ -141,17 +142,17 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
             // AI Setups //////////////////////////////////////////////////////////////////////////////////////////////
             // Red AIs.
             int redAiCount = 3;
-            for(int red = 0; red < redAiCount; red++)
+            for (int red = 0; red < redAiCount; red++)
             {
                 // Generate skills.
                 int?[] aiSkillIds, aiSkillLevels;
                 LobbyAiSkillGenerator.I.GenerateSkills(out aiSkillIds, out aiSkillLevels);
 
                 // Show skills on UI.
-                for(int iconNo = 0; iconNo < GameInfo.max_skill_count; iconNo ++)
+                for (int iconNo = 0; iconNo < GameInfo.max_skill_count; iconNo++)
                 {
                     int? skillId_nullable = aiSkillIds[iconNo];
-                    if(skillId_nullable.HasValue)
+                    if (skillId_nullable.HasValue)
                     {
                         int skillId = (int)skillId_nullable;
                         SkillData data = SkillDatabase.I.SearchSkillById(skillId);
@@ -172,7 +173,7 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
 
             // Blue AIs.
             int blueAiCount = 4;
-            for(int blue = 0; blue < blueAiCount; blue++)
+            for (int blue = 0; blue < blueAiCount; blue++)
             {
                 // Generate skills.
                 int?[] aiSkillIds, aiSkillLevels;
@@ -191,10 +192,10 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
 
     void Update()
     {
-        if(!pageChanged) return;
+        if (!pageChanged) return;
 
         Sequence sequence = DOTween.Sequence();
-        switch(page)
+        switch (page)
         {
             case Page.stage:
                 if (ruleObject.activeSelf)
@@ -248,7 +249,7 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
                 returnButton.onClick.RemoveAllListeners();
                 if (selectedMulti)
                 {
-                    if(selectedHost)
+                    if (selectedHost)
                     {
                         returnButton.onClick.AddListener(() =>
                         {
@@ -283,19 +284,19 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
     // Stage //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void Stage(int stage_id)
     {
-        switch(stage_id)
+        switch (stage_id)
         {
             case 0:
-            break;
+                break;
 
             case 1:
-            break;
+                break;
 
             case 2:
-            break;
+                break;
 
             case 3:
-            break;
+                break;
         }
         SetPage(Page.rule);
     }
@@ -306,13 +307,13 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
     // Rule ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void Rule(int rule_id)
     {
-        switch(rule_id)
+        switch (rule_id)
         {
             case 0:
-            break;
+                break;
 
             case 1:
-            break;
+                break;
         }
         SetPage(Page.participant);
     }
@@ -345,23 +346,23 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
         skillDecks[deck_id].skills[skill_id].icon.sprite = sprite;
         skillDecks[deck_id].skills[skill_id].icon.color = icon_color;
         skillDecks[deck_id].skills[skill_id].frame.color = frame_color;
-   }
+    }
 
     public void SkillArrow(int direction)
     {
-        switch(direction)
+        switch (direction)
         {
             case 1:
-            deck_num ++;
-            deck_num = Mathf.Clamp(deck_num, 0, GameInfo.deck_count - 1);
-            break;
+                deck_num++;
+                deck_num = Mathf.Clamp(deck_num, 0, GameInfo.deck_count - 1);
+                break;
 
             case -1:
-            deck_num --;
-            deck_num = Mathf.Clamp(deck_num, 0, GameInfo.deck_count - 1);
-            break;
+                deck_num--;
+                deck_num = Mathf.Clamp(deck_num, 0, GameInfo.deck_count - 1);
+                break;
         }
-        if(selectedMulti)
+        if (selectedMulti)
         {
             int?[] new_skillIds, new_skillLevels;
             PlayerInfo.SkillIdGetter(deck_num, out new_skillIds);
@@ -386,22 +387,22 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
     // SkillIconを全て更新する
     void RefreshPlayerSkillIcons()
     {
-        if(selectedMulti)
+        if (selectedMulti)
         {
-            for(int deck_id = 0; deck_id < skillDecks.Length; deck_id++)
+            for (int deck_id = 0; deck_id < skillDecks.Length; deck_id++)
             {
                 LobbyParticipantData? data_nullable;
                 int fighterNo = GameInfo.GetNoFromTeam(Team.Red, deck_id);
                 data_nullable = LobbyLinkedData.I.GetParticipantDataByNo(fighterNo);
 
-                if(data_nullable.HasValue)
+                if (data_nullable.HasValue)
                 {
                     LobbyParticipantData data = data_nullable.Value;
                     int?[] skillIds, skillLevels;
                     LobbyParticipantData.SkillCodeDecoder(data.skillCode.ToString(), out skillIds, out skillLevels);
-                    for(int skillNum = 0; skillNum < GameInfo.max_skill_count; skillNum++)
+                    for (int skillNum = 0; skillNum < GameInfo.max_skill_count; skillNum++)
                     {
-                        if(skillIds[skillNum].HasValue)
+                        if (skillIds[skillNum].HasValue)
                         {
                             int skillId = (int)skillIds[skillNum];
                             SkillData skillData = SkillDatabase.I.SearchSkillById(skillId);
@@ -415,7 +416,7 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
                 }
                 else
                 {
-                    for(int skillNum = 0; skillNum < GameInfo.max_skill_count; skillNum++)
+                    for (int skillNum = 0; skillNum < GameInfo.max_skill_count; skillNum++)
                     {
                         SkillUISetter(deck_id, skillNum, null, Color.clear, Color.white);
                     }
@@ -425,10 +426,10 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
 
         else
         {
-            for(int k = 0; k < GameInfo.max_skill_count; k++)
+            for (int k = 0; k < GameInfo.max_skill_count; k++)
             {
                 int? skillId = PlayerInfo.deck_skill_ids[deck_num, k];
-                if(skillId.HasValue)
+                if (skillId.HasValue)
                 {
                     SkillData data = SkillDatabase.I.SearchSkillById((int)skillId);
                     SkillUISetter(0, k, data.GetSprite(), Color.white, data.GetColor());
@@ -449,12 +450,12 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
         {
             if (blockNo == nameblockIndex)
             {
-                if(!arrows[blockNo].activeSelf) arrows[blockNo].SetActive(true);
+                if (!arrows[blockNo].activeSelf) arrows[blockNo].SetActive(true);
                 NameUISetter(blockNo, myName);
             }
             else
             {
-                if(arrows[blockNo].activeSelf) arrows[blockNo].SetActive(false);
+                if (arrows[blockNo].activeSelf) arrows[blockNo].SetActive(false);
 
                 // Set your team mates names to UI.
                 int mateFighterNo = GameInfo.GetNoFromTeam(myTeam, blockNo);
@@ -474,13 +475,13 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
 
     public void ReadyForBattle()
     {
-        if(selectedMulti)
+        if (selectedMulti)
         {
             isReady = !isReady;
             LobbyParticipantData old_data = (LobbyParticipantData)LobbyLinkedData.I.GetParticipantDataByClientId(myClientId);
-            LobbyParticipantData new_data = new LobbyParticipantData(myNumber, myName, myClientId, myTeam, isReady, old_data.skillCode);
+            LobbyParticipantData new_data = new LobbyParticipantData(myNumber, myName, myClientId, myTeam, isReady, old_data.skillCode.Value.Value);
             LobbyLinkedData.I.SetParticipantDataServerRpc(myClientId, new_data);
-            if(isReady)
+            if (isReady)
             {
                 readyForBattleText.text = "Change Skill Deck";
                 returnButton.interactable = false;
@@ -496,8 +497,10 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
         {
             readyForBattleButton.interactable = false;
             var seq = DOTween.Sequence();
-            seq.Append(participantObject.transform.DOScaleX(0, tweenDuration).OnComplete(() => {
-                LobbyFighter.I.SortieAllFighters(Team.Red, () => DOVirtual.DelayedCall(1, () => SceneManager2.I.LoadSceneAsync2(GameScenes.offline, FadeType.left, FadeType.bottom)).Play()); }));
+            seq.Append(participantObject.transform.DOScaleX(0, tweenDuration).OnComplete(() =>
+            {
+                LobbyFighter.I.SortieAllFighters(Team.Red, () => DOVirtual.DelayedCall(1, () => SceneManager2.I.LoadSceneAsync2(GameScenes.offline, FadeType.left, FadeType.bottom)).Play());
+            }));
             seq.Join(returnRect.DOAnchorPosX(-100, tweenDuration));
             seq.Append(menuRect.DOScaleY(0, tweenDuration));
             seq.Play();
@@ -519,10 +522,10 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
         returnButton.interactable = false;
         returnRect.DOAnchorPosX(-100, tweenDuration);
 
-        if(selectedMulti)
+        if (selectedMulti)
         {
             NetworkManager.Singleton.Shutdown();
-            if(selectedHost)
+            if (selectedHost)
             {
                 stageObject.transform.DOScaleX(0, tweenDuration);
             }

@@ -12,10 +12,10 @@ public class LobbyLinkedData : NetworkBehaviour
     {
         get
         {
-            if(instance == null)
+            if (instance == null)
             {
                 instance = FindObjectOfType<LobbyLinkedData>();
-                if(instance == null) {instance = new GameObject(typeof(LobbyLinkedData).ToString()).AddComponent<LobbyLinkedData>();}
+                if (instance == null) { instance = new GameObject(typeof(LobbyLinkedData).ToString()).AddComponent<LobbyLinkedData>(); }
             }
             return instance;
         }
@@ -23,7 +23,7 @@ public class LobbyLinkedData : NetworkBehaviour
 
     void Awake()
     {
-        if(this != I)
+        if (this != I)
         {
             Destroy(this.gameObject);
             return;
@@ -38,7 +38,7 @@ public class LobbyLinkedData : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         // Hostはここでparticipant dataを入れる
-        if(IsHost) participantDatas.Add(GameNetPortal.I.hostData);
+        if (IsHost) participantDatas.Add(GameNetPortal.I.hostData);
     }
 
     public void AddOnValueChangedAction(Action<NetworkListEvent<LobbyParticipantData>> action)
@@ -48,9 +48,9 @@ public class LobbyLinkedData : NetworkBehaviour
 
     public LobbyParticipantData? GetParticipantDataByClientId(ulong clientId)
     {
-        foreach(LobbyParticipantData data in participantDatas)
+        foreach (LobbyParticipantData data in participantDatas)
         {
-            if(data.clientId == clientId)
+            if (data.clientId == clientId)
             {
                 return data;
             }
@@ -60,9 +60,9 @@ public class LobbyLinkedData : NetworkBehaviour
 
     public LobbyParticipantData? GetParticipantDataByNo(int number)
     {
-        foreach(LobbyParticipantData data in participantDatas)
+        foreach (LobbyParticipantData data in participantDatas)
         {
-            if(data.number == number)
+            if (data.number == number)
             {
                 return data;
             }
@@ -72,15 +72,15 @@ public class LobbyLinkedData : NetworkBehaviour
 
     public int? GetUnusedNumber()
     {
-        for(int k = 0; k < GameInfo.max_player_count; k++)
+        for (int k = 0; k < GameInfo.max_player_count; k++)
         {
             int counter = 0;
-            foreach(LobbyParticipantData data in participantDatas)
+            foreach (LobbyParticipantData data in participantDatas)
             {
-                if(data.number == k) break;
-                else counter ++;
+                if (data.number == k) break;
+                else counter++;
             }
-            if(counter == participantDatas.Count) return k;
+            if (counter == participantDatas.Count) return k;
         }
         return null;
     }
@@ -89,15 +89,15 @@ public class LobbyLinkedData : NetworkBehaviour
     public void SetParticipantDataServerRpc(ulong clientId, LobbyParticipantData inputData)
     {
         int? dataIndex = null;
-        foreach(LobbyParticipantData data in participantDatas)
+        foreach (LobbyParticipantData data in participantDatas)
         {
-            if(data.clientId == clientId)
+            if (data.clientId == clientId)
             {
                 dataIndex = participantDatas.IndexOf(data);
                 break;
             }
         }
-        if(dataIndex.HasValue)
+        if (dataIndex.HasValue)
         {
             participantDatas[(int)dataIndex] = inputData;
         }
@@ -120,9 +120,9 @@ public class LobbyLinkedData : NetworkBehaviour
 
     public bool IsEveryoneReady()
     {
-        foreach(LobbyParticipantData data in participantDatas)
+        foreach (LobbyParticipantData data in participantDatas)
         {
-            if(!data.isReady) return false;
+            if (!data.isReady) return false;
         }
         return true;
     }
@@ -136,11 +136,11 @@ public class LobbyLinkedData : NetworkBehaviour
         }
         else
         {
-            foreach(LobbyParticipantData data in participantDatas)
+            foreach (LobbyParticipantData data in participantDatas)
             {
-                if(data.team == team)
+                if (data.team == team)
                 {
-                    count ++;
+                    count++;
                 }
             }
         }
@@ -149,7 +149,7 @@ public class LobbyLinkedData : NetworkBehaviour
 
     public override void OnDestroy()
     {
-        if(participantDatas == null) participantDatas = new NetworkList<LobbyParticipantData>();
+        if (participantDatas == null) participantDatas = new NetworkList<LobbyParticipantData>();
         base.OnDestroy();
     }
 }
@@ -159,20 +159,22 @@ public class LobbyLinkedData : NetworkBehaviour
 public struct LobbyParticipantData : INetworkSerializable, IEquatable<LobbyParticipantData>
 {
     public int number;
-    public FixedString32Bytes name;
+    public ForceNetworkSerializeByMemcpy<FixedString32Bytes> name;
     public ulong clientId;
     public Team team;
     public bool isReady;
-    public FixedString32Bytes skillCode;
+    public ForceNetworkSerializeByMemcpy<FixedString32Bytes> skillCode;
 
-    public LobbyParticipantData(int number, FixedString32Bytes name, ulong clientId, Team team, bool isReady, FixedString32Bytes skillCode)
+    public LobbyParticipantData(int number, string name, ulong clientId, Team team, bool isReady, string skillCode)
     {
+        ForceNetworkSerializeByMemcpy<FixedString32Bytes> Name = new ForceNetworkSerializeByMemcpy<FixedString32Bytes>(name);
+        ForceNetworkSerializeByMemcpy<FixedString32Bytes> SkillCode = new ForceNetworkSerializeByMemcpy<FixedString32Bytes>(skillCode);
         this.number = number;
-        this.name = name;
+        this.name = Name;
         this.clientId = clientId;
         this.team = team;
         this.isReady = isReady;
-        this.skillCode = skillCode;
+        this.skillCode = SkillCode;
     }
 
     void INetworkSerializable.NetworkSerialize<T>(BufferSerializer<T> serializer)
@@ -199,9 +201,9 @@ public struct LobbyParticipantData : INetworkSerializable, IEquatable<LobbyParti
     public static void SkillCodeEncoder(int?[] skillIds, int?[] skillLevels, out string skillCode)
     {
         skillCode = "";
-        for(int k = 0; k < GameInfo.max_skill_count; k++)
+        for (int k = 0; k < GameInfo.max_skill_count; k++)
         {
-            if(skillIds[k].HasValue)
+            if (skillIds[k].HasValue)
             {
                 skillCode += skillIds[k].ToString() + "-";
                 skillCode += skillLevels[k].ToString() + "/";
@@ -221,12 +223,12 @@ public struct LobbyParticipantData : INetworkSerializable, IEquatable<LobbyParti
         int skillNumber = 0;
         bool decodingSkillId = true;
         string skillId_cashe = "";
-        for(int k = 0; k < skillCode.Length; k++)
+        for (int k = 0; k < skillCode.Length; k++)
         {
-            if(skillCode[k] == '-')
+            if (skillCode[k] == '-')
             {
                 decodingSkillId = false;
-                if(skillId_cashe == "n")
+                if (skillId_cashe == "n")
                 {
                     skillIds[skillNumber] = null;
                 }
@@ -236,16 +238,16 @@ public struct LobbyParticipantData : INetworkSerializable, IEquatable<LobbyParti
                 }
                 skillId_cashe = "";
             }
-            else if(skillCode[k] == '/')
+            else if (skillCode[k] == '/')
             {
                 decodingSkillId = true;
-                skillNumber ++;
+                skillNumber++;
             }
             else
             {
-                if(decodingSkillId)
+                if (decodingSkillId)
                 {
-                    if(skillCode[k] == 'n')
+                    if (skillCode[k] == 'n')
                     {
                         skillId_cashe += "n";
                     }
@@ -256,7 +258,7 @@ public struct LobbyParticipantData : INetworkSerializable, IEquatable<LobbyParti
                 }
                 else
                 {
-                    if(skillCode[k] == 'n')
+                    if (skillCode[k] == 'n')
                     {
                         skillLevels[skillNumber] = null;
                     }

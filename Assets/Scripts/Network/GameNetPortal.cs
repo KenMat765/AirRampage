@@ -9,14 +9,14 @@ using UnityEngine.SceneManagement;
 
 public class GameNetPortal : Singleton<GameNetPortal>
 {
-    protected override bool dont_destroy_on_load {get; set;} = true;
+    protected override bool dont_destroy_on_load { get; set; } = true;
     readonly string SERVER_TO_CLIENT_CONNECTIONRESULT = "ServerToClientConnectionResult";
-    public enum ConnectStatus {SUCCESS, WRONG_PASSWORD, SERVER_FULL}
+    public enum ConnectStatus { SUCCESS, WRONG_PASSWORD, SERVER_FULL }
     public ConnectStatus connectStatus;
     Action<ConnectStatus> OnRecieveConnectionResult;
-    string password;
-    public void SetPassword(string password) => this.password = password;
-    public LobbyParticipantData hostData {get; private set;}
+    // string password;
+    // public void SetPassword(string password) => this.password = password;
+    public LobbyParticipantData hostData { get; private set; }
     public bool gameStarted = false;
 
 
@@ -27,7 +27,7 @@ public class GameNetPortal : Singleton<GameNetPortal>
         NetworkManager.Singleton.OnClientConnectedCallback += HandleOnClientConnected;
         NetworkManager.Singleton.OnClientDisconnectCallback += HandleOnClientDisconnect;
         NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
-        OnRecieveConnectionResult += (ConnectStatus connectStatus) => 
+        OnRecieveConnectionResult += (ConnectStatus connectStatus) =>
         {
             switch (connectStatus)
             {
@@ -44,14 +44,14 @@ public class GameNetPortal : Singleton<GameNetPortal>
     }
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// StartHost(), StartClient() ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // StartHost(), StartClient() ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void ApprovalCheck(byte[] connectionData, ulong clientId, NetworkManager.ConnectionApprovedDelegate callback)
     {
         // ゲームが開始されていたら入れない
-        if(gameStarted)
+        if (gameStarted)
         {
             callback(false, null, false, null, null);
             return;
@@ -61,7 +61,7 @@ public class GameNetPortal : Singleton<GameNetPortal>
         var payload = JsonUtility.FromJson<ConnectionPayload>(payloadJSON);
 
         // Serverは無条件で入れる
-        if(clientId == NetworkManager.Singleton.LocalClientId)
+        if (clientId == NetworkManager.Singleton.LocalClientId)
         {
             callback(false, null, true, null, null);
             NetworkManager.Singleton.SceneManager.LoadScene("SortieLobby", UnityEngine.SceneManagement.LoadSceneMode.Single);
@@ -71,25 +71,25 @@ public class GameNetPortal : Singleton<GameNetPortal>
             return;
         }
 
-        if(password != payload.password) connectStatus = ConnectStatus.WRONG_PASSWORD;
-        else if(NetworkManager.Singleton.ConnectedClients.Count > GameInfo.max_player_count) connectStatus = ConnectStatus.SERVER_FULL;
+        // if(password != payload.password) connectStatus = ConnectStatus.WRONG_PASSWORD;
+        if (NetworkManager.Singleton.ConnectedClients.Count > GameInfo.max_player_count) connectStatus = ConnectStatus.SERVER_FULL;
         else connectStatus = ConnectStatus.SUCCESS;
-        
+
         // とりあえず入れる
         callback(false, null, true, null, null);
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Networked /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Networked /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         // 接続結果をClientに送信
         ServerToClientConnectResult(clientId, connectStatus);
 
-        if(connectStatus == ConnectStatus.SUCCESS)
+        if (connectStatus == ConnectStatus.SUCCESS)
         {
             // 固有番号を取得
             int? number = LobbyLinkedData.I.GetUnusedNumber();
-            if(!number.HasValue)
+            if (!number.HasValue)
             {
                 Debug.LogError("人数が超過しています");
                 return;
@@ -129,18 +129,18 @@ public class GameNetPortal : Singleton<GameNetPortal>
     [ClientRpc]
     void RefreshAllFightersClientRpc(ulong clientId)
     {
-        if(clientId == NetworkManager.Singleton.LocalClientId) return;
+        if (clientId == NetworkManager.Singleton.LocalClientId) return;
         LobbyFighter.I.RefreshFighterPreparation();
     }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Shutdown() ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Shutdown() ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void HandleOnClientDisconnect(ulong clientId)
     {
         DisableFighterClientRpc(clientId);
-        if(NetworkManager.Singleton.IsHost)
+        if (NetworkManager.Singleton.IsHost)
         {
             LobbyLinkedData.I.DeleteParticipantData(clientId);
         }
@@ -153,14 +153,14 @@ public class GameNetPortal : Singleton<GameNetPortal>
     [ClientRpc]
     void DisableFighterClientRpc(ulong clientId)
     {
-        if(clientId == NetworkManager.Singleton.LocalClientId) return;
+        if (clientId == NetworkManager.Singleton.LocalClientId) return;
         LobbyParticipantData data = LobbyLinkedData.I.GetParticipantDataByClientId(clientId).Value;
         LobbyFighter.I.DisableFighter(data.number);
     }
 
     void OnDestroy()
     {
-        if(NetworkManager.Singleton)
+        if (NetworkManager.Singleton)
         {
             NetworkManager.Singleton.OnServerStarted -= HandleOnServerStarted;
             NetworkManager.Singleton.OnClientConnectedCallback -= HandleOnClientConnected;
