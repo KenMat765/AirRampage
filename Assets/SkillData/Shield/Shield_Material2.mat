@@ -104,6 +104,8 @@ Material:
     - _FrontMinAlpha: 0.2
     - _Height: 1.2860383
     - _MaxSurfaceOffset: 0.01
+    - _QueueControl: 0
+    - _QueueOffset: 0
     - _WaveFrequency: 5
     - _WaveIntencity: 10
     m_Colors:
