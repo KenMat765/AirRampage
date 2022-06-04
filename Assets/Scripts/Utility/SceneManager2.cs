@@ -20,44 +20,40 @@ public class SceneManager2 : Singleton<SceneManager2>
     private void OnSceneLoaded(Scene loadedScene, LoadSceneMode sceneMode)
     {
         // In battle scenes, camera setup is called in ParticipantManager.
-        if(loadedScene.name == "Offline") return;
+        if (loadedScene.name == "Offline") return;
         CameraManager.SetupCameraInScene();
     }
 
     public void LoadScene2(GameScenes gameScene)
     {
-        switch(gameScene)
+        switch (gameScene)
         {
-            case GameScenes.menu :
-            SceneManager.LoadScene("Menu");
-            CSManager.swipe_condition = (TouchExtension touch) => { return true; };
-            break;
+            case GameScenes.menu:
+                SceneManager.LoadScene("Menu");
+                CSManager.swipe_condition = (TouchExtension touch) => { return true; };
+                break;
 
-            case GameScenes.skillport :
-            SceneManager.LoadScene("SkillPort");
-            break;
+            case GameScenes.skillport:
+                SceneManager.LoadScene("SkillPort");
+                break;
 
-            case GameScenes.offline :
-            SceneManager.LoadScene("Offline");
-            break;
+            case GameScenes.offline:
+                SceneManager.LoadScene("Offline");
+                break;
 
-            case GameScenes.onlinelobby :
-            SceneManager.LoadScene("OnlineLobby");
-            break;
+            case GameScenes.onlinelobby:
+                SceneManager.LoadScene("OnlineLobby");
+                break;
 
-            case GameScenes.sortielobby :
-            SceneManager.LoadScene("SortieLobby");
-            break;
-
-            case GameScenes.online :
-            SceneManager.LoadScene("Online");
-            break;
+            case GameScenes.sortielobby:
+                SceneManager.LoadScene("SortieLobby");
+                break;
         }
     }
 
     public void LoadSceneAsync2(GameScenes gameScene, FadeType fadeOutType, FadeType fadeInType)
     {
-        if(beforeSceneUnload != null) { beforeSceneUnload(); }
+        if (beforeSceneUnload != null) { beforeSceneUnload(); }
         StartCoroutine(SceneLoader(gameScene, fadeOutType, fadeInType));
     }
     IEnumerator SceneLoader(GameScenes gameScene, FadeType fadeOutType, FadeType fadeInType)
@@ -67,35 +63,31 @@ public class SceneManager2 : Singleton<SceneManager2>
         yield return new WaitForSeconds(fadeout_duration);
 
         AsyncOperation async;
-        switch(gameScene)
+        switch (gameScene)
         {
-            case GameScenes.menu :
-            async = SceneManager.LoadSceneAsync("Menu");
-            CSManager.swipe_condition = (TouchExtension touch) => { return true; };
-            break;
+            case GameScenes.menu:
+                async = SceneManager.LoadSceneAsync("Menu");
+                CSManager.swipe_condition = (TouchExtension touch) => { return true; };
+                break;
 
-            case GameScenes.skillport :
-            async = SceneManager.LoadSceneAsync("SkillPort");
-            break;
+            case GameScenes.skillport:
+                async = SceneManager.LoadSceneAsync("SkillPort");
+                break;
 
-            case GameScenes.offline :
-            async = SceneManager.LoadSceneAsync("Offline");
-            break;
+            case GameScenes.offline:
+                async = SceneManager.LoadSceneAsync("Offline");
+                break;
 
-            case GameScenes.onlinelobby :
-            async = SceneManager.LoadSceneAsync("OnlineLobby");
-            break;
+            case GameScenes.onlinelobby:
+                async = SceneManager.LoadSceneAsync("OnlineLobby");
+                break;
 
-            case GameScenes.sortielobby :
-            async = SceneManager.LoadSceneAsync("SortieLobby");
-            break;
+            case GameScenes.sortielobby:
+                async = SceneManager.LoadSceneAsync("SortieLobby");
+                break;
 
-            case GameScenes.online :
-            async = SceneManager.LoadSceneAsync("Online");
-            break;
-
-            default :
-            yield break;
+            default:
+                yield break;
         }
         async.allowSceneActivation = false;
 
@@ -114,7 +106,7 @@ public class SceneManager2 : Singleton<SceneManager2>
     public static void BeforeSceneUnload(params Action[] actions)
     {
         beforeSceneUnload = default;
-        foreach(Action action in actions) { beforeSceneUnload += action; }
+        foreach (Action action in actions) { beforeSceneUnload += action; }
     }
 }
 
@@ -125,5 +117,4 @@ public enum GameScenes
     offline,
     onlinelobby,
     sortielobby,
-    online
 }

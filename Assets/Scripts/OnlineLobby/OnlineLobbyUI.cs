@@ -13,12 +13,12 @@ public class OnlineLobbyUI : MonoBehaviour
     RectTransform menuRect, returnRect;
     Button returnButton, confirmButton;
     Text confirmButtonText, titleText;
-    TMP_InputField passwordInputField, nameInputField;
-    GameObject hostClientObject, passwordNameObject;
+    TMP_InputField nameInputField, inputField1, inputField2;
+    GameObject hostClientObject, localRelayObject, nameObject, passwordObject;
 
     const float tweenDuration = 0.1f, tweenInterval = 0.8f;
 
-    enum Page { hostClient, passwordName }
+    enum Page { hostClient, localRelay, name, password }
     Page page;
     bool pageChanged = false;
     void SetPage(Page next)
@@ -27,7 +27,7 @@ public class OnlineLobbyUI : MonoBehaviour
         pageChanged = true;
     }
 
-    bool selectedHost;
+    bool selectedHost, selectedLocal;
 
 
 
@@ -44,17 +44,22 @@ public class OnlineLobbyUI : MonoBehaviour
         returnButton.interactable = false;
 
         hostClientObject = menuRect.Find("HostClient").gameObject;
-        passwordNameObject = menuRect.Find("PasswordName").gameObject;
+        localRelayObject = menuRect.Find("LocalRelay").gameObject;
+        nameObject = menuRect.Find("Name").gameObject;
+        passwordObject = menuRect.Find("Password").gameObject;
         hostClientObject.SetActive(true);
-        passwordNameObject.SetActive(false);
+        localRelayObject.SetActive(false);
+        nameObject.SetActive(false);
+        passwordObject.SetActive(false);
 
         titleText = menuRect.Find("Title").GetComponent<Text>();
         titleText.DOFade(0, 0);
 
-        passwordInputField = passwordNameObject.transform.Find("PasswordInputField").GetComponent<TMP_InputField>();
-        nameInputField = passwordNameObject.transform.Find("NameInputField").GetComponent<TMP_InputField>();
+        nameInputField = nameObject.transform.Find("InputField").GetComponent<TMP_InputField>();
+        inputField1 = passwordObject.transform.Find("InputField1").GetComponent<TMP_InputField>();
+        inputField2 = passwordObject.transform.Find("InputField2").GetComponent<TMP_InputField>();
 
-        var confirmButtonObject = passwordNameObject.transform.Find("ConfirmButton");
+        var confirmButtonObject = passwordObject.transform.Find("ConfirmButton");
         confirmButton = confirmButtonObject.GetComponent<Button>();
         confirmButtonText = confirmButtonObject.GetComponentInChildren<Text>();
         confirmButton.interactable = false;
@@ -83,7 +88,8 @@ public class OnlineLobbyUI : MonoBehaviour
         {
             case Page.hostClient:
                 sequence.Append(titleText.DOFade(0, tweenDuration).OnComplete(() => titleText.text = "Multi"));
-                sequence.Join(passwordNameObject.transform.DOScaleX(0, tweenDuration).OnComplete(() => passwordNameObject.SetActive(false)));
+                sequence.Join(localRelayObject.transform.DOScaleX(0, tweenDuration).OnComplete(() => localRelayObject.SetActive(false)));
+
                 sequence.Join(hostClientObject.transform.DOScaleX(0, 0).OnComplete(() => { hostClientObject.SetActive(true); returnButton.interactable = false; }));
                 sequence.AppendInterval(tweenInterval);
                 sequence.Append(hostClientObject.transform.DOScaleX(1, tweenDuration).OnComplete(() => returnButton.interactable = true));
@@ -92,20 +98,47 @@ public class OnlineLobbyUI : MonoBehaviour
                 returnButton.onClick.AddListener(ExitLobby);
                 break;
 
-            case Page.passwordName:
+            case Page.localRelay:
+                sequence.Append(titleText.DOFade(0, tweenDuration).OnComplete(() => titleText.text = "Connection"));
+                sequence.Join(hostClientObject.transform.DOScaleX(0, tweenDuration).OnComplete(() => hostClientObject.SetActive(false)));
+                sequence.Join(nameObject.transform.DOScaleX(0, tweenDuration).OnComplete(() => nameObject.SetActive(false)));
+
+                sequence.Join(localRelayObject.transform.DOScaleX(0, 0).OnComplete(() => { localRelayObject.SetActive(true); returnButton.interactable = false; }));
+                sequence.AppendInterval(tweenInterval);
+                sequence.Append(localRelayObject.transform.DOScaleX(1, tweenDuration).OnComplete(() => returnButton.interactable = true));
+
+                returnButton.onClick.RemoveAllListeners();
+                returnButton.onClick.AddListener(() => SetPage(Page.hostClient));
+                break;
+
+            case Page.name:
+                sequence.Append(titleText.DOFade(0, tweenDuration).OnComplete(() => titleText.text = "Name"));
+                sequence.Join(localRelayObject.transform.DOScaleX(0, tweenDuration).OnComplete(() => localRelayObject.SetActive(false)));
+                sequence.Join(passwordObject.transform.DOScaleX(0, tweenDuration).OnComplete(() => passwordObject.SetActive(false)));
+
+                sequence.Join(nameObject.transform.DOScaleX(0, 0).OnComplete(() => { nameObject.SetActive(true); returnButton.interactable = false; }));
+                sequence.AppendInterval(tweenInterval);
+                sequence.Append(nameObject.transform.DOScaleX(1, tweenDuration).OnComplete(() => returnButton.interactable = true));
+
+                returnButton.onClick.RemoveAllListeners();
+                returnButton.onClick.AddListener(() => SetPage(Page.localRelay));
+                break;
+
+            case Page.password:
                 sequence.Append(titleText.DOFade(0, tweenDuration)
                 .OnComplete(() =>
                 {
                     if (selectedHost) titleText.text = "Host";
                     else titleText.text = "Client";
                 }));
-                sequence.Join(hostClientObject.transform.DOScaleX(0, tweenDuration).OnComplete(() => hostClientObject.SetActive(false)));
-                sequence.Join(passwordNameObject.transform.DOScaleX(0, 0).OnComplete(() => { passwordNameObject.SetActive(true); returnButton.interactable = false; }));
+                sequence.Join(nameObject.transform.DOScaleX(0, tweenDuration).OnComplete(() => nameObject.SetActive(false)));
+
+                sequence.Join(passwordObject.transform.DOScaleX(0, 0).OnComplete(() => { passwordObject.SetActive(true); returnButton.interactable = false; }));
                 sequence.AppendInterval(tweenInterval);
-                sequence.Append(passwordNameObject.transform.DOScaleX(1, tweenDuration).OnComplete(() => returnButton.interactable = true));
+                sequence.Append(passwordObject.transform.DOScaleX(1, tweenDuration).OnComplete(() => returnButton.interactable = true));
 
                 returnButton.onClick.RemoveAllListeners();
-                returnButton.onClick.AddListener(() => SetPage(Page.hostClient));
+                returnButton.onClick.AddListener(() => SetPage(Page.name));
                 break;
         }
         sequence.Join(titleText.DOFade(0.7f, tweenDuration));
@@ -121,7 +154,7 @@ public class OnlineLobbyUI : MonoBehaviour
         selectedHost = true;
         SortieLobbyUI.selectedHost = selectedHost;
         confirmButtonText.text = "Create Lobby";
-        SetPage(Page.passwordName);
+        SetPage(Page.localRelay);
     }
 
     public void Client()
@@ -129,7 +162,24 @@ public class OnlineLobbyUI : MonoBehaviour
         selectedHost = false;
         SortieLobbyUI.selectedHost = selectedHost;
         confirmButtonText.text = "Enter Lobby";
-        SetPage(Page.passwordName);
+        SetPage(Page.localRelay);
+    }
+
+    public void LocalNetwork()
+    {
+        selectedLocal = true;
+        SetPage(Page.name);
+    }
+
+    public void RelayServer()
+    {
+        selectedLocal = false;
+        SetPage(Page.name);
+    }
+
+    public void NameInput()
+    {
+        SetPage(Page.password);
     }
 
     public void Confirm()
@@ -146,8 +196,15 @@ public class OnlineLobbyUI : MonoBehaviour
             string payloadJSON = JsonUtility.ToJson(new ConnectionPayload(nameInputField.text, skillCode));
             byte[] payloadBytes = Encoding.ASCII.GetBytes(payloadJSON);
             NetworkManager.Singleton.NetworkConfig.ConnectionData = payloadBytes;
-            // GameNetPortal.I.StartHost();
-            RelayAllocation.AllocateRelayAndConfigureTransportAsHost(this, GameInfo.max_player_count - 1);
+            if (selectedLocal)
+            {
+                RelayAllocation.SignOutPlayer();
+                GameNetPortal.I.StartHost();
+            }
+            else
+            {
+                RelayAllocation.AllocateRelayAndConfigureTransportAsHost(this, GameInfo.max_player_count - 1);
+            }
         }
         else
         {
@@ -160,13 +217,21 @@ public class OnlineLobbyUI : MonoBehaviour
             var payloadJSON = JsonUtility.ToJson(new ConnectionPayload(nameInputField.text, skillCode));
             byte[] payloadBytes = Encoding.ASCII.GetBytes(payloadJSON);
             NetworkManager.Singleton.NetworkConfig.ConnectionData = payloadBytes;
-            // GameNetPortal.I.StartClient();
-            RelayAllocation.ConfigureTransportAsClient(this, passwordInputField.text);
+            if (selectedLocal)
+            {
+                RelayAllocation.SignOutPlayer();
+                GameNetPortal.I.StartClient();
+            }
+            else
+            {
+                RelayAllocation.ConfigureTransportAsClient(this, inputField1.text);
+            }
         }
     }
 
     void ExitLobby()
     {
+        RelayAllocation.SignOutPlayer();
         returnButton.interactable = false;
         returnRect.DOAnchorPosX(-100, tweenDuration);
         hostClientObject.transform.DOScaleX(0, tweenDuration);
@@ -179,7 +244,7 @@ public class OnlineLobbyUI : MonoBehaviour
 
     public void OnValueChangedInputField()
     {
-        if (passwordInputField.text == "" || nameInputField.text == "")
+        if (inputField1.text == "" || inputField2.text == "")
         {
             confirmButton.interactable = false;
             confirmButtonText.color = new Color(0, 0.96f, 1, 0.3f);

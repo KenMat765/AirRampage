@@ -37,6 +37,12 @@ public class RelayAllocation : MonoBehaviour
         }
     }
 
+    ///<Summary> Sign out from AuthenticationService. </Summary>
+    public static void SignOutPlayer()
+    {
+        if (AuthenticationService.Instance.IsSignedIn) AuthenticationService.Instance.SignOut(true);
+    }
+
 
 
     ///<Summary> Allocate Relay Server. </Summary>
