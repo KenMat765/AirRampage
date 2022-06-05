@@ -139,14 +139,18 @@ public class GameNetPortal : Singleton<GameNetPortal>
 
     private void HandleOnClientDisconnect(ulong clientId)
     {
-        DisableFighterClientRpc(clientId);
+        if (SceneManager.GetActiveScene().name == "SortieLobby")
+        {
+            DisableFighterClientRpc(clientId);
+        }
+
         if (NetworkManager.Singleton.IsHost)
         {
             LobbyLinkedData.I.DeleteParticipantData(clientId);
         }
         else
         {
-            SceneManager2.I.LoadScene2(GameScenes.sortielobby);
+            SceneManager2.I.LoadScene2(GameScenes.onlinelobby);
         }
     }
 
