@@ -471,8 +471,8 @@ MonoBehaviour:
   m_MaxSendQueueSize: 50000000
   m_HeartbeatTimeoutMS: 500
   m_ConnectTimeoutMS: 1000
-  m_MaxConnectAttempts: 60
-  m_DisconnectTimeoutMS: 10000
+  m_MaxConnectAttempts: 7
+  m_DisconnectTimeoutMS: 100
   ConnectionData:
     Address: 127.0.0.1
     Port: 7777
@@ -3781,6 +3781,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   connectStatus: 0
   gameStarted: 0
+  connectedCount: 0
 --- !u!4 &1262868005
 Transform:
   m_ObjectHideFlags: 0

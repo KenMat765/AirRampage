@@ -20,7 +20,6 @@ public class GameNetPortal : Singleton<GameNetPortal>
     public bool gameStarted = false;
 
 
-
     void Start()
     {
         NetworkManager.Singleton.OnServerStarted += HandleOnServerStarted;
@@ -139,6 +138,7 @@ public class GameNetPortal : Singleton<GameNetPortal>
 
     private void HandleOnClientDisconnect(ulong clientId)
     {
+        // If current scene is at SortieLobby, disable the fighter of disconnected client at all connected clients by sending client RPC.
         if (SceneManager.GetActiveScene().name == "SortieLobby")
         {
             DisableFighterClientRpc(clientId);
@@ -146,10 +146,23 @@ public class GameNetPortal : Singleton<GameNetPortal>
 
         if (NetworkManager.Singleton.IsHost)
         {
-            LobbyLinkedData.I.DeleteParticipantData(clientId);
+            // If disconnected client was host.
+            if (clientId == NetworkManager.Singleton.LocalClientId)
+            {
+
+            }
+
+            // If diconnected client was not host.
+            else
+            {
+                // Host deletes the ParticipantData of disconncted client.
+                LobbyLinkedData.I.DeleteParticipantData(clientId);
+            }
         }
+
         else
         {
+            // Disconnected client goes back to Scene : OnlineLobby.
             SceneManager2.I.LoadScene2(GameScenes.onlinelobby);
         }
     }
