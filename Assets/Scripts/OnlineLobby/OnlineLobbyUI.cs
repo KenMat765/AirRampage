@@ -220,6 +220,7 @@ public class OnlineLobbyUI : MonoBehaviour
             if (selectedLocal)
             {
                 GameNetPortal.I.StartClient();
+                InfoCanvas.I.OpenFrameAndEnterText("Connecting to Server ...", InfoCanvas.EnterMode.typing);
             }
             else
             {
