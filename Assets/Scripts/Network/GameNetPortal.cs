@@ -162,8 +162,11 @@ public class GameNetPortal : Singleton<GameNetPortal>
 
         else
         {
-            // Disconnected client goes back to Scene : OnlineLobby.
-            SceneManager2.I.LoadScene2(GameScenes.onlinelobby);
+            if (SceneManager.GetActiveScene().name != "OnlineLobby")
+            {
+                // Disconnected client goes back to Scene : OnlineLobby.
+                SceneManager2.I.LoadScene2(GameScenes.onlinelobby);
+            }
         }
     }
 

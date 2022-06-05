@@ -12,7 +12,7 @@ public class OnlineLobbyUI : MonoBehaviour
 {
     RectTransform menuRect, returnRect;
     Button returnButton, confirmButton;
-    Text confirmButtonText, titleText;
+    TextMeshProUGUI titleText, confirmButtonText;
     TMP_InputField nameInputField, inputField1, inputField2;
     GameObject hostClientObject, localRelayObject, nameObject, passwordObject;
 
@@ -52,7 +52,7 @@ public class OnlineLobbyUI : MonoBehaviour
         nameObject.SetActive(false);
         passwordObject.SetActive(false);
 
-        titleText = menuRect.Find("Title").GetComponent<Text>();
+        titleText = menuRect.Find("Title").GetComponent<TextMeshProUGUI>();
         titleText.DOFade(0, 0);
 
         nameInputField = nameObject.transform.Find("InputField").GetComponent<TMP_InputField>();
@@ -61,7 +61,7 @@ public class OnlineLobbyUI : MonoBehaviour
 
         var confirmButtonObject = passwordObject.transform.Find("ConfirmButton");
         confirmButton = confirmButtonObject.GetComponent<Button>();
-        confirmButtonText = confirmButtonObject.GetComponentInChildren<Text>();
+        confirmButtonText = confirmButtonObject.GetComponentInChildren<TextMeshProUGUI>();
         confirmButton.interactable = false;
         confirmButtonText.color = new Color(1, 0.96f, 1, 0.3f);
 
@@ -219,7 +219,6 @@ public class OnlineLobbyUI : MonoBehaviour
             NetworkManager.Singleton.NetworkConfig.ConnectionData = payloadBytes;
             if (selectedLocal)
             {
-                RelayAllocation.SignOutPlayer();
                 GameNetPortal.I.StartClient();
             }
             else
