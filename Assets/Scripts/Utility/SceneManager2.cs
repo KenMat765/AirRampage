@@ -19,6 +19,16 @@ public class SceneManager2 : Singleton<SceneManager2>
 
     private void OnSceneLoaded(Scene loadedScene, LoadSceneMode sceneMode)
     {
+        // If entered sortie lobby scene, frame of info canvas might be open.
+        if (loadedScene.name == "SortieLobby")
+        {
+            if (InfoCanvas.I.isFrameOpen)
+            {
+                InfoCanvas.I.CloseFrame();
+                InfoCanvas.I.CloseButtonInteract(false);
+            }
+        }
+
         // In battle scenes, camera setup is called in ParticipantManager.
         if (loadedScene.name == "Offline") return;
         CameraManager.SetupCameraInScene();
