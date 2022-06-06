@@ -31,7 +31,19 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
 
     void Start()
     {
-        transform.Find("JoinCode").GetComponent<TextMeshProUGUI>().text = RelayAllocation.joinCode;
+        if (selectedMulti)
+        {
+            switch (GameNetPortal.I.connectionMode)
+            {
+                case GameNetPortal.ConnectionMode.LOCAL:
+                    transform.Find("JoinCode").GetComponent<TextMeshProUGUI>().text = GameNetPortal.ipAddress;
+                    break;
+
+                case GameNetPortal.ConnectionMode.RELAY:
+                    transform.Find("JoinCode").GetComponent<TextMeshProUGUI>().text = RelayAllocation.joinCode;
+                    break;
+            }
+        }
 
         menuRect = transform.Find("Menu").GetComponent<RectTransform>();
         returnRect = transform.Find("Return").GetComponent<RectTransform>();

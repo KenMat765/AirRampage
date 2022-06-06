@@ -6,6 +6,7 @@ using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Net;
 
 public class GameNetPortal : Singleton<GameNetPortal>
 {
@@ -19,9 +20,22 @@ public class GameNetPortal : Singleton<GameNetPortal>
     public LobbyParticipantData hostData { get; private set; }
     public bool gameStarted = false;
 
+    // 
+    // 
+    // 
+    public enum ConnectionMode { LOCAL, RELAY }
+    public ConnectionMode connectionMode;
+    public static string ipAddress;
+
 
     void Start()
     {
+        // 
+        // 
+        // 
+        string hostName = Dns.GetHostName();
+        ipAddress = Dns.GetHostAddresses(hostName)[0].ToString();
+
         NetworkManager.Singleton.OnServerStarted += HandleOnServerStarted;
         NetworkManager.Singleton.OnClientConnectedCallback += HandleOnClientConnected;
         NetworkManager.Singleton.OnClientDisconnectCallback += HandleOnClientDisconnect;

@@ -7,6 +7,7 @@ using TMPro;
 using System.Text;
 using Unity.Netcode;
 using Cysharp.Threading.Tasks;
+using Unity.Netcode.Transports.UTP;
 
 public class OnlineLobbyUI : MonoBehaviour
 {
@@ -168,12 +169,14 @@ public class OnlineLobbyUI : MonoBehaviour
     public void LocalNetwork()
     {
         selectedLocal = true;
+        GameNetPortal.I.connectionMode = GameNetPortal.ConnectionMode.LOCAL;
         SetPage(Page.name);
     }
 
     public void RelayServer()
     {
         selectedLocal = false;
+        GameNetPortal.I.connectionMode = GameNetPortal.ConnectionMode.RELAY;
         SetPage(Page.name);
     }
 
@@ -198,7 +201,7 @@ public class OnlineLobbyUI : MonoBehaviour
             NetworkManager.Singleton.NetworkConfig.ConnectionData = payloadBytes;
             if (selectedLocal)
             {
-                RelayAllocation.SignOutPlayer();
+                NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(GameNetPortal.ipAddress, 7777);
                 GameNetPortal.I.StartHost();
             }
             else
@@ -219,6 +222,7 @@ public class OnlineLobbyUI : MonoBehaviour
             NetworkManager.Singleton.NetworkConfig.ConnectionData = payloadBytes;
             if (selectedLocal)
             {
+                NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(inputField1.text, 7777);
                 GameNetPortal.I.StartClient();
                 InfoCanvas.I.OpenFrameAndEnterText("Connecting to Server ...", InfoCanvas.EnterMode.typing);
                 InfoCanvas.I.CloseButtonInteract(false);
