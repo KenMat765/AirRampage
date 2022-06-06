@@ -162,7 +162,16 @@ public class GameNetPortal : Singleton<GameNetPortal>
 
         else
         {
-            if (SceneManager.GetActiveScene().name != "OnlineLobby")
+            // If failed to enter SortieLobby.
+            if (SceneManager.GetActiveScene().name == "OnlineLobby")
+            {
+                if (!InfoCanvas.I.isFrameOpen) InfoCanvas.I.OpenFrameAndEnterText("Failed to Connect to Server", InfoCanvas.EnterMode.inMoment);
+                else InfoCanvas.I.EnterText("Failed to Connect to Server", InfoCanvas.EnterMode.inMoment);
+                InfoCanvas.I.CloseButtonInteract(true);
+            }
+
+            // If kicked out after entered SortieLobby or battle scene.
+            else
             {
                 // Disconnected client goes back to Scene : OnlineLobby.
                 SceneManager2.I.LoadScene2(GameScenes.onlinelobby);

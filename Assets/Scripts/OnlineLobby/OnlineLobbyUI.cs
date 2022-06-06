@@ -221,6 +221,7 @@ public class OnlineLobbyUI : MonoBehaviour
             {
                 GameNetPortal.I.StartClient();
                 InfoCanvas.I.OpenFrameAndEnterText("Connecting to Server ...", InfoCanvas.EnterMode.typing);
+                InfoCanvas.I.CloseButtonInteract(false);
             }
             else
             {
