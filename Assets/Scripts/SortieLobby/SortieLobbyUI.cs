@@ -404,7 +404,7 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
             for (int deck_id = 0; deck_id < skillDecks.Length; deck_id++)
             {
                 LobbyParticipantData? data_nullable;
-                int fighterNo = GameInfo.GetNoFromTeam(Team.Red, deck_id);
+                int fighterNo = GameInfo.GetNoFromTeam(myTeam, deck_id);
                 data_nullable = LobbyLinkedData.I.GetParticipantDataByNo(fighterNo);
 
                 if (data_nullable.HasValue)
