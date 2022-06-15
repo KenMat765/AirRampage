@@ -15,7 +15,7 @@ public class ShieldHitDetector : MonoBehaviour
     public void DecreaseDurability(float damage)
     {
         // Only the owner get damage to shield.
-        if(BattleInfo.isMulti && !shield.IsOwner) return;
+        if (BattleInfo.isMulti && !shield.IsOwner) return;
         shield_durability -= damage;
     }
 
@@ -35,21 +35,21 @@ public class ShieldHitDetector : MonoBehaviour
         shield = GetComponentInParent<Shield>();
 
         mat = GetComponent<Renderer>().material;
-        property_Id =Shader.PropertyToID("_Height");
+        property_Id = Shader.PropertyToID("_Height");
         mat.SetFloat(property_Id, -1);
 
         // impactsを生成
         int default_count = 3;
         impacts = new List<GameObject>();
-        for(int k = 0; k < default_count; k++)
+        for (int k = 0; k < default_count; k++)
         {
             impacts.Add(Instantiate(impact_origin, transform));
             impacts[k].SetActive(false);
         }
 
         // 敵の弾丸のlayer設定
-        if(gameObject.layer == LayerMask.NameToLayer("RedShield")) enemy_bullet_layer = LayerMask.NameToLayer("BlueBullet");
-        else if(gameObject.layer == LayerMask.NameToLayer("BlueShield")) enemy_bullet_layer = LayerMask.NameToLayer("RedBullet");
+        if (gameObject.layer == LayerMask.NameToLayer("RedShield")) enemy_bullet_layer = LayerMask.NameToLayer("BlueBullet");
+        else if (gameObject.layer == LayerMask.NameToLayer("BlueShield")) enemy_bullet_layer = LayerMask.NameToLayer("RedBullet");
         else Debug.LogError("Layer is not set to Shield Prefab");
     }
 
@@ -57,12 +57,12 @@ public class ShieldHitDetector : MonoBehaviour
     {
         // shield_durabilityを時間経過によって減らす
         shield_durability -= exhaust_speed * Time.deltaTime;
-        
+
         // elapsed_timeをshield_durabilityに応じて更新
         shield.MeterDecreaserManual((Mathf.Clamp(shield_durability, 0, shield.shield_durability) * shield.charge_time) / shield.shield_durability);
 
         // 破壊処理
-        if(shield_durability <= 0)
+        if (shield_durability <= 0)
         {
             // Shieldから起動する際に毎回初期化されるので、0< のfloatなら何でも良い(if文を抜けるため)
             shield_durability = 1;
@@ -74,10 +74,10 @@ public class ShieldHitDetector : MonoBehaviour
 
     void OnCollisionEnter(Collision other)
     {
-        if(other.gameObject.layer == enemy_bullet_layer)
+        if (other.gameObject.layer == enemy_bullet_layer)
         {
             // 波紋の演出
-            foreach(ContactPoint c_point in other.contacts)
+            foreach (ContactPoint c_point in other.contacts)
             {
                 GameObject impact = GetImpact();
                 impact.transform.position = c_point.point;
@@ -88,15 +88,15 @@ public class ShieldHitDetector : MonoBehaviour
 
     GameObject GetImpact()
     {
-        foreach(GameObject impact in impacts)
+        foreach (GameObject impact in impacts)
         {
-            if(!impact.activeSelf)
+            if (!impact.activeSelf)
             {
                 impact.SetActive(true);
                 return impact;
             }
         }
-        GameObject new_impact = Instantiate(impact_origin, transform); 
+        GameObject new_impact = Instantiate(impact_origin, transform);
         impacts.Add(new_impact);
         new_impact.SetActive(true);
         return new_impact;
@@ -115,7 +115,7 @@ public class ShieldHitDetector : MonoBehaviour
         mat.SetFloat(property_Id, -1);    // 破壊された瞬間に起動した時
         activate_tweener = mat.DOFloat(2, property_Id, activate_duration);
     }
-    
+
     // Called from Shield.EndProccess().
     public void DestroyShield()
     {
@@ -124,15 +124,16 @@ public class ShieldHitDetector : MonoBehaviour
 
         // Play effect.
         if (activate_tweener.IsActive()) activate_tweener.Kill(true);
-        mat.DOFloat(-1, property_Id, activate_duration).OnComplete(() => { gameObject.SetActive(false); });
+        // Throws Null Reference Error of mat when called before activating shield.
+        if (mat != null) mat.DOFloat(-1, property_Id, activate_duration).OnComplete(() => { gameObject.SetActive(false); });
     }
 
     public void TerminateShield()
     {
         spr_collider.enabled = false;
         shield_durability = 1;
-        // 起動前に死ぬと mat == null でエラーが出る
-        if(mat != null) mat.SetFloat(property_Id, -1);
+        // Throws Null Reference Error of mat when called before activating shield.
+        if (mat != null) mat.SetFloat(property_Id, -1);
         gameObject.SetActive(false);
     }
 }
