@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 public class KillerRaven : SkillAttack
 {
@@ -18,10 +19,10 @@ public class KillerRaven : SkillAttack
         original_prefab = TeamPrefabGetter();
         InitTransformsLists(raven_count);
         const float r = 0.15f;
-        for(int k = 0; k < raven_count; k++)
+        for (int k = 0; k < raven_count; k++)
         {
-            var angle = k * 2*Mathf.PI /raven_count;
-            var euler_angle = angle * 180/Mathf.PI;
+            var angle = k * 2 * Mathf.PI / raven_count;
+            var euler_angle = angle * 180 / Mathf.PI;
             var raven_localPos = new Vector3(r * Mathf.Cos(angle), r * Mathf.Sin(angle), 0);
             SetPrefabLocalTransforms(k, raven_localPos, new Vector3(-euler_angle, 90, -90), new Vector3(0.4f, 0.4f, 0.4f));
         }
@@ -32,28 +33,28 @@ public class KillerRaven : SkillAttack
     {
         base.Activator();
         MeterDecreaser();
-        
+
         // 今回の発射で使用するweapons
         Weapon[] weapons_this_time = new Weapon[raven_count];
         int[] ready_indexes = GetPrefabIndexes(raven_count);
-        for(int k = 0; k < raven_count; k++) weapons_this_time[k] = weapons[ready_indexes[k]];
+        for (int k = 0; k < raven_count; k++) weapons_this_time[k] = weapons[ready_indexes[k]];
 
         // Target objects necessary to activate this skill.
         GameObject[] targets = new GameObject[raven_count];
 
         // Multi Players.
-        if(BattleInfo.isMulti)
+        if (BattleInfo.isMulti)
         {
-            if(attack.IsOwner)
+            if (attack.IsOwner)
             {
                 // Owner of this skill pack target fighter's number to this array.
                 int[] target_nos = new int[raven_count];
-                for(int k = 0; k < target_nos.Length; k ++) target_nos[k] = -1;
+                for (int k = 0; k < target_nos.Length; k++) target_nos[k] = -1;
 
                 // Activate your own skill.
-                if(attack.homingCount > 0)
+                if (attack.homingCount > 0)
                 {
-                    for(int k = 0; k < raven_count; k ++)
+                    for (int k = 0; k < raven_count; k++)
                     {
                         int target_no = attack.homingTargetNos.RandomChoice();
 
@@ -70,13 +71,13 @@ public class KillerRaven : SkillAttack
                 }
 
                 // Send Rpc to your clones.
-                if(IsHost)
+                if (IsHost)
                 {
-                    attack.SkillActivatorClientRpc(OwnerClientId, skillNo, target_nos);
+                    attack.SkillActivatorClientRpc(NetworkManager.Singleton.LocalClientId, skillNo, target_nos);
                 }
                 else
                 {
-                    attack.SkillActivatorServerRpc(OwnerClientId, skillNo, target_nos);
+                    attack.SkillActivatorServerRpc(NetworkManager.Singleton.LocalClientId, skillNo, target_nos);
                 }
             }
             else

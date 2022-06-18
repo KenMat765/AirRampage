@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using TMPro;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -36,7 +37,8 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
             switch (GameNetPortal.I.connectionMode)
             {
                 case GameNetPortal.ConnectionMode.LOCAL:
-                    transform.Find("JoinCode").GetComponent<TextMeshProUGUI>().text = GameNetPortal.ipAddress;
+                    // transform.Find("JoinCode").GetComponent<TextMeshProUGUI>().text = GameNetPortal.ipAddress;
+                    transform.Find("JoinCode").GetComponent<TextMeshProUGUI>().text = NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Address;
                     break;
 
                 case GameNetPortal.ConnectionMode.RELAY:

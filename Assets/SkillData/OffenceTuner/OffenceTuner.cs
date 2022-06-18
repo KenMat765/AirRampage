@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 public class OffenceTuner : SkillAssist
 {
@@ -30,15 +31,15 @@ public class OffenceTuner : SkillAssist
         effect.Play();
 
         // Grader must be called from the owner of this fighter only.
-        if(BattleInfo.isMulti && !attack.IsOwner) return;
+        if (BattleInfo.isMulti && !attack.IsOwner) return;
 
         base.Activator();
         MeterDecreaser(duration);
         attack.fighterCondition.PowerGrader(power_grade, duration);
-        if(BattleInfo.isMulti)
+        if (BattleInfo.isMulti)
         {
-            if (IsHost) attack.SkillActivatorClientRpc(OwnerClientId, skillNo);
-            else attack.SkillActivatorServerRpc(OwnerClientId, skillNo);
+            if (IsHost) attack.SkillActivatorClientRpc(NetworkManager.Singleton.LocalClientId, skillNo);
+            else attack.SkillActivatorServerRpc(NetworkManager.Singleton.LocalClientId, skillNo);
         }
     }
 
@@ -46,7 +47,7 @@ public class OffenceTuner : SkillAssist
     {
         effect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 
-        if(BattleInfo.isMulti && !attack.IsOwner) return;
+        if (BattleInfo.isMulti && !attack.IsOwner) return;
 
         base.ForceTermination();
     }

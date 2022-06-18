@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using Unity.Netcode;
 
 class Crown : SkillAttack
 {
@@ -23,9 +24,9 @@ class Crown : SkillAttack
         original_prefab = TeamPrefabGetter();
         InitTransformsLists(crown_count);
         const float r = 0.18f;
-        for(int k = 0; k < crown_count; k++)
+        for (int k = 0; k < crown_count; k++)
         {
-            var angle = Mathf.PI/2 + k*2*Mathf.PI/crown_count;
+            var angle = Mathf.PI / 2 + k * 2 * Mathf.PI / crown_count;
             var crown_localPos = new Vector3(r * Mathf.Cos(angle), r * Mathf.Sin(angle), 0);
             SetPrefabLocalTransforms(k, crown_localPos, Vector3.zero, Vector3.zero);
         }
@@ -41,18 +42,18 @@ class Crown : SkillAttack
         GameObject[] targets = new GameObject[crown_count];
 
         // Multi Players.
-        if(BattleInfo.isMulti)
+        if (BattleInfo.isMulti)
         {
-            if(attack.IsOwner)
+            if (attack.IsOwner)
             {
                 // Owner of this skill pack target fighter's number to this array.
                 int[] target_nos = new int[crown_count];
-                for(int k = 0; k < target_nos.Length; k ++) target_nos[k] = -1;
+                for (int k = 0; k < target_nos.Length; k++) target_nos[k] = -1;
 
                 // Activate your own skill.
-                if(attack.homingCount > 0)
+                if (attack.homingCount > 0)
                 {
-                    for(int k = 0; k < crown_count; k ++)
+                    for (int k = 0; k < crown_count; k++)
                     {
                         int target_no = attack.homingTargetNos.RandomChoice();
 
@@ -66,13 +67,13 @@ class Crown : SkillAttack
                 StartCoroutine(activator(targets));
 
                 // Send Rpc to your clones.
-                if(IsHost)
+                if (IsHost)
                 {
-                    attack.SkillActivatorClientRpc(OwnerClientId, skillNo, target_nos);
+                    attack.SkillActivatorClientRpc(NetworkManager.Singleton.LocalClientId, skillNo, target_nos);
                 }
                 else
                 {
-                    attack.SkillActivatorServerRpc(OwnerClientId, skillNo, target_nos);
+                    attack.SkillActivatorServerRpc(NetworkManager.Singleton.LocalClientId, skillNo, target_nos);
                 }
             }
             else
@@ -94,9 +95,9 @@ class Crown : SkillAttack
         else
         {
             // Activate your own skill.
-            if(attack.homingCount > 0)
+            if (attack.homingCount > 0)
             {
-                for(int k = 0; k < crown_count; k ++)
+                for (int k = 0; k < crown_count; k++)
                 {
                     int target_no = attack.homingTargetNos.RandomChoice();
                     targets[k] = ParticipantManager.I.fighterInfos[target_no].body;
@@ -111,7 +112,7 @@ class Crown : SkillAttack
         // 今回の発射で使用するweapons
         Weapon[] weapons_this_time = new Weapon[crown_count];
         int[] ready_indexes = GetPrefabIndexes(crown_count);
-        for(int k = 0; k < crown_count; k++) weapons_this_time[k] = weapons[ready_indexes[k]];
+        for (int k = 0; k < crown_count; k++) weapons_this_time[k] = weapons[ready_indexes[k]];
 
         // Blast bullets.
         for (int k = 0; k < crown_count; k++)

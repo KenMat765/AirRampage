@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 using DG.Tweening;
 
 public class StarGazer : SkillAttack
 {
     // スキルレベルによって変更の可能性があるパラメータ
-    float generate_time ;
+    float generate_time;
     float startup_time;
     protected override void ParameterUpdater()
     {
@@ -24,10 +25,10 @@ public class StarGazer : SkillAttack
     {
         base.Update();
 
-        if(generating)
+        if (generating)
         {
             timer += Time.deltaTime;
-            if(timer > generate_time) EndProccess();
+            if (timer > generate_time) EndProccess();
         }
     }
 
@@ -45,7 +46,7 @@ public class StarGazer : SkillAttack
         original_prefab = gazer_root.transform.Find("Projectile_StarGazer").gameObject;
         SetPrefabLocalTransform(Vector3.zero, Vector3.zero, new Vector3(8, 8, 8));
         const int gazer_default_count = 15;
-        for(int k = 0; k < gazer_default_count; k++) GeneratePrefab(gazer_root.transform);
+        for (int k = 0; k < gazer_default_count; k++) GeneratePrefab(gazer_root.transform);
     }
 
     public override void Activator(int[] transfer = null)
@@ -77,21 +78,15 @@ public class StarGazer : SkillAttack
         if (BattleInfo.isMulti && attack.IsOwner)
         {
             // Send Rpc to your clones.
-            if(IsHost)
-            {
-                attack.SkillActivatorClientRpc(OwnerClientId, skillNo);
-            }
-            else
-            {
-                attack.SkillActivatorServerRpc(OwnerClientId, skillNo);
-            }
+            if (IsHost) attack.SkillActivatorClientRpc(NetworkManager.Singleton.LocalClientId, skillNo);
+            else attack.SkillActivatorServerRpc(NetworkManager.Singleton.LocalClientId, skillNo);
         }
     }
 
     IEnumerator StartGenerateGazer()
     {
         const float interval = 0.03f;
-        while(generating)
+        while (generating)
         {
             int index = GetPrefabIndex(gazer_root.transform);
 
@@ -121,6 +116,6 @@ public class StarGazer : SkillAttack
     {
         base.ForceTermination();
         EndProccess();
-        if(root_tweener.IsActive()) root_tweener.Kill();
+        if (root_tweener.IsActive()) root_tweener.Kill();
     }
 }

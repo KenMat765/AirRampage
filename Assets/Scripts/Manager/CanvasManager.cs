@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 // 一番最初のシーンに配置すること！！
 public class CanvasManager : Singleton<CanvasManager>
@@ -15,9 +14,6 @@ public class CanvasManager : Singleton<CanvasManager>
     {
         base.Awake();
         RectTransform canvas_rect = GameObject.Find("Canvas").GetComponent<RectTransform>();
-
-        // SceneManager.activeSceneChanged += (Scene before, Scene after) => canvas_rect = GameObject.Find("Canvas").GetComponent<RectTransform>();
-        
         canvas_width = canvas_rect.rect.width;
         canvas_height = canvas_rect.rect.height;
         canvas_scale = canvas_rect.localScale;

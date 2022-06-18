@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 public class RepairDevice : SkillHeal
 {
@@ -28,15 +29,15 @@ public class RepairDevice : SkillHeal
         effect.Play();
 
         // Decreaser must be called from the owner of this fighter only, because HP is linked among all clients.
-        if(BattleInfo.isMulti && !attack.IsOwner) return;
+        if (BattleInfo.isMulti && !attack.IsOwner) return;
 
         base.Activator();
         MeterDecreaser();
         attack.fighterCondition.HPDecreaser(-repair_amount);
-        if(BattleInfo.isMulti)
+        if (BattleInfo.isMulti)
         {
-            if (IsHost) attack.SkillActivatorClientRpc(OwnerClientId, skillNo);
-            else attack.SkillActivatorServerRpc(OwnerClientId, skillNo);
+            if (IsHost) attack.SkillActivatorClientRpc(NetworkManager.Singleton.LocalClientId, skillNo);
+            else attack.SkillActivatorServerRpc(NetworkManager.Singleton.LocalClientId, skillNo);
         }
     }
 
@@ -44,7 +45,7 @@ public class RepairDevice : SkillHeal
     {
         effect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 
-        if(BattleInfo.isMulti && !attack.IsOwner) return;
+        if (BattleInfo.isMulti && !attack.IsOwner) return;
 
         base.ForceTermination();
     }

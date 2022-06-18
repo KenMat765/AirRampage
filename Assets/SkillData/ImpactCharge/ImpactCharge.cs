@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 public class ImpactCharge : SkillAttack
-{   
+{
     public override void Generator()
     {
         base.Generator();
@@ -20,16 +21,16 @@ public class ImpactCharge : SkillAttack
         GameObject target = null;
 
         // Multi Players.
-        if(BattleInfo.isMulti)
+        if (BattleInfo.isMulti)
         {
-            if(attack.IsOwner)
+            if (attack.IsOwner)
             {
                 // As you need to send an ARRAY through RPC, define an array of size 1.
                 int[] target_no = new int[1];
                 target_no[0] = -1;
 
                 // Activate your own skill.
-                if(attack.homingCount > 0)
+                if (attack.homingCount > 0)
                 {
                     int targetNo = attack.homingTargetNos[0];
                     target = ParticipantManager.I.fighterInfos[targetNo].body;
@@ -38,19 +39,19 @@ public class ImpactCharge : SkillAttack
                 weapons[GetPrefabIndex()].Activate(target);
 
                 // Send Rpc to your clones.
-                if(IsHost)
+                if (IsHost)
                 {
-                    attack.SkillActivatorClientRpc(OwnerClientId, skillNo, target_no);
+                    attack.SkillActivatorClientRpc(NetworkManager.Singleton.LocalClientId, skillNo, target_no);
                 }
                 else
                 {
-                    attack.SkillActivatorServerRpc(OwnerClientId, skillNo, target_no);
+                    attack.SkillActivatorServerRpc(NetworkManager.Singleton.LocalClientId, skillNo, target_no);
                 }
             }
             else
             {
                 // Receive Rpc from the owner.
-                if(received_targetNos[0] != -1)
+                if (received_targetNos[0] != -1)
                 {
                     target = ParticipantManager.I.fighterInfos[(int)received_targetNos[0]].body;
                 }
@@ -62,7 +63,7 @@ public class ImpactCharge : SkillAttack
         else
         {
             // Activate your own skill.
-            if(attack.homingCount > 0)
+            if (attack.homingCount > 0)
             {
                 int targetNo = attack.homingTargetNos[0];
                 target = ParticipantManager.I.fighterInfos[targetNo].body;

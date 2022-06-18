@@ -19,7 +19,7 @@ public abstract class Attack : NetworkBehaviour
     {
         SetLayerInteggers();
     }
-    
+
     protected virtual void FixedUpdate()
     {
         UpdateTrans();
@@ -28,9 +28,9 @@ public abstract class Attack : NetworkBehaviour
 
 
 
-    public FighterCondition fighterCondition {get; set;}
-    public virtual void OnDeath() {}
-    public virtual void OnRevival() {}
+    public FighterCondition fighterCondition { get; set; }
+    public virtual void OnDeath() { }
+    public virtual void OnRevival() { }
 
 
 
@@ -47,22 +47,22 @@ public abstract class Attack : NetworkBehaviour
 
 
     // ParticipantManagerのAwake()でセットされる ////////////////////////////////////////////////////////////////////////
-    public Skill[] skills {get; set;} = new Skill[GameInfo.max_skill_count];
+    public Skill[] skills { get; set; } = new Skill[GameInfo.max_skill_count];
 
 
 
     // Lock On ///////////////////////////////////////////////////////////////////////////////////////////////////////
     public List<int> homingTargetNos;    // homingTargets = ボディ or シールド。 プロパティにするとおかしくなる(?)。
     public int homingCount { get { return homingTargetNos.Count; } }
-    public abstract float homingAngle {get; set;}    // Abilityで変化
-    public abstract float homingDist {get; set;}    // Abilityで変化
+    public abstract float homingAngle { get; set; }    // Abilityで変化
+    public abstract float homingDist { get; set; }    // Abilityで変化
     LayerMask enemy_mask;    // enemy_layer = Fighter-Root
 
     void SetLayerInteggers()
     {
         // Set Fighter-Root's layer to enemy_mask.
-        if(fighterCondition.fighterTeam.Value == Team.Red) enemy_mask = 1 << 18;
-        else if(fighterCondition.fighterTeam.Value == Team.Blue) enemy_mask = 1 << 17;
+        if (fighterCondition.fighterTeam.Value == Team.Red) enemy_mask = 1 << 18;
+        else if (fighterCondition.fighterTeam.Value == Team.Blue) enemy_mask = 1 << 17;
         else Debug.LogError("Team not set at FighterCondition");
     }
 
@@ -72,16 +72,16 @@ public abstract class Attack : NetworkBehaviour
         Collider[] colliders = Physics.OverlapSphere(BPos, homingDist, enemy_mask);
 
         // Detect targets, and set them to homingTargetNos.
-        if(colliders.Length > 0)
+        if (colliders.Length > 0)
         {
             LayerMask terrain = LayerMask.GetMask("Terrain");
             var possibleTargets = colliders.Select(t => t.gameObject);
 
             // Get fighter number of targets.
-            homingTargetNos = possibleTargets.Where(p => 
+            homingTargetNos = possibleTargets.Where(p =>
 
                 // Check if target is inside homing range.
-                Vector3.Angle(transform.forward, p.transform.position - MyPos) < homingAngle && 
+                Vector3.Angle(transform.forward, p.transform.position - MyPos) < homingAngle &&
 
                 // Check if there are no obstacles (terrain) between self and target.
                 !Physics.Raycast(MyPos, p.transform.position - MyPos, Vector3.Magnitude(p.transform.position - MyPos), terrain))
@@ -102,19 +102,19 @@ public abstract class Attack : NetworkBehaviour
     [SerializeField] GameObject originalNormalBullet;
     List<GameObject> normalBullets;
     List<Weapon> normalWeapons;
-    protected abstract float setInterval {get; set;}
-    protected float blastTimer {get; set;}
-    HomingType homingType = HomingType.PreHoming; 
+    protected abstract float setInterval { get; set; }
+    protected float blastTimer { get; set; }
+    HomingType homingType = HomingType.PreHoming;
 
     // Variables that may vary by Ability.
-    protected abstract int rapidCount {get; set;}
+    protected abstract int rapidCount { get; set; }
     float power = 1, speed = 30, lifespan = 1;
 
     void PoolNormalBullets(int quantity)
     {
         normalBullets = new List<GameObject>();
         normalWeapons = new List<Weapon>();
-        for(int k = 0; k < quantity; k++)
+        for (int k = 0; k < quantity; k++)
         {
             GameObject bullet = Instantiate(originalNormalBullet, BPos, BRot, transform);
             normalBullets.Add(bullet);
@@ -127,7 +127,7 @@ public abstract class Attack : NetworkBehaviour
 
     int GetNormalBulletIndex()
     {
-        foreach(GameObject normalBullet in normalBullets) {if(normalBullet.activeSelf == false) {return normalBullets.IndexOf(normalBullet);}}
+        foreach (GameObject normalBullet in normalBullets) { if (normalBullet.activeSelf == false) { return normalBullets.IndexOf(normalBullet); } }
         GameObject newBullet = Instantiate(originalNormalBullet, BPos, BRot, transform);   //全て使用中だったら新たに作成
         normalBullets.Add(newBullet);
         Weapon weapon = newBullet.GetComponent<Weapon>();
@@ -168,9 +168,9 @@ public abstract class Attack : NetworkBehaviour
     [ClientRpc]
     protected void NormalRapidClientRpc(ulong senderId, int targetNo, int bulletCount)
     {
-        if(NetworkManager.Singleton.LocalClientId == senderId) return;
+        if (NetworkManager.Singleton.LocalClientId == senderId) return;
         GameObject target = null;
-        if(targetNo != -1) target = ParticipantManager.I.fighterInfos[targetNo].body;
+        if (targetNo != -1) target = ParticipantManager.I.fighterInfos[targetNo].body;
         NormalRapid(target, bulletCount);
     }
 
@@ -185,7 +185,7 @@ public abstract class Attack : NetworkBehaviour
     [ClientRpc]
     public void SkillActivatorClientRpc(ulong senderId, int skillNo, int[] targetNos = null)
     {
-        if(NetworkManager.Singleton.LocalClientId == senderId) return;
+        if (NetworkManager.Singleton.LocalClientId == senderId) return;
         skills[skillNo].Activator(targetNos);
     }
 
@@ -198,7 +198,7 @@ public abstract class Attack : NetworkBehaviour
     [ClientRpc]
     public void SkillEndProccessClientRpc(ulong senderId, int skillNo)
     {
-        if(NetworkManager.Singleton.LocalClientId == senderId) return;
+        if (NetworkManager.Singleton.LocalClientId == senderId) return;
         skills[skillNo].EndProccess();
     }
 }

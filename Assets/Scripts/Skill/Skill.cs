@@ -12,50 +12,50 @@ public abstract class Skill : NetworkBehaviour
     /// </Summary>
     // Assigned from ParticipantManager.
     // Used to identify which skill to activate when received skill activator RPCs.
-    public int skillNo {get; set;}
+    public int skillNo { get; set; }
 
     protected virtual void Update() { Charger(); }
 
-    public float charge_time {get; set;}
-    public float elapsed_time {get; private set;}
-    public bool isCharged {get; private set;} = false;
-    protected bool ready2Charge {get; private set;} = true;
+    public float charge_time { get; set; }
+    public float elapsed_time { get; private set; }
+    public bool isCharged { get; private set; } = false;
+    protected bool ready2Charge { get; private set; } = true;
     bool isUsing = false;
 
     protected GameObject original_prefab;
-    protected List<GameObject> prefabs {get; private set;}
+    protected List<GameObject> prefabs { get; private set; }
 
     /// <Summary>
     /// Prefabを生成する際に参照する位置情報。
     /// </Summary>
-    protected Vector3 local_position {get; set;}
+    protected Vector3 local_position { get; set; }
 
     /// <Summary>
     /// Prefabを生成する際に参照する角度情報。
     /// </Summary>
-    protected Vector3 local_eulerAngle {get; set;}
+    protected Vector3 local_eulerAngle { get; set; }
 
     /// <Summary>
     /// Prefabを生成する際に参照するスケール情報。
     /// </Summary>
-    protected Vector3 local_scale {get; set;}
+    protected Vector3 local_scale { get; set; }
 
     /// <Summary>
     /// Prefabを生成する際に参照する位置情報。Prefabごとに位置が異なる場合に使用する。
     /// </Summary>
-    protected Vector3[] local_positions {get; set;}
+    protected Vector3[] local_positions { get; set; }
 
     /// <Summary>
     /// Prefabを生成する際に参照する位置情報。Prefabごとに角度が異なる場合に使用する。
     /// </Summary>
-    protected Vector3[] local_eulerAngles {get; set;}
+    protected Vector3[] local_eulerAngles { get; set; }
 
     /// <Summary>
     /// Prefabを生成する際に参照する位置情報。Prefabごとにスケールが異なる場合に使用する。
     /// </Summary>
-    protected Vector3[] local_scales {get; set;}
+    protected Vector3[] local_scales { get; set; }
 
-    protected Attack attack {get; private set;}
+    protected Attack attack { get; private set; }
     Tweener meter_tweener;
 
     public abstract void LevelDataSetter(LevelData levelData);
@@ -70,32 +70,32 @@ public abstract class Skill : NetworkBehaviour
 
     public virtual void Activator(int[] transfer = null)
     {
-        if(!isCharged || attack.fighterCondition.isDead) return;
+        if (!isCharged || attack.fighterCondition.isDead) return;
         isCharged = false;
         ready2Charge = false;
     }
 
     void Charger()
     {
-        if(!isCharged && ready2Charge)
+        if (!isCharged && ready2Charge)
         {
             elapsed_time += Time.deltaTime;
-            if(elapsed_time >= charge_time) { isCharged = true; }
+            if (elapsed_time >= charge_time) { isCharged = true; }
         }
     }
 
     /// <Summary>
     /// 終了時の後片付け。
     /// </Summary>
-    public virtual void EndProccess() {}
+    public virtual void EndProccess() { }
 
     /// <Summary>
     /// 起動中に死亡した時に呼ばれる。基本的にはEndProcessと同様の処理(一部例外のスキルあり)。
     /// </Summary>
     public virtual void ForceTermination()
     {
-        if(meter_tweener.IsActive()) meter_tweener.Kill();
-        if(isUsing)
+        if (meter_tweener.IsActive()) meter_tweener.Kill();
+        if (isUsing)
         {
             elapsed_time = 0;
             isUsing = false;
@@ -111,9 +111,11 @@ public abstract class Skill : NetworkBehaviour
         isUsing = true;
         meter_tweener = DOTween.To(() => elapsed_time, (value) => elapsed_time = value, 0, duration)
             .OnComplete(() =>
-            {ready2Charge = true;
-            isUsing = false;
-            if(OnCompleteCallback != null) OnCompleteCallback();});
+            {
+                ready2Charge = true;
+                isUsing = false;
+                if (OnCompleteCallback != null) OnCompleteCallback();
+            });
     }
 
     /// <Summary>
@@ -122,9 +124,9 @@ public abstract class Skill : NetworkBehaviour
     /// </Summary>
     public void MeterDecreaserManual(float end_value)
     {
-        if(!isUsing) isUsing = true;
+        if (!isUsing) isUsing = true;
         elapsed_time = end_value;
-        if(elapsed_time <= 0)
+        if (elapsed_time <= 0)
         {
             ready2Charge = true;
             isUsing = false;
@@ -136,8 +138,8 @@ public abstract class Skill : NetworkBehaviour
     /// </Summary>
     protected GameObject TeamPrefabGetter()
     {
-        if(attack.fighterCondition.fighterTeam.Value == Team.Red) return SkillDatabase.I.SearchSkillByName(this.GetType().Name).GetPrefabRed();
-        else if(attack.fighterCondition.fighterTeam.Value == Team.Blue) return SkillDatabase.I.SearchSkillByName(this.GetType().Name).GetPrefabBlue();
+        if (attack.fighterCondition.fighterTeam.Value == Team.Red) return SkillDatabase.I.SearchSkillByName(this.GetType().Name).GetPrefabRed();
+        else if (attack.fighterCondition.fighterTeam.Value == Team.Blue) return SkillDatabase.I.SearchSkillByName(this.GetType().Name).GetPrefabBlue();
         else
         {
             Debug.LogError("AttackにTeamが割り当てられていません。ParticipantManagerでAttackにTeamが割り当てられているか確認してください。");
@@ -181,7 +183,7 @@ public abstract class Skill : NetworkBehaviour
     /// </Summary>
     protected virtual GameObject GeneratePrefab(Transform parent = null)
     {
-        if(parent == null) parent = attack.fighterCondition.body.transform;
+        if (parent == null) parent = attack.fighterCondition.body.transform;
         GameObject prefab = Instantiate(original_prefab, parent);
         prefab.transform.localPosition = local_position;
         prefab.transform.localRotation = Quaternion.Euler(local_eulerAngle);
@@ -196,11 +198,11 @@ public abstract class Skill : NetworkBehaviour
     /// </Summary>
     protected virtual GameObject[] GeneratePrefabs(int count, Transform parent = null)
     {
-        if(parent == null) parent = attack.fighterCondition.body.transform;
+        if (parent == null) parent = attack.fighterCondition.body.transform;
 
         GameObject[] generated_prefabs = new GameObject[count];
 
-        for(int k = 0; k < count; k++)
+        for (int k = 0; k < count; k++)
         {
             GameObject prefab = Instantiate(original_prefab, parent);
             prefab.transform.localPosition = local_positions[k];
@@ -209,7 +211,7 @@ public abstract class Skill : NetworkBehaviour
             prefabs.Add(prefab);
             generated_prefabs[k] = prefab;
         }
-        
+
         return generated_prefabs;
     }
 }

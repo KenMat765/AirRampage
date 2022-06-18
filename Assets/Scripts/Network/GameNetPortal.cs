@@ -7,6 +7,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Net;
+using System.Net.NetworkInformation;
 
 public class GameNetPortal : Singleton<GameNetPortal>
 {
@@ -33,8 +34,24 @@ public class GameNetPortal : Singleton<GameNetPortal>
         // 
         // 
         // 
-        string hostName = Dns.GetHostName();
-        ipAddress = Dns.GetHostAddresses(hostName)[0].ToString();
+        NetworkInterface[] nis = NetworkInterface.GetAllNetworkInterfaces();
+        foreach (NetworkInterface ni in nis)
+        {
+            if (ni.Name == "en0")
+            {
+                IPInterfaceProperties ipip = ni.GetIPProperties();
+                UnicastIPAddressInformationCollection uipaic = ipip.UnicastAddresses;
+                foreach (var uipai in uipaic)
+                {
+                    string address = uipai.Address.ToString();
+                    if (address.Length < 16)
+                    {
+                        ipAddress = address;
+                        break;
+                    }
+                }
+            }
+        }
 
         NetworkManager.Singleton.OnServerStarted += HandleOnServerStarted;
         NetworkManager.Singleton.OnClientConnectedCallback += HandleOnClientConnected;

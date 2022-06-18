@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 public class Shield : SkillAssist
 {
     // スキルレベルによって変更の可能性があるパラメータ
-    public float shield_durability {get; private set;}
+    public float shield_durability { get; private set; }
     float exhaust_speed;
     protected override void ParameterUpdater()
     {
@@ -34,13 +35,13 @@ public class Shield : SkillAssist
         // Activate shield.
         hit_detector.ShieldActivator(shield_durability, exhaust_speed);
 
-        if(BattleInfo.isMulti && !attack.IsOwner) return;
+        if (BattleInfo.isMulti && !attack.IsOwner) return;
 
         base.Activator();
-        if(BattleInfo.isMulti)
+        if (BattleInfo.isMulti)
         {
-            if (IsHost) attack.SkillActivatorClientRpc(OwnerClientId, skillNo);
-            else attack.SkillActivatorServerRpc(OwnerClientId, skillNo);
+            if (IsHost) attack.SkillActivatorClientRpc(NetworkManager.Singleton.LocalClientId, skillNo);
+            else attack.SkillActivatorServerRpc(NetworkManager.Singleton.LocalClientId, skillNo);
         }
     }
 
@@ -51,7 +52,7 @@ public class Shield : SkillAssist
         // Destroy shield.
         hit_detector.DestroyShield();
 
-        if(BattleInfo.isMulti && attack.IsOwner) attack.SkillEndProccessServerRpc(OwnerClientId, skillNo);
+        if (BattleInfo.isMulti && attack.IsOwner) attack.SkillEndProccessServerRpc(OwnerClientId, skillNo);
     }
 
     public override void ForceTermination()
