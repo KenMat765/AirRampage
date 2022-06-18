@@ -31,7 +31,7 @@ class NitroBoost : SkillAssist
         jetAudioController = afterBurners.GetComponent<JetAudioController>();
         burnerController = afterBurners.GetComponent<BurnerController>();
         wind = prefabs[0].GetComponent<WindController>();
-        PlayerMovement playerMovement = GetComponent<PlayerMovement>();
+        PlayerMovement playerMovement = GetComponentInParent<PlayerMovement>();
         if (playerMovement != null) cameraController = playerMovement.cameraController;
     }
 
@@ -48,7 +48,7 @@ class NitroBoost : SkillAssist
         base.Activator();
         MeterDecreaser(boost_duration, EndProccess);
         attack.fighterCondition.PauseGradingSpeed(attack.fighterCondition.defaultSpeed * speed_magnif, accel_duration);
-        if (cameraController != null) cameraController.ViewChanger(90, accel_duration);
+        if (cameraController != null) cameraController.ViewChanger(100, accel_duration);
         if (BattleInfo.isMulti)
         {
             if (IsHost) attack.SkillActivatorClientRpc(NetworkManager.Singleton.LocalClientId, skillNo);
