@@ -201,7 +201,7 @@ public class OnlineLobbyUI : MonoBehaviour
             NetworkManager.Singleton.NetworkConfig.ConnectionData = payloadBytes;
             if (selectedLocal)
             {
-                NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(GameNetPortal.ipAddress, 7777);
+                NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(TerminalInfo.ipAddress, 7777);
                 GameNetPortal.I.StartHost();
             }
             else

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.0118783135, g: 0.034796875, b: 0.09940716, a: 1}
+  m_IndirectSpecularColor: {r: 0.011487832, g: 0.034049574, b: 0.0974214, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -8506,6 +8506,8 @@ MonoBehaviour:
   speedDots: {fileID: 508129638}
   powerDots: {fileID: 1678545399}
   defenceDots: {fileID: 34699098}
+  touch: {x: 0, y: 0}
+  stick: {x: 0, y: 0}
 --- !u!4 &1529958736
 Transform:
   m_ObjectHideFlags: 0

@@ -19,13 +19,13 @@ public class uGUIMannager : Singleton<uGUIMannager>
     [SerializeField] Image screen_color;
 
     static Vector2 firstStickPos;
-    public static bool onStick {get; private set;}
-    public static Vector2 norm_diffPos {get; private set;}
+    public static bool onStick { get; private set; }
+    public static Vector2 norm_diffPos { get; private set; }
 
     [SerializeField] Image leftStick, leftStickBack;
 
     [SerializeField] Image blastButton;
-    public static bool onBlast {get; private set;}
+    public static bool onBlast { get; private set; }
 
     [SerializeField] Image lockOn;
     [SerializeField] AudioSource lockOnSound;
@@ -37,7 +37,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
     [SerializeField] Sprite defaultSkillIcon;
     Text destroyerTex, destroyedTex;
     Image arrow, skill_icon;
-    
+
     [SerializeField] GameObject killedRepo;
     Text killed, reviveIn, reviveCount;
 
@@ -87,16 +87,16 @@ public class uGUIMannager : Singleton<uGUIMannager>
         HPs_white = HP_objects.Select(h => h.transform.Find("HP_white").GetComponent<Image>()).ToArray();
         Image[] team_icons = HP_objects.Select(h => h.transform.Find("Team").GetComponent<Image>()).ToArray();
         TextMeshProUGUI[] name_icons = HP_objects.Select(h => h.transform.Find("Name").GetComponent<TextMeshProUGUI>()).ToArray();
-        for(int no = 0; no < GameInfo.max_player_count; no++)
+        for (int no = 0; no < GameInfo.max_player_count; no++)
         {
             Team team = ParticipantManager.I.fighterInfos[no].fighterCondition.fighterTeam.Value;
-            if(team == Team.Red) team_icons[no].color = Color.red;
+            if (team == Team.Red) team_icons[no].color = Color.red;
             else team_icons[no].color = Color.blue;
             string name = ParticipantManager.I.fighterInfos[no].fighterCondition.fighterName.Value.ToString();
             name_icons[no].text = name;
         }
 
-        for(int k = 0; k < GameInfo.max_skill_count; k++)
+        for (int k = 0; k < GameInfo.max_skill_count; k++)
         {
             Transform skill_btn_trans = skillButtonsObj.transform.Find("SkillButton" + k);
             skill_fills[k] = skill_btn_trans.transform.Find("Fill").GetComponent<Image>();
@@ -109,7 +109,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
         speed_dots = new Image[dot_count];
         power_dots = new Image[dot_count];
         defence_dots = new Image[dot_count];
-        for(int k = 0; k < dot_count; k++)
+        for (int k = 0; k < dot_count; k++)
         {
             speed_dots[k] = speedDots.transform.Find("Dot" + k).GetComponent<Image>();
             power_dots[k] = powerDots.transform.Find("Dot" + k).GetComponent<Image>();
@@ -120,9 +120,9 @@ public class uGUIMannager : Singleton<uGUIMannager>
             defence_dots[k].color = Color.clear;
         }
 
-        CSManager.swipe_condition = (TouchExtension swipe) => 
+        CSManager.swipe_condition = (TouchExtension swipe) =>
         {
-            if((swipe.start_pos - firstStickPos).sqrMagnitude < Mathf.Pow(leftStickBack.rectTransform.rect.width/2, 2)) { return false; }
+            if ((swipe.start_pos.Screen2Canvas(AnchorPosition.LeftDown) - firstStickPos).sqrMagnitude < Mathf.Pow(leftStickBack.rectTransform.rect.width / 2, 2)) { return false; }
             else { return true; }
         };
     }
@@ -150,11 +150,19 @@ public class uGUIMannager : Singleton<uGUIMannager>
 
 
 
+    [SerializeField] Vector2 touch;
+    [SerializeField] Vector2 stick;
     void LeftStickMannager()
     {
+        // 
+        // 
+        // 
+        touch = CSManager.currentTouches[0].start_pos;
+        stick = firstStickPos;
+
         TouchExtension[] onStick_touches;
-        float detect_radius = leftStickBack.rectTransform.rect.width/2;
-        if(CSManager.currentTouches.FindElement(s => (s.start_pos - firstStickPos).sqrMagnitude < Mathf.Pow(detect_radius, 2), out onStick_touches))
+        float detect_radius = leftStickBack.rectTransform.rect.width / 2;
+        if (CSManager.currentTouches.FindElement(s => (s.start_pos.Screen2Canvas(AnchorPosition.LeftDown) - firstStickPos).sqrMagnitude < Mathf.Pow(detect_radius, 2), out onStick_touches))
         {
             onStick = true;
         }
@@ -165,16 +173,17 @@ public class uGUIMannager : Singleton<uGUIMannager>
             norm_diffPos = Vector2.zero;
         }
 
-        if(onStick)
+        if (onStick)
         {
-            float diffPosMaxMag = leftStickBack.rectTransform.rect.width/2;
+            float diffPosMaxMag = leftStickBack.rectTransform.rect.width / 2;
             Vector2 diffPos;
             TouchExtension onStick_touch = onStick_touches[0];  // 最初に Left Stick に触れたもののみを検知
+            Vector2 onStick_touch_canvas_pos = onStick_touch.current_pos.Screen2Canvas(AnchorPosition.LeftDown);
 
-            if((onStick_touch.current_pos - firstStickPos).sqrMagnitude < Mathf.Pow(diffPosMaxMag, 2)) { diffPos = onStick_touch.current_pos - firstStickPos; }
-            else { diffPos = (onStick_touch.current_pos - firstStickPos).normalized*diffPosMaxMag; }
+            if ((onStick_touch_canvas_pos - firstStickPos).sqrMagnitude < Mathf.Pow(diffPosMaxMag, 2)) { diffPos = onStick_touch_canvas_pos - firstStickPos; }
+            else { diffPos = (onStick_touch_canvas_pos - firstStickPos).normalized * diffPosMaxMag; }
             leftStick.rectTransform.anchoredPosition = firstStickPos + diffPos;
-            norm_diffPos = diffPos/diffPosMaxMag;
+            norm_diffPos = diffPos / diffPosMaxMag;
         }
     }
 
@@ -182,8 +191,8 @@ public class uGUIMannager : Singleton<uGUIMannager>
 
     void BlastManager()
     {
-        float detect_radius = blastButton.rectTransform.rect.width/2;
-        if(CSManager.currentTouches.Any(s => (s.start_pos.Screen2Canvas() - blastButton.rectTransform.position.XY().UnScaleCanvasPos()).sqrMagnitude < Mathf.Pow(detect_radius, 2)))
+        float detect_radius = blastButton.rectTransform.rect.width / 2;
+        if (CSManager.currentTouches.Any(s => (s.start_pos.Screen2Canvas() - blastButton.rectTransform.position.XY().UnScaleCanvasPos()).sqrMagnitude < Mathf.Pow(detect_radius, 2)))
         {
             onBlast = true;
         }
@@ -192,11 +201,11 @@ public class uGUIMannager : Singleton<uGUIMannager>
 
     void LockOnManager()
     {
-        if(playerInfo.attack.homingCount == 0)
+        if (playerInfo.attack.homingCount == 0)
         {
             Color defaultColor = new Color(0.84f, 0.84f, 0.84f);
             Transform player_trans = playerInfo.fighter.transform;
-            lockOn.rectTransform.position = RectTransformUtility.WorldToScreenPoint(player_camera, player_trans.position + player_trans.forward*40).Screen2Canvas().ScaleCanvasPos();
+            lockOn.rectTransform.position = RectTransformUtility.WorldToScreenPoint(player_camera, player_trans.position + player_trans.forward * 40).Screen2Canvas().ScaleCanvasPos();
             lockOn.color = defaultColor;
             lastTarget = null;
         }
@@ -206,7 +215,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
             GameObject currentTarget = ParticipantManager.I.fighterInfos[currentTargetNo].body;
             lockOn.rectTransform.position = RectTransformUtility.WorldToScreenPoint(player_camera, currentTarget.transform.position).Screen2Canvas().ScaleCanvasPos();
             lockOn.color = Color.red;
-            if(currentTarget != lastTarget)
+            if (currentTarget != lastTarget)
             {
                 lockOnSound.Play();
                 lastTarget = currentTarget;
@@ -219,11 +228,11 @@ public class uGUIMannager : Singleton<uGUIMannager>
     void HpOnHead()
     {
         // Playerは除く
-        for(int id = 0; id < GameInfo.max_player_count; id++)
+        for (int id = 0; id < GameInfo.max_player_count; id++)
         {
-            if(id != ParticipantManager.I.myFighterNo)
+            if (id != ParticipantManager.I.myFighterNo)
             {
-                if(ParticipantManager.I.fighterInfos[id].bodyManager.visible == true)
+                if (ParticipantManager.I.fighterInfos[id].bodyManager.visible == true)
                 {
                     Vector2 canvasPos = RectTransformUtility.WorldToScreenPoint(player_camera, ParticipantManager.I.fighterInfos[id].body.transform.position).Screen2Canvas().ScaleCanvasPos();
                     HP_rects[id].position = canvasPos + new Vector2(0, 50).ScaleCanvasPos();
@@ -254,7 +263,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
 
     void ScreenColorManager()
     {
-        if(!playerInfo.fighterCondition.isDead)
+        if (!playerInfo.fighterCondition.isDead)
         {
             screen_color.color = Color.Lerp(screen_color.color, Color.clear, 0.2f);
             reviveCount.color = Color.clear;
@@ -264,10 +273,10 @@ public class uGUIMannager : Singleton<uGUIMannager>
         }
         else
         {
-            screen_color.color = new Color(1,0,0,0.5f);
+            screen_color.color = new Color(1, 0, 0, 0.5f);
             reviveCount.text = Mathf.Ceil(playerInfo.fighterCondition.revivalTime - playerInfo.fighterCondition.revive_timer).ToString();
             killed.color = Color.Lerp(killed.color, Color.white, 0.1f);
-            if(playerInfo.fighterCondition.revive_timer > playerInfo.fighterCondition.revivalTime - 5)
+            if (playerInfo.fighterCondition.revive_timer > playerInfo.fighterCondition.revivalTime - 5)
             {
                 reviveCount.color = Color.white;
                 reviveIn.color = Color.white;
@@ -279,9 +288,9 @@ public class uGUIMannager : Singleton<uGUIMannager>
 
     void ReportKill()
     {
-        foreach(Sequence sequence in sequences)
+        foreach (Sequence sequence in sequences)
         {
-            if(sequence != null && !seqPlaying)
+            if (sequence != null && !seqPlaying)
             {
                 sequence.Play();
                 currSeq = sequence;
@@ -293,11 +302,11 @@ public class uGUIMannager : Singleton<uGUIMannager>
     public void BookRepo(string destroyer, string destroyed, Color arrowColor, Sprite skill_sprite)
     {
         Sprite icon;
-        if(skill_sprite == null) icon = defaultSkillIcon;
+        if (skill_sprite == null) icon = defaultSkillIcon;
         else icon = skill_sprite;
 
         Sequence newSeq = DOTween.Sequence()
-            .OnStart(() => {destroyerTex.text = destroyer; destroyedTex.text = destroyed; arrow.color = arrowColor; skill_icon.sprite = icon;})
+            .OnStart(() => { destroyerTex.text = destroyer; destroyedTex.text = destroyed; arrow.color = arrowColor; skill_icon.sprite = icon; })
             .Append(destroyRepo.transform.DOLocalMoveX(-720, 0.2f))
             .Append(arrow.DOColor(Color.clear, 0.2f).SetLoops(5, LoopType.Yoyo))
                 .Join(destroyerTex.DOColor(Color.clear, 0.2f).SetLoops(5, LoopType.Yoyo))
@@ -308,13 +317,13 @@ public class uGUIMannager : Singleton<uGUIMannager>
                 .Join(destroyedTex.DOColor(Color.white, 0.2f))
                 .Join(skill_icon.DOColor(Color.white, 0.2f))
             .Append(destroyRepo.transform.DOLocalMoveX(-1100, 0.2f).SetDelay(3))
-            .OnComplete(() => 
+            .OnComplete(() =>
             {
                 destroyerTex.text = "";
                 destroyedTex.text = "";
                 sequences.Remove(currSeq);
                 seqPlaying = false;
-            }); 
+            });
         sequences.Add(newSeq);
     }
 
@@ -322,7 +331,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
 
     void ButtonSetup()
     {
-        for(int k = 0; k < GameInfo.max_skill_count; k++)
+        for (int k = 0; k < GameInfo.max_skill_count; k++)
         {
             int m = k;
 
@@ -331,7 +340,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
             skill_btns[k].interactable = false;
 
             int? skill_id = BattleInfo.battleDatas[ParticipantManager.I.myFighterNo].skillIds[k];
-            if(skill_id == null)
+            if (skill_id == null)
             {
                 skill_imgs[k].sprite = null;
                 skill_imgs[k].color = Color.clear;
@@ -355,25 +364,25 @@ public class uGUIMannager : Singleton<uGUIMannager>
         Color green = new Color(0.37f, 1, 0.3f, 1);
 
         // Playerが死んでいた場合 return
-        if(playerInfo.fighterCondition.isDead)
+        if (playerInfo.fighterCondition.isDead)
         {
-            for(int k = 0; k < GameInfo.max_skill_count; k++)
+            for (int k = 0; k < GameInfo.max_skill_count; k++)
             {
-                if(skill_btns[k].interactable) { skill_btns[k].interactable = false; }
+                if (skill_btns[k].interactable) { skill_btns[k].interactable = false; }
             }
             return;
         }
 
-        for(int k = 0; k < GameInfo.max_skill_count; k++)
+        for (int k = 0; k < GameInfo.max_skill_count; k++)
         {
             Skill skill_instance = playerInfo.attack.skills[k];
-            if(skill_instance != null)
+            if (skill_instance != null)
             {
                 // チャージ完了の時
-                if(skill_instance.isCharged)
+                if (skill_instance.isCharged)
                 {
-                    if(!skill_btns[k].interactable) skill_btns[k].interactable = true;
-                    if(!(skill_fills[k].color == green)) skill_fills[k].color = green;
+                    if (!skill_btns[k].interactable) skill_btns[k].interactable = true;
+                    if (!(skill_fills[k].color == green)) skill_fills[k].color = green;
                 }
 
                 // チャージ中の時
@@ -381,7 +390,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
                 {
                     // fillAmountを更新
                     skill_fills[k].fillAmount = skill_instance.elapsed_time.Normalize(0, skill_instance.charge_time) * 0.167f;
-                    if(!(skill_fills[k].color == Color.red)) skill_fills[k].color = Color.red;
+                    if (!(skill_fills[k].color == Color.red)) skill_fills[k].color = Color.red;
                 }
             }
         }
@@ -399,48 +408,48 @@ public class uGUIMannager : Singleton<uGUIMannager>
         int defence_grade = playerInfo.fighterCondition.defence_grade;
 
         // gradeが変化した時だけDotsの色を変更
-        if(speed_grade != speed_grade_cash)
+        if (speed_grade != speed_grade_cash)
         {
             speed_grade_cash = speed_grade;
-            switch(speed_grade)
+            switch (speed_grade)
             {
-                case -3 : for(int k = 0; k < 3; k++) speed_dots[k].color = dot_blue; break;
-                case -2 : for(int k = 0; k < 2; k++) speed_dots[k].color = dot_blue; speed_dots[2].color = Color.clear; break;
-                case -1 : speed_dots[0].color = dot_blue; for(int k = 1; k < 3; k++) speed_dots[k].color = Color.clear; break;
-                case 0 : for(int k = 0; k < 3; k++) speed_dots[k].color = Color.clear; break;
-                case 1 : speed_dots[0].color = dot_orange; for(int k = 1; k < 3; k++) speed_dots[k].color = Color.clear; break;
-                case 2 : for(int k = 0; k < 2; k++) speed_dots[k].color = dot_orange; speed_dots[2].color = Color.clear; break;
-                case 3 : for(int k = 0; k < 3; k++) speed_dots[k].color = dot_orange; break;
+                case -3: for (int k = 0; k < 3; k++) speed_dots[k].color = dot_blue; break;
+                case -2: for (int k = 0; k < 2; k++) speed_dots[k].color = dot_blue; speed_dots[2].color = Color.clear; break;
+                case -1: speed_dots[0].color = dot_blue; for (int k = 1; k < 3; k++) speed_dots[k].color = Color.clear; break;
+                case 0: for (int k = 0; k < 3; k++) speed_dots[k].color = Color.clear; break;
+                case 1: speed_dots[0].color = dot_orange; for (int k = 1; k < 3; k++) speed_dots[k].color = Color.clear; break;
+                case 2: for (int k = 0; k < 2; k++) speed_dots[k].color = dot_orange; speed_dots[2].color = Color.clear; break;
+                case 3: for (int k = 0; k < 3; k++) speed_dots[k].color = dot_orange; break;
             }
         }
 
-        if(power_grade != power_grade_cash)
+        if (power_grade != power_grade_cash)
         {
             power_grade_cash = power_grade;
-            switch(power_grade)
+            switch (power_grade)
             {
-                case -3 : for(int k = 0; k < 3; k++) power_dots[k].color = dot_blue; break;
-                case -2 : for(int k = 0; k < 2; k++) power_dots[k].color = dot_blue; power_dots[2].color = Color.clear; break;
-                case -1 : power_dots[0].color = dot_blue; for(int k = 1; k < 3; k++) power_dots[k].color = Color.clear; break;
-                case 0 : for(int k = 0; k < 3; k++) power_dots[k].color = Color.clear; break;
-                case 1 : power_dots[0].color = dot_orange; for(int k = 1; k < 3; k++) power_dots[k].color = Color.clear; break;
-                case 2 : for(int k = 0; k < 2; k++) power_dots[k].color = dot_orange; power_dots[2].color = Color.clear; break;
-                case 3 : for(int k = 0; k < 3; k++) power_dots[k].color = dot_orange; break;
+                case -3: for (int k = 0; k < 3; k++) power_dots[k].color = dot_blue; break;
+                case -2: for (int k = 0; k < 2; k++) power_dots[k].color = dot_blue; power_dots[2].color = Color.clear; break;
+                case -1: power_dots[0].color = dot_blue; for (int k = 1; k < 3; k++) power_dots[k].color = Color.clear; break;
+                case 0: for (int k = 0; k < 3; k++) power_dots[k].color = Color.clear; break;
+                case 1: power_dots[0].color = dot_orange; for (int k = 1; k < 3; k++) power_dots[k].color = Color.clear; break;
+                case 2: for (int k = 0; k < 2; k++) power_dots[k].color = dot_orange; power_dots[2].color = Color.clear; break;
+                case 3: for (int k = 0; k < 3; k++) power_dots[k].color = dot_orange; break;
             }
         }
 
-        if(defence_grade != defence_grade_cash)
+        if (defence_grade != defence_grade_cash)
         {
             defence_grade_cash = defence_grade;
-            switch(defence_grade)
+            switch (defence_grade)
             {
-                case -3 : for(int k = 0; k < 3; k++) defence_dots[k].color = dot_blue; break;
-                case -2 : for(int k = 0; k < 2; k++) defence_dots[k].color = dot_blue; defence_dots[2].color = Color.clear; break;
-                case -1 : defence_dots[0].color = dot_blue; for(int k = 1; k < 3; k++) defence_dots[k].color = Color.clear; break;
-                case 0 : for(int k = 0; k < 3; k++) defence_dots[k].color = Color.clear; break;
-                case 1 : defence_dots[0].color = dot_orange; for(int k = 1; k < 3; k++) defence_dots[k].color = Color.clear; break;
-                case 2 : for(int k = 0; k < 2; k++) defence_dots[k].color = dot_orange; defence_dots[2].color = Color.clear; break;
-                case 3 : for(int k = 0; k < 3; k++) defence_dots[k].color = dot_orange; break;
+                case -3: for (int k = 0; k < 3; k++) defence_dots[k].color = dot_blue; break;
+                case -2: for (int k = 0; k < 2; k++) defence_dots[k].color = dot_blue; defence_dots[2].color = Color.clear; break;
+                case -1: defence_dots[0].color = dot_blue; for (int k = 1; k < 3; k++) defence_dots[k].color = Color.clear; break;
+                case 0: for (int k = 0; k < 3; k++) defence_dots[k].color = Color.clear; break;
+                case 1: defence_dots[0].color = dot_orange; for (int k = 1; k < 3; k++) defence_dots[k].color = Color.clear; break;
+                case 2: for (int k = 0; k < 2; k++) defence_dots[k].color = dot_orange; defence_dots[2].color = Color.clear; break;
+                case 3: for (int k = 0; k < 3; k++) defence_dots[k].color = dot_orange; break;
             }
         }
     }

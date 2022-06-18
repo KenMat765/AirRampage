@@ -6,8 +6,6 @@ using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Net;
-using System.Net.NetworkInformation;
 
 public class GameNetPortal : Singleton<GameNetPortal>
 {
@@ -20,39 +18,12 @@ public class GameNetPortal : Singleton<GameNetPortal>
     // public void SetPassword(string password) => this.password = password;
     public LobbyParticipantData hostData { get; private set; }
     public bool gameStarted = false;
-
-    // 
-    // 
-    // 
     public enum ConnectionMode { LOCAL, RELAY }
     public ConnectionMode connectionMode;
-    public static string ipAddress;
 
 
     void Start()
     {
-        // 
-        // 
-        // 
-        NetworkInterface[] nis = NetworkInterface.GetAllNetworkInterfaces();
-        foreach (NetworkInterface ni in nis)
-        {
-            if (ni.Name == "en0")
-            {
-                IPInterfaceProperties ipip = ni.GetIPProperties();
-                UnicastIPAddressInformationCollection uipaic = ipip.UnicastAddresses;
-                foreach (var uipai in uipaic)
-                {
-                    string address = uipai.Address.ToString();
-                    if (address.Length < 16)
-                    {
-                        ipAddress = address;
-                        break;
-                    }
-                }
-            }
-        }
-
         NetworkManager.Singleton.OnServerStarted += HandleOnServerStarted;
         NetworkManager.Singleton.OnClientConnectedCallback += HandleOnClientConnected;
         NetworkManager.Singleton.OnClientDisconnectCallback += HandleOnClientDisconnect;
