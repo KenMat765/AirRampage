@@ -150,16 +150,8 @@ public class uGUIMannager : Singleton<uGUIMannager>
 
 
 
-    [SerializeField] Vector2 touch;
-    [SerializeField] Vector2 stick;
     void LeftStickMannager()
     {
-        // 
-        // 
-        // 
-        touch = CSManager.currentTouches[0].start_pos;
-        stick = firstStickPos;
-
         TouchExtension[] onStick_touches;
         float detect_radius = leftStickBack.rectTransform.rect.width / 2;
         if (CSManager.currentTouches.FindElement(s => (s.start_pos.Screen2Canvas(AnchorPosition.LeftDown) - firstStickPos).sqrMagnitude < Mathf.Pow(detect_radius, 2), out onStick_touches))

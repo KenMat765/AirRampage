@@ -8,7 +8,7 @@ public class TerminalInfo : MonoBehaviour
     public static string ipAddress;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    void GetInfo()
+    static void GetInfo()
     {
         NetworkInterface[] nis = NetworkInterface.GetAllNetworkInterfaces();
         foreach (NetworkInterface ni in nis)

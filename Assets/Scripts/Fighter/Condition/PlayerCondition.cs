@@ -12,15 +12,15 @@ public class PlayerCondition : FighterCondition
 
 
 
-    public override float default_HP {get; set;} = 100;
+    public override float default_HP { get; set; } = 100;
     public override void HPDecreaser(float deltaHP)
     {
         base.HPDecreaser(deltaHP);
-        if(BattleInfo.isMulti) HpDecreaser_UIServerRPC(HP);
+        if (BattleInfo.isMulti) HpDecreaser_UIServerRPC(HP);
         else uGUIMannager.I.HPDecreaser_UI(fighterNo.Value, HP.Normalize(0, default_HP));
     }
 
-    public override float revivalTime {get; set;} = 7;
+    public override float revivalTime { get; set; } = 7;
     protected override void Revival()
     {
         base.Revival();

@@ -72,7 +72,7 @@ class NitroBoost : SkillAssist
         if (cameraController != null) cameraController.ResetView(decelerate_duration);
 
         // Send RPC to all clones to end this skill.
-        if (BattleInfo.isMulti) attack.SkillEndProccessServerRpc(OwnerClientId, skillNo);
+        if (BattleInfo.isMulti) attack.SkillEndProccessServerRpc(NetworkManager.Singleton.LocalClientId, skillNo);
     }
 
     public override void ForceTermination()

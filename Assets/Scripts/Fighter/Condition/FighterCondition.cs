@@ -20,7 +20,7 @@ public abstract class FighterCondition : NetworkBehaviour
     protected virtual void Start()
     {
         // Only the owner refers to HP, speed, defence, and power.
-        if(BattleInfo.isMulti && !IsOwner) return;
+        if (BattleInfo.isMulti && !IsOwner) return;
         HPResetter();
         SpeedResetter();
         PowerResetter();
@@ -30,11 +30,11 @@ public abstract class FighterCondition : NetworkBehaviour
     void Update()
     {
         // Only the owner of this fighter calls Update().
-        if(BattleInfo.isMulti && !IsOwner) return;
+        if (BattleInfo.isMulti && !IsOwner) return;
 
         DeathJudger();
 
-        if(isDead) return;
+        if (isDead) return;
 
         SpeedTimeUpdate();
         PowerTimeUpdate();
@@ -73,8 +73,8 @@ public abstract class FighterCondition : NetworkBehaviour
     // Only the owner of this fighter knows HP.
     [Header("Current Status")]
     public float HP;
-    public abstract float default_HP {get; set;}
-    public bool isDead {get; private set;}
+    public abstract float default_HP { get; set; }
+    public bool isDead { get; private set; }
 
     // Only the owner of this fighter initializes HP, because HP is linked among all clones.
     void HPResetter() => HP = default_HP;
@@ -111,9 +111,9 @@ public abstract class FighterCondition : NetworkBehaviour
     public float defence;
 
     // Only reffered by owner.
-    public int speed_grade {get; private set;}
-    public int power_grade {get; private set;}
-    public int defence_grade {get; private set;}
+    public int speed_grade { get; private set; }
+    public int power_grade { get; private set; }
+    public int defence_grade { get; private set; }
 
     // Only reffered by owner.
     float speed_duration;
@@ -141,10 +141,10 @@ public abstract class FighterCondition : NetworkBehaviour
     // Only the owner of this fighter needs to updates timers.
     void SpeedTimeUpdate()
     {
-        if(speed_grade != 0)
+        if (speed_grade != 0)
         {
             speed_timer += Time.deltaTime;
-            if(speed_timer > speed_duration)
+            if (speed_timer > speed_duration)
             {
                 SpeedGrader(-speed_grade, 0);
                 speed_duration = 0;
@@ -153,10 +153,10 @@ public abstract class FighterCondition : NetworkBehaviour
     }
     void PowerTimeUpdate()
     {
-        if(power_grade != 0)
+        if (power_grade != 0)
         {
             power_timer += Time.deltaTime;
-            if(power_timer > power_duration)
+            if (power_timer > power_duration)
             {
                 PowerGrader(-power_grade, 0);
                 power_duration = 0;
@@ -165,10 +165,10 @@ public abstract class FighterCondition : NetworkBehaviour
     }
     void DefenceTimeUpdate()
     {
-        if(defence_grade != 0)
+        if (defence_grade != 0)
         {
             defence_timer += Time.deltaTime;
-            if(defence_timer > defence_duration)
+            if (defence_timer > defence_duration)
             {
                 DefenceGrader(-defence_grade, 0);
                 defence_duration = 0;
@@ -207,49 +207,49 @@ public abstract class FighterCondition : NetworkBehaviour
     void SpeedUpdater()
     {
         // pausing_speed の時は速度変更を行わない
-        if(pausing_speed) return;
+        if (pausing_speed) return;
 
-        switch(speed_grade)
+        switch (speed_grade)
         {
-            case -3 : SpeedMultiplier(1/3f, speed_change_duration); break;
-            case -2 : SpeedMultiplier(1/2f, speed_change_duration); break;
-            case -1 : SpeedMultiplier(1/1.5f, speed_change_duration); break;
-            case  0 : SpeedMultiplier(1, speed_change_duration); break;
-            case  1 : SpeedMultiplier(1.2f, speed_change_duration); break;
-            case  2 : SpeedMultiplier(1.5f, speed_change_duration); break;
-            case  3 : SpeedMultiplier(2, speed_change_duration); break;
+            case -3: SpeedMultiplier(1 / 3f, speed_change_duration); break;
+            case -2: SpeedMultiplier(1 / 2f, speed_change_duration); break;
+            case -1: SpeedMultiplier(1 / 1.5f, speed_change_duration); break;
+            case 0: SpeedMultiplier(1, speed_change_duration); break;
+            case 1: SpeedMultiplier(1.2f, speed_change_duration); break;
+            case 2: SpeedMultiplier(1.5f, speed_change_duration); break;
+            case 3: SpeedMultiplier(2, speed_change_duration); break;
         }
     }
     void PowerUpdater()
     {
         // pausing_power の時は速度変更を行わない
-        if(pausing_power) return;
+        if (pausing_power) return;
 
-        switch(power_grade)
+        switch (power_grade)
         {
-            case -3 : PowerMultiplier(1/2f); break;
-            case -2 : PowerMultiplier(1/1.5f); break;
-            case -1 : PowerMultiplier(1/1.2f); break;
-            case  0 : PowerMultiplier(1); break;
-            case  1 : PowerMultiplier(1.2f); break;
-            case  2 : PowerMultiplier(1.5f); break;
-            case  3 : PowerMultiplier(2); break;
+            case -3: PowerMultiplier(1 / 2f); break;
+            case -2: PowerMultiplier(1 / 1.5f); break;
+            case -1: PowerMultiplier(1 / 1.2f); break;
+            case 0: PowerMultiplier(1); break;
+            case 1: PowerMultiplier(1.2f); break;
+            case 2: PowerMultiplier(1.5f); break;
+            case 3: PowerMultiplier(2); break;
         }
     }
     void DefenceUpdater()
     {
         // pausing_defence の時は速度変更を行わない
-        if(pausing_defence) return;
+        if (pausing_defence) return;
 
-        switch(defence_grade)
+        switch (defence_grade)
         {
-            case -3 : DefenceMultiplier(1/2f); break;
-            case -2 : DefenceMultiplier(1/1.5f); break;
-            case -1 : DefenceMultiplier(1/1.2f); break;
-            case  0 : DefenceMultiplier(1); break;
-            case  1 : DefenceMultiplier(1.2f); break;
-            case  2 : DefenceMultiplier(1.5f); break;
-            case  3 : DefenceMultiplier(2); break;
+            case -3: DefenceMultiplier(1 / 2f); break;
+            case -2: DefenceMultiplier(1 / 1.5f); break;
+            case -1: DefenceMultiplier(1 / 1.2f); break;
+            case 0: DefenceMultiplier(1); break;
+            case 1: DefenceMultiplier(1.2f); break;
+            case 2: DefenceMultiplier(1.5f); break;
+            case 3: DefenceMultiplier(2); break;
         }
     }
     void SpeedMultiplier(float magnif, float duration = 0)
@@ -268,7 +268,7 @@ public abstract class FighterCondition : NetworkBehaviour
         speed_grade = Mathf.Clamp(speed_grade, -3, 3);
 
         // 持続時間は長い方を採択
-        if(new_duration > speed_duration) speed_duration = new_duration;
+        if (new_duration > speed_duration) speed_duration = new_duration;
         speed_timer = 0;
 
         SpeedUpdater();
@@ -279,7 +279,7 @@ public abstract class FighterCondition : NetworkBehaviour
         power_grade = Mathf.Clamp(power_grade, -3, 3);
 
         // 持続時間は長い方を採択
-        if(new_duration > power_duration) power_duration = new_duration;
+        if (new_duration > power_duration) power_duration = new_duration;
         power_timer = 0;
 
         PowerUpdater();
@@ -290,7 +290,7 @@ public abstract class FighterCondition : NetworkBehaviour
         defence_grade = Mathf.Clamp(defence_grade, -3, 3);
 
         // 持続時間は長い方を採択
-        if(new_duration > defence_duration) defence_duration = new_duration;
+        if (new_duration > defence_duration) defence_duration = new_duration;
         defence_timer = 0;
 
         DefenceUpdater();
@@ -299,37 +299,37 @@ public abstract class FighterCondition : NetworkBehaviour
     // Only the owner of the fighter needs to pause/resume grading.
     public void PauseGradingSpeed(float speed_temp, float duration = 0)
     {
-        if(BattleInfo.isMulti && !IsOwner) return;
+        if (BattleInfo.isMulti && !IsOwner) return;
         pausing_speed = true;
         DOTween.To(() => speed, (x) => speed = x, speed_temp, duration);
     }
     public void ResumeGradingSpeed()
     {
-        if(BattleInfo.isMulti && !IsOwner) return;
+        if (BattleInfo.isMulti && !IsOwner) return;
         pausing_speed = false;
         SpeedUpdater();
     }
     public void PauseGradingPower(float power_temp)
     {
-        if(BattleInfo.isMulti && !IsOwner) return;
+        if (BattleInfo.isMulti && !IsOwner) return;
         pausing_power = true;
         power = power_temp;
     }
     public void ResumeGradingPower()
     {
-        if(BattleInfo.isMulti && !IsOwner) return;
+        if (BattleInfo.isMulti && !IsOwner) return;
         pausing_power = false;
         PowerUpdater();
     }
     public void PauseGradingDefence(float defence_temp)
     {
-        if(BattleInfo.isMulti && !IsOwner) return;
+        if (BattleInfo.isMulti && !IsOwner) return;
         pausing_defence = true;
         defence = defence_temp;
     }
     public void ResumeGradingDefence()
     {
-        if(BattleInfo.isMulti && !IsOwner) return;
+        if (BattleInfo.isMulti && !IsOwner) return;
         pausing_defence = false;
         DefenceUpdater();
     }
@@ -337,20 +337,20 @@ public abstract class FighterCondition : NetworkBehaviour
 
 
     // Death & Revival //////////////////////////////////////////////////////////////////////////////////////////////
-    public abstract float revivalTime {get; set;}
-    public float revive_timer {get; private set;}
+    public abstract float revivalTime { get; set; }
+    public float revive_timer { get; private set; }
     ParticleSystem deadEffect;
     AudioSource deadSound;
 
     // Collider needs to be disabled, in order not to be detected by other fighter as homing target.
     Collider col;
-    
+
     // Should be called on every clients.
     protected virtual void Death(int destroyerNo, string destroyerSkillName)
     {
         deadEffect.Play();
         deadSound.Play();
-        
+
         col.enabled = false;
 
         movement.OnDeath();
@@ -369,7 +369,7 @@ public abstract class FighterCondition : NetworkBehaviour
 
         col.enabled = true;
 
-        if(BattleInfo.isMulti)
+        if (BattleInfo.isMulti)
         {
             if (IsOwner)
             {
@@ -397,7 +397,7 @@ public abstract class FighterCondition : NetworkBehaviour
     [ClientRpc]
     void DeathClientRpc(ulong senderId, int destroyerNo, string destroyerSkillName)
     {
-        if(NetworkManager.Singleton.LocalClientId == senderId) return;
+        if (NetworkManager.Singleton.LocalClientId == senderId) return;
         Death(destroyerNo, destroyerSkillName);
     }
 
@@ -410,29 +410,29 @@ public abstract class FighterCondition : NetworkBehaviour
     [ClientRpc]
     void RevivalClientRpc(ulong senderId)
     {
-        if(NetworkManager.Singleton.LocalClientId == senderId) return;
+        if (NetworkManager.Singleton.LocalClientId == senderId) return;
         Revival();
     }
 
     // Only the owner should call this.
     void DeathJudger()
     {
-        if(HP <= 0)
+        if (HP <= 0)
         {
-            if(!isDead)
+            if (!isDead)
             {
                 isDead = true;
                 Death(receiver.lastShooterNo, receiver.lastSkillName);
-                if(BattleInfo.isMulti)
+                if (BattleInfo.isMulti)
                 {
-                    if(IsHost) DeathClientRpc(OwnerClientId, receiver.lastShooterNo, receiver.lastSkillName);
+                    if (IsHost) DeathClientRpc(OwnerClientId, receiver.lastShooterNo, receiver.lastSkillName);
                     else DeathServerRpc(OwnerClientId, receiver.lastShooterNo, receiver.lastSkillName);
                 }
             }
             else
             {
                 revive_timer += Time.deltaTime;
-                if(revive_timer > revivalTime)
+                if (revive_timer > revivalTime)
                 {
                     revive_timer = 0;
                     isDead = false;
