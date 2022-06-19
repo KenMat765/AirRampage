@@ -21,8 +21,9 @@ public class InfoCanvas : Singleton<InfoCanvas>
     public enum EnterMode { inMoment, typing }
     float frameScaleX;
 
-    void Start()
+    protected override void Awake()
     {
+        base.Awake();
         frameScaleX = frameRect.localScale.x;
         frameRect.DOScaleX(0, 0);
         isFrameOpen = false;
@@ -54,7 +55,7 @@ public class InfoCanvas : Singleton<InfoCanvas>
     ///<param name="text"> Text to enter. </param>
     ///<param name="enterMode"> Determines how to enter the text. </param>
     ///<param name="clearPrevious"> Whether to clear previous text. </param>
-    public void EnterText(string text, EnterMode enterMode, bool clearPrevious = true)
+    public void EnterText(string text, EnterMode enterMode = EnterMode.inMoment, bool clearPrevious = true)
     {
         if (clearPrevious) textBox.text = "";
 
@@ -91,7 +92,7 @@ public class InfoCanvas : Singleton<InfoCanvas>
     }
 
     ///<Summary> Open the Info Canvas frame, and Enter text. </Summary>
-    public void OpenFrameAndEnterText(string text, EnterMode enterMode, bool clearPrevious = true)
+    public void OpenFrameAndEnterText(string text, EnterMode enterMode = EnterMode.inMoment, bool clearPrevious = true)
     {
         if (isFrameOpen)
         {

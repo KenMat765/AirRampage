@@ -192,8 +192,8 @@ public class OnlineLobbyUI : MonoBehaviour
             // GameNetPortal.I.SetPassword(passwordInputField.text);
             string skillCode;
             int?[] skillIds, skillLevels;
-            PlayerInfo.SkillIdGetter(0, out skillIds);
-            PlayerInfo.SkillLevelGetter(0, out skillLevels);
+            PlayerInfo.I.SkillIdGetter(0, out skillIds);
+            PlayerInfo.I.SkillLevelGetter(0, out skillLevels);
             LobbyParticipantData.SkillCodeEncoder(skillIds, skillLevels, out skillCode);
             // string payloadJSON = JsonUtility.ToJson(new ConnectionPayload(passwordInputField.text, nameInputField.text, skillCode));
             string payloadJSON = JsonUtility.ToJson(new ConnectionPayload(nameInputField.text, skillCode));
@@ -213,8 +213,8 @@ public class OnlineLobbyUI : MonoBehaviour
         {
             string skillCode;
             int?[] skillIds, skillLevels;
-            PlayerInfo.SkillIdGetter(0, out skillIds);
-            PlayerInfo.SkillLevelGetter(0, out skillLevels);
+            PlayerInfo.I.SkillIdGetter(0, out skillIds);
+            PlayerInfo.I.SkillLevelGetter(0, out skillLevels);
             LobbyParticipantData.SkillCodeEncoder(skillIds, skillLevels, out skillCode);
             // var payloadJSON = JsonUtility.ToJson(new ConnectionPayload(passwordInputField.text, nameInputField.text, skillCode));
             var payloadJSON = JsonUtility.ToJson(new ConnectionPayload(nameInputField.text, skillCode));

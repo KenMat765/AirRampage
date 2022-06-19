@@ -49,7 +49,7 @@ public class SkillPortManager : Singleton<SkillPortManager>
         skilldeck_btn_rect.anchoredPosition = new Vector2(-300, 0);
         skillgear_btn_rect.anchoredPosition = new Vector2(300, 0);
         return_rect.anchoredPosition = new Vector2(-100, -120);
-        
+
         cirkit_img = list_rect.Find("Cirkit").GetComponent<Image>();
         cirkit_img.fillAmount = 0;
         cirkit_img.color = Color.grey;
@@ -59,8 +59,15 @@ public class SkillPortManager : Singleton<SkillPortManager>
             EnterButtons();
             EnterReturn_Glass();
         });
+
+        // 
+        // 
+        // 
+        ii = SaveManager.LoadData<PlayerInfo>("PlayerInfo");
+        Debug.Log(ii.deck_skill_ids[0, 0]);
     }
-    
+    static PlayerInfo ii;
+
 
 
     // ↓ 階層遷移を伴う処理 ↓ ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,36 +85,43 @@ public class SkillPortManager : Singleton<SkillPortManager>
 
     public void Return()
     {
-        switch(current_page)
+        switch (current_page)
         {
             case Page.menu:
-            ExitButtons();
-            ExitReturn_Glass();
-            Utilities.DelayCall(this, wait_time, () =>
-            {
-                SceneManager2.I.LoadSceneAsync2(GameScenes.menu, FadeType.bottom, FadeType.bottom);
-            });
-            break;
+                ExitButtons();
+                ExitReturn_Glass();
+                Utilities.DelayCall(this, wait_time, () =>
+                {
+                    SceneManager2.I.LoadSceneAsync2(GameScenes.menu, FadeType.bottom, FadeType.bottom);
+                });
+                break;
 
             case Page.deck:
-            skillDeck.OnExit();
-            ExitDeck();
-            Utilities.DelayCall(this, change_interval, EnterButtons);
-            break;
+                skillDeck.OnExit();
+                ExitDeck();
+                SaveManager.SaveData<PlayerInfo>(PlayerInfo.I);
+
+                // 
+                // 
+                // 
+                InfoCanvas.I.OpenFrameAndEnterText(PlayerInfo.I.deck_skill_ids[0, 0].ToString(), InfoCanvas.EnterMode.inMoment);
+
+                Utilities.DelayCall(this, change_interval, EnterButtons);
+                break;
 
             case Page.gear:
-            ExitGear();
-            Utilities.DelayCall(this, change_interval, EnterButtons);
-            break;
+                ExitGear();
+                Utilities.DelayCall(this, change_interval, EnterButtons);
+                break;
 
             case Page.deck_list:
-            skillDeckList.OnExit();
-            ExitInfoList();
-            Utilities.DelayCall(this, change_interval, EnterDeck);
-            break;
+                skillDeckList.OnExit();
+                ExitInfoList();
+                Utilities.DelayCall(this, change_interval, EnterDeck);
+                break;
 
             case Page.gear_list:
-            break;
+                break;
         }
     }
 
@@ -121,14 +135,14 @@ public class SkillPortManager : Singleton<SkillPortManager>
     public void OnSelectEquip()
     {
         int deck_num = skillDeck.current_deck_num;
-        for(int k = 0; k < GameInfo.max_skill_count; k++)
+        for (int k = 0; k < GameInfo.max_skill_count; k++)
         {
-            if(PlayerInfo.deck_skill_ids[deck_num, k] == skillDeckList.current_skill_id)
+            if (PlayerInfo.I.deck_skill_ids[deck_num, k] == skillDeckList.current_skill_id)
             {
-                PlayerInfo.deck_skill_ids[deck_num, k] = null;
+                PlayerInfo.I.deck_skill_ids[deck_num, k] = null;
             }
         }
-        PlayerInfo.deck_skill_ids[deck_num, skillDeck.selected_icon_index] = skillDeckList.current_skill_id;
+        PlayerInfo.I.deck_skill_ids[deck_num, skillDeck.selected_icon_index] = skillDeckList.current_skill_id;
 
         skillDeckList.OnExit();
         ExitInfoList();

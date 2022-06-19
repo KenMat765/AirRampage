@@ -14,7 +14,7 @@ public class SkillDeckList : MonoBehaviour
 
     Image glow_img;
 
-    public const int num_in_page = 3*4;
+    public const int num_in_page = 3 * 4;
     RectTransform[] icon_rects = new RectTransform[num_in_page];
     Image[] icon_imgs = new Image[num_in_page];
     Image[] skill_imgs = new Image[num_in_page];
@@ -24,7 +24,7 @@ public class SkillDeckList : MonoBehaviour
     int total_page_count = 3;
     int current_page_num = 0;
     int? current_icon_index = null;
-    public int? current_skill_id {get; private set;} = null;
+    public int? current_skill_id { get; private set; } = null;
 
 
 
@@ -32,7 +32,7 @@ public class SkillDeckList : MonoBehaviour
     {
         infoBoardImg.color = Color.white;
         cirkit_img.color = Color.gray;
-        
+
         type_text = infoBoardImg.transform.Find("Type").GetComponent<Text>();
         name_text = infoBoardImg.transform.Find("Name").GetComponent<Text>();
         explain_text = infoBoardImg.transform.Find("Explain").GetComponent<Text>();
@@ -41,7 +41,7 @@ public class SkillDeckList : MonoBehaviour
         glow_img = glowRect.GetComponent<Image>();
         glow_img.color = Color.clear;
 
-        for(int order = 0; order < num_in_page; order++)
+        for (int order = 0; order < num_in_page; order++)
         {
             GameObject icon_obj = transform.Find("Icon" + order).gameObject;
             icon_rects[order] = icon_obj.GetComponent<RectTransform>();
@@ -60,11 +60,11 @@ public class SkillDeckList : MonoBehaviour
     // skill_id = page * num_in_page + icon_index
     public void OnSelectIcon(int order)
     {
-        if(current_icon_index == order) ResetInfoBoard();
+        if (current_icon_index == order) ResetInfoBoard();
         else
         {
             current_icon_index = order;
-            current_skill_id = current_page_num*num_in_page + order;
+            current_skill_id = current_page_num * num_in_page + order;
 
             glowRect.position = icon_rects[order].position;
             glow_img.color = new Color(1, 1, 1, 0.5f);
@@ -76,31 +76,31 @@ public class SkillDeckList : MonoBehaviour
             cirkit_img.fillAmount = 0;
             cirkit_img.color = data.GetColor();
 
-            type_text.color = new Color(1,1,1,0);
-            name_text.color = new Color(1,1,1,0);
-            explain_text.color = new Color(1,1,1,0);
+            type_text.color = new Color(1, 1, 1, 0);
+            name_text.color = new Color(1, 1, 1, 0);
+            explain_text.color = new Color(1, 1, 1, 0);
 
-            switch(data.GetSkillType())
+            switch (data.GetSkillType())
             {
                 case SkillType.attack:
-                type_text.text = "攻撃系";
-                break;
-                
+                    type_text.text = "攻撃系";
+                    break;
+
                 case SkillType.heal:
-                type_text.text = "回復系";
-                break;
+                    type_text.text = "回復系";
+                    break;
 
                 case SkillType.assist:
-                type_text.text = "補助系";
-                break;
+                    type_text.text = "補助系";
+                    break;
 
                 case SkillType.disturb:
-                type_text.text = "妨害系";
-                break;
+                    type_text.text = "妨害系";
+                    break;
 
-                default :
-                type_text.text = "Null";
-                break;
+                default:
+                    type_text.text = "Null";
+                    break;
             }
             name_text.text = data.GetNameJp();
             explain_text.text = data.GetInfomation();
@@ -137,7 +137,7 @@ public class SkillDeckList : MonoBehaviour
 
     public void OnExit()
     {
-        for(int order = 0; order < num_in_page; order++) icon_imgs[order].raycastTarget = false;
+        for (int order = 0; order < num_in_page; order++) icon_imgs[order].raycastTarget = false;
         ResetInfoBoard();
         current_page_num = 0;
     }
@@ -146,10 +146,10 @@ public class SkillDeckList : MonoBehaviour
 
     void RefreshIcons(int page_num)
     {
-        for(int order = 0; order < num_in_page; order++)
+        for (int order = 0; order < num_in_page; order++)
         {
             SkillData data = SkillDatabase.I.SearchSkillByPageOrder(page_num, order);
-            if(data == null)
+            if (data == null)
             {
                 icon_imgs[order].color = Color.clear;
                 skill_imgs[order].color = Color.clear;
@@ -157,7 +157,7 @@ public class SkillDeckList : MonoBehaviour
             }
             else
             {
-                if(!PlayerInfo.unlock[data.GetId()])
+                if (!PlayerInfo.I.unlock[data.GetId()])
                 {
                     icon_imgs[order].color = new Color(1, 1, 1, 0.5f);
                     skill_imgs[order].color = Color.clear;
