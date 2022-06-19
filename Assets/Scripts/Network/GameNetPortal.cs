@@ -124,14 +124,7 @@ public class GameNetPortal : Singleton<GameNetPortal>
 
     private void HandleOnClientConnected(ulong clientId)
     {
-        RefreshAllFightersClientRpc(clientId);
-    }
 
-    [ClientRpc]
-    void RefreshAllFightersClientRpc(ulong clientId)
-    {
-        if (clientId == NetworkManager.Singleton.LocalClientId) return;
-        LobbyFighter.I.RefreshFighterPreparation();
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -140,12 +133,6 @@ public class GameNetPortal : Singleton<GameNetPortal>
 
     private void HandleOnClientDisconnect(ulong clientId)
     {
-        // If current scene is at SortieLobby, disable the fighter of disconnected client at all connected clients by sending client RPC.
-        if (SceneManager.GetActiveScene().name == "SortieLobby")
-        {
-            DisableFighterClientRpc(clientId);
-        }
-
         if (NetworkManager.Singleton.IsHost)
         {
             // If disconnected client was host.

@@ -35,6 +35,10 @@ public class LobbyFighter : Singleton<LobbyFighter>
 
         if (!selectedMulti) return;
         RefreshFighterPreparation();
+        LobbyLinkedData.I.AddOnValueChangedAction((NetworkListEvent<LobbyParticipantData> listEvent) =>
+        {
+            RefreshFighterPreparation();
+        });
     }
 
     public void PrepareFighter(int index)
@@ -94,12 +98,20 @@ public class LobbyFighter : Singleton<LobbyFighter>
     {
         LobbyParticipantData myData = LobbyLinkedData.I.GetParticipantDataByClientId(NetworkManager.Singleton.LocalClientId).Value;
         Team myTeam = myData.team;
+        int[] teamNos = GameInfo.GetNosFromTeam(myTeam);
+        List<int> preparedNos = new List<int>();
         foreach (LobbyParticipantData data in LobbyLinkedData.I.participantDatas)
         {
             if (data.team != myTeam) continue;
+            preparedNos.Add(data.number);
             if (fighters[data.number].activeSelf) continue;
             PrepareFighter(data.number);
             nameTexts[data.number].text = data.name.ToString();
+        }
+        foreach (int teamNo in teamNos)
+        {
+            if (preparedNos.Contains(teamNo)) continue;
+            DisableFighter(teamNo);
         }
     }
 
