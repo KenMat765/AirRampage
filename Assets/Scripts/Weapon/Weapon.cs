@@ -11,7 +11,7 @@ public abstract class Weapon : Utilities
     bool penetrate;
     void WhenPenetrateRange()
     {
-        if(penetrate && IsRange())
+        if (penetrate && IsRange())
         {
             attackRange = AttackRange.Single;
             Debug.LogWarning("貫通型の範囲攻撃は不可能なので、攻撃範囲はSingleに変更されました");
@@ -51,7 +51,7 @@ public abstract class Weapon : Utilities
     AudioSource hitSound;
     bool HasHitEffectWhenRange(GameObject obj)
     {
-        if(IsRange() && !HasHitEffect()) return false;
+        if (IsRange() && !HasHitEffect()) return false;
         else return true;
     }
     bool HasHitEffect() { return hitEffect != null; }
@@ -67,32 +67,32 @@ public abstract class Weapon : Utilities
 
 
     // スキルレベルによって変化する要素 /////////////////////////////////////////////////////////////////////////////////////
-    protected float power {get; set;}
-    protected float lifespan {get; set;}
-    protected float speed {get; set;}
+    protected float power { get; set; }
+    protected float lifespan { get; set; }
+    protected float speed { get; set; }
 
-    protected HomingType homingType {get; set;}
-    protected float homingAccuracy {get; set;}
-    protected float homingAngle {get; set;}
+    protected HomingType homingType { get; set; }
+    protected float homingAccuracy { get; set; }
+    protected float homingAngle { get; set; }
 
 
     // Receiverに受け渡す要素 /////////////////////////////////////////////////////////////////////////////////////////////
-    protected float power_temp {get; private set;}
+    protected float power_temp { get; private set; }
 
-    protected bool speedDown {get; private set;}
-    protected float speedProbability {get; private set;}
-    protected int speedGrade {get; private set;}
-    protected float speedDuration {get; private set;}
+    protected bool speedDown { get; private set; }
+    protected float speedProbability { get; private set; }
+    protected int speedGrade { get; private set; }
+    protected float speedDuration { get; private set; }
 
-    protected bool powerDown {get; private set;}
-    protected float powerProbability {get; private set;}
-    protected int powerGrade {get; private set;}
-    protected float powerDuration {get; private set;}
+    protected bool powerDown { get; private set; }
+    protected float powerProbability { get; private set; }
+    protected int powerGrade { get; private set; }
+    protected float powerDuration { get; private set; }
 
-    protected bool defenceDown {get; private set;}
-    protected float defenceProbability {get; private set;}
-    protected int defenceGrade {get; private set;}
-    protected float defenceDuration {get; private set;}
+    protected bool defenceDown { get; private set; }
+    protected float defenceProbability { get; private set; }
+    protected int defenceGrade { get; private set; }
+    protected float defenceDuration { get; private set; }
 
 
     // Skillからセット //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,8 +101,8 @@ public abstract class Weapon : Utilities
     System.Func<float> StayMotion = null;
     Attack attack;
     [SerializeField] GameObject targetObject = null;
-    
-    
+
+
     int enemy_body_layer, enemy_shield_layer;
     LayerMask enemy_mask;    // enemy_mask = ボディ + シールド
 
@@ -130,14 +130,14 @@ public abstract class Weapon : Utilities
 
         parent = transform.parent;
 
-        if(attack.fighterCondition.fighterTeam.Value == Team.Red)
+        if (attack.fighterCondition.fighterTeam.Value == Team.Red)
         {
             gameObject.layer = LayerMask.NameToLayer("RedBullet");
             enemy_body_layer = LayerMask.NameToLayer("BlueBody");
             enemy_shield_layer = LayerMask.NameToLayer("BlueShield");
             enemy_mask = (1 << 12) + (1 << 14);
         }
-        else if(attack.fighterCondition.fighterTeam.Value == Team.Blue)
+        else if (attack.fighterCondition.fighterTeam.Value == Team.Blue)
         {
             gameObject.layer = LayerMask.NameToLayer("BlueBullet");
             enemy_body_layer = LayerMask.NameToLayer("RedBody");
@@ -146,26 +146,26 @@ public abstract class Weapon : Utilities
         }
         else Debug.LogError("AttackにTeamが割り当てられていません。ParticipantManagerでAttackにTeamが割り当てられているか確認してください。");
 
-        if(blastImpact != null)
+        if (blastImpact != null)
         {
             blastImpact.transform.parent = owner.transform;
             blastImpact.transform.localPosition = startPos;
             blastImpact.transform.localRotation = startRot;
             blastImpact.SetActive(false);
         }
-        
-        if(trail != null)
+
+        if (trail != null)
         {
             trail_startPos = trail.transform.localPosition;
             trail_startRot = trail.transform.localRotation;
         }
 
-        if(hitEffect != null)
+        if (hitEffect != null)
         {
             hitEffect.SetActive(false);
             hit_startPos = hitEffect.transform.localPosition;
             hit_startRot = hitEffect.transform.localRotation;
-            if(penetrate)
+            if (penetrate)
             {
                 hitEffects = new List<GameObject>();
                 hitEffects.Add(hitEffect);
@@ -173,29 +173,29 @@ public abstract class Weapon : Utilities
         }
 
         parent_particle = GetComponent<ParticleSystem>();
-   }
+    }
 
     protected virtual void FixedUpdate()
     {
-        switch(current_state)
+        switch (current_state)
         {
             case WeaponState.staying:
-            OnStaying();
-            break;
+                OnStaying();
+                break;
 
             case WeaponState.moving:
-            OnMoving();
-            break;
+                OnMoving();
+                break;
 
             case WeaponState.exploding:
-            OnExploding();
-            break;
+                OnExploding();
+                break;
         }
     }
 
     protected virtual void OnEnable()
     {
-        if(StayMotion == null)
+        if (StayMotion == null)
         {
             current_state = WeaponState.moving;
             OnStartMoving();
@@ -210,21 +210,33 @@ public abstract class Weapon : Utilities
     protected virtual void OnCollisionEnter(Collision col)
     {
         // 攻撃：Attack Range == Single
-        if(attackRange == AttackRange.Single)
+        if (attackRange == AttackRange.Single)
         {
             GameObject hit_obj = col.gameObject;
 
             // Shieldだった場合
             // ヒット：シールド
-            if(hit_obj.layer == enemy_shield_layer)
+            if (hit_obj.layer == enemy_shield_layer)
             {
-                // Call this on every clones.
-                hit_obj.GetComponent<ShieldHitDetector>().DecreaseDurability(power_temp);
+                if (BattleInfo.isMulti)
+                {
+                    // Only the owner of this weapon requests to server to change parameters.
+                    if (attack.IsOwner)
+                    {
+                        Receiver receiver = hit_obj.GetComponentInParent<Receiver>();
+                        receiver.ShieldDurabilityDecreaseServerRpc(power_temp);
+                    }
+                }
+                else
+                {
+                    ShieldHitDetector hitDetector = hit_obj.GetComponent<ShieldHitDetector>();
+                    hitDetector.DecreaseDurability(power_temp);
+                }
             }
 
             // Shieldでなかった場合
             // ヒット：ボディ
-            else if(hit_obj.layer == enemy_body_layer)
+            else if (hit_obj.layer == enemy_body_layer)
             {
                 // Get fighter's Receiver.
                 Receiver receiver = hit_obj.GetComponent<Receiver>();
@@ -232,7 +244,7 @@ public abstract class Weapon : Utilities
                 // All weapons call this.
                 receiver.ExplosionEffectPlayer();
 
-                if(BattleInfo.isMulti)
+                if (BattleInfo.isMulti)
                 {
                     // Only the owner of this weapon requests to server to change parameters.
                     if (attack.IsOwner)
@@ -256,14 +268,14 @@ public abstract class Weapon : Utilities
         }
 
         // 当たったものに関係なく以下を実行
-        if(hitEffect == null)
+        if (hitEffect == null)
         {
             // 貫通型でないならKill
-            if(!penetrate) KillWeapon();
+            if (!penetrate) KillWeapon();
         }
         else
         {
-            if(penetrate)
+            if (penetrate)
             {
                 // hitEffect を リジェクト ＋ 再生
                 GameObject effect = GetHitEffectFromList();
@@ -304,7 +316,7 @@ public abstract class Weapon : Utilities
 
     public void TerminateWeapon()
     {
-        if(current_state == WeaponState.staying || (lockonType == LockonType.Self && current_state != WeaponState.inactive))
+        if (current_state == WeaponState.staying || (lockonType == LockonType.Self && current_state != WeaponState.inactive))
         {
             KillWeapon();
         }
@@ -322,7 +334,7 @@ public abstract class Weapon : Utilities
     void OnStaying()
     {
         elapsedTime += Time.deltaTime;
-        if(elapsedTime > motion_duration)
+        if (elapsedTime > motion_duration)
         {
             current_state = WeaponState.moving;
             OnStartMoving();
@@ -336,62 +348,62 @@ public abstract class Weapon : Utilities
         elapsedTime = 0;
 
         // 標的をセット
-        switch(lockonType)
+        switch (lockonType)
         {
             // Set target from each skills.
             case LockonType.Zero:
-            // if(attack.homingTargets.Count > 0) targetObject = attack.homingTargets[0];
-            // else targetObject = null;
-            break;
+                // if(attack.homingTargets.Count > 0) targetObject = attack.homingTargets[0];
+                // else targetObject = null;
+                break;
 
             // Set target from each skills.
             case LockonType.Random:
-            // if(attack.homingTargets.Count > 0) targetObject = attack.homingTargets.RandomChoice();
-            // else targetObject = null;
-            break;
+                // if(attack.homingTargets.Count > 0) targetObject = attack.homingTargets.RandomChoice();
+                // else targetObject = null;
+                break;
 
             // Set target by yourself.
             case LockonType.Self:
-            targetObject = owner;
-            break;
+                targetObject = owner;
+                break;
         }
 
         // 準ホーミング
-        if(homingType == HomingType.PreHoming)
+        if (homingType == HomingType.PreHoming)
         {
-            if(targetObject != null) PreHoming();
+            if (targetObject != null) PreHoming();
         }
 
         // 弾をリジェクト ＋ 発射音、エフェクト再生
-        if(lockonType == LockonType.Self) transform.parent = transform.root;
+        if (lockonType == LockonType.Self) transform.parent = transform.root;
         else transform.parent = null;
-        if(blastImpact != null) blastImpact.SetActive(true);
-        if(hasDefaultTarget) default_target = speed * lifespan * owner.transform.forward;
+        if (blastImpact != null) blastImpact.SetActive(true);
+        if (hasDefaultTarget) default_target = speed * lifespan * owner.transform.forward;
     }
 
     protected virtual void OnMoving()
     {
         // ホーミング
-        switch(homingType)
+        switch (homingType)
         {
             case HomingType.Normal:
-            if(hasDefaultTarget) HomeToDefault();
-            break;
+                if (hasDefaultTarget) HomeToDefault();
+                break;
 
             case HomingType.PreHoming:
-            if(targetObject == null && hasDefaultTarget) HomeToDefault();
-            break;
+                if (targetObject == null && hasDefaultTarget) HomeToDefault();
+                break;
 
             case HomingType.Homing:
-            if(targetObject != null) Homing();
-            else if(hasDefaultTarget) HomeToDefault();
-            break;
+                if (targetObject != null) Homing();
+                else if (hasDefaultTarget) HomeToDefault();
+                break;
         }
 
         elapsedTime += Time.deltaTime;
-        if(elapsedTime > lifespan)
+        if (elapsedTime > lifespan)
         {
-            if(hitEffect == null)
+            if (hitEffect == null)
             {
                 KillWeapon();
             }
@@ -410,7 +422,7 @@ public abstract class Weapon : Utilities
     {
         elapsedTime = 0;
 
-        if(attackRange == AttackRange.Range && alreadyBombed == null)
+        if (attackRange == AttackRange.Range && alreadyBombed == null)
         {
             alreadyBombed = new List<GameObject>();
         }
@@ -419,34 +431,47 @@ public abstract class Weapon : Utilities
     void OnExploding()
     {
         // 攻撃：Attack Range == Range
-        if(attackRange == AttackRange.Range)
+        if (attackRange == AttackRange.Range)
         {
             // ヒット：ボディ or シールド
             Collider[] hits = Physics.OverlapSphere(transform.position, rangeRadius, enemy_mask);
 
-            foreach(Collider hit in hits)
+            foreach (Collider hit in hits)
             {
                 GameObject hit_obj = hit.gameObject;
 
                 // Shieldだった場合
                 // ヒット：シールド
-                if(hit_obj.layer == enemy_shield_layer)
+                if (hit_obj.layer == enemy_shield_layer)
                 {
-                    if(!alreadyBombed.Contains(hit_obj))
+                    if (!alreadyBombed.Contains(hit_obj))
                     {
                         // Call this on every clones.
-                        hit_obj.GetComponent<ShieldHitDetector>().DecreaseDurability(power_temp);
                         alreadyBombed.Add(hit.gameObject);
                         alreadyBombed.Add(hit.transform.parent.gameObject);
+                        if (BattleInfo.isMulti)
+                        {
+                            // Only the owner of this weapon requests to server to change parameters.
+                            if (attack.IsOwner)
+                            {
+                                Receiver receiver = hit_obj.GetComponentInParent<Receiver>();
+                                receiver.ShieldDurabilityDecreaseServerRpc(power_temp);
+                            }
+                        }
+                        else
+                        {
+                            ShieldHitDetector hitDetector = hit_obj.GetComponent<ShieldHitDetector>();
+                            hitDetector.DecreaseDurability(power_temp);
+                        }
                     }
                 }
 
                 // Shieldでなかった場合
                 // ヒット：ボディ
-                else if(hit_obj.layer == enemy_body_layer)
+                else if (hit_obj.layer == enemy_body_layer)
                 {
                     // まだダメージを与えていない敵だった場合
-                    if(!alreadyBombed.Contains(hit_obj))
+                    if (!alreadyBombed.Contains(hit_obj))
                     {
                         alreadyBombed.Add(hit.gameObject);
 
@@ -482,14 +507,14 @@ public abstract class Weapon : Utilities
         }
 
         elapsedTime += Time.deltaTime;
-        if(elapsedTime > hitDuration)
+        if (elapsedTime > hitDuration)
         {
             hitEffect.SetActive(false);
             hitEffect.transform.parent = transform;
             hitEffect.transform.localPosition = hit_startPos;
             hitEffect.transform.localRotation = hit_startRot;
 
-            if(attackRange == AttackRange.Range) alreadyBombed.Clear();
+            if (attackRange == AttackRange.Range) alreadyBombed.Clear();
 
             KillWeapon();
         }
@@ -536,7 +561,7 @@ public abstract class Weapon : Utilities
     // hitEffectを持つ貫通型スキルで使用
     GameObject GetHitEffectFromList()
     {
-        foreach(GameObject effect in hitEffects) if(!effect.activeSelf) return effect;
+        foreach (GameObject effect in hitEffects) if (!effect.activeSelf) return effect;
         GameObject new_effect = Instantiate(hitEffect, transform);
         hitEffects.Add(new_effect);
         return new_effect;
@@ -548,7 +573,7 @@ public abstract class Weapon : Utilities
         GetComponent<ParticleSystem>().Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 
         // hit_soundを再生
-        if(hitSound != null) { hitSound.Play(); }
+        if (hitSound != null) { hitSound.Play(); }
 
         // hit_effect を リジェクト ＋ 再生
         hitEffect.transform.parent = null;
@@ -559,7 +584,7 @@ public abstract class Weapon : Utilities
     {
         current_state = WeaponState.inactive;
         elapsedTime = 0;
-        if(gameObject.activeSelf) gameObject.SetActive(false);
+        if (gameObject.activeSelf) gameObject.SetActive(false);
         transform.parent = parent;
         transform.localPosition = startPos;
         transform.localRotation = startRot;

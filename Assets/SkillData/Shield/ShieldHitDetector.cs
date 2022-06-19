@@ -12,12 +12,7 @@ public class ShieldHitDetector : MonoBehaviour
     // Shieldクラスからセット
     float shield_durability;
 
-    public void DecreaseDurability(float damage)
-    {
-        // Only the owner get damage to shield.
-        if (BattleInfo.isMulti && !shield.IsOwner) return;
-        shield_durability -= damage;
-    }
+    public void DecreaseDurability(float damage) => shield_durability -= damage;
 
     float exhaust_speed;
 
@@ -51,6 +46,11 @@ public class ShieldHitDetector : MonoBehaviour
         if (gameObject.layer == LayerMask.NameToLayer("RedShield")) enemy_bullet_layer = LayerMask.NameToLayer("BlueBullet");
         else if (gameObject.layer == LayerMask.NameToLayer("BlueShield")) enemy_bullet_layer = LayerMask.NameToLayer("RedBullet");
         else Debug.LogError("Layer is not set to Shield Prefab");
+
+        if (!BattleInfo.isMulti) return;
+
+        // Set self to Receiver (Used in RPC)
+        GetComponentInParent<Receiver>().hitDetector = this;
     }
 
     void Update()
