@@ -31,6 +31,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 10, y: 10, z: 10}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3840132583387267044}
   m_Father: {fileID: 0}
@@ -55,6 +56,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -205,13 +207,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 04eaee107ee735041bd798a6f8e6e30c, type: 3}
---- !u!1 &7357570654846930048 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8389547181428282493, guid: 04eaee107ee735041bd798a6f8e6e30c, type: 3}
-  m_PrefabInstance: {fileID: 1330531327943170301}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3840132583387267044 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2827164406174426905, guid: 04eaee107ee735041bd798a6f8e6e30c, type: 3}
+  m_PrefabInstance: {fileID: 1330531327943170301}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &7357570654846930048 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8389547181428282493, guid: 04eaee107ee735041bd798a6f8e6e30c, type: 3}
   m_PrefabInstance: {fileID: 1330531327943170301}
   m_PrefabAsset: {fileID: 0}

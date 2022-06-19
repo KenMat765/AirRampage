@@ -106,7 +106,8 @@ Material:
     - _MaxSurfaceOffset: 0.01
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _WaveFrequency: 5
+    - _Quietness: 1
+    - _WaveFrequency: 7.5
     - _WaveIntencity: 10
     m_Colors:
     - Color_79b9ce38eb7a4dadb9ff3681f61dda3e: {r: 11.984314, g: 0.8784314, b: 0, a: 1}
