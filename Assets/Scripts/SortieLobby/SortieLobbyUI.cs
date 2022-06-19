@@ -379,8 +379,8 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
         if (selectedMulti)
         {
             int?[] new_skillIds, new_skillLevels;
-            PlayerInfo.I.SkillIdGetter(deck_num, out new_skillIds);
-            PlayerInfo.I.SkillLevelGetter(deck_num, out new_skillLevels);
+            PlayerInfo.I.SkillIdsGetter(deck_num, out new_skillIds);
+            PlayerInfo.I.SkillLevelsGetter(deck_num, out new_skillLevels);
             string new_skillCode;
             LobbyParticipantData.SkillCodeEncoder(new_skillIds, new_skillLevels, out new_skillCode);
             LobbyParticipantData new_data = new LobbyParticipantData(myNumber, myName, myClientId, myTeam, isReady, new_skillCode);
@@ -440,9 +440,11 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
 
         else
         {
+            int?[] skillIds = new int?[GameInfo.max_skill_count];
+            PlayerInfo.I.SkillIdsGetter(deck_num, out skillIds);
             for (int k = 0; k < GameInfo.max_skill_count; k++)
             {
-                int? skillId = PlayerInfo.I.deck_skill_ids[deck_num, k];
+                int? skillId = skillIds[k];
                 if (skillId.HasValue)
                 {
                     SkillData data = SkillDatabase.I.SearchSkillById((int)skillId);
@@ -521,8 +523,8 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
 
             // Send battle data to BattleInfo.
             int?[] skillIds, skillLevels;
-            PlayerInfo.I.SkillIdGetter(deck_num, out skillIds);
-            PlayerInfo.I.SkillLevelGetter(deck_num, out skillLevels);
+            PlayerInfo.I.SkillIdsGetter(deck_num, out skillIds);
+            PlayerInfo.I.SkillLevelsGetter(deck_num, out skillLevels);
             BattleInfo.ParticipantBattleData battleData = new BattleInfo.ParticipantBattleData(0, true, null, "Player", Team.Red, skillIds, skillLevels);
             BattleInfo.battleDatas[0] = battleData;
         }

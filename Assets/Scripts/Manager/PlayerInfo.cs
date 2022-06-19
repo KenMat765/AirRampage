@@ -8,51 +8,118 @@ public class PlayerInfo
     // The only instance of PlayerInfo.
     public static PlayerInfo I { get; set; }
 
-    // 
-    // 
-    // 
-    public int[,] ddd = new int[GameInfo.deck_count, GameInfo.max_skill_count];
+    /// <Summary> returns -1 if null. </Summary>
+    public string[] deck_skill_ids = new string[GameInfo.deck_count];
 
-    public int?[,] deck_skill_ids { get; set; } = new int?[GameInfo.deck_count, GameInfo.max_skill_count];
-    public void SkillIdGetter(int deckNumber, out int?[] skillIds)
+    public void SkillIdSetter(int deckNo, int skillNo, int? skillId)
+    {
+        int[] skillIds = StringToSkillIds(deck_skill_ids[deckNo]);
+        if (skillId.HasValue)
+        {
+            skillIds[skillNo] = (int)skillId;
+        }
+        else
+        {
+            skillIds[skillNo] = -1;
+        }
+        string skillIds_str = SkillIdsToString(skillIds);
+        deck_skill_ids[deckNo] = skillIds_str;
+    }
+
+    public void SkillIdsGetter(int deckNumber, out int?[] skillIds)
     {
         skillIds = new int?[GameInfo.max_skill_count];
+        int[] skillIds_temp = StringToSkillIds(deck_skill_ids[deckNumber]);
         for (int k = 0; k < GameInfo.max_skill_count; k++)
         {
-            skillIds[k] = deck_skill_ids[deckNumber, k];
-        }
-    }
-    public void SkillLevelGetter(int deckNumber, out int?[] skillLevels)
-    {
-        skillLevels = new int?[GameInfo.max_skill_count];
-        for (int k = 0; k < GameInfo.max_skill_count; k++)
-        {
-            int? skillId_nullable = deck_skill_ids[deckNumber, k];
-            if (skillId_nullable.HasValue)
+            if (skillIds_temp[k] == -1)
             {
-                int skillId = (int)skillId_nullable;
-                skillLevels[k] = level[skillId];
+                skillIds[k] = null;
             }
             else
             {
-                skillLevels[k] = null;
+                skillIds[k] = skillIds_temp[k];
             }
         }
+    }
+
+    public void SkillLevelsGetter(int deckNumber, out int?[] skillLevels)
+    {
+        skillLevels = new int?[GameInfo.max_skill_count];
+        int[] skillIds_temp = StringToSkillIds(deck_skill_ids[deckNumber]);
+        for (int k = 0; k < GameInfo.max_skill_count; k++)
+        {
+            int skillId_temp = skillIds_temp[k];
+            if (skillId_temp == -1)
+            {
+                skillLevels[k] = null;
+            }
+            else
+            {
+                skillLevels[k] = level[skillId_temp];
+            }
+        }
+    }
+
+    // Convert Skill Ids to string, in order to convert to JSON.
+    // [1,4,-1,3,2] -> "1/4/-1/3/2/"
+    string SkillIdsToString(int[] skillIds)
+    {
+        string result = "";
+        for (int k = 0; k < skillIds.Length; k++)
+        {
+            result += skillIds[k] + "/";
+        }
+        return result;
+    }
+
+    // "1/4/-1/3/2/" -> [1,4,-1,3,2]
+    int[] StringToSkillIds(string skillIds_str)
+    {
+        int[] result = new int[GameInfo.max_skill_count];
+
+        // Input will be null when there are no save data.
+        if (skillIds_str == null || skillIds_str == "")
+        {
+            for (int m = 0; m < result.Length; m++)
+            {
+                result[m] = -1;
+            }
+            return result;
+        }
+
+        string id_str = "";
+        int no = 0;
+        for (int k = 0; k < skillIds_str.Length; k++)
+        {
+            char cur_char = skillIds_str[k];
+            if (cur_char == '/')
+            {
+                result[no] = int.Parse(id_str);
+                id_str = "";
+                no++;
+            }
+            else
+            {
+                id_str += cur_char;
+            }
+        }
+        return result;
     }
 
     // skill_id と unlock したかのセット
     // スキルの数だけ手動で追加する必要がある
-    public Dictionary<int, bool> unlock { get; set; } = new Dictionary<int, bool>()
+    public bool[] unlock =
     {
-        {0, true}, {1, true}, {2, true}, {3, true}, {4, true}, {5, true},
-        {6, true}, {7, true}, {8, true}, {9, true}, {10, true}, {11, true},
+        true, true, true, true, true, true,
+        true, true, true, true, true, true
     };
 
     // skill_id と 各スキルのレベル のセット
     // スキルの数だけ手動で追加する必要がある
-    public Dictionary<int, int> level { get; set; } = new Dictionary<int, int>()
+    public int[] level =
     {
-        {0, 3}, {1, 3}, {2, 3}, {3, 3}, {4, 3}, {5, 3},
-        {6, 3}, {7, 3}, {8, 3}, {9, 3}, {10, 3}, {11, 3},
+        3, 3, 3, 3, 3, 3,
+        3, 3, 3, 3, 3, 3
     };
 }

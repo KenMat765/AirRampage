@@ -61,9 +61,11 @@ public class SkillDeck : Utilities
 
     public void OnSelectIcon(int icon_index)
     {
+        int?[] skillIds = new int?[GameInfo.max_skill_count];
+        PlayerInfo.I.SkillIdsGetter(current_deck_num, out skillIds);
         if (current_icon_index != icon_index)
         {
-            if (PlayerInfo.I.deck_skill_ids[current_deck_num, icon_index] != null)
+            if (skillIds[icon_index] != null)
             {
                 FadeInLeader(icon_index, LeaderType.Line);
             }
@@ -105,7 +107,7 @@ public class SkillDeck : Utilities
 
     public void OnSelectRemove()
     {
-        PlayerInfo.I.deck_skill_ids[current_deck_num, selected_icon_index] = null;
+        PlayerInfo.I.SkillIdSetter(current_deck_num, selected_icon_index, null);
         RefreshIcons(current_deck_num);
         FadeOutLeader();
         current_icon_index = null;
@@ -214,9 +216,11 @@ public class SkillDeck : Utilities
 
     void RefreshIcons(int deck_num)
     {
+        int?[] skillIds = new int?[GameInfo.max_skill_count];
+        PlayerInfo.I.SkillIdsGetter(deck_num, out skillIds);
         for (int k = 0; k < icon_imgs.Length; k++)
         {
-            if (PlayerInfo.I.deck_skill_ids[deck_num, k] == null)
+            if (skillIds[k] == null)
             {
                 icon_imgs[k].color = Color.white;
                 skill_imgs[k].sprite = null;
@@ -224,7 +228,7 @@ public class SkillDeck : Utilities
             }
             else
             {
-                SkillData data = SkillDatabase.I.SearchSkillById((int)PlayerInfo.I.deck_skill_ids[deck_num, k]);
+                SkillData data = SkillDatabase.I.SearchSkillById((int)skillIds[k]);
 
                 // いらない予定 (data == null はあり得ない)
                 if (data == null)

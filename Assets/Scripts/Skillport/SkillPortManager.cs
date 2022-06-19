@@ -59,14 +59,7 @@ public class SkillPortManager : Singleton<SkillPortManager>
             EnterButtons();
             EnterReturn_Glass();
         });
-
-        // 
-        // 
-        // 
-        ii = SaveManager.LoadData<PlayerInfo>("PlayerInfo");
-        Debug.Log(ii.deck_skill_ids[0, 0]);
     }
-    static PlayerInfo ii;
 
 
 
@@ -100,12 +93,6 @@ public class SkillPortManager : Singleton<SkillPortManager>
                 skillDeck.OnExit();
                 ExitDeck();
                 SaveManager.SaveData<PlayerInfo>(PlayerInfo.I);
-
-                // 
-                // 
-                // 
-                InfoCanvas.I.OpenFrameAndEnterText(PlayerInfo.I.deck_skill_ids[0, 0].ToString(), InfoCanvas.EnterMode.inMoment);
-
                 Utilities.DelayCall(this, change_interval, EnterButtons);
                 break;
 
@@ -135,14 +122,16 @@ public class SkillPortManager : Singleton<SkillPortManager>
     public void OnSelectEquip()
     {
         int deck_num = skillDeck.current_deck_num;
+        int?[] skillIds = new int?[GameInfo.max_skill_count];
+        PlayerInfo.I.SkillIdsGetter(deck_num, out skillIds);
         for (int k = 0; k < GameInfo.max_skill_count; k++)
         {
-            if (PlayerInfo.I.deck_skill_ids[deck_num, k] == skillDeckList.current_skill_id)
+            if (skillIds[k] == skillDeckList.current_skill_id)
             {
-                PlayerInfo.I.deck_skill_ids[deck_num, k] = null;
+                PlayerInfo.I.SkillIdSetter(deck_num, k, null);
             }
         }
-        PlayerInfo.I.deck_skill_ids[deck_num, skillDeck.selected_icon_index] = skillDeckList.current_skill_id;
+        PlayerInfo.I.SkillIdSetter(deck_num, skillDeck.selected_icon_index, skillDeckList.current_skill_id);
 
         skillDeckList.OnExit();
         ExitInfoList();
