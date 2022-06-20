@@ -21,10 +21,10 @@ public class PlayerMovement : Movement
         UpdateTrans();
 
         // Only the owner can controll fighter.
-        if(BattleInfo.isMulti && !IsOwner) return;
+        if (BattleInfo.isMulti && !IsOwner) return;
 
         // Don't move when dead.
-        if(fighterCondition.isDead) return;
+        if (fighterCondition.isDead) return;
 
         MoveForward();
         Rotate();
@@ -36,11 +36,11 @@ public class PlayerMovement : Movement
     public override void OnRevival()
     {
         base.OnRevival();
-        if(uTurndirection == -1)
+        if (uTurndirection == -1)
         {
             uTurndirection = 1;
 
-            if(BattleInfo.isMulti && ! IsOwner) return;
+            if (BattleInfo.isMulti && !IsOwner) return;
 
             cameraController.CameraTurn(uTurndirection);
         }
@@ -49,19 +49,19 @@ public class PlayerMovement : Movement
 
 
     float maxRotSpeed = 40;
-    public int stickReverse {get; set;} = -1;    // 設定で変更可能に
+    public int stickReverse { get; set; } = -1;    // 設定で変更可能に
     bool can_rotate = true;
 
     protected override void Rotate()
     {
-        if(can_rotate)
+        if (can_rotate)
         {
-            if(uGUIMannager.onStick)
+            if (uGUIMannager.onStick)
             {
                 const int k = 100;
-                float targetRotX = Utilities.R2R(uGUIMannager.norm_diffPos.y, 0, maxTiltX, Utilities.FunctionType.convex_down, k);;
+                float targetRotX = Utilities.R2R(uGUIMannager.norm_diffPos.y, 0, maxTiltX, Utilities.FunctionType.convex_down, k); ;
                 float relativeRotY = Utilities.R2R(uGUIMannager.norm_diffPos.x, 0, maxRotSpeed, Utilities.FunctionType.convex_down, k);
-                float targetRotZ = Utilities.R2R(uGUIMannager.norm_diffPos.x, 0, maxTiltZ, Utilities.FunctionType.convex_down, k);;
+                float targetRotZ = Utilities.R2R(uGUIMannager.norm_diffPos.x, 0, maxTiltZ, Utilities.FunctionType.convex_down, k); ;
                 Quaternion targetRot = Quaternion.Euler(targetRotX * stickReverse * uTurndirection, myRot.eulerAngles.y + relativeRotY, targetRotZ * -1 * uTurndirection);
                 transform.rotation = Quaternion.Slerp(myRot, targetRot, 0.05f);
             }
@@ -90,7 +90,7 @@ public class PlayerMovement : Movement
     {
         StartCoroutine(base.uTurn());
 
-        if(BattleInfo.isMulti && !IsOwner) yield break;
+        if (BattleInfo.isMulti && !IsOwner) yield break;
 
         yield return new WaitForSeconds(0.33f);
 
@@ -101,26 +101,21 @@ public class PlayerMovement : Movement
     {
         StartCoroutine(base.flip());
 
-        if(BattleInfo.isMulti && !IsOwner) yield break;
+        if (BattleInfo.isMulti && !IsOwner) yield break;
 
         can_rotate = false;
-        cameraController.CameraLookUp(-90*uTurndirection, flipTime/2);
-        float speed_temp = fighterCondition.speed;
-        fighterCondition.PauseGradingSpeed(0);
+        cameraController.CameraLookUp(-90 * uTurndirection, flipTime / 2);
 
-        yield return new WaitForSeconds(1.2f);
+        yield return new WaitForSeconds(flipTime);
 
-        fighterCondition.ResumeGradingSpeed();
-        
-        yield return new WaitForSeconds(flipTime - 1.2f);
         can_rotate = true;
     }
 
     protected override void FourActionExe()
     {
-        if(CSManager.swipeDown) {Uturn();}
-        else if(CSManager.swipeUp) {Flip();}
-        else if(CSManager.swipeLeft) {LeftRole(0);}
-        else if(CSManager.swipeRight) {RightRole(0);}
+        if (CSManager.swipeDown) { Uturn(); }
+        else if (CSManager.swipeUp) { Flip(); }
+        else if (CSManager.swipeLeft) { LeftRole(0); }
+        else if (CSManager.swipeRight) { RightRole(0); }
     }
 }

@@ -102,7 +102,7 @@ Material:
     - _BackAlpha: 0.08
     - _FresnelPower: 2
     - _FrontMinAlpha: 0.2
-    - _Height: 1.2860383
+    - _Height: 2
     - _MaxSurfaceOffset: 0.01
     - _QueueControl: 0
     - _QueueOffset: 0
