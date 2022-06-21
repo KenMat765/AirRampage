@@ -25,9 +25,6 @@ public class SkillDeck : Utilities
     int? current_icon_index = null;
     public int selected_icon_index { get; private set; } = 0;
 
-    const float fadeout_duration = 0.05f;
-    const float number_duration = 0.1f;
-
     Sequence fadein_seq;
 
 
@@ -66,6 +63,11 @@ public class SkillDeck : Utilities
         PlayerInfo.I.SkillIdsGetter(current_deck_num, out skillIds);
         if (current_icon_index != icon_index)
         {
+            if (current_icon_index != null)
+            {
+                FadeOutLeader();
+            }
+
             if (skillIds[icon_index] != null)
             {
                 FadeInLeader(icon_index, LeaderType.Line);
@@ -73,11 +75,6 @@ public class SkillDeck : Utilities
             else
             {
                 FadeInLeader(icon_index, LeaderType.Line2);
-            }
-
-            if (current_icon_index != null)
-            {
-                FadeOutLeader();
             }
 
             current_icon_index = icon_index;
@@ -93,6 +90,8 @@ public class SkillDeck : Utilities
 
     public void GoToNextDeck(int direction)
     {
+        float number_duration = 0.1f;
+
         int next_deck_num = ((current_deck_num + direction) % GameInfo.deck_count + GameInfo.deck_count) % GameInfo.deck_count;
 
         numberImgs[current_deck_num].fillAmount = 0;
@@ -147,21 +146,21 @@ public class SkillDeck : Utilities
 
     void FadeInLeader(int icon_index, LeaderType leader_type)
     {
-        float line_duration = 0.1f;
-        float text_duration = 0.1f;
+        float line_duration = 0.15f;
+        float text_duration = 0.15f;
 
         fadein_seq = DOTween.Sequence();
 
         switch (leader_type)
         {
             case LeaderType.Line:
-                fadein_seq.Join(skill_names[icon_index].DOFade(1, text_duration));
+                fadein_seq.Append(DOTween.To(() => lines[icon_index].fillAmount, (value) => lines[icon_index].fillAmount = value, 1, line_duration));
+                fadein_seq.Append(skill_names[icon_index].DOFade(1, text_duration));
                 fadein_seq.Join(change_btn_imgs[icon_index].DOFade(1, text_duration));
                 fadein_seq.Join(change_texts[icon_index].DOFade(1, text_duration));
                 fadein_seq.Join(remove_btn_imgs[icon_index].DOFade(1, text_duration));
                 fadein_seq.Join(remove_texts[icon_index].DOFade(1, text_duration));
-                DOTween.To(() => lines[icon_index].fillAmount, (value) => lines[icon_index].fillAmount = value, 1, line_duration)
-                    .OnComplete(() => fadein_seq.Play());
+                fadein_seq.Play();
 
                 change_btn_imgs[icon_index].raycastTarget = true;
                 remove_btn_imgs[icon_index].raycastTarget = true;
@@ -169,10 +168,10 @@ public class SkillDeck : Utilities
                 break;
 
             case LeaderType.Line2:
-                fadein_seq.Join(set_texts[icon_index].DOFade(1, text_duration));
+                fadein_seq.Append(DOTween.To(() => line2s[icon_index].fillAmount, (value) => line2s[icon_index].fillAmount = value, 1, line_duration));
+                fadein_seq.Append(set_texts[icon_index].DOFade(1, text_duration));
                 fadein_seq.Join(set_btn_imgs[icon_index].DOFade(1, text_duration));
-                DOTween.To(() => line2s[icon_index].fillAmount, (value) => line2s[icon_index].fillAmount = value, 1, line_duration)
-                    .OnComplete(() => fadein_seq.Play());
+                fadein_seq.Play();
 
                 set_btn_imgs[icon_index].raycastTarget = true;
 
@@ -182,11 +181,13 @@ public class SkillDeck : Utilities
 
     void FadeOutLeader()
     {
+        float fadeout_duration = 0.1f;
+
         if (current_icon_index != null)
         {
             int casted_icon_index = (int)current_icon_index;
 
-            fadein_seq.Kill(true);
+            fadein_seq.Kill(false);
 
             var seq = DOTween.Sequence();
 
@@ -197,13 +198,13 @@ public class SkillDeck : Utilities
                 seq.Join(change_texts[casted_icon_index].DOFade(0, fadeout_duration));
                 seq.Join(remove_btn_imgs[casted_icon_index].DOFade(0, fadeout_duration));
                 seq.Join(remove_texts[casted_icon_index].DOFade(0, fadeout_duration));
-                seq.Join(DOTween.To(() => lines[casted_icon_index].fillAmount, (value) => lines[casted_icon_index].fillAmount = value, 0, fadeout_duration));
+                seq.Append(DOTween.To(() => lines[casted_icon_index].fillAmount, (value) => lines[casted_icon_index].fillAmount = value, 0, fadeout_duration));
             }
             if (line2s[casted_icon_index].fillAmount > 0)
             {
                 seq.Join(set_texts[casted_icon_index].DOFade(0, fadeout_duration));
                 seq.Join(set_btn_imgs[casted_icon_index].DOFade(0, fadeout_duration));
-                seq.Join(DOTween.To(() => line2s[casted_icon_index].fillAmount, (value) => line2s[casted_icon_index].fillAmount = value, 0, fadeout_duration));
+                seq.Append(DOTween.To(() => line2s[casted_icon_index].fillAmount, (value) => line2s[casted_icon_index].fillAmount = value, 0, fadeout_duration));
             }
 
             seq.Play();
