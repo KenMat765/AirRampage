@@ -178,6 +178,10 @@ public class SkillPortManager : Singleton<SkillPortManager>
     void EnterDeck()
     {
         current_page = Page.deck;
+
+        // Wait until deck is refreshed.
+        skillDeck.RefreshIcons(skillDeck.current_deck_num);
+
         deck_rect.DOAnchorPosY(80, enter_exit_duration);
         right_btn_rect.DOAnchorPosX(-140, enter_exit_duration);
         left_btn_rect.DOAnchorPosX(140, enter_exit_duration)

@@ -55,6 +55,7 @@ public class SkillDeck : Utilities
         }
 
         OnExit();
+        RefreshIcons(0);
     }
 
 
@@ -117,7 +118,6 @@ public class SkillDeck : Utilities
 
     public void OnEnter()
     {
-        RefreshIcons(current_deck_num);
         for (int k = 0; k < icon_imgs.Length; k++)
         {
             icon_imgs[k].raycastTarget = true;
@@ -214,7 +214,7 @@ public class SkillDeck : Utilities
         }
     }
 
-    void RefreshIcons(int deck_num)
+    public void RefreshIcons(int deck_num)
     {
         int?[] skillIds = new int?[GameInfo.max_skill_count];
         PlayerInfo.I.SkillIdsGetter(deck_num, out skillIds);

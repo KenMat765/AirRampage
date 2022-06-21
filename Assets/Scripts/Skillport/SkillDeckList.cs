@@ -53,6 +53,8 @@ public class SkillDeckList : MonoBehaviour
         equip_btn_img = infoBoardImg.transform.Find("Equip").GetComponent<Image>();
         equip_btn_img.color = Color.grey;
         equip_btn_img.raycastTarget = false;
+
+        RefreshIcons(0);
     }
 
 
