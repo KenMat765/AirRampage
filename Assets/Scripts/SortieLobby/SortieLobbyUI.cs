@@ -515,7 +515,7 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
             var seq = DOTween.Sequence();
             seq.Append(participantObject.transform.DOScaleX(0, tweenDuration).OnComplete(() =>
             {
-                LobbyFighter.I.SortieAllFighters(Team.RED, () => DOVirtual.DelayedCall(1, () => SceneManager2.I.LoadSceneAsync2(GameScenes.offline, FadeType.left, FadeType.bottom)).Play());
+                LobbyFighter.I.SortieAllFighters(Team.RED, () => DOVirtual.DelayedCall(1, () => SceneManager2.I.LoadSceneAsync2(GameScenes.offline, FadeType.left)).Play());
             }));
             seq.Join(returnRect.DOAnchorPosX(-100, tweenDuration));
             seq.Append(menuRect.DOScaleY(0, tweenDuration));
@@ -560,7 +560,7 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
             DOVirtual.DelayedCall(tweenDuration, () =>
             {
                 menuRect.DOScaleY(0, tweenDuration);
-                SceneManager2.I.LoadSceneAsync2(GameScenes.menu, FadeType.gradually, FadeType.left);
+                SceneManager2.I.LoadSceneAsync2(GameScenes.menu, FadeType.gradually);
             }).Play();
         }
     }

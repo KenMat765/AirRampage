@@ -85,7 +85,7 @@ public class SkillPortManager : Singleton<SkillPortManager>
                 ExitReturn_Glass();
                 Utilities.DelayCall(this, wait_time, () =>
                 {
-                    SceneManager2.I.LoadSceneAsync2(GameScenes.menu, FadeType.bottom, FadeType.bottom);
+                    SceneManager2.I.LoadSceneAsync2(GameScenes.menu, FadeType.bottom);
                 });
                 break;
 

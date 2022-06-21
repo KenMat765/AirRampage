@@ -243,7 +243,7 @@ public class OnlineLobbyUI : MonoBehaviour
         DOVirtual.DelayedCall(tweenDuration, () =>
         {
             menuRect.DOScaleY(0, tweenDuration);
-            SceneManager2.I.LoadSceneAsync2(GameScenes.menu, FadeType.gradually, FadeType.left);
+            SceneManager2.I.LoadSceneAsync2(GameScenes.menu, FadeType.gradually);
         }).Play();
     }
 

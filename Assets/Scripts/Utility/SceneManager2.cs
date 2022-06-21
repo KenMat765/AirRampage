@@ -29,9 +29,15 @@ public class SceneManager2 : Singleton<SceneManager2>
             }
         }
 
-        // In battle scenes, camera setup is called in ParticipantManager.
-        if (loadedScene.name == "Offline") return;
-        CameraManager.SetupCameraInScene();
+        if (loadedScene.name != "Offline")
+        {
+            // In battle scenes, camera setup is called in ParticipantManager.
+            CameraManager.SetupCameraInScene();
+
+            // In battle scenes, fade in to the scene in BattleSceneConstructor.
+            FadeCanvas.I.StopBlink();
+            float fadein_duration = FadeCanvas.I.FadeIn(FadeType.left);
+        }
     }
 
     public void LoadScene2(GameScenes gameScene)
@@ -61,12 +67,12 @@ public class SceneManager2 : Singleton<SceneManager2>
         }
     }
 
-    public void LoadSceneAsync2(GameScenes gameScene, FadeType fadeOutType, FadeType fadeInType)
+    public void LoadSceneAsync2(GameScenes gameScene, FadeType fadeOutType)
     {
         if (beforeSceneUnload != null) { beforeSceneUnload(); }
-        StartCoroutine(SceneLoader(gameScene, fadeOutType, fadeInType));
+        StartCoroutine(SceneLoader(gameScene, fadeOutType));
     }
-    IEnumerator SceneLoader(GameScenes gameScene, FadeType fadeOutType, FadeType fadeInType)
+    IEnumerator SceneLoader(GameScenes gameScene, FadeType fadeOutType)
     {
         float fadeout_duration = FadeCanvas.I.FadeOut(fadeOutType);
 
@@ -107,8 +113,6 @@ public class SceneManager2 : Singleton<SceneManager2>
 
         yield return new WaitForSeconds(1.5f);    // 3.5秒間だけ"Now Loading ..."をわざと表示
 
-        float fadein_duration = FadeCanvas.I.FadeIn(fadeInType);
-        FadeCanvas.I.StopBlink();
         async.allowSceneActivation = true;
     }
 

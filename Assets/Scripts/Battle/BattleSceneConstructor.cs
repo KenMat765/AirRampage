@@ -16,6 +16,8 @@ public class BattleSceneConstructor : MonoBehaviour
 
         // uGUIManagerをアクティブ化
         uGUIMannager.I.enabled = true;
+        FadeCanvas.I.StopBlink();
+        float fadein_duration = FadeCanvas.I.FadeIn(FadeType.left);
 
         // 任意のタイミングでゲームを開始する
         yield return new WaitForSeconds(1);

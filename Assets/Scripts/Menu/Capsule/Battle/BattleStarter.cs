@@ -24,7 +24,7 @@ public class BattleStarter : Utilities
         multiButton.interactable = false;
         SortieLobbyUI.selectedMulti = false;
         LobbyFighter.selectedMulti = false;
-        SceneManager2.I.LoadSceneAsync2(GameScenes.sortielobby, FadeType.left, FadeType.bottom);
+        SceneManager2.I.LoadSceneAsync2(GameScenes.sortielobby, FadeType.left);
     }
 
     public void MultiBattle()
@@ -33,6 +33,6 @@ public class BattleStarter : Utilities
         multiButton.interactable = false;
         SortieLobbyUI.selectedMulti = true;
         LobbyFighter.selectedMulti = true;
-        SceneManager2.I.LoadSceneAsync2(GameScenes.onlinelobby, FadeType.bottom, FadeType.left);
+        SceneManager2.I.LoadSceneAsync2(GameScenes.onlinelobby, FadeType.bottom);
     }
 }

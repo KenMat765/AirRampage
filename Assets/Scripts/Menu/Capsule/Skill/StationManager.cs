@@ -11,8 +11,8 @@ public class StationManager : MonoBehaviour
     void Start()
     {
         stationCapsule = GetComponentInParent<Capsule>();
-        stationCapsule.finish_open_action = () => {skillPortButton.interactable = true; abilityBaseButton.interactable = true;};
-        stationCapsule.start_close_action = () => {skillPortButton.interactable = false; abilityBaseButton.interactable = false;};
+        stationCapsule.finish_open_action = () => { skillPortButton.interactable = true; abilityBaseButton.interactable = true; };
+        stationCapsule.start_close_action = () => { skillPortButton.interactable = false; abilityBaseButton.interactable = false; };
         skillPortButton.interactable = false;
         abilityBaseButton.interactable = false;
     }
@@ -21,7 +21,7 @@ public class StationManager : MonoBehaviour
     {
         skillPortButton.interactable = false;
         abilityBaseButton.interactable = false;
-        SceneManager2.I.LoadSceneAsync2(GameScenes.skillport, FadeType.gradually, FadeType.bottom);
+        SceneManager2.I.LoadSceneAsync2(GameScenes.skillport, FadeType.gradually);
     }
 
     public void ActivateAbilityBase()
