@@ -18,7 +18,35 @@ public class Receiver : NetworkBehaviour
 
 
     public FighterCondition fighterCondition { get; set; }
-    public virtual void OnDeath(int destroyerNo, string destroyerSkillName) { }
+    public virtual void OnDeath(int destroyerNo, string destroyerSkillName)
+    {
+        if (BattleInfo.rule == Rule.BATTLEROYAL)
+        {
+            // Point totalization should be done only at server.
+            if (BattleInfo.isMulti && !IsHost) return;
+
+            int myPoint = (fighterCondition.gameObject.tag == "Zako") ? BattleRoyal.point_zako : BattleRoyal.point_player;
+
+            // If killer is NOT Zako.
+            if (0 <= destroyerNo && destroyerNo < GameInfo.max_player_count)
+            {
+                BattleRoyal.points[destroyerNo] += myPoint;
+            }
+
+            // If killer is Zako.
+            else
+            {
+                if (ParticipantManager.I.fighterInfos[destroyerNo].fighterCondition.fighterTeam.Value == Team.RED)
+                {
+                    BattleRoyal.points[GameInfo.max_player_count] += myPoint;
+                }
+                else
+                {
+                    BattleRoyal.points[GameInfo.max_player_count + 1] += myPoint;
+                }
+            }
+        }
+    }
     public virtual void OnRevival() { }
 
 
@@ -36,7 +64,8 @@ public class Receiver : NetworkBehaviour
     public int lastShooterNo { get; private set; }
     public string lastSkillName { get; private set; }
 
-    public virtual void LastShooterDetector(int fighterNo, string skillName)
+    // Call : Server + Owner.
+    public void LastShooterDetector(int fighterNo, string skillName)
     {
         lastShooterNo = fighterNo;
         lastSkillName = skillName;
@@ -45,14 +74,34 @@ public class Receiver : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void LastShooterDetectorServerRpc(int fighterNo, string skillName)
     {
-        if (IsOwner) LastShooterDetector(fighterNo, skillName);
-        else LastShooterDetectorClientRpc(fighterNo, skillName);
+        // Call in server too.
+        LastShooterDetector(fighterNo, skillName);
+        if (!IsOwner) LastShooterDetectorClientRpc(fighterNo, skillName);
     }
 
     [ClientRpc]
-    void LastShooterDetectorClientRpc(int fighterNo, string skillName)
+    public void LastShooterDetectorClientRpc(int fighterNo, string skillName)
     {
+        // Call in owner.
         if (IsOwner) LastShooterDetector(fighterNo, skillName);
+    }
+
+
+    // Other things to do when weapon hit.
+    // Call : Owner.
+    public virtual void OnWeaponHit(int fighterNo) { }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void OnWeaponHitServerRpc(int fighterNo)
+    {
+        if (IsOwner) OnWeaponHit(fighterNo);
+        else OnWeaponHitClientRpc(fighterNo);
+    }
+
+    [ClientRpc]
+    void OnWeaponHitClientRpc(int fighterNo)
+    {
+        if (IsOwner) OnWeaponHit(fighterNo);
     }
 
 

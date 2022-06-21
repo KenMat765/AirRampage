@@ -90,7 +90,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
         for (int no = 0; no < GameInfo.max_player_count; no++)
         {
             Team team = ParticipantManager.I.fighterInfos[no].fighterCondition.fighterTeam.Value;
-            if (team == Team.Red) team_icons[no].color = Color.red;
+            if (team == Team.RED) team_icons[no].color = Color.red;
             else team_icons[no].color = Color.blue;
             string name = ParticipantManager.I.fighterInfos[no].fighterCondition.fighterName.Value.ToString();
             name_icons[no].text = name;

@@ -85,7 +85,7 @@ public class MultiGameStarter : NetworkBehaviour
                     aiTeam = GameInfo.GetTeamFromNo(no);
 
                     // Determine AI name.
-                    if (aiTeam == Team.Red)
+                    if (aiTeam == Team.RED)
                     {
                         redAICounter++;
                         aiName = "AIRed" + redAICounter.ToString();

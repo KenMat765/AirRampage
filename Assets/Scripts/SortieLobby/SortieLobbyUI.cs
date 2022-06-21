@@ -149,7 +149,7 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
                     });
                 returnRect.DOAnchorPosX(100, tweenDuration)
                     .OnComplete(() => returnButton.interactable = true);
-                LobbyFighter.I.PrepareAllFighters(Team.Red);
+                LobbyFighter.I.PrepareAllFighters(Team.RED);
             }).Play();
 
 
@@ -179,9 +179,9 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
                 }
 
                 // Generate & Send battle data to BattleInfo.
-                int aiNo = GameInfo.GetNoFromTeam(Team.Red, 1 + red);
+                int aiNo = GameInfo.GetNoFromTeam(Team.RED, 1 + red);
                 string aiName = "AIRed" + (red + 1).ToString();
-                BattleInfo.ParticipantBattleData battleData = new BattleInfo.ParticipantBattleData(aiNo, false, null, aiName, Team.Red, aiSkillIds, aiSkillLevels);
+                BattleInfo.ParticipantBattleData battleData = new BattleInfo.ParticipantBattleData(aiNo, false, null, aiName, Team.RED, aiSkillIds, aiSkillLevels);
                 BattleInfo.battleDatas[aiNo] = battleData;
             }
 
@@ -194,9 +194,9 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
                 LobbyAiSkillGenerator.I.GenerateSkills(out aiSkillIds, out aiSkillLevels);
 
                 // Generate & Send battle data to BattleInfo.
-                int aiNo = GameInfo.GetNoFromTeam(Team.Blue, blue);
+                int aiNo = GameInfo.GetNoFromTeam(Team.BLUE, blue);
                 string aiName = "AIBlue" + (blue + 1).ToString();
-                BattleInfo.ParticipantBattleData battleData = new BattleInfo.ParticipantBattleData(aiNo, false, null, aiName, Team.Blue, aiSkillIds, aiSkillLevels);
+                BattleInfo.ParticipantBattleData battleData = new BattleInfo.ParticipantBattleData(aiNo, false, null, aiName, Team.BLUE, aiSkillIds, aiSkillLevels);
                 BattleInfo.battleDatas[aiNo] = battleData;
             }
         }
@@ -515,7 +515,7 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
             var seq = DOTween.Sequence();
             seq.Append(participantObject.transform.DOScaleX(0, tweenDuration).OnComplete(() =>
             {
-                LobbyFighter.I.SortieAllFighters(Team.Red, () => DOVirtual.DelayedCall(1, () => SceneManager2.I.LoadSceneAsync2(GameScenes.offline, FadeType.left, FadeType.bottom)).Play());
+                LobbyFighter.I.SortieAllFighters(Team.RED, () => DOVirtual.DelayedCall(1, () => SceneManager2.I.LoadSceneAsync2(GameScenes.offline, FadeType.left, FadeType.bottom)).Play());
             }));
             seq.Join(returnRect.DOAnchorPosX(-100, tweenDuration));
             seq.Append(menuRect.DOScaleY(0, tweenDuration));
@@ -525,7 +525,7 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
             int?[] skillIds, skillLevels;
             PlayerInfo.I.SkillIdsGetter(deck_num, out skillIds);
             PlayerInfo.I.SkillLevelsGetter(deck_num, out skillLevels);
-            BattleInfo.ParticipantBattleData battleData = new BattleInfo.ParticipantBattleData(0, true, null, "Player", Team.Red, skillIds, skillLevels);
+            BattleInfo.ParticipantBattleData battleData = new BattleInfo.ParticipantBattleData(0, true, null, "Player", Team.RED, skillIds, skillLevels);
             BattleInfo.battleDatas[0] = battleData;
         }
     }

@@ -130,14 +130,14 @@ public abstract class Weapon : Utilities
 
         parent = transform.parent;
 
-        if (attack.fighterCondition.fighterTeam.Value == Team.Red)
+        if (attack.fighterCondition.fighterTeam.Value == Team.RED)
         {
             gameObject.layer = LayerMask.NameToLayer("RedBullet");
             enemy_body_layer = LayerMask.NameToLayer("BlueBody");
             enemy_shield_layer = LayerMask.NameToLayer("BlueShield");
             enemy_mask = (1 << 12) + (1 << 14);
         }
-        else if (attack.fighterCondition.fighterTeam.Value == Team.Blue)
+        else if (attack.fighterCondition.fighterTeam.Value == Team.BLUE)
         {
             gameObject.layer = LayerMask.NameToLayer("BlueBullet");
             enemy_body_layer = LayerMask.NameToLayer("RedBody");
@@ -250,19 +250,21 @@ public abstract class Weapon : Utilities
                     if (attack.IsOwner)
                     {
                         receiver.HPDownServerRpc(power_temp);
+                        receiver.LastShooterDetectorServerRpc(attack.fighterCondition.fighterNo.Value, skill_name);
+                        receiver.OnWeaponHitServerRpc(attack.fighterCondition.fighterNo.Value);
                         if (speedDown) receiver.SpeedDownServerRpc(speedGrade, speedDuration, speedProbability);
                         if (powerDown) receiver.PowerDownServerRpc(powerGrade, powerDuration, powerProbability);
                         if (defenceDown) receiver.DefenceDownServerRpc(defenceGrade, defenceDuration, defenceProbability);
-                        if (hit_obj.transform.parent.tag != "Zako") receiver.LastShooterDetectorServerRpc(attack.fighterCondition.fighterNo.Value, skill_name);
                     }
                 }
                 else
                 {
                     receiver.HPDown(power_temp);
+                    receiver.LastShooterDetector(attack.fighterCondition.fighterNo.Value, skill_name);
+                    receiver.OnWeaponHit(attack.fighterCondition.fighterNo.Value);
                     if (speedDown) receiver.SpeedDown(speedGrade, speedDuration, speedProbability);
                     if (powerDown) receiver.PowerDown(powerGrade, powerDuration, powerProbability);
                     if (defenceDown) receiver.DefenceDown(defenceGrade, defenceDuration, defenceProbability);
-                    if (hit_obj.transform.parent.tag != "Zako") receiver.LastShooterDetector(attack.fighterCondition.fighterNo.Value, skill_name);
                 }
             }
         }
@@ -487,19 +489,21 @@ public abstract class Weapon : Utilities
                             if (attack.IsOwner)
                             {
                                 receiver.HPDownServerRpc(power_temp);
+                                receiver.LastShooterDetectorServerRpc(attack.fighterCondition.fighterNo.Value, skill_name);
+                                receiver.OnWeaponHitServerRpc(attack.fighterCondition.fighterNo.Value);
                                 if (speedDown) receiver.SpeedDownServerRpc(speedGrade, speedDuration, speedProbability);
                                 if (powerDown) receiver.PowerDownServerRpc(powerGrade, powerDuration, powerProbability);
                                 if (defenceDown) receiver.DefenceDownServerRpc(defenceGrade, defenceDuration, defenceProbability);
-                                if (hit_obj.transform.parent.tag != "Zako") receiver.LastShooterDetectorServerRpc(attack.fighterCondition.fighterNo.Value, skill_name);
                             }
                         }
                         else
                         {
                             receiver.HPDown(power_temp);
+                            receiver.LastShooterDetector(attack.fighterCondition.fighterNo.Value, skill_name);
+                            receiver.OnWeaponHit(attack.fighterCondition.fighterNo.Value);
                             if (speedDown) receiver.SpeedDown(speedGrade, speedDuration, speedProbability);
                             if (powerDown) receiver.PowerDown(powerGrade, powerDuration, powerProbability);
                             if (defenceDown) receiver.DefenceDown(defenceGrade, defenceDuration, defenceProbability);
-                            if (hit_obj.transform.parent.tag != "Zako") receiver.LastShooterDetector(attack.fighterCondition.fighterNo.Value, skill_name);
                         }
                     }
                 }

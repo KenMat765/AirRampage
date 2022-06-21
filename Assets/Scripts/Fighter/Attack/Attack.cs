@@ -61,8 +61,8 @@ public abstract class Attack : NetworkBehaviour
     void SetLayerInteggers()
     {
         // Set Fighter-Root's layer to enemy_mask.
-        if (fighterCondition.fighterTeam.Value == Team.Red) enemy_mask = 1 << 18;
-        else if (fighterCondition.fighterTeam.Value == Team.Blue) enemy_mask = 1 << 17;
+        if (fighterCondition.fighterTeam.Value == Team.RED) enemy_mask = 1 << 18;
+        else if (fighterCondition.fighterTeam.Value == Team.BLUE) enemy_mask = 1 << 17;
         else Debug.LogError("Team not set at FighterCondition");
     }
 

@@ -19,7 +19,7 @@ public class SpawnPoints : MonoBehaviour
         {
             if (point.spawnZako)
             {
-                if (point.team == Team.Red)
+                if (point.team == Team.RED)
                 {
                     point.pointNo = redZako;
                     redZako++;
@@ -32,7 +32,7 @@ public class SpawnPoints : MonoBehaviour
             }
             else
             {
-                if (point.team == Team.Red)
+                if (point.team == Team.RED)
                 {
                     point.pointNo = red;
                     red++;

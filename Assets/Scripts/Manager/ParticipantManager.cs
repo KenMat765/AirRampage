@@ -113,7 +113,7 @@ public class ParticipantManager : NetworkBehaviour
                 Team team = GameInfo.GetTeamFromNo(no);
                 SpawnPoint point = SpawnPoints.GetSpawnPoint(no);
                 GameObject aiFighter;
-                if (team == Team.Red)
+                if (team == Team.RED)
                 {
                     aiFighter = Instantiate(redAiPrefab, point.transform.position, point.transform.rotation);
                 }
@@ -127,15 +127,15 @@ public class ParticipantManager : NetworkBehaviour
 
             // Generate Zakos
             int red_pointNo = 0, blue_pointNo = 0;
-            SpawnPoint redPoint = SpawnPoints.GetSpawnPointZako(Team.Red, red_pointNo);
-            SpawnPoint bluePoint = SpawnPoints.GetSpawnPointZako(Team.Blue, blue_pointNo); ;
+            SpawnPoint redPoint = SpawnPoints.GetSpawnPointZako(Team.RED, red_pointNo);
+            SpawnPoint bluePoint = SpawnPoints.GetSpawnPointZako(Team.BLUE, blue_pointNo); ;
             int red_current_spawned = 0, blue_current_spawned = 0;
             for (int no = 0; no < SpawnPoints.zakoCountPerTeam; no++)
             {
                 if (red_current_spawned == redPoint.zakoCount)
                 {
                     red_pointNo++;
-                    redPoint = SpawnPoints.GetSpawnPointZako(Team.Red, red_pointNo);
+                    redPoint = SpawnPoints.GetSpawnPointZako(Team.RED, red_pointNo);
                     red_current_spawned = 0;
                 }
                 red_current_spawned++;
@@ -147,7 +147,7 @@ public class ParticipantManager : NetworkBehaviour
                 if (blue_current_spawned == bluePoint.zakoCount)
                 {
                     blue_pointNo++;
-                    bluePoint = SpawnPoints.GetSpawnPointZako(Team.Blue, blue_pointNo);
+                    bluePoint = SpawnPoints.GetSpawnPointZako(Team.BLUE, blue_pointNo);
                     blue_current_spawned = 0;
                 }
                 blue_current_spawned++;
@@ -230,12 +230,12 @@ public class ParticipantManager : NetworkBehaviour
                     if (fighter.layer == LayerMask.NameToLayer("RedFighter"))
                     {
                         fighterCondition.fighterName.Value = "ZakoRed";
-                        fighterCondition.fighterTeam.Value = Team.Red;
+                        fighterCondition.fighterTeam.Value = Team.RED;
                     }
                     else
                     {
                         fighterCondition.fighterName.Value = "ZakoBlue";
-                        fighterCondition.fighterTeam.Value = Team.Blue;
+                        fighterCondition.fighterTeam.Value = Team.BLUE;
                     }
                 }
             }
@@ -291,7 +291,7 @@ public class ParticipantManager : NetworkBehaviour
                 // Create fighter.
                 GameObject fighter;
                 SpawnPoint point = SpawnPoints.GetSpawnPoint(no);
-                if (battleData.team == Team.Red)
+                if (battleData.team == Team.RED)
                 {
                     fighter = Instantiate(redPlayerPrefab, point.transform.position, point.transform.rotation);
                 }
@@ -318,7 +318,7 @@ public class ParticipantManager : NetworkBehaviour
                 // Create fighter.
                 GameObject fighter;
                 SpawnPoint point = SpawnPoints.GetSpawnPoint(no);
-                if (battleData.team == Team.Red)
+                if (battleData.team == Team.RED)
                 {
                     fighter = Instantiate(redAiPrefab, point.transform.position, point.transform.rotation);
                 }
@@ -347,8 +347,8 @@ public class ParticipantManager : NetworkBehaviour
     void SpawnAllZakos()
     {
         int red_pointNo = 0, blue_pointNo = 0;
-        SpawnPoint redPoint = SpawnPoints.GetSpawnPointZako(Team.Red, red_pointNo);
-        SpawnPoint bluePoint = SpawnPoints.GetSpawnPointZako(Team.Blue, blue_pointNo); ;
+        SpawnPoint redPoint = SpawnPoints.GetSpawnPointZako(Team.RED, red_pointNo);
+        SpawnPoint bluePoint = SpawnPoints.GetSpawnPointZako(Team.BLUE, blue_pointNo); ;
         int red_current_spawned = 0, blue_current_spawned = 0;
 
         for (int k = 0; k < SpawnPoints.zakoCountPerTeam; k++)
@@ -356,7 +356,7 @@ public class ParticipantManager : NetworkBehaviour
             if (red_current_spawned == redPoint.zakoCount)
             {
                 red_pointNo++;
-                redPoint = SpawnPoints.GetSpawnPointZako(Team.Red, red_pointNo);
+                redPoint = SpawnPoints.GetSpawnPointZako(Team.RED, red_pointNo);
                 red_current_spawned = 0;
             }
 
@@ -371,7 +371,7 @@ public class ParticipantManager : NetworkBehaviour
             redCondition.fighterNo.Value = GameInfo.max_player_count + k;
             // redCondition.fighterName.Value = "ZakoRed" + (k + 1);
             redCondition.fighterName.Value = "ZakoRed";
-            redCondition.fighterTeam.Value = Team.Red;
+            redCondition.fighterTeam.Value = Team.RED;
 
             // Spawn fighter.
             NetworkObject redNet = red.GetComponent<NetworkObject>();
@@ -381,7 +381,7 @@ public class ParticipantManager : NetworkBehaviour
             if (blue_current_spawned == bluePoint.zakoCount)
             {
                 blue_pointNo++;
-                bluePoint = SpawnPoints.GetSpawnPointZako(Team.Blue, blue_pointNo);
+                bluePoint = SpawnPoints.GetSpawnPointZako(Team.BLUE, blue_pointNo);
                 blue_current_spawned = 0;
             }
 
@@ -396,7 +396,7 @@ public class ParticipantManager : NetworkBehaviour
             blueCondition.fighterNo.Value = GameInfo.max_player_count + k + SpawnPoints.zakoCountPerTeam;
             // blueCondition.fighterName.Value = "ZakoBlue" + (k + 1);
             blueCondition.fighterName.Value = "ZakoBlue";
-            blueCondition.fighterTeam.Value = Team.Blue;
+            blueCondition.fighterTeam.Value = Team.BLUE;
 
 
             // Spawn fighter.

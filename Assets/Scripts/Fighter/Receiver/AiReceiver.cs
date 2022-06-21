@@ -8,16 +8,16 @@ public class AiReceiver : Receiver
 {
     void Update()
     {
-        if(BattleInfo.isMulti && !IsHost) return;
+        if (BattleInfo.isMulti && !IsHost) return;
 
-        if(!underAttack)
+        if (!underAttack)
         {
-            if(hitTimer > 0) hitTimer -= Time.deltaTime;
+            if (hitTimer > 0) hitTimer -= Time.deltaTime;
             else hitBulletCount = 0;
         }
         else
         {
-            if(hitTimer > 0)
+            if (hitTimer > 0)
             {
                 UpdateShooterPosition();
                 hitTimer -= Time.deltaTime;
@@ -38,15 +38,17 @@ public class AiReceiver : Receiver
     // Must be called on every clients.
     public override void OnDeath(int destroyerNo, string destroyerSkillName)
     {
+        base.OnDeath(destroyerNo, destroyerSkillName);
+
         string destroyer_name = ParticipantManager.I.fighterInfos[destroyerNo].fighterCondition.fighterName.Value.ToString();
         string my_name = fighterCondition.fighterName.Value.ToString();
 
         Color arrowColor;
-        if(fighterCondition.fighterTeam.Value == Team.Red) arrowColor = Color.blue;
+        if (fighterCondition.fighterTeam.Value == Team.RED) arrowColor = Color.blue;
         else arrowColor = Color.red;
 
         Sprite skill_sprite;
-        if(destroyerSkillName == "NormalBlast") skill_sprite = null;
+        if (destroyerSkillName == "NormalBlast") skill_sprite = null;
         else skill_sprite = SkillDatabase.I.SearchSkillByName(destroyerSkillName.ToString()).GetSprite();
 
         uGUIMannager.I.BookRepo(destroyer_name, my_name, arrowColor, skill_sprite);
@@ -56,14 +58,13 @@ public class AiReceiver : Receiver
 
 
     // Damage ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    public override void LastShooterDetector(int fighterNo, string skillName)
+    public override void OnWeaponHit(int fighterNo)
     {
-        base.LastShooterDetector(fighterNo, skillName);
-        if(!underAttack)
+        if (!underAttack)
         {
             hitTimer = 5;
-            hitBulletCount ++;
-            if(hitBulletCount > 10)
+            hitBulletCount++;
+            if (hitBulletCount > 10)
             {
                 underAttack = true;
                 currentShooter = ParticipantManager.I.fighterInfos[fighterNo].body;
@@ -79,11 +80,11 @@ public class AiReceiver : Receiver
 
 
     // Detect Shooter ///////////////////////////////////////////////////////////////////////////////////////////////
-    public bool underAttack {get; private set;}
-    public GameObject currentShooter {get; private set;}
-    public Vector3 shooterPos {get; private set;}
-    public Vector3 relativeSPos {get; private set;}
-    public float relativeSAngle {get; private set;}
+    public bool underAttack { get; private set; }
+    public GameObject currentShooter { get; private set; }
+    public Vector3 shooterPos { get; private set; }
+    public Vector3 relativeSPos { get; private set; }
+    public float relativeSAngle { get; private set; }
 
     int hitBulletCount;
     float hitTimer;

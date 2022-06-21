@@ -68,7 +68,7 @@ public class GameNetPortal : Singleton<GameNetPortal>
             NetworkManager.Singleton.SceneManager.LoadScene("SortieLobby", UnityEngine.SceneManagement.LoadSceneMode.Single);
             NetworkManager.Singleton.SceneManager.OnLoadComplete += HandleOnSceneLoadComplete;
             // HostのデータはLobbyLinkedDataのOnNetworkSpawn()でListに加える
-            hostData = new LobbyParticipantData(0, payload.playerName, clientId, Team.Red, false, payload.skillCode);
+            hostData = new LobbyParticipantData(0, payload.playerName, clientId, Team.RED, false, payload.skillCode);
             return;
         }
 

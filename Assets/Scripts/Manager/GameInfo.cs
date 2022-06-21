@@ -11,15 +11,15 @@ public class GameInfo : MonoBehaviour
     public static Team GetTeamFromNo(int No)
     {
         // If No is even, team is Red.
-        if (No % 2 == 0) return Team.Red;
-        else return Team.Blue;
+        if (No % 2 == 0) return Team.RED;
+        else return Team.BLUE;
 
         // if(No < 4) return Team.Red;
         // else return Team.Blue;
     }
     public static int[] GetNosFromTeam(Team team)
     {
-        if (team == Team.Red)
+        if (team == Team.RED)
         {
             int[] Nos = { 0, 2, 4, 6 };
             // int[] Nos = {0, 1, 2, 3};
@@ -34,7 +34,7 @@ public class GameInfo : MonoBehaviour
     }
     public static int GetNoFromTeam(Team team, int number)
     {
-        if (team == Team.Red)
+        if (team == Team.RED)
         {
             int[] Nos = { 0, 2, 4, 6 };
             // int[] Nos = {0, 1, 2, 3};
@@ -59,4 +59,6 @@ public class GameInfo : MonoBehaviour
     }
 }
 
-public enum Team { Red, Blue }
+public enum Team { RED, BLUE }
+
+public enum Rule { BATTLEROYAL, TERMINAL }

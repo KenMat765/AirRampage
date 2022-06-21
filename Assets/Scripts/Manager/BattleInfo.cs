@@ -5,10 +5,11 @@ using UnityEngine;
 public static class BattleInfo
 {
     // オンラインかどうか
-    public static bool isMulti {get; set;}
-    public static bool isHost {get; set;}
+    public static bool isMulti { get; set; }
+    public static bool isHost { get; set; }
 
     // ルール
+    public static Rule rule;
 
     // ステージ
 
@@ -34,20 +35,20 @@ public static class BattleInfo
             this.skillLevels = skillLevels;
         }
     }
-    public static ParticipantBattleData[] battleDatas {get; set;} = new ParticipantBattleData[GameInfo.max_player_count];
+    public static ParticipantBattleData[] battleDatas { get; set; } = new ParticipantBattleData[GameInfo.max_player_count];
     public static ParticipantBattleData? GetBattleDataByFighterNo(int fighterNo)
     {
-        foreach(ParticipantBattleData battleData in battleDatas)
+        foreach (ParticipantBattleData battleData in battleDatas)
         {
-            if(battleData.fighterNo == fighterNo) return battleData;
+            if (battleData.fighterNo == fighterNo) return battleData;
         }
         return null;
     }
     public static ParticipantBattleData? GetBattleDataByClientId(ulong clientId)
     {
-        foreach(ParticipantBattleData battleData in battleDatas)
+        foreach (ParticipantBattleData battleData in battleDatas)
         {
-            if(battleData.clientId == clientId) return battleData;
+            if (battleData.clientId == clientId) return battleData;
         }
         return null;
     }
