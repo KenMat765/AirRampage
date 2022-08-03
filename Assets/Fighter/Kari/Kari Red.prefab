@@ -152,9 +152,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 991260272811643308}
-  - component: {fileID: 991260272811643303}
   - component: {fileID: 991260272811643297}
   - component: {fileID: 3572961368007648344}
+  - component: {fileID: 1872754474}
   m_Layer: 17
   m_Name: Kari Red
   m_TagString: Player
@@ -179,19 +179,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!135 &991260272811643303
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 991260272811643310}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &991260272811643297
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -201,13 +188,13 @@ Rigidbody:
   m_GameObject: {fileID: 991260272811643310}
   serializedVersion: 2
   m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_Drag: Infinity
+  m_AngularDrag: Infinity
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 112
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!114 &3572961368007648344
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -220,7 +207,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c3b79385e3a244be8f64c6e3c2f7ea5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
+  speed: 2
+--- !u!136 &1872754474
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 991260272811643310}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.1
+  m_Height: 0.3
+  m_Direction: 2
+  m_Center: {x: 0, y: 0, z: 0.02}
 --- !u!1 &4331735357330259622
 GameObject:
   m_ObjectHideFlags: 0
@@ -272,6 +273,14 @@ PrefabInstance:
     - target: {fileID: 478680618601193746, guid: 8e26b53f19d9b4a1eb8cfdbe52dcb181, type: 3}
       propertyPath: m_Name
       value: AfterBurners
+      objectReference: {fileID: 0}
+    - target: {fileID: 3680438112376988725, guid: 8e26b53f19d9b4a1eb8cfdbe52dcb181, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6689509908227455219, guid: 8e26b53f19d9b4a1eb8cfdbe52dcb181, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8448190468984899795, guid: 8e26b53f19d9b4a1eb8cfdbe52dcb181, type: 3}
       propertyPath: m_RootOrder

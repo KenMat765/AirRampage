@@ -5,8 +5,6 @@ using UnityEngine;
 public class KariFighter : MonoBehaviour
 {
     [SerializeField] float speed;
-    Vector3 myPos { get { return transform.position; } }
-    Quaternion myRot { get { return transform.rotation; } }
 
     void Start()
     {
@@ -17,8 +15,8 @@ public class KariFighter : MonoBehaviour
     {
         // Move Forward.
         transform.position = Vector3.MoveTowards(
-            myPos,
-            myPos + (transform.forward * speed * Time.deltaTime),
+            transform.position,
+            transform.position + (transform.forward * speed * Time.deltaTime),
             speed);
 
         // Rotation.
@@ -48,8 +46,8 @@ public class KariFighter : MonoBehaviour
                 relativeRotY = maxRotSpeed * -1;
                 targetRotZ = maxTiltZ * -1;
             }
-            targetRot = Quaternion.Euler(targetRotX * -1, myRot.eulerAngles.y + relativeRotY, targetRotZ * -1);
-            transform.rotation = Quaternion.Slerp(myRot, targetRot, 0.05f);
+            targetRot = Quaternion.Euler(targetRotX * -1, transform.rotation.eulerAngles.y + relativeRotY, targetRotZ * -1);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, 0.05f);
         }
         else
         {
@@ -60,6 +58,6 @@ public class KariFighter : MonoBehaviour
     void FixTilt()
     {
         const float fix_time = 0.05f;
-        transform.rotation = Quaternion.Slerp(myRot, Quaternion.Euler(0, myRot.eulerAngles.y, 0), fix_time);
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0), fix_time);
     }
 }
