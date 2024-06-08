@@ -4,60 +4,67 @@ using System;
 using UnityEngine;
 using DG.Tweening;
 using TMPro;
-using Unity.Netcode;
 
 public class LobbyFighter : Singleton<LobbyFighter>
 {
     protected override bool dont_destroy_on_load { get; set; } = false;
-    public GameObject[] fighters;
-    GameObject[] afterburners;
-    TextMeshProUGUI[] nameTexts;
+    [SerializeField] GameObject[] fighters_red;
+    [SerializeField] GameObject[] fighters_blue;
+    GameObject[] afterburners_red;
+    GameObject[] afterburners_blue;
+    TextMeshProUGUI[] nameTexts_red;
+    TextMeshProUGUI[] nameTexts_blue;
     const float prepareDuration = 0.3f, sortieDuration = 0.35f;
     const float interval = 0.1f;
     public bool listChanged { get; set; }
-    public static bool selectedMulti = true;
-
-
 
     void Start()
     {
-        afterburners = new GameObject[fighters.Length];
-        nameTexts = new TextMeshProUGUI[fighters.Length];
-        foreach (GameObject fighter in fighters)
+        // Red fighters.
+        afterburners_red = new GameObject[fighters_red.Length];
+        nameTexts_red = new TextMeshProUGUI[fighters_red.Length];
+        foreach (GameObject fighter_red in fighters_red)
         {
-            fighter.transform.DOMoveZ(-5.5f, 0);
-            if (fighter.activeSelf) fighter.SetActive(false);
-            afterburners[Array.IndexOf(fighters, fighter)] = fighter.transform.Find("AfterBurners").gameObject;
-            TextMeshProUGUI textMeshPro = fighter.transform.Find("Canvas/Text (TMP)").GetComponent<TextMeshProUGUI>();
+            fighter_red.transform.DOMoveZ(-5.5f, 0);
+            if (fighter_red.activeSelf) fighter_red.SetActive(false);
+            afterburners_red[Array.IndexOf(fighters_red, fighter_red)] = fighter_red.transform.Find("AfterBurners").gameObject;
+            TextMeshProUGUI textMeshPro = fighter_red.transform.Find("Canvas/Text (TMP)").GetComponent<TextMeshProUGUI>();
             textMeshPro.text = "";
-            nameTexts[Array.IndexOf(fighters, fighter)] = textMeshPro;
+            nameTexts_red[Array.IndexOf(fighters_red, fighter_red)] = textMeshPro;
         }
 
-        if (!selectedMulti) return;
-        RefreshFighterPreparation();
-        LobbyLinkedData.I.AddOnValueChangedAction((NetworkListEvent<LobbyParticipantData> listEvent) =>
+        // Blue fighters.
+        afterburners_blue = new GameObject[fighters_blue.Length];
+        nameTexts_blue = new TextMeshProUGUI[fighters_blue.Length];
+        foreach (GameObject fighter_blue in fighters_blue)
         {
-            RefreshFighterPreparation();
-        });
+            fighter_blue.transform.DOMoveZ(-5.5f, 0);
+            if (fighter_blue.activeSelf) fighter_blue.SetActive(false);
+            afterburners_blue[Array.IndexOf(fighters_blue, fighter_blue)] = fighter_blue.transform.Find("AfterBurners").gameObject;
+            TextMeshProUGUI textMeshPro = fighter_blue.transform.Find("Canvas/Text (TMP)").GetComponent<TextMeshProUGUI>();
+            textMeshPro.text = "";
+            nameTexts_blue[Array.IndexOf(fighters_blue, fighter_blue)] = textMeshPro;
+        }
     }
 
-    public void PrepareFighter(int index)
+    public void PrepareFighter(Team team, int block_id)
     {
-        fighters[index].SetActive(true);
-        fighters[index].transform.DOMoveZ(-0.5f, prepareDuration);
-    }
+        switch (team)
+        {
+            case Team.RED:
+                fighters_red[block_id].SetActive(true);
+                fighters_red[block_id].transform.DOMoveZ(-0.5f, prepareDuration);
+                break;
 
-    public void SortieFighter(int index)
-    {
-        fighters[index].transform.DOMoveZ(6, sortieDuration);
-        var particles = afterburners[index].GetComponentsInChildren<ParticleSystem>();
-        foreach (ParticleSystem particle in particles) particle.Play();
-    }
+            case Team.BLUE:
+                fighters_blue[block_id].SetActive(true);
+                fighters_blue[block_id].transform.DOMoveZ(-0.5f, prepareDuration);
+                break;
 
-    public void DisableFighter(int index)
-    {
-        fighters[index].SetActive(false);
-        fighters[index].transform.DOMoveZ(-5.5f, 0);
+            default:
+                Debug.LogError("Team was NONE!!");
+                break;
+        }
     }
 
     public void PrepareAllFighters(Team team, Action callback = null)
@@ -67,14 +74,40 @@ public class LobbyFighter : Singleton<LobbyFighter>
 
     IEnumerator prepareAllFighters(Team team, Action callback)
     {
-        int[] nos = GameInfo.GetNosFromTeam(team);
-        PrepareFighter(nos[0]);
-        for (int k = 1; k < nos.Length; k++)
+        PrepareFighter(team, 0);
+        for (int member_num = 1; member_num < GameInfo.team_member_count; member_num++)
         {
             yield return new WaitForSeconds(interval);
-            PrepareFighter(nos[k]);
+            PrepareFighter(team, member_num);
         }
-        if (callback != null) callback();
+
+        // Callback.
+        if (callback != null)
+        {
+            callback();
+        }
+    }
+
+    public void SortieFighter(Team team, int block_id)
+    {
+        switch (team)
+        {
+            case Team.RED:
+                fighters_red[block_id].transform.DOMoveZ(8, sortieDuration);
+                var particles_red = afterburners_red[block_id].GetComponentsInChildren<ParticleSystem>();
+                foreach (ParticleSystem particle in particles_red) particle.Play();
+                break;
+
+            case Team.BLUE:
+                fighters_blue[block_id].transform.DOMoveZ(8, sortieDuration);
+                var particles_blue = afterburners_blue[block_id].GetComponentsInChildren<ParticleSystem>();
+                foreach (ParticleSystem particle in particles_blue) particle.Play();
+                break;
+
+            default:
+                Debug.LogError("Team was NONE!!");
+                break;
+        }
     }
 
     public void SortieAllFighters(Team team, Action callback = null)
@@ -84,39 +117,76 @@ public class LobbyFighter : Singleton<LobbyFighter>
 
     IEnumerator sortieAllFighters(Team team, Action callback)
     {
-        int[] nos = GameInfo.GetNosFromTeam(team);
-        SortieFighter(nos[0]);
-        for (int k = 1; k < nos.Length; k++)
+        SortieFighter(team, 0);
+        for (int k = 1; k < GameInfo.team_member_count; k++)
         {
             yield return new WaitForSeconds(interval);
-            SortieFighter(nos[k]);
+            SortieFighter(team, k);
         }
-        if (callback != null) callback();
-    }
 
-    public void RefreshFighterPreparation()
-    {
-        LobbyParticipantData myData = LobbyLinkedData.I.GetParticipantDataByClientId(NetworkManager.Singleton.LocalClientId).Value;
-        Team myTeam = myData.team;
-        int[] teamNos = GameInfo.GetNosFromTeam(myTeam);
-        List<int> preparedNos = new List<int>();
-        foreach (LobbyParticipantData data in LobbyLinkedData.I.participantDatas)
+        // Callback.
+        if (callback != null)
         {
-            if (data.team != myTeam) continue;
-            preparedNos.Add(data.number);
-            if (fighters[data.number].activeSelf) continue;
-            PrepareFighter(data.number);
-            nameTexts[data.number].text = data.name.ToString();
-        }
-        foreach (int teamNo in teamNos)
-        {
-            if (preparedNos.Contains(teamNo)) continue;
-            DisableFighter(teamNo);
+            callback();
         }
     }
 
-    public void NameFighter(int fighterNo, string name)
+    public void DisableFighter(Team team, int block_id)
     {
-        nameTexts[fighterNo].text = name;
+        switch (team)
+        {
+            case Team.RED:
+                fighters_red[block_id].transform.DOMoveZ(-5.5f, prepareDuration)
+                    .OnComplete(() => fighters_red[block_id].SetActive(false));
+                break;
+
+            case Team.BLUE:
+                fighters_blue[block_id].transform.DOMoveZ(-5.5f, prepareDuration)
+                    .OnComplete(() => fighters_blue[block_id].SetActive(false));
+                break;
+
+            default:
+                Debug.LogError("Team was NONE!!");
+                break;
+        }
+    }
+
+    public void DisableAllFighters(Team team, Action callback = null)
+    {
+        StartCoroutine(disableAllFighters(team, callback));
+    }
+
+    IEnumerator disableAllFighters(Team team, Action callback)
+    {
+        DisableFighter(team, 0);
+        for (int k = 1; k < GameInfo.team_member_count; k++)
+        {
+            yield return new WaitForSeconds(interval);
+            DisableFighter(team, k);
+        }
+
+        // Callback.
+        if (callback != null)
+        {
+            callback();
+        }
+    }
+
+    public void NameFighter(Team team, int block_id, string name)
+    {
+        switch (team)
+        {
+            case Team.RED:
+                nameTexts_red[block_id].text = name;
+                break;
+
+            case Team.BLUE:
+                nameTexts_blue[block_id].text = name;
+                break;
+
+            default:
+                Debug.LogError("Team was NONE!!");
+                break;
+        }
     }
 }

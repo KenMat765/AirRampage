@@ -5,20 +5,14 @@ using UnityEngine;
 [System.Serializable]
 public class ConnectionPayload
 {
-    // public string password;
     public string playerName;
     public string skillCode;
+    public string abilityCode;
 
-    // public ConnectionPayload(string password, string playerName, string skillCode)
-    // {
-    //     this.password = password;
-    //     this.playerName = playerName;
-    //     this.skillCode = skillCode;
-    // }
-
-    public ConnectionPayload(string playerName, string skillCode)
+    public ConnectionPayload(string playerName, string skillCode, string abilityCode)
     {
         this.playerName = playerName;
         this.skillCode = skillCode;
+        this.abilityCode = abilityCode;
     }
 }

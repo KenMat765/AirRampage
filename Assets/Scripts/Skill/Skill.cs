@@ -14,13 +14,17 @@ public abstract class Skill : NetworkBehaviour
     // Used to identify which skill to activate when received skill activator RPCs.
     public int skillNo { get; set; }
 
-    protected virtual void Update() { Charger(); }
+    protected virtual void Update()
+    {
+        Charger();
+    }
 
     public float charge_time { get; set; }
     public float elapsed_time { get; private set; }
     public bool isCharged { get; private set; } = false;
     protected bool ready2Charge { get; private set; } = true;
-    bool isUsing = false;
+    public bool isUsing { get; private set; } = false;
+    public bool isLocked { get; set; } = false;
 
     protected GameObject original_prefab;
     protected List<GameObject> prefabs { get; private set; }
@@ -65,21 +69,43 @@ public abstract class Skill : NetworkBehaviour
     {
         prefabs = new List<GameObject>();
         attack = GetComponent<Attack>();
-        ParameterUpdater();
+        ParameterUpdater(); // charge_time is set here.
+        if (attack.fighterCondition.has_skillBoost)
+        {
+            elapsed_time = charge_time;
+        }
     }
 
     public virtual void Activator(int[] transfer = null)
     {
-        if (!isCharged || attack.fighterCondition.isDead) return;
+        if (!isCharged || attack.fighterCondition.isDead || isLocked)
+        {
+            return;
+        }
+
         isCharged = false;
         ready2Charge = false;
     }
 
     void Charger()
     {
+        if (isLocked)
+        {
+            return;
+        }
+
         if (!isCharged && ready2Charge)
         {
-            elapsed_time += Time.deltaTime;
+            float dt = Time.deltaTime;
+            if (attack.fighterCondition.has_technician_1)
+            {
+                dt *= 1.2f;
+            }
+            if (attack.fighterCondition.has_technician_2)
+            {
+                dt *= 1.5f;
+            }
+            elapsed_time += dt;
             if (elapsed_time >= charge_time) { isCharged = true; }
         }
     }
@@ -94,19 +120,45 @@ public abstract class Skill : NetworkBehaviour
     /// </Summary>
     public virtual void ForceTermination()
     {
-        if (meter_tweener.IsActive()) meter_tweener.Kill();
-        if (isUsing)
+        if (meter_tweener.IsActive())
+        {
+            meter_tweener.Kill();
+        }
+        elapsed_time = 0;
+        isCharged = false;
+        isUsing = false;
+        ready2Charge = true;
+    }
+
+    public virtual void ForceTermination(bool maintain_charge)
+    {
+        if (meter_tweener.IsActive())
+        {
+            meter_tweener.Kill();
+        }
+        // Reset charge of ALL skills.
+        if (!maintain_charge)
         {
             elapsed_time = 0;
-            isUsing = false;
+            isCharged = false;
         }
+        else
+        {
+            // If the skill was used, reset charge.
+            if (isUsing)
+            {
+                elapsed_time = 0;
+                isCharged = false;
+            }
+        }
+        isUsing = false;
         ready2Charge = true;
     }
 
     /// <Summary>
     /// メーター(elapsed_time)を時間経過により減少させる。デフォルトでは一瞬で０になる。
     /// </Summary>
-    protected void MeterDecreaser(float duration = 0, System.Action OnCompleteCallback = null)
+    public void MeterDecreaser(float duration = 0, System.Action OnCompleteCallback = null)
     {
         isUsing = true;
         meter_tweener = DOTween.To(() => elapsed_time, (value) => elapsed_time = value, 0, duration)

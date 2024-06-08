@@ -9,10 +9,10 @@ public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
     {
         get
         {
-            if(instance == null)
+            if (instance == null)
             {
                 instance = FindObjectOfType<T>();
-                if(instance == null) {instance = new GameObject(typeof(T).ToString()).AddComponent<T>();}
+                if (instance == null) { instance = new GameObject(typeof(T).ToString()).AddComponent<T>(); }
             }
             return instance;
         }
@@ -22,12 +22,12 @@ public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 
     protected virtual void Awake()
     {
-        if(this != I)
+        if (this != I)
         {
-            Destroy(this.gameObject);
+            Destroy(this);
             return;
         }
-        if(dont_destroy_on_load)
-        { DontDestroyOnLoad(this.gameObject); }
+
+        if (dont_destroy_on_load) DontDestroyOnLoad(this.gameObject);
     }
 }

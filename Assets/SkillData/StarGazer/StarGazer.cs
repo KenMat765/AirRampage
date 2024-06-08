@@ -44,7 +44,7 @@ public class StarGazer : SkillAttack
 
         // prefabs、weaponsの初期設定
         original_prefab = gazer_root.transform.Find("Projectile_StarGazer").gameObject;
-        SetPrefabLocalTransform(Vector3.zero, Vector3.zero, new Vector3(8, 8, 8));
+        SetPrefabLocalTransform(Vector3.zero, Vector3.zero, new Vector3(2f, 2f, 2f));
         const int gazer_default_count = 15;
         for (int k = 0; k < gazer_default_count; k++) GeneratePrefab(gazer_root.transform);
     }
@@ -64,7 +64,7 @@ public class StarGazer : SkillAttack
         gazer_root.transform.rotation = Quaternion.Euler(-30, euler_y, 0);
 
         // rootを発射
-        const float root_distance = 40;
+        const float root_distance = 100;
         root_tweener = gazer_root.transform.DOMove(gazer_root.transform.forward * root_distance, startup_time)
             .SetRelative()
             .SetEase(Ease.OutCubic)

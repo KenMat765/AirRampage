@@ -4,8 +4,8 @@ using UnityEngine;
 
 public abstract class SkillAttack : Skill
 {
-    protected List<Weapon> weapons {get; private set;}
-    protected AttackLevelData levelData {get; private set;}
+    protected List<Weapon> weapons { get; private set; }
+    protected AttackLevelData levelData { get; private set; }
     public override void LevelDataSetter(LevelData levelData) => this.levelData = (AttackLevelData)levelData;
     protected override void ParameterUpdater() => charge_time = levelData.ChargeTime;
     protected virtual System.Func<float> StayMotionGenerator(GameObject prefab) { return null; }
@@ -19,7 +19,7 @@ public abstract class SkillAttack : Skill
     public override void ForceTermination()
     {
         base.ForceTermination();
-        foreach(Weapon weapon in weapons) weapon.TerminateWeapon();
+        foreach (Weapon weapon in weapons) weapon.TerminateWeapon();
     }
 
 
@@ -29,7 +29,7 @@ public abstract class SkillAttack : Skill
     /// </Summary>
     protected override GameObject GeneratePrefab(Transform parent = null)
     {
-        if(parent == null) parent = transform;
+        if (parent == null) parent = transform;
         GameObject prefab = Instantiate(original_prefab, parent);
         prefab.transform.localPosition = local_position;
         prefab.transform.localRotation = Quaternion.Euler(local_eulerAngle);
@@ -37,7 +37,7 @@ public abstract class SkillAttack : Skill
         prefabs.Add(prefab);
 
         Weapon weapon = prefab.GetComponent<Weapon>();
-        weapon.WeaponSetter(gameObject, attack, this.GetType().Name, StayMotionGenerator(prefab));
+        weapon.WeaponSetter(gameObject, attack, true, this.GetType().Name, StayMotionGenerator(prefab));
         weapon.WeaponParameterSetter(levelData);
         weapons.Add(weapon);
 
@@ -50,7 +50,7 @@ public abstract class SkillAttack : Skill
     protected int GetPrefabIndex(Transform parent = null)
     {
         // 未使用のものがあればそのIndexを返す
-        foreach(GameObject prefab in prefabs) if(!prefab.activeSelf) return prefabs.IndexOf(prefab);
+        foreach (GameObject prefab in prefabs) if (!prefab.activeSelf) return prefabs.IndexOf(prefab);
 
         // なかった場合は新たにprefabを生成
         GameObject new_prefab = GeneratePrefab(parent);
@@ -63,11 +63,11 @@ public abstract class SkillAttack : Skill
     /// </Summary>
     protected override GameObject[] GeneratePrefabs(int count, Transform parent = null)
     {
-        if(parent == null) parent = transform;
+        if (parent == null) parent = transform;
 
         GameObject[] generated_prefabs = new GameObject[count];
 
-        for(int k = 0; k < count; k++)
+        for (int k = 0; k < count; k++)
         {
             GameObject prefab = Instantiate(original_prefab, parent);
             prefab.transform.localPosition = local_positions[k];
@@ -76,13 +76,13 @@ public abstract class SkillAttack : Skill
             prefabs.Add(prefab);
 
             Weapon weapon = prefab.GetComponent<Weapon>();
-            weapon.WeaponSetter(gameObject, attack, this.GetType().Name, StayMotionGenerator(prefab));
+            weapon.WeaponSetter(gameObject, attack, true, this.GetType().Name, StayMotionGenerator(prefab));
             weapon.WeaponParameterSetter(levelData);
             weapons.Add(weapon);
 
             generated_prefabs[k] = prefab;
         }
-        
+
         return generated_prefabs;
     }
 
@@ -96,10 +96,10 @@ public abstract class SkillAttack : Skill
         // 発射準備が完了しているセットがあるか検索
         int? final_index_in_ready_set = null;
         int total_set_count = prefabs.Count / count;
-        for(int set_count = 0; set_count < total_set_count; set_count++)
+        for (int set_count = 0; set_count < total_set_count; set_count++)
         {
             int final_index_in_set = count * set_count + (count - 1);
-            if(!prefabs[final_index_in_set].activeSelf)
+            if (!prefabs[final_index_in_set].activeSelf)
             {
                 final_index_in_ready_set = final_index_in_set;
                 break;
@@ -107,10 +107,10 @@ public abstract class SkillAttack : Skill
         }
 
         // 発射準備が完了しているセットがなかった場合は、新たにprefabを生成
-        if(final_index_in_ready_set == null)
+        if (final_index_in_ready_set == null)
         {
             GameObject[] new_prefabs = GeneratePrefabs(count);
-            for(int k = 0; k < count; k++)
+            for (int k = 0; k < count; k++)
             {
                 int prefab_index = prefabs.IndexOf(new_prefabs[k]);
                 indexes[k] = prefab_index;
@@ -119,7 +119,7 @@ public abstract class SkillAttack : Skill
         // 発射準備が完了しているセットがあった場合は、それを使う
         else
         {
-            for(int k = 0; k < count; k++)
+            for (int k = 0; k < count; k++)
             {
                 int prefab_index = (int)final_index_in_ready_set - k;
                 indexes[count - 1 - k] = prefab_index;

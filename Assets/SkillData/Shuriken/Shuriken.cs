@@ -20,7 +20,7 @@ public class Shuriken : SkillAttack
         base.Generator();
         original_prefab = TeamPrefabGetter();
         InitTransformsLists(shuriken_count);
-        for (int k = 0; k < shuriken_count; k++) SetPrefabLocalTransforms(k, Vector3.zero, new Vector3(Random.value * 360, Random.value * 360, Random.value * 360), new Vector3(10, 10, 10));
+        for (int k = 0; k < shuriken_count; k++) SetPrefabLocalTransforms(k, Vector3.zero, new Vector3(Random.value * 360, Random.value * 360, Random.value * 360), new Vector3(4, 4, 4));
         GeneratePrefabs(shuriken_count);
     }
 

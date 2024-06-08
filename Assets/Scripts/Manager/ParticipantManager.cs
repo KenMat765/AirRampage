@@ -4,53 +4,27 @@ using UnityEngine;
 using Unity.Netcode;
 
 
-// バトルシーン開始時に全参加者を取得 ＋ Id振り分け(参加者は 4機 × 2チーム = 8機で固定)
-public class ParticipantManager : NetworkBehaviour
+// Handles every fighter's information, including AIs and Zakos.
+public class ParticipantManager : NetworkSingleton<ParticipantManager>
 {
-    static ParticipantManager instance;
-    public static ParticipantManager I
-    {
-        get
-        {
-            if (instance == null)
-            {
-                instance = FindObjectOfType<ParticipantManager>();
-                if (instance == null) { instance = new GameObject(typeof(ParticipantManager).ToString()).AddComponent<ParticipantManager>(); }
-            }
-            return instance;
-        }
-    }
+    protected override bool dont_destroy_on_load { get; set; } = false;
 
-
-
-    // 外部から参照可能なプロバティ
-    // All fighters' information in scene (Player + AI + Zako)
     public FighterInfo[] fighterInfos { get; private set; }
     NetworkVariable<bool> allSpawnComplete = new NetworkVariable<bool>(false);
     public int myFighterNo { get; private set; }
     public bool infoSetComplete { get; private set; } = false;
-    [SerializeField] GameObject redPlayerPrefab, bluePlayerPrefab, redAiPrefab, blueAiPrefab;
+    public int zakoCountAll { get; private set; }
+    [SerializeField] GameObject redPlayerPrefab, bluePlayerPrefab, redAiPrefab, blueAiPrefab, zakoPrefab;
 
 
+    public void FighterSetup(SpawnPointManager spawnPointManager) => StartCoroutine(fighterSetup(spawnPointManager));
 
-    void Awake()
+    IEnumerator fighterSetup(SpawnPointManager spawnPointManager)
     {
-        if (this != I)
-        {
-            Destroy(this.gameObject);
-            return;
-        }
-        StartCoroutine(OnAwakeProcess());
-    }
+        zakoCountAll = spawnPointManager.zakoCountAll;
 
-
-
-    IEnumerator OnAwakeProcess()
-    {
-        // Define necessary variables.
-        // allFighters include Zakos.
-        fighterInfos = new FighterInfo[GameInfo.max_player_count + (SpawnPoints.zakoCountAll)];    // ← refer based on fighterNo
-        GameObject[] allFighters = new GameObject[GameInfo.max_player_count + (SpawnPoints.zakoCountAll)];
+        fighterInfos = new FighterInfo[GameInfo.max_player_count + (zakoCountAll)];
+        GameObject[] allFighters = new GameObject[GameInfo.max_player_count + (zakoCountAll)];
         GameObject myPlayer = null;
 
 
@@ -60,9 +34,9 @@ public class ParticipantManager : NetworkBehaviour
             if (NetworkManager.Singleton.IsHost)
             {
                 // Generate Players and AIs.
-                SpawnAllFighters();
-                // Create Zakos
-                SpawnAllZakos();
+                SpawnAllFighters(spawnPointManager);
+                // Generate Zakos
+                SpawnAllZakos(spawnPointManager);
             }
 
             // Wait until spawning is finished.
@@ -82,12 +56,14 @@ public class ParticipantManager : NetworkBehaviour
                     myFighterNo = fighterNo;
                 }
             }
+
             GameObject[] ais = GameObject.FindGameObjectsWithTag("AI");
             foreach (GameObject ai in ais)
             {
                 int fighterNo = ai.GetComponent<FighterCondition>().fighterNo.Value;
                 allFighters[fighterNo] = ai;
             }
+
             GameObject[] zakos = GameObject.FindGameObjectsWithTag("Zako");
             foreach (GameObject zako in zakos)
             {
@@ -101,7 +77,7 @@ public class ParticipantManager : NetworkBehaviour
         else
         {
             // Generate your fighter
-            SpawnPoint myPoint = SpawnPoints.GetSpawnPoint(0);
+            SpawnPointFighter myPoint = spawnPointManager.GetSpawnPointFighter(0);
             myPlayer = Instantiate(redPlayerPrefab, myPoint.transform.position, myPoint.transform.rotation);
             allFighters[0] = myPlayer;
             myPlayer.GetComponent<FighterCondition>().fighterNo.Value = 0;
@@ -110,8 +86,9 @@ public class ParticipantManager : NetworkBehaviour
             // Generate AIs
             for (int no = 1; no < GameInfo.max_player_count; no++)
             {
+                // GetTeamFromNo(int) only returns Team.RED or Team.BLUE.
                 Team team = GameInfo.GetTeamFromNo(no);
-                SpawnPoint point = SpawnPoints.GetSpawnPoint(no);
+                SpawnPointFighter point = spawnPointManager.GetSpawnPointFighter(no);
                 GameObject aiFighter;
                 if (team == Team.RED)
                 {
@@ -126,35 +103,43 @@ public class ParticipantManager : NetworkBehaviour
             }
 
             // Generate Zakos
-            int red_pointNo = 0, blue_pointNo = 0;
-            SpawnPoint redPoint = SpawnPoints.GetSpawnPointZako(Team.RED, red_pointNo);
-            SpawnPoint bluePoint = SpawnPoints.GetSpawnPointZako(Team.BLUE, blue_pointNo); ;
-            int red_current_spawned = 0, blue_current_spawned = 0;
-            for (int no = 0; no < SpawnPoints.zakoCountPerTeam; no++)
-            {
-                if (red_current_spawned == redPoint.zakoCount)
-                {
-                    red_pointNo++;
-                    redPoint = SpawnPoints.GetSpawnPointZako(Team.RED, red_pointNo);
-                    red_current_spawned = 0;
-                }
-                red_current_spawned++;
-                GameObject redZako;
-                redZako = Instantiate(redZakoPrefab, redPoint.transform.position, redPoint.transform.rotation);
-                allFighters[GameInfo.max_player_count + no] = redZako;
-                redZako.GetComponent<FighterCondition>().fighterNo.Value = GameInfo.max_player_count + no;
+            int point_no = 0;
+            SpawnPointZako zako_point = spawnPointManager.GetSpawnPointZako(point_no);
+            int current_spawned = 0;
 
-                if (blue_current_spawned == bluePoint.zakoCount)
+            // First zako No is equal to max player count.
+            zako_point.from_inclusive.Value = GameInfo.max_player_count;
+
+            for (int no = 0; no < zakoCountAll; no++)
+            {
+                int zakoNo = GameInfo.max_player_count + no;
+
+                // If spawned requested zakos, go to next spawn point.
+                if (current_spawned == zako_point.zakoCount)
                 {
-                    blue_pointNo++;
-                    bluePoint = SpawnPoints.GetSpawnPointZako(Team.BLUE, blue_pointNo);
-                    blue_current_spawned = 0;
+                    point_no++;
+                    zako_point = spawnPointManager.GetSpawnPointZako(point_no);
+                    current_spawned = 0;
+                    zako_point.from_inclusive.Value = zakoNo;
                 }
-                blue_current_spawned++;
-                GameObject blueZako;
-                blueZako = Instantiate(blueZakoPrefab, bluePoint.transform.position, bluePoint.transform.rotation);
-                allFighters[GameInfo.max_player_count + no + SpawnPoints.zakoCountPerTeam] = blueZako;
-                blueZako.GetComponent<FighterCondition>().fighterNo.Value = GameInfo.max_player_count + no + SpawnPoints.zakoCountPerTeam;
+
+                current_spawned++;
+
+                GameObject zako;
+                zako = Instantiate(zakoPrefab, zako_point.transform.position, zako_point.transform.rotation);
+
+                allFighters[zakoNo] = zako;
+
+                // Set fighterNo & fighterName at fighter condition.
+                ZakoCondition zako_condition = zako.GetComponent<ZakoCondition>();
+                zako_condition.fighterNo.Value = zakoNo;
+                zako_condition.fighterName.Value = "Zako";
+                // Team of zako is determined at each spawn points.
+                zako_condition.fighterTeam.Value = Team.NONE;
+                zako_condition.spawnPoint = zako_point;
+
+                // Add zako to Zako Spawn Points standbys.
+                zako_point.standbys.Add(zakoNo);
             }
         }
 
@@ -170,7 +155,7 @@ public class ParticipantManager : NetworkBehaviour
 
 
         // Process for all fighters /////////////////////////////////////////////////////////////////////////
-        for (int no = 0; no < GameInfo.max_player_count + (SpawnPoints.zakoCountAll); no++)
+        for (int no = 0; no < GameInfo.max_player_count + zakoCountAll; no++)
         {
             // Get necessary components.
             GameObject fighter = allFighters[no];
@@ -221,25 +206,6 @@ public class ParticipantManager : NetworkBehaviour
                 }
             }
 
-            // Only for Zakos.
-            else
-            {
-                if (!BattleInfo.isMulti)
-                {
-                    fighterCondition.fighterNo.Value = no;
-                    if (fighter.layer == LayerMask.NameToLayer("RedFighter"))
-                    {
-                        fighterCondition.fighterName.Value = "ZakoRed";
-                        fighterCondition.fighterTeam.Value = Team.RED;
-                    }
-                    else
-                    {
-                        fighterCondition.fighterName.Value = "ZakoBlue";
-                        fighterCondition.fighterTeam.Value = Team.BLUE;
-                    }
-                }
-            }
-
             // Set fighter name to fighterNo for easier reference to fighterNo.
             fighter.name = no.ToString();
 
@@ -249,7 +215,7 @@ public class ParticipantManager : NetworkBehaviour
             // 
             // 
             // For AI Debug.
-            // if(no == 3)
+            // if (no == 3)
             // {
             //     fighter.transform.Find("Kari Camera").gameObject.SetActive(true);
             // }
@@ -263,7 +229,7 @@ public class ParticipantManager : NetworkBehaviour
 
 
     // Only the host calls this method.
-    void SpawnAllFighters()
+    void SpawnAllFighters(SpawnPointManager spawnPointManager)
     {
         for (int no = 0; no < GameInfo.max_player_count; no++)
         {
@@ -290,7 +256,7 @@ public class ParticipantManager : NetworkBehaviour
 
                 // Create fighter.
                 GameObject fighter;
-                SpawnPoint point = SpawnPoints.GetSpawnPoint(no);
+                SpawnPointFighter point = spawnPointManager.GetSpawnPointFighter(no);
                 if (battleData.team == Team.RED)
                 {
                     fighter = Instantiate(redPlayerPrefab, point.transform.position, point.transform.rotation);
@@ -317,7 +283,7 @@ public class ParticipantManager : NetworkBehaviour
             {
                 // Create fighter.
                 GameObject fighter;
-                SpawnPoint point = SpawnPoints.GetSpawnPoint(no);
+                SpawnPointFighter point = spawnPointManager.GetSpawnPointFighter(no);
                 if (battleData.team == Team.RED)
                 {
                     fighter = Instantiate(redAiPrefab, point.transform.position, point.transform.rotation);
@@ -341,68 +307,51 @@ public class ParticipantManager : NetworkBehaviour
     }
 
 
-    // zakoCount : zako count per team.
-    [SerializeField] GameObject redZakoPrefab, blueZakoPrefab;
     // Only the host calls this method.
-    void SpawnAllZakos()
+    void SpawnAllZakos(SpawnPointManager spawnPointManager)
     {
-        int red_pointNo = 0, blue_pointNo = 0;
-        SpawnPoint redPoint = SpawnPoints.GetSpawnPointZako(Team.RED, red_pointNo);
-        SpawnPoint bluePoint = SpawnPoints.GetSpawnPointZako(Team.BLUE, blue_pointNo); ;
-        int red_current_spawned = 0, blue_current_spawned = 0;
+        int point_no = 0;
+        SpawnPointZako zako_point = spawnPointManager.GetSpawnPointZako(point_no);
+        int current_spawned = 0;
 
-        for (int k = 0; k < SpawnPoints.zakoCountPerTeam; k++)
+        // First zako No is equal to max player count.
+        zako_point.from_inclusive.Value = GameInfo.max_player_count;
+
+        for (int k = 0; k < spawnPointManager.zakoCountAll; k++)
         {
-            if (red_current_spawned == redPoint.zakoCount)
+            int zakoNo = GameInfo.max_player_count + k;
+
+            // If spawned requested zakos, go to next spawn point.
+            if (current_spawned == zako_point.zakoCount)
             {
-                red_pointNo++;
-                redPoint = SpawnPoints.GetSpawnPointZako(Team.RED, red_pointNo);
-                red_current_spawned = 0;
+                point_no++;
+                zako_point = spawnPointManager.GetSpawnPointZako(point_no);
+                current_spawned = 0;
+                zako_point.from_inclusive.Value = zakoNo;
             }
 
-            red_current_spawned++;
+            current_spawned++;
 
             // Create fighter.
-            GameObject red;
-            red = Instantiate(redZakoPrefab, redPoint.transform.position, redPoint.transform.rotation);
+            GameObject zako;
+            zako = Instantiate(zakoPrefab, zako_point.transform.position, zako_point.transform.rotation);
 
             // Set fighterNo & fighterName at fighter condition.
-            FighterCondition redCondition = red.GetComponent<FighterCondition>();
-            redCondition.fighterNo.Value = GameInfo.max_player_count + k;
-            // redCondition.fighterName.Value = "ZakoRed" + (k + 1);
-            redCondition.fighterName.Value = "ZakoRed";
-            redCondition.fighterTeam.Value = Team.RED;
+            ZakoCondition zako_condition = zako.GetComponent<ZakoCondition>();
+            zako_condition.fighterNo.Value = zakoNo;
+            zako_condition.fighterName.Value = "Zako";
+            // Team of zako is determined at each spawn points.
+            zako_condition.fighterTeam.Value = Team.NONE;
+            zako_condition.spawnPoint = zako_point;
 
             // Spawn fighter.
-            NetworkObject redNet = red.GetComponent<NetworkObject>();
-            redNet.Spawn();
+            NetworkObject zako_net = zako.GetComponent<NetworkObject>();
+            zako_net.Spawn();
 
-
-            if (blue_current_spawned == bluePoint.zakoCount)
-            {
-                blue_pointNo++;
-                bluePoint = SpawnPoints.GetSpawnPointZako(Team.BLUE, blue_pointNo);
-                blue_current_spawned = 0;
-            }
-
-            blue_current_spawned++;
-
-            // Create fighter.
-            GameObject blue;
-            blue = Instantiate(blueZakoPrefab, bluePoint.transform.position, bluePoint.transform.rotation);
-
-            // Set fighterNo & fighterName & team at fighter condition.
-            FighterCondition blueCondition = blue.GetComponent<FighterCondition>();
-            blueCondition.fighterNo.Value = GameInfo.max_player_count + k + SpawnPoints.zakoCountPerTeam;
-            // blueCondition.fighterName.Value = "ZakoBlue" + (k + 1);
-            blueCondition.fighterName.Value = "ZakoBlue";
-            blueCondition.fighterTeam.Value = Team.BLUE;
-
-
-            // Spawn fighter.
-            NetworkObject blueNet = blue.GetComponent<NetworkObject>();
-            blueNet.Spawn();
+            // Add zako to Zako Spawn Points standbys.
+            zako_point.standbys.Add(zakoNo);
         }
+
         // Zakos are spawned after players and AIs.
         // Therefore, set allSpawnComplete true, after you spawned Zakos.
         allSpawnComplete.Value = true;
@@ -419,6 +368,34 @@ public class ParticipantManager : NetworkBehaviour
             info.attack.enabled = activate;
             info.receiver.enabled = activate;
         }
+    }
+
+    // Activate (or unactivate) fighters except zakos.
+    public void FightersActivationHandler(bool activate)
+    {
+        for (int id = 0; id < GameInfo.max_player_count; id++)
+        {
+            FighterActivationHandler(id, activate);
+        }
+    }
+
+    // Activate (or unactivate) zakos.
+    public void ZakosActivationHandler(bool activate)
+    {
+        for (int id = GameInfo.max_player_count; id < GameInfo.max_player_count + zakoCountAll; id++)
+        {
+            FighterActivationHandler(id, activate);
+        }
+    }
+
+    // Activate (or unactivate) fighter by id.
+    public void FighterActivationHandler(int id, bool activate)
+    {
+        FighterInfo info = fighterInfos[id];
+        info.fighterCondition.enabled = activate;
+        info.movement.enabled = activate;
+        info.attack.enabled = activate;
+        info.receiver.enabled = activate;
     }
 }
 

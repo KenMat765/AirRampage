@@ -21,7 +21,7 @@ public class KillerRaven : SkillAttack
         const float r = 0.15f;
         for (int k = 0; k < raven_count; k++)
         {
-            var angle = k * 2 * Mathf.PI / raven_count;
+            var angle = k * 2 * Mathf.PI / raven_count - Mathf.PI / 2.1f;
             var euler_angle = angle * 180 / Mathf.PI;
             var raven_localPos = new Vector3(r * Mathf.Cos(angle), r * Mathf.Sin(angle), 0);
             SetPrefabLocalTransforms(k, raven_localPos, new Vector3(-euler_angle, 90, -90), new Vector3(0.4f, 0.4f, 0.4f));
@@ -56,7 +56,8 @@ public class KillerRaven : SkillAttack
                 {
                     for (int k = 0; k < raven_count; k++)
                     {
-                        int target_no = attack.homingTargetNos.RandomChoice();
+                        // int target_no = attack.homingTargetNos.RandomChoice();
+                        int target_no = attack.homingTargetNos[k % attack.homingCount];
 
                         // Pack target fighters to array to activate your skill.
                         targets[k] = ParticipantManager.I.fighterInfos[target_no].body;
@@ -65,10 +66,11 @@ public class KillerRaven : SkillAttack
                         target_nos[k] = target_no;
                     }
                 }
-                for (int k = 0; k < raven_count; k++)
-                {
-                    weapons_this_time[k].Activate(targets[k]);
-                }
+                // for (int k = 0; k < raven_count; k++)
+                // {
+                //     weapons_this_time[k].Activate(targets[k]);
+                // }
+                StartCoroutine(activator(weapons_this_time, targets));
 
                 // Send Rpc to your clones.
                 if (IsHost)
@@ -91,10 +93,11 @@ public class KillerRaven : SkillAttack
                         targets[k] = ParticipantManager.I.fighterInfos[(int)received_targetNos[k]].body;
                     }
                 }
-                for (int k = 0; k < raven_count; k++)
-                {
-                    weapons_this_time[k].Activate(targets[k]);
-                }
+                // for (int k = 0; k < raven_count; k++)
+                // {
+                //     weapons_this_time[k].Activate(targets[k]);
+                // }
+                StartCoroutine(activator(weapons_this_time, targets));
             }
         }
 
@@ -106,14 +109,26 @@ public class KillerRaven : SkillAttack
             {
                 for (int k = 0; k < raven_count; k++)
                 {
-                    int targetNo = attack.homingTargetNos.RandomChoice();
-                    targets[k] = ParticipantManager.I.fighterInfos[targetNo].body;
+                    // int target_no = attack.homingTargetNos.RandomChoice();
+                    int target_no = attack.homingTargetNos[k % attack.homingCount];
+                    targets[k] = ParticipantManager.I.fighterInfos[target_no].body;
                 }
             }
-            for (int k = 0; k < raven_count; k++)
-            {
-                weapons_this_time[k].Activate(targets[k]);
-            }
+            // for (int k = 0; k < raven_count; k++)
+            // {
+            //     weapons_this_time[k].Activate(targets[k]);
+            // }
+            StartCoroutine(activator(weapons_this_time, targets));
+        }
+    }
+
+    IEnumerator activator(Weapon[] weapons, GameObject[] targets)
+    {
+        const float interval = 0.05f;
+        for (int k = 0; k < raven_count; k++)
+        {
+            weapons[k].Activate(targets[k]);
+            yield return new WaitForSeconds(interval);
         }
     }
 }

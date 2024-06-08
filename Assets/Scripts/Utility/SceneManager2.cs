@@ -29,7 +29,7 @@ public class SceneManager2 : Singleton<SceneManager2>
             }
         }
 
-        if (loadedScene.name != "Offline")
+        if (loadedScene.name != "Space")
         {
             // In battle scenes, camera setup is called in ParticipantManager.
             CameraManager.SetupCameraInScene();
@@ -44,25 +44,33 @@ public class SceneManager2 : Singleton<SceneManager2>
     {
         switch (gameScene)
         {
-            case GameScenes.menu:
+            case GameScenes.MENU:
                 SceneManager.LoadScene("Menu");
                 CSManager.swipe_condition = (TouchExtension touch) => { return true; };
                 break;
 
-            case GameScenes.skillport:
+            case GameScenes.SKILLPORT:
                 SceneManager.LoadScene("SkillPort");
                 break;
 
-            case GameScenes.offline:
-                SceneManager.LoadScene("Offline");
-                break;
-
-            case GameScenes.onlinelobby:
+            case GameScenes.ONLINELOBBY:
                 SceneManager.LoadScene("OnlineLobby");
                 break;
 
-            case GameScenes.sortielobby:
+            case GameScenes.SORTIELOBBY:
                 SceneManager.LoadScene("SortieLobby");
+                break;
+
+            case GameScenes.CANYON:
+                SceneManager.LoadScene("Canyon");
+                break;
+
+            case GameScenes.SPACE:
+                SceneManager.LoadScene("Space");
+                break;
+
+            case GameScenes.SNOWPEAK:
+                SceneManager.LoadScene("SnowPeak");
                 break;
         }
     }
@@ -72,34 +80,78 @@ public class SceneManager2 : Singleton<SceneManager2>
         if (beforeSceneUnload != null) { beforeSceneUnload(); }
         StartCoroutine(SceneLoader(gameScene, fadeOutType));
     }
+    public void LoadSceneAsync2(Stage stage, FadeType fadeOutType)
+    {
+        if (beforeSceneUnload != null) { beforeSceneUnload(); }
+        GameScenes gameScene;
+        switch (stage)
+        {
+            case Stage.CANYON:
+                gameScene = GameScenes.CANYON;
+                break;
+
+            case Stage.SNOWPEAK:
+                gameScene = GameScenes.SNOWPEAK;
+                break;
+
+            case Stage.SPACE:
+                gameScene = GameScenes.SPACE;
+                break;
+
+            default:
+                Debug.LogError("Could not associate stage with game scene!!", gameObject);
+                return;
+        }
+        StartCoroutine(SceneLoader(gameScene, fadeOutType));
+    }
     IEnumerator SceneLoader(GameScenes gameScene, FadeType fadeOutType)
     {
         float fadeout_duration = FadeCanvas.I.FadeOut(fadeOutType);
 
-        yield return new WaitForSeconds(fadeout_duration);
+        yield return new WaitForSeconds(fadeout_duration + 0.2f);
 
         AsyncOperation async;
         switch (gameScene)
         {
-            case GameScenes.menu:
+            case GameScenes.MENU:
                 async = SceneManager.LoadSceneAsync("Menu");
                 CSManager.swipe_condition = (TouchExtension touch) => { return true; };
                 break;
 
-            case GameScenes.skillport:
+            case GameScenes.SKILLPORT:
                 async = SceneManager.LoadSceneAsync("SkillPort");
                 break;
 
-            case GameScenes.offline:
-                async = SceneManager.LoadSceneAsync("Offline");
+            case GameScenes.ABILITYPORT:
+                async = SceneManager.LoadSceneAsync("AbilityPort");
                 break;
 
-            case GameScenes.onlinelobby:
+            case GameScenes.SKILLFACTORY:
+                async = SceneManager.LoadSceneAsync("SkillFactory");
+                break;
+
+            case GameScenes.ABILITYFACTORY:
+                async = SceneManager.LoadSceneAsync("AbilityFactory");
+                break;
+
+            case GameScenes.ONLINELOBBY:
                 async = SceneManager.LoadSceneAsync("OnlineLobby");
                 break;
 
-            case GameScenes.sortielobby:
+            case GameScenes.SORTIELOBBY:
                 async = SceneManager.LoadSceneAsync("SortieLobby");
+                break;
+
+            case GameScenes.CANYON:
+                async = SceneManager.LoadSceneAsync("Canyon");
+                break;
+
+            case GameScenes.SPACE:
+                async = SceneManager.LoadSceneAsync("Space");
+                break;
+
+            case GameScenes.SNOWPEAK:
+                async = SceneManager.LoadSceneAsync("SnowPeak");
                 break;
 
             default:
@@ -109,9 +161,9 @@ public class SceneManager2 : Singleton<SceneManager2>
 
         yield return new WaitUntil(() => async.progress >= 0.9f);
 
-        FadeCanvas.I.StartBlink();
+        float blink_duration = FadeCanvas.I.StartBlink();
 
-        yield return new WaitForSeconds(1.5f);    // 3.5秒間だけ"Now Loading ..."をわざと表示
+        yield return new WaitForSeconds(blink_duration);
 
         async.allowSceneActivation = true;
     }
@@ -126,9 +178,14 @@ public class SceneManager2 : Singleton<SceneManager2>
 
 public enum GameScenes
 {
-    menu,
-    skillport,
-    offline,
-    onlinelobby,
-    sortielobby,
+    MENU,
+    SKILLPORT,
+    ABILITYPORT,
+    SKILLFACTORY,
+    ABILITYFACTORY,
+    ONLINELOBBY,
+    SORTIELOBBY,
+    CANYON,
+    SPACE,
+    SNOWPEAK
 }

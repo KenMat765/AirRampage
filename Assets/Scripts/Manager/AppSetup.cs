@@ -7,13 +7,26 @@ public class AppSetup
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     static void ApplicationSetup()
     {
-        FPSSetup();
         LoadPlayerInfo();
+        SetFPS(PlayerInfo.I.fps);
+        SetVolume(PlayerInfo.I.volume);
+        SetBGM(PlayerInfo.I.bgm);
     }
 
-    static void FPSSetup()
+    public static void SetFPS(int fps)
     {
-        Application.targetFrameRate = 60;
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = fps;
+    }
+
+    public static void SetVolume(float volume)
+    {
+        AudioListener.volume = volume;
+    }
+
+    public static void SetBGM(float bgm)
+    {
+        BGMManager.I.SetBGMVolume(bgm);
     }
 
     static void LoadPlayerInfo()

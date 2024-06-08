@@ -14,13 +14,13 @@ public class SkillData : ScriptableObject
     SkillType skillType;
     void SetColorBySkillType()
     {
-        switch(skillType)
+        switch (skillType)
         {
             case SkillType.attack: skillColor = Color.red; break;
             case SkillType.heal: skillColor = Color.green; break;
             case SkillType.assist: skillColor = new Color(0, 0.15f, 1, 1); break;
             case SkillType.disturb: skillColor = new Color(0.55f, 0, 1, 1); break;
-            default : skillColor = Color.gray; break;
+            default: skillColor = Color.gray; break;
         }
     }
 
@@ -30,11 +30,12 @@ public class SkillData : ScriptableObject
     [SerializeField] GameObject skillPrefabBlue;
     [SerializeField] Skill skillScript;
     [SerializeField, TextArea(3, 5)] string skillInformation;
+    [SerializeField] string[] skillFeatures;
 
     public string GetName() { return skillName; }
     public string GetNameJp() { return skillNameJp; }
     public int GetId() { return skillId; }
-    public (int,int) GetPageOrder()
+    public (int, int) GetPageOrder()
     {
         int page, order;
         page = skillId / SkillDeckList.num_in_page;
@@ -48,6 +49,7 @@ public class SkillData : ScriptableObject
     public GameObject GetPrefabBlue() { return skillPrefabBlue; }
     public Skill GetScript() { return skillScript; }
     public string GetInfomation() { return skillInformation; }
+    public string[] GetFeatures() { return skillFeatures; }
 }
 
 public enum SkillType { attack, heal, assist, disturb }

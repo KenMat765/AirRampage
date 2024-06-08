@@ -2,75 +2,159 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using Cysharp.Threading.Tasks;
 
-public class CameraController : MonoBehaviour
+public class CameraController : Singleton<CameraController>
 {
-    const float default_view = 60;
-    Transform root_trans;
-    Camera cam;
+    protected override bool dont_destroy_on_load { get; set; } = false;
+
+    public Camera cam { get; private set; }
+    public ViewType viewType;
+
+    [SerializeField] GameObject cam_fps, cam_tps_near, cam_tps_far;
+
+    float shiftSpeed;
+    [SerializeField] float defaultShiftSpeed;
+    [SerializeField] float rotationSpeed;
+
+    [Header("Fix Rotation")]
+    public bool xAxis;
+    public bool yAxis;
+    public bool zAxis;
+
+    public Transform fighterTrans { get; set; }
+
+    Vector3 currentRelativePos = Vector3.zero;
+    Vector3 targetRelativePos = Vector3.zero;
+    bool control_rot = true;
+
     Animator animator;
-    bool fix_rotation = true;
+    float default_view;
 
-
-
-    void Start()
+    async void Start()
     {
-        root_trans = transform.parent;
-        cam = GetComponent<Camera>();
-        cam.fieldOfView = default_view;
-        animator = GetComponent<Animator>();
+        shiftSpeed = defaultShiftSpeed;
+
+        // Wait until fighterTrans is set from ParticipantManager.
+        await UniTask.WaitUntil(() => fighterTrans != null);
+
+        ChangeViewType(viewType);
+        default_view = cam.fieldOfView;
     }
 
     void Update()
     {
-        FixCameraRotation();
-    }
+        if (viewType == ViewType.FPS) return;
 
+        if (fighterTrans == null) return;
 
+        // Position controll
+        currentRelativePos = Vector3.MoveTowards(currentRelativePos, targetRelativePos, shiftSpeed * Time.deltaTime);
+        Vector3 target_pos = fighterTrans.position + currentRelativePos;
+        transform.position = target_pos;
 
-    // z軸方向回転を抑える
-    void FixCameraRotation()
-    {
-        if(fix_rotation)
+        // Rotation controll
+        if (control_rot)
         {
-            Quaternion rootRot = transform.root.rotation;
-            root_trans.rotation = Quaternion.Euler(rootRot.eulerAngles.x, rootRot.eulerAngles.y, 0);
+            float x_euler = xAxis ? 0 : fighterTrans.rotation.eulerAngles.x;
+            float y_euler = yAxis ? 0 : fighterTrans.rotation.eulerAngles.y;
+            float z_euler = zAxis ? 0 : fighterTrans.rotation.eulerAngles.z;
+            Quaternion target_rot = Quaternion.Euler(x_euler, y_euler, z_euler);
+            Quaternion slerp_rot = Quaternion.Slerp(transform.rotation, target_rot, rotationSpeed * Time.deltaTime);
+            transform.rotation = slerp_rot;
         }
     }
 
+    void ChangeViewType(ViewType new_viewType)
+    {
+        viewType = new_viewType;
+        switch (viewType)
+        {
+            case ViewType.FPS:
+                cam = cam_fps.GetComponent<Camera>();
+                cam_fps.SetActive(true);
+                cam_tps_near.SetActive(false);
+                cam_tps_far.SetActive(false);
+                transform.SetParent(fighterTrans.Find("fighterbody"));
+                transform.localPosition = Vector3.zero;
+                transform.localScale = Vector3.one;
+                break;
 
+            case ViewType.TPS_NEAR:
+                cam = cam_tps_near.GetComponent<Camera>();
+                cam_fps.SetActive(false);
+                cam_tps_near.SetActive(true);
+                cam_tps_far.SetActive(false);
+                transform.SetParent(null);
+                transform.position = fighterTrans.position;
+                animator = cam_tps_near.GetComponent<Animator>();
+                transform.localScale = fighterTrans.localScale;
+                break;
+
+            case ViewType.TPS_FAR:
+                cam = cam_tps_far.GetComponent<Camera>();
+                cam_fps.SetActive(false);
+                cam_tps_near.SetActive(false);
+                cam_tps_far.SetActive(true);
+                transform.SetParent(null);
+                transform.position = fighterTrans.position;
+                animator = cam_tps_far.GetComponent<Animator>();
+                transform.localScale = fighterTrans.localScale;
+                break;
+        }
+        CameraManager.SetupCameraInScene();
+    }
 
     // Flip時に上を向かせる
-    public void CameraLookUp(float euler_angle, float lookup_half_time)
+    public void LookUp(float euler_angle, float lookup_half_time)
     {
-        fix_rotation = false;
-        root_trans.DOLocalRotate(new Vector3(euler_angle, 0, 0), lookup_half_time, RotateMode.LocalAxisAdd)
+        if (viewType == ViewType.FPS) return;
+
+        control_rot = false;
+        transform.DOLocalRotate(new Vector3(euler_angle, 0, 0), lookup_half_time, RotateMode.LocalAxisAdd)
             .SetLoops(2, LoopType.Yoyo)
             .SetEase(Ease.InOutQuad)
-            .OnComplete(() => fix_rotation = true);
+            .OnComplete(() => control_rot = true);
     }
-    
-
 
     // ブースト時に視野角を変化
-    public void ViewChanger(float destination_view, float duration)
+    public void ChangeView(float destination_view, float duration)
     {
+        if (viewType == ViewType.FPS) return;
         DOTween.To(() => cam.fieldOfView, (x) => cam.fieldOfView = x, destination_view, duration);
     }
-
-
 
     // Cameraを初期状態に戻す
     public void ResetView(float duration = 0)
     {
+        if (viewType == ViewType.FPS) return;
         DOTween.To(() => cam.fieldOfView, (x) => cam.fieldOfView = x, default_view, duration);
     }
 
-
-
     // Animator起動
-    public void CameraTurn(int direction)
+    public void TurnCamera(int direction)
     {
+        if (viewType == ViewType.FPS) return;
         animator.SetInteger("Direction", direction);
     }
+
+    public void ShiftCameraPos(Vector3 relative_pos, float? shift_speed = null)
+    {
+        if (viewType == ViewType.FPS) return;
+        shiftSpeed = shift_speed.HasValue ? shift_speed.Value : defaultShiftSpeed;
+        targetRelativePos = relative_pos;
+    }
+
+    public void ResetCameraPos(float? shift_speed = null)
+    {
+        shiftSpeed = shift_speed.HasValue ? shift_speed.Value : defaultShiftSpeed;
+        targetRelativePos = Vector3.zero;
+    }
+}
+
+public enum ViewType
+{
+    FPS,
+    TPS_NEAR,
+    TPS_FAR
 }

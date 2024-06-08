@@ -10,7 +10,7 @@ public class SkillLevelData : ScriptableObject
     SkillData skillData;
     void OnSkillDataSet()
     {
-        if(skillData != null)
+        if (skillData != null)
         {
             skillName = skillData.GetName();
             skillId = skillData.GetId();
@@ -27,56 +27,56 @@ public class SkillLevelData : ScriptableObject
 
     public LevelData GetLevelData(int level)
     {
-        switch(skillType)
+        switch (skillType)
         {
-            case SkillType.attack :
-            switch(level)
-            {
-                case 1 : return attackLevelData1;
-                case 2 : return attackLevelData2;
-                case 3 : return attackLevelData3;
-                case 4 : return attackLevelData4;
-                case 5 : return attackLevelData5;
-                default : Debug.LogError("レベルが範囲を超えています"); return null;
-            }
+            case SkillType.attack:
+                switch (level)
+                {
+                    case 1: return attackLevelData1;
+                    case 2: return attackLevelData2;
+                    case 3: return attackLevelData3;
+                    case 4: return attackLevelData4;
+                    case 5: return attackLevelData5;
+                    default: Debug.LogError("レベルが範囲を超えています"); return null;
+                }
 
-            case SkillType.heal :
-            switch(level)
-            {
-                case 1 : return healLevelData1;
-                case 2 : return healLevelData2;
-                case 3 : return healLevelData3;
-                case 4 : return healLevelData4;
-                case 5 : return healLevelData5;
-                default : Debug.LogError("レベルが範囲を超えています"); return null;
-            }
+            case SkillType.heal:
+                switch (level)
+                {
+                    case 1: return healLevelData1;
+                    case 2: return healLevelData2;
+                    case 3: return healLevelData3;
+                    case 4: return healLevelData4;
+                    case 5: return healLevelData5;
+                    default: Debug.LogError("レベルが範囲を超えています"); return null;
+                }
 
-            case SkillType.assist :
-            switch(level)
-            {
-                case 1 : return assistLevelData1;
-                case 2 : return assistLevelData2;
-                case 3 : return assistLevelData3;
-                case 4 : return assistLevelData4;
-                case 5 : return assistLevelData5;
-                default : Debug.LogError("レベルが範囲を超えています"); return null;
-            }
+            case SkillType.assist:
+                switch (level)
+                {
+                    case 1: return assistLevelData1;
+                    case 2: return assistLevelData2;
+                    case 3: return assistLevelData3;
+                    case 4: return assistLevelData4;
+                    case 5: return assistLevelData5;
+                    default: Debug.LogError("レベルが範囲を超えています"); return null;
+                }
 
-            case SkillType.disturb :
-            switch(level)
-            {
-                case 1 : return disturbLevelData1;
-                case 2 : return disturbLevelData2;
-                case 3 : return disturbLevelData3;
-                case 4 : return disturbLevelData4;
-                case 5 : return disturbLevelData5;
-                default : Debug.LogError("レベルが範囲を超えています"); return null;
-            }
+            case SkillType.disturb:
+                switch (level)
+                {
+                    case 1: return disturbLevelData1;
+                    case 2: return disturbLevelData2;
+                    case 3: return disturbLevelData3;
+                    case 4: return disturbLevelData4;
+                    case 5: return disturbLevelData5;
+                    default: Debug.LogError("レベルが範囲を超えています"); return null;
+                }
 
-            default : Debug.LogError("SkillTypeがNullです"); return null;
+            default: Debug.LogError("SkillTypeがNullです"); return null;
         }
     }
-    
+
     [SerializeField, ReadOnly, ShowIf("HasSkillData")] string skillName;
     public string GetName() { return skillName; }
     [SerializeField, ReadOnly, ShowIf("HasSkillData")] int skillId;
@@ -87,7 +87,7 @@ public class SkillLevelData : ScriptableObject
     bool IsHeal() { return skillType == SkillType.heal; }
     bool IsAssist() { return skillType == SkillType.assist; }
     bool IsDisturb() { return skillType == SkillType.disturb; }
-    
+
 
     [ShowIf("IsAttack"), BoxGroup("Level 1"), SerializeField]
     AttackLevelData attackLevelData1;
@@ -156,20 +156,22 @@ public class SkillLevelData : ScriptableObject
 
 public interface LevelData
 {
-    public float ChargeTime {get; set;}
-    public float FreeFloat1 {get; set;}
-    public float FreeFloat2 {get; set;}
-    public float FreeFloat3 {get; set;}
+    public float ChargeTime { get; set; }
+    public float FreeFloat1 { get; set; }
+    public float FreeFloat2 { get; set; }
+    public float FreeFloat3 { get; set; }
+    public string[] EnhanceDetails { get; set; }
 }
 
 
 [System.Serializable]
 public struct AttackLevelData : LevelData
 {
-    [field : SerializeField] public float ChargeTime {get; set;}
-    [field : SerializeField] public float FreeFloat1 {get; set;}
-    [field : SerializeField] public float FreeFloat2 {get; set;}
-    [field : SerializeField] public float FreeFloat3 {get; set;}
+    [field: SerializeField] public float ChargeTime { get; set; }
+    [field: SerializeField] public float FreeFloat1 { get; set; }
+    [field: SerializeField] public float FreeFloat2 { get; set; }
+    [field: SerializeField] public float FreeFloat3 { get; set; }
+    [field: SerializeField] public string[] EnhanceDetails { get; set; }
 
     [Header("Basics")]
     public float Power;
@@ -195,10 +197,11 @@ public struct AttackLevelData : LevelData
 [System.Serializable]
 public struct HealLevelData : LevelData
 {
-    [field : SerializeField] public float ChargeTime {get; set;}
-    [field : SerializeField] public float FreeFloat1 {get; set;}
-    [field : SerializeField] public float FreeFloat2 {get; set;}
-    [field : SerializeField] public float FreeFloat3 {get; set;}
+    [field: SerializeField] public float ChargeTime { get; set; }
+    [field: SerializeField] public float FreeFloat1 { get; set; }
+    [field: SerializeField] public float FreeFloat2 { get; set; }
+    [field: SerializeField] public float FreeFloat3 { get; set; }
+    [field: SerializeField] public string[] EnhanceDetails { get; set; }
 
     public float RepairAmount;
 }
@@ -207,10 +210,11 @@ public struct HealLevelData : LevelData
 [System.Serializable]
 public struct AssistLevelData : LevelData
 {
-    [field : SerializeField] public float ChargeTime {get; set;}
-    [field : SerializeField] public float FreeFloat1 {get; set;}
-    [field : SerializeField] public float FreeFloat2 {get; set;}
-    [field : SerializeField] public float FreeFloat3 {get; set;}
+    [field: SerializeField] public float ChargeTime { get; set; }
+    [field: SerializeField] public float FreeFloat1 { get; set; }
+    [field: SerializeField] public float FreeFloat2 { get; set; }
+    [field: SerializeField] public float FreeFloat3 { get; set; }
+    [field: SerializeField] public string[] EnhanceDetails { get; set; }
 
     [Range(0, 3)] public int SpeedGrade, PowerGrade, DefenceGrade;
     public float SpeedDuration, PowerDuration, DefenceDuration;
@@ -220,10 +224,11 @@ public struct AssistLevelData : LevelData
 [System.Serializable]
 public struct DisturbLevelData : LevelData
 {
-    [field : SerializeField] public float ChargeTime {get; set;}
-    [field : SerializeField] public float FreeFloat1 {get; set;}
-    [field : SerializeField] public float FreeFloat2 {get; set;}
-    [field : SerializeField] public float FreeFloat3 {get; set;}
+    [field: SerializeField] public float ChargeTime { get; set; }
+    [field: SerializeField] public float FreeFloat1 { get; set; }
+    [field: SerializeField] public float FreeFloat2 { get; set; }
+    [field: SerializeField] public float FreeFloat3 { get; set; }
+    [field: SerializeField] public string[] EnhanceDetails { get; set; }
 
     [Header("Basics")]
     public float Speed;

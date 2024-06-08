@@ -4,6 +4,8 @@ using System;
 using System.Linq;
 using UnityEngine;
 using DG.Tweening;
+using Unity.VisualScripting;
+using UnityEngine.UI;
 
 
 
@@ -72,12 +74,15 @@ public abstract class Utilities : MonoBehaviour
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static class MethodExtension
 {
+    public static IEnumerable<T> RandomizeOrder<T>(this IEnumerable<T> original)
+    {
+        IEnumerable<T> copy = original.ToList();
+        copy = copy.OrderBy(a => Guid.NewGuid()).ToList();
+        return copy;
+    }
     public static T RandomChoice<T>(this IEnumerable<T> ienumerable) { return ienumerable.Any() ? ienumerable.ElementAt(UnityEngine.Random.Range(0, ienumerable.Count())) : default(T); }
     public static float Normalize(this float value, float min_value, float max_value) { return (value - min_value) / (max_value - min_value); }
     public static Vector2 XY(this Vector3 vector)
@@ -113,20 +118,6 @@ static class MethodExtension
                 canvasPos = new Vector2((ratioX - 1f) * CanvasManager.canvas_width, ratioY * CanvasManager.canvas_height);
                 break;
         }
-        return canvasPos;
-    }
-    public static Vector2 ScaleCanvasPos(this Vector2 canvasPos)
-    {
-        float x_scale = CanvasManager.canvas_scale.x;
-        float y_scale = CanvasManager.canvas_scale.y;
-        Vector2 norm_canvasPos = new Vector2(canvasPos.x * x_scale, canvasPos.y * y_scale);
-        return norm_canvasPos;
-    }
-    public static Vector2 UnScaleCanvasPos(this Vector2 scaled_canvasPos)
-    {
-        float x_scale = CanvasManager.canvas_scale.x;
-        float y_scale = CanvasManager.canvas_scale.y;
-        Vector2 canvasPos = new Vector2(scaled_canvasPos.x / x_scale, scaled_canvasPos.y / y_scale);
         return canvasPos;
     }
     public static GameObject[] GetAllChildren(this GameObject parent)
@@ -174,8 +165,93 @@ static class MethodExtension
                 break;
         }
     }
-}
 
+    public static T String2Enum<T>(this string str) where T : Enum
+    {
+        T e = (T)Enum.Parse(typeof(T), str);
+        return e;
+    }
+
+    public static bool String2Bool(this string str)
+    {
+        bool b = Convert.ToBoolean(str);
+        return b;
+    }
+
+    public static int String2Int(this string str)
+    {
+        int i = int.Parse(str);
+        return i;
+    }
+
+    // {1,10,...} -> "1/10/..."
+    public static string Ints2String(this List<int> ints)
+    {
+        string str = "";
+        foreach (int i in ints)
+        {
+            str += i.ToString() + "/";
+        }
+        return str;
+    }
+
+    // "1/10/..." -> {1,10,...}
+    public static List<int> String2Ints(this string str)
+    {
+        List<int> ints = new List<int>();
+        string str_cashe = "";
+        for (int s = 0; s < str.Length; s++)
+        {
+            char code = str[s];
+            if (code == '/')
+            {
+                int i = int.Parse(str_cashe);
+                ints.Append(i);
+                str_cashe = "";
+            }
+            else
+            {
+                str_cashe += code;
+            }
+        }
+        return ints;
+    }
+
+    // {false, true, true, ...} -> "ftt..."
+    public static string Bools2String(this IEnumerable<bool> bools)
+    {
+        string str = "";
+        foreach (bool b in bools)
+        {
+            if (b) str += "t";
+            else str += "f";
+        }
+        return str;
+    }
+
+    // "ftt..." -> {false, true, true, ...}
+    public static List<bool> String2Bools(this string str)
+    {
+        List<bool> bools = new List<bool>();
+        for (int s = 0; s < str.Length; s++)
+        {
+            char code = str[s];
+            if (code == 't') bools.Add(true);
+            else bools.Add(false);
+        }
+        return bools;
+    }
+
+    public static void FadeColor(this Graphic graphic, float alpha)
+    {
+        Color new_color = new Color(graphic.color.r, graphic.color.g, graphic.color.b, alpha);
+        graphic.color = new_color;
+    }
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 public enum Direction { up, down, left, right }
 public enum AnchorPosition { Center, LeftUp, LeftDown, RightUp, RightDown }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

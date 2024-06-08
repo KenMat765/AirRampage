@@ -1,34 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using NaughtyAttributes;
 
-// Has to be called before ParticipantManager.
-[DefaultExecutionOrder(-1)]
 public class SpawnPoints : MonoBehaviour
 {
-    public static SpawnPoint[] spawnPoints { get; private set; }
-    public static int zakoCountAll { get; private set; }
-    public static int zakoCountPerTeam { get { return zakoCountAll / 2; } }
+    [SerializeField] SpawnPoint[] spawnPoints;
+    [ReadOnly] public int zakoCountAll;
 
-    [ContextMenu("Distribute Point Numbers")]
-    void DistributePointNumbers()
+    // Called from Editor.
+    [ContextMenu("Initialize Spawn Points")]
+    void InitializeSpawnPoints()
     {
-        spawnPoints = GetComponentsInChildren<SpawnPoint>();
-        int red = 0, blue = 0, redZako = 0, blueZako = 0;
+        int red = 0, blue = 0, zako = 0;
         foreach (SpawnPoint point in spawnPoints)
         {
             if (point.spawnZako)
             {
-                if (point.team == Team.RED)
-                {
-                    point.pointNo = redZako;
-                    redZako++;
-                }
-                else
-                {
-                    point.pointNo = blueZako;
-                    blueZako++;
-                }
+                zakoCountAll += point.zakoCount;
+                point.pointNo = zako;
+                zako++;
             }
             else
             {
@@ -46,16 +37,7 @@ public class SpawnPoints : MonoBehaviour
         }
     }
 
-    void Awake()
-    {
-        spawnPoints = GetComponentsInChildren<SpawnPoint>();
-        foreach (SpawnPoint point in spawnPoints)
-        {
-            if (point.spawnZako) zakoCountAll += point.zakoCount;
-        }
-    }
-
-    public static SpawnPoint GetSpawnPoint(int fighterNo)
+    public SpawnPoint GetSpawnPoint(int fighterNo)
     {
         SpawnPoint result = null;
         Team team = GameInfo.GetTeamFromNo(fighterNo);
@@ -71,12 +53,12 @@ public class SpawnPoints : MonoBehaviour
         return result;
     }
 
-    public static SpawnPoint GetSpawnPointZako(Team team, int pointNo)
+    public SpawnPoint GetSpawnPointZako(int pointNo)
     {
         SpawnPoint result = null;
         foreach (SpawnPoint point in spawnPoints)
         {
-            if (point.spawnZako && point.team == team && point.pointNo == pointNo)
+            if (point.spawnZako && point.pointNo == pointNo)
             {
                 result = point;
                 break;

@@ -19,19 +19,20 @@ public class SkillPortManager : Singleton<SkillPortManager>
     Button return_btn;
     [SerializeField] RectTransform info_rect;
     [SerializeField] RectTransform list_rect;
-    Image cirkit_img;
+    Image circuit_img;
 
     const float wait_time = 1.2f;
     const float enter_exit_duration = 0.1f;
     const float change_interval = 0.8f;
-    const float cirkit_duration = 0.2f;
+    const float circuit_duration = 0.2f;
 
     [SerializeField] SkillDeck skillDeck;
     [SerializeField] SkillDeckList skillDeckList;
 
-    enum Page { menu, deck, gear, deck_list, gear_list }
+    enum Page { menu, deck, deck_list, gear_list }
     Page current_page = Page.menu;
 
+    bool is_deck = false;
 
 
     void Start()
@@ -50,9 +51,9 @@ public class SkillPortManager : Singleton<SkillPortManager>
         skillgear_btn_rect.anchoredPosition = new Vector2(300, 0);
         return_rect.anchoredPosition = new Vector2(-100, -120);
 
-        cirkit_img = list_rect.Find("Cirkit").GetComponent<Image>();
-        cirkit_img.fillAmount = 0;
-        cirkit_img.color = Color.grey;
+        circuit_img = list_rect.Find("Circuit").GetComponent<Image>();
+        circuit_img.fillAmount = 0;
+        circuit_img.color = Color.grey;
 
         Utilities.DelayCall(this, wait_time, () =>
         {
@@ -66,14 +67,16 @@ public class SkillPortManager : Singleton<SkillPortManager>
     // ↓ 階層遷移を伴う処理 ↓ ////////////////////////////////////////////////////////////////////////////////////////////////
     public void OnSelectDeckBtn()
     {
+        is_deck = true;
         ExitButtons();
         Utilities.DelayCall(this, change_interval, EnterDeck);
     }
 
     public void OnSelectGearBtn()
     {
+        is_deck = false;
         ExitButtons();
-        Utilities.DelayCall(this, change_interval, EnterGear);
+        Utilities.DelayCall(this, enter_exit_duration + change_interval, EnterInfoList);
     }
 
     public void Return()
@@ -85,7 +88,7 @@ public class SkillPortManager : Singleton<SkillPortManager>
                 ExitReturn_Glass();
                 Utilities.DelayCall(this, wait_time, () =>
                 {
-                    SceneManager2.I.LoadSceneAsync2(GameScenes.menu, FadeType.bottom);
+                    SceneManager2.I.LoadSceneAsync2(GameScenes.MENU, FadeType.bottom);
                 });
                 break;
 
@@ -96,11 +99,6 @@ public class SkillPortManager : Singleton<SkillPortManager>
                 Utilities.DelayCall(this, change_interval, EnterButtons);
                 break;
 
-            case Page.gear:
-                ExitGear();
-                Utilities.DelayCall(this, change_interval, EnterButtons);
-                break;
-
             case Page.deck_list:
                 skillDeckList.OnExit();
                 ExitInfoList();
@@ -108,6 +106,9 @@ public class SkillPortManager : Singleton<SkillPortManager>
                 break;
 
             case Page.gear_list:
+                skillDeckList.OnExit();
+                ExitInfoList();
+                Utilities.DelayCall(this, change_interval, EnterButtons);
                 break;
         }
     }
@@ -121,21 +122,47 @@ public class SkillPortManager : Singleton<SkillPortManager>
 
     public void OnSelectEquip()
     {
-        int deck_num = skillDeck.current_deck_num;
-        int?[] skillIds = new int?[GameInfo.max_skill_count];
-        PlayerInfo.I.SkillIdsGetter(deck_num, out skillIds);
-        for (int k = 0; k < GameInfo.max_skill_count; k++)
+        // Set selected skill to deck.
+        if (is_deck)
         {
-            if (skillIds[k] == skillDeckList.current_skill_id)
+            int deck_num = skillDeck.current_deck_num;
+            int?[] skillIds = new int?[GameInfo.max_skill_count];
+            PlayerInfo.I.SkillIdsGetter(deck_num, out skillIds);
+            for (int k = 0; k < GameInfo.max_skill_count; k++)
             {
-                PlayerInfo.I.SkillIdSetter(deck_num, k, null);
+                if (skillIds[k] == skillDeckList.current_skill_id)
+                {
+                    PlayerInfo.I.SkillIdSetter(deck_num, k, null);
+                }
             }
-        }
-        PlayerInfo.I.SkillIdSetter(deck_num, skillDeck.selected_icon_index, skillDeckList.current_skill_id);
+            PlayerInfo.I.SkillIdSetter(deck_num, skillDeck.selected_icon_index, skillDeckList.current_skill_id);
 
-        skillDeckList.OnExit();
-        ExitInfoList();
-        Utilities.DelayCall(this, change_interval, EnterDeck);
+            skillDeckList.OnExit();
+            ExitInfoList();
+            Utilities.DelayCall(this, change_interval, EnterDeck);
+        }
+
+        // Level up selected skill
+        else
+        {
+            int skill_id = (int)skillDeckList.current_skill_id;
+            UpgradeSkill(skill_id);
+            skillDeckList.RefreshInfoBoard(skill_id);
+        }
+    }
+
+    void UpgradeSkill(int skill_id)
+    {
+        // Level up skill
+        int current_level = PlayerInfo.I.skl_level[skill_id];
+        int new_level = current_level + 1;
+        new_level = Mathf.Clamp(new_level, 1, 5);
+        PlayerInfo.I.skl_level[skill_id] = new_level;
+        // Reduce coins
+        int cost = GameInfo.upgrade_coin[current_level - 1];
+        PlayerInfo.I.coins -= cost;
+        // Save PlayerInfo
+        SaveManager.SaveData<PlayerInfo>(PlayerInfo.I);
     }
 
 
@@ -201,22 +228,16 @@ public class SkillPortManager : Singleton<SkillPortManager>
         left_btn_rect.LetOutRect(Direction.left, 100, enter_exit_duration);
     }
 
-    void EnterGear()
-    {
-        current_page = Page.gear;
-    }
-
-    void ExitGear()
-    {
-        return_btn.interactable = false;
-    }
-
     void EnterInfoList()
     {
-        current_page = Page.deck_list;
-        info_rect.DOAnchorPosX(-480, enter_exit_duration);
+        if (is_deck)
+            current_page = Page.deck_list;
+        else
+            current_page = Page.gear_list;
+        skillDeckList.is_deck = is_deck;
+        info_rect.DOAnchorPosX(-470, enter_exit_duration);
         list_rect.DOAnchorPosX(432, enter_exit_duration)
-            .OnComplete(() => cirkit_img.DOFillAmount(1, cirkit_duration)
+            .OnComplete(() => circuit_img.DOFillAmount(1, circuit_duration)
                 .OnComplete(() =>
                 {
                     return_btn.interactable = true;
@@ -228,7 +249,7 @@ public class SkillPortManager : Singleton<SkillPortManager>
     {
         return_btn.interactable = false;
         skillDeckList.OnExit();
-        cirkit_img.DOFillAmount(0, cirkit_duration)
+        circuit_img.DOFillAmount(0, circuit_duration)
             .OnComplete(() =>
             {
                 info_rect.LetOutRect(Direction.left, 350, enter_exit_duration);

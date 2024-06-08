@@ -7,7 +7,6 @@ public class BattleStarter : Utilities
 {
     Capsule battleCapsule;
     [SerializeField] Button soloButton, multiButton;
-    int selected_deck;
 
     void Start()
     {
@@ -22,17 +21,15 @@ public class BattleStarter : Utilities
     {
         soloButton.interactable = false;
         multiButton.interactable = false;
-        SortieLobbyUI.selectedMulti = false;
-        LobbyFighter.selectedMulti = false;
-        SceneManager2.I.LoadSceneAsync2(GameScenes.sortielobby, FadeType.left);
+        BattleInfo.isMulti = false;
+        SceneManager2.I.LoadSceneAsync2(GameScenes.SORTIELOBBY, FadeType.left);
     }
 
     public void MultiBattle()
     {
         soloButton.interactable = false;
         multiButton.interactable = false;
-        SortieLobbyUI.selectedMulti = true;
-        LobbyFighter.selectedMulti = true;
-        SceneManager2.I.LoadSceneAsync2(GameScenes.onlinelobby, FadeType.bottom);
+        BattleInfo.isMulti = true;
+        SceneManager2.I.LoadSceneAsync2(GameScenes.ONLINELOBBY, FadeType.bottom);
     }
 }

@@ -55,7 +55,8 @@ class Crown : SkillAttack
                 {
                     for (int k = 0; k < crown_count; k++)
                     {
-                        int target_no = attack.homingTargetNos.RandomChoice();
+                        // int target_no = attack.homingTargetNos.RandomChoice();
+                        int target_no = attack.homingTargetNos[k % attack.homingCount];
 
                         // Pack target fighters to array to activate your skill.
                         targets[k] = ParticipantManager.I.fighterInfos[target_no].body;
@@ -99,7 +100,8 @@ class Crown : SkillAttack
             {
                 for (int k = 0; k < crown_count; k++)
                 {
-                    int target_no = attack.homingTargetNos.RandomChoice();
+                    // int target_no = attack.homingTargetNos.RandomChoice();
+                    int target_no = attack.homingTargetNos[k % attack.homingCount];
                     targets[k] = ParticipantManager.I.fighterInfos[target_no].body;
                 }
             }
@@ -128,7 +130,7 @@ class Crown : SkillAttack
         motion = () =>
         {
             prefab.transform.localScale = Vector3.zero;
-            prefab.transform.DOScale(new Vector3(0.07f, 0.07f, 0.07f), grow_duration);
+            prefab.transform.DOScale(new Vector3(0.07f, 0.07f, 0.07f), grow_duration).SetEase(Ease.OutQuint);
             return interval * crown_count;
         };
         return motion;

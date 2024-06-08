@@ -1,5 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [System.Serializable]
@@ -7,6 +10,9 @@ public class PlayerInfo
 {
     // The only instance of PlayerInfo.
     public static PlayerInfo I { get; set; }
+
+
+    // === Skill === //
 
     /// <Summary> returns -1 if null. </Summary>
     public string[] deck_skill_ids = new string[GameInfo.deck_count];
@@ -56,7 +62,7 @@ public class PlayerInfo
             }
             else
             {
-                skillLevels[k] = level[skillId_temp];
+                skillLevels[k] = skl_level[skillId_temp];
             }
         }
     }
@@ -109,17 +115,81 @@ public class PlayerInfo
 
     // skill_id と unlock したかのセット
     // スキルの数だけ手動で追加する必要がある
-    public bool[] unlock =
+    public bool[] skl_unlock =
     {
         true, true, true, true, true, true,
-        true, true, true, true, true, true
+        true, true, true, true, true, true,
+        true
     };
 
     // skill_id と 各スキルのレベル のセット
     // スキルの数だけ手動で追加する必要がある
-    public int[] level =
+    public int[] skl_level =
     {
-        3, 3, 3, 3, 3, 3,
-        3, 3, 3, 3, 3, 3
+        1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1,
+        1
     };
+
+
+    // === Ability === //
+    public List<int> AbilityIdsGetter()
+    {
+        List<int> abilityIds = new List<int>();
+        for (int id = 0; id < AbilityDatabase.I.ability_count; id++)
+        {
+            bool is_equiped = abi_equip[id];
+            if (is_equiped)
+            {
+                abilityIds.Add(id);
+            }
+        }
+        return abilityIds;
+    }
+
+    public bool[] abi_unlock =
+    {
+        true, true, true, true, true, true,
+        true, true, true, true, true, true,
+        true, true, true, true, true, true,
+        true, true, true, true, true, true,
+        true, true, true, true, true, true,
+        true, true, true, true, true, true,
+        true, true, true, true, true, true,
+        true, true, true, true, true, true,
+        true, true, true, true, true, true,
+    };
+
+    public bool[] abi_equip =
+    {
+        false, false, false, false, false, false,
+        false, false, false, false, false, false,
+        false, false, false, false, false, false,
+        false, false, false, false, false, false,
+        false, false, false, false, false, false,
+        false, false, false, false, false, false,
+        false, false, false, false, false, false,
+        false, false, false, false, false, false,
+        false, false, false, false, false, false,
+    };
+
+
+    // === Settings === //
+    public string myName = "Kari name";
+    public float volume = 1.0f;
+    public int fps = 60;
+    public float bgm = 1.0f;
+    public bool postprocess = true;
+    public int coins
+    {
+        get
+        {
+            return Coins;
+        }
+        set
+        {
+            Coins = Mathf.Clamp(value, 0, 9999);
+        }
+    }
+    [SerializeField] int Coins = 9999;
 }

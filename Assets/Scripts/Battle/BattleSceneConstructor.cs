@@ -23,7 +23,7 @@ public class BattleSceneConstructor : MonoBehaviour
         yield return new WaitForSeconds(1);
 
         // ゲーム開始
-        ParticipantManager.I.AllFightersActivationHandler(true);
+        ParticipantManager.I.FightersActivationHandler(true);
         Destroy(this.gameObject);
     }
 }

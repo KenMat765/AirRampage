@@ -3,28 +3,297 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Unity.Collections;
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
+using Unity.Services.Relay;
+using Unity.Services.Relay.Models;
+using Unity.Services.Lobbies;
+using Unity.Services.Lobbies.Models;
+using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 public class GameNetPortal : Singleton<GameNetPortal>
 {
-    protected override bool dont_destroy_on_load { get; set; } = true;
+    protected override bool dont_destroy_on_load { get; set; } = false;
     readonly string SERVER_TO_CLIENT_CONNECTIONRESULT = "ServerToClientConnectionResult";
-    public enum ConnectStatus { SUCCESS, WRONG_PASSWORD, SERVER_FULL }
+    public enum ConnectStatus { SUCCESS, SERVER_FULL }
     public ConnectStatus connectStatus;
     Action<ConnectStatus> OnRecieveConnectionResult;
-    // string password;
-    // public void SetPassword(string password) => this.password = password;
-    public LobbyParticipantData hostData { get; private set; }
-    public bool gameStarted = false;
-    public enum ConnectionMode { LOCAL, RELAY }
-    public ConnectionMode connectionMode;
+    List<LobbyParticipantData> clientDataQueue = new List<LobbyParticipantData>();
+    bool isHost { get { return BattleInfo.isHost; } }
+
+    /// <summary>
+    /// Called when client was kicked out from Relay. (!! This is NOT called for the host !!)
+    /// </summary>
+    public Action OnKickedOutAction { get; set; }
 
 
-    void Start()
+
+    // ====== Lobby ====== //
+    public Lobby joinedLobby { get; private set; }
+    public string playerId { get; private set; }
+    public const string KEY_RELAY_CODE = "RelayCode";
+    float heartbeatTimer = 0f;
+    float heatbeatInterval = 15f;
+
+    public async Task<bool> CreateLobbyAsync(bool isPrivate, string relay_code = "")
     {
+        try
+        {
+            string lobbyName = "TestLobby";
+            int maxPlayers = GameInfo.max_player_count;
+            CreateLobbyOptions createLobbyOptions = new CreateLobbyOptions()
+            {
+                IsPrivate = isPrivate,
+                Data = new Dictionary<string, DataObject>()
+                {
+                    {KEY_RELAY_CODE, new DataObject(DataObject.VisibilityOptions.Member, relay_code)},
+                }
+            };
+            joinedLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, createLobbyOptions);
+            Debug.Log("Lobby created: " + joinedLobby.LobbyCode);
+            return true;
+        }
+        catch (LobbyServiceException e)
+        {
+            Debug.Log("Error creating lobby: " + e.Message);
+            return false;
+        }
+    }
+
+    /// <summary>Join random public lobby.</summary>
+    public async Task<bool> EnterRandomLobby()
+    {
+        try
+        {
+            QuickJoinLobbyOptions options = new QuickJoinLobbyOptions();
+            joinedLobby = await LobbyService.Instance.QuickJoinLobbyAsync(options);
+            Debug.Log("Lobby joined : " + joinedLobby.LobbyCode);
+            return true;
+        }
+        catch (LobbyServiceException e)
+        {
+            Debug.Log("Error joining lobby : " + e.Message);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Join private lobby by lobby code.
+    /// Password can be set to lobby, but use lobby code as password for now.
+    /// Lobby code is visible only to lobby members, and players from outside can join to the private lobby by lobby code.
+    /// </summary>
+    /// <param name="lobbyCode">code necessary to join lobby.</param>
+    public async Task<bool> EnterLobbyWithCode(string lobbyCode)
+    {
+        try
+        {
+            JoinLobbyByCodeOptions options = new JoinLobbyByCodeOptions();
+            joinedLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode, options);
+            Debug.Log("Lobby joined:" + joinedLobby.LobbyCode);
+            return true;
+        }
+        catch (LobbyServiceException e)
+        {
+            Debug.Log("Error joining lobby:" + e.Message);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Send heartbeat to lobby, so as not to kill lobby. (Host only method)
+    /// Call this in Update.
+    /// </summary>
+    async void RefreshLobbyHeatbeat()
+    {
+        // This method is only for host.
+        if (!isHost)
+        {
+            return;
+        }
+
+        // Do nothig if not joined to any lobby.
+        if (joinedLobby == null)
+        {
+            return;
+        }
+
+        // Send heartbeat after heartbeatInterval.
+        heartbeatTimer += Time.deltaTime;
+        if (heartbeatTimer > heatbeatInterval)
+        {
+            heartbeatTimer = 0.0f;
+            await LobbyService.Instance.SendHeartbeatPingAsync(joinedLobby.Id);
+        }
+    }
+
+    public async void UpdateJoinedLobby(bool? is_private = null, bool? is_locked = null, string relay_code = "")
+    {
+        if (joinedLobby == null)
+        {
+            Debug.LogWarning("joinedLobby is null");
+            return;
+        }
+        joinedLobby = await Lobbies.Instance.UpdateLobbyAsync(joinedLobby.Id, new UpdateLobbyOptions
+        {
+            IsPrivate = is_private.HasValue ? is_private.Value : joinedLobby.IsPrivate,
+            IsLocked = is_locked.HasValue ? is_locked.Value : joinedLobby.IsLocked,
+            Data = new Dictionary<string, DataObject>()
+            {
+                {KEY_RELAY_CODE, new DataObject(DataObject.VisibilityOptions.Member,
+                    relay_code != "" ? relay_code : joinedLobby.Data[KEY_RELAY_CODE].Value)},
+            }
+        });
+    }
+
+    public string GetRelayCodeFromJoinedLobby()
+    {
+        if (joinedLobby == null)
+        {
+            Debug.LogWarning("joinedLobby is null");
+            return "";
+        }
+        return joinedLobby.Data[KEY_RELAY_CODE].Value;
+    }
+
+    public async Task ExitJoinedLobby()
+    {
+        if (joinedLobby == null)
+        {
+            Debug.LogWarning("joinedLobby is null");
+            return;
+        }
+        try
+        {
+            await Lobbies.Instance.RemovePlayerAsync(joinedLobby.Id, playerId);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("Error removing player from joinedLobby : " + e);
+        }
+        joinedLobby = null;
+    }
+
+    public async Task KillJoinedLobby()
+    {
+        if (joinedLobby == null)
+        {
+            Debug.LogWarning("joinedLobby is null");
+            return;
+        }
+        await Lobbies.Instance.DeleteLobbyAsync(joinedLobby.Id);
+        joinedLobby = null;
+    }
+
+
+
+    // ====== Relay ====== //
+    public async Task<string> CreateRelayAsync(int max_player_count)
+    {
+        try
+        {
+            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(max_player_count);
+            string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetHostRelayData(
+                allocation.RelayServer.IpV4,
+                (ushort)allocation.RelayServer.Port,
+                allocation.AllocationIdBytes,
+                allocation.Key,
+                allocation.ConnectionData
+                );
+
+            // If host is not running.
+            if (!NetworkManager.Singleton.IsHost)
+            {
+                // If client is currently running, stop it.
+                if (NetworkManager.Singleton.IsClient)
+                {
+                    NetworkManager.Singleton.Shutdown();
+                    await UniTask.WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
+                }
+                NetworkManager.Singleton.StartHost();
+            }
+
+            return joinCode;
+        }
+        catch (RelayServiceException e)
+        {
+            Debug.Log("Failed to create Relay" + e);
+            return "";
+        }
+    }
+
+    public async Task<bool> EnterRelayAsync(string join_code)
+    {
+        try
+        {
+            JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(join_code);
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetClientRelayData(
+                joinAllocation.RelayServer.IpV4,
+                (ushort)joinAllocation.RelayServer.Port,
+                joinAllocation.AllocationIdBytes,
+                joinAllocation.Key,
+                joinAllocation.ConnectionData,
+                joinAllocation.HostConnectionData
+                );
+
+            // If client is not running or host is running.
+            if (!NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsHost)
+            {
+                // If host is currently running, stop it.
+                if (NetworkManager.Singleton.IsHost)
+                {
+                    NetworkManager.Singleton.Shutdown();
+                    await UniTask.WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
+                }
+                NetworkManager.Singleton.StartClient();
+            }
+
+            return true;
+        }
+        catch (RelayServiceException e)
+        {
+            Debug.Log("Failed to enter Relay: " + e);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Set connection data (name, skill code, ability_code) to NetworkManager's singleton.
+    /// !! Called BEFORE starting host or client !!
+    /// </summary>
+    void SetConnectionData()
+    {
+        // Generate skill code
+        int deckNum = 0;
+        string skillCode;
+        int?[] skillIds, skillLevels;
+        PlayerInfo.I.SkillIdsGetter(deckNum, out skillIds);
+        PlayerInfo.I.SkillLevelsGetter(deckNum, out skillLevels);
+        LobbyParticipantData.SkillCodeEncoder(skillIds, skillLevels, out skillCode);
+
+        // Generate ability code
+        string abilityCode;
+        List<int> abilityIds = PlayerInfo.I.AbilityIdsGetter();
+        LobbyParticipantData.AbilityCodeEncoder(abilityIds, out abilityCode);
+
+        var payload = new ConnectionPayload(PlayerInfo.I.myName, skillCode, abilityCode);
+        string payloadJSON = JsonUtility.ToJson(payload);
+        byte[] payloadBytes = Encoding.ASCII.GetBytes(payloadJSON);
+        NetworkManager.Singleton.NetworkConfig.ConnectionData = payloadBytes;
+    }
+
+
+
+    async void Start()
+    {
+        // Sign in to UnityServices & AuthenticationService. (returns player ID)
+        playerId = await RelayAllocation.SignInPlayerAsync();
+
         NetworkManager.Singleton.OnServerStarted += HandleOnServerStarted;
+        NetworkManager.Singleton.OnServerStopped += HandleOnServerStopped;
         NetworkManager.Singleton.OnClientConnectedCallback += HandleOnClientConnected;
         NetworkManager.Singleton.OnClientDisconnectCallback += HandleOnClientDisconnect;
         NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
@@ -35,145 +304,156 @@ public class GameNetPortal : Singleton<GameNetPortal>
                 case ConnectStatus.SUCCESS:
                     break;
 
-                case ConnectStatus.WRONG_PASSWORD:
-                    break;
-
                 case ConnectStatus.SERVER_FULL:
                     break;
             }
         };
+
+        SetConnectionData();
+    }
+
+    void Update()
+    {
+        RefreshLobbyHeatbeat();
     }
 
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // StartHost(), StartClient() ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private void ApprovalCheck(byte[] connectionData, ulong clientId, NetworkManager.ConnectionApprovedDelegate callback)
+    // Called at server side. Host assigns member number of each team here.
+    void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
     {
-        // ゲームが開始されていたら入れない
-        if (gameStarted)
-        {
-            callback(false, null, false, null, null);
-            return;
-        }
+        Debug.Log("Approval Check");
 
+        response.Pending = true;
+
+        ulong clientId = request.ClientNetworkId;
+        byte[] connectionData = request.Payload;
         string payloadJSON = Encoding.ASCII.GetString(connectionData);
-        var payload = JsonUtility.FromJson<ConnectionPayload>(payloadJSON);
+        ConnectionPayload payload = JsonUtility.FromJson<ConnectionPayload>(payloadJSON);
 
         // Serverは無条件で入れる
         if (clientId == NetworkManager.Singleton.LocalClientId)
         {
-            callback(false, null, true, null, null);
-            NetworkManager.Singleton.SceneManager.LoadScene("SortieLobby", UnityEngine.SceneManagement.LoadSceneMode.Single);
-            NetworkManager.Singleton.SceneManager.OnLoadComplete += HandleOnSceneLoadComplete;
-            // HostのデータはLobbyLinkedDataのOnNetworkSpawn()でListに加える
-            hostData = new LobbyParticipantData(0, payload.playerName, clientId, Team.RED, false, payload.skillCode);
+            Debug.Log("Server Entered");
+
+            response.Approved = true;
+            response.CreatePlayerObject = false;
+            response.PlayerPrefabHash = null;
+            response.Position = null;
+            response.Rotation = null;
+            response.Pending = false;
+
+            LobbyParticipantData hostData = new LobbyParticipantData(0, 0, PlayerInfo.I.myName, clientId, false, Team.RED, false, true, payload.skillCode, payload.abilityCode);
+            clientDataQueue.Add(hostData);
             return;
         }
 
-        // if(password != payload.password) connectStatus = ConnectStatus.WRONG_PASSWORD;
+        // Set connection status for client.
         if (NetworkManager.Singleton.ConnectedClients.Count > GameInfo.max_player_count) connectStatus = ConnectStatus.SERVER_FULL;
         else connectStatus = ConnectStatus.SUCCESS;
 
-        // とりあえず入れる
-        callback(false, null, true, null, null);
+        // Enter client even if connectStatus is not SUCCESS, in order to send connectStatus to client.
+        response.Approved = true;
+        response.CreatePlayerObject = false;
+        response.PlayerPrefabHash = null;
+        response.Position = null;
+        response.Rotation = null;
+        response.Pending = false;
 
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // Networked /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Networked ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        // 接続結果をClientに送信
+        // Send connectStatus to connected client.
         ServerToClientConnectResult(clientId, connectStatus);
 
         if (connectStatus == ConnectStatus.SUCCESS)
         {
-            // 固有番号を取得
-            int? number = LobbyLinkedData.I.GetUnusedNumber();
-            if (!number.HasValue)
-            {
-                Debug.LogError("人数が超過しています");
-                return;
-            }
-
-            // Determine team from number.
-            Team team = GameInfo.GetTeamFromNo((int)number);
-
-            // ClientのデータはServer側で入室時に入れる
-            LobbyParticipantData data = new LobbyParticipantData((int)number, payload.playerName, clientId, team, false, payload.skillCode);
-            LobbyLinkedData.I.participantDatas.Add(data);
+            // Add client's lobby data to queue if connection was approved. (properties set later : number, member_number, team, selectedTeam)
+            LobbyParticipantData clientData = new LobbyParticipantData(-1, -1, payload.playerName, clientId, false, Team.RED, false, true, payload.skillCode, payload.abilityCode);
+            clientDataQueue.Add(clientData);
         }
         else
         {
+            // Disconnect client here after sending connectStatus.
             StartCoroutine(DisconnectClientDelayed(clientId));
         }
     }
 
-    private void HandleOnSceneLoadComplete(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
+
+
+    void HandleOnSceneLoadComplete(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
     {
-        // 
-        // 
-        // 
-        // Debug.Log("Scene Load Complete");
+        Debug.Log("<color=yellow>Scene Load Complete</color>");
     }
 
-    private void HandleOnServerStarted()
+    void HandleOnServerStarted()
     {
-
+        Debug.Log("<color=green>Server Started</color>");
+        LobbyLinkedData.I.participantDatas.Clear();   // Clear all participants lobby data.
     }
 
-    private void HandleOnClientConnected(ulong clientId)
+    void HandleOnServerStopped(bool stopHost)
     {
-
+        Debug.Log($"<color=red>Server Stopped</color> {stopHost}");
     }
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Shutdown() ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private void HandleOnClientDisconnect(ulong clientId)
+    void HandleOnClientConnected(ulong clientId)
     {
+        Debug.Log($"<color=green>New Client Connected</color> {clientId}");
+
+        // Server.
         if (NetworkManager.Singleton.IsHost)
         {
-            // If disconnected client was host.
-            if (clientId == NetworkManager.Singleton.LocalClientId)
+            // Add connected clients (including host) lobby data to LobbyLinkedData.
+            foreach (LobbyParticipantData lobby_data in clientDataQueue)
             {
-
-            }
-
-            // If diconnected client was not host.
-            else
-            {
-                // Host deletes the ParticipantData of disconncted client.
-                LobbyLinkedData.I.DeleteParticipantData(clientId);
-            }
-        }
-
-        else
-        {
-            // If failed to enter SortieLobby.
-            if (SceneManager.GetActiveScene().name == "OnlineLobby")
-            {
-                if (!InfoCanvas.I.isFrameOpen) InfoCanvas.I.OpenFrameAndEnterText("Failed to Connect to Server", InfoCanvas.EnterMode.inMoment);
-                else InfoCanvas.I.EnterText("Failed to Connect to Server", InfoCanvas.EnterMode.inMoment);
-                InfoCanvas.I.CloseButtonInteract(true);
-            }
-
-            // If kicked out after entered SortieLobby or battle scene.
-            else
-            {
-                // Disconnected client goes back to Scene : OnlineLobby.
-                SceneManager2.I.LoadScene2(GameScenes.onlinelobby);
+                if (lobby_data.clientId == clientId)
+                {
+                    Debug.Log($"<color=green>Added lobby data</color> {clientId}");
+                    LobbyLinkedData.I.participantDatas.Add(lobby_data);
+                    clientDataQueue.Remove(lobby_data);
+                    break;
+                }
             }
         }
     }
 
-    [ClientRpc]
-    void DisableFighterClientRpc(ulong clientId)
+    // Called only at server & disconnected client (!! This is not called if disconnected client was HOST !!)
+    void HandleOnClientDisconnect(ulong clientId)
     {
-        if (clientId == NetworkManager.Singleton.LocalClientId) return;
-        LobbyParticipantData data = LobbyLinkedData.I.GetParticipantDataByClientId(clientId).Value;
-        LobbyFighter.I.DisableFighter(data.number);
+        Debug.Log($"<color=red>Client Disconnected</color> {clientId}");
+
+        // Server.
+        if (NetworkManager.Singleton.IsHost)
+        {
+            // Remove disconnected client's lobby data.
+            LobbyLinkedData.I.RemoveParticipantData(clientId);
+        }
+
+        // Disconnected client
+        else
+        {
+            // // If still at OnlineLobby.
+            // if (SceneManager.GetActiveScene().name == "OnlineLobby")
+            // {
+            //     if (joinedLobby != null)
+            //     {
+            //         await ExitJoinedLobby();
+            //     }
+            //     if (NetworkManager.Singleton.IsClient)
+            //     {
+            //         NetworkManager.Singleton.Shutdown();
+            //         await UniTask.WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
+            //     }
+            //     OnKickedOutAction?.Invoke();
+            // }
+
+            // // If kicked out after entered SortieLobby or battle scenes.
+            // else
+            // {
+            //     SceneManager2.I.LoadScene2(GameScenes.ONLINELOBBY);
+            // }
+        }
     }
 
     void OnDestroy()
@@ -187,11 +467,13 @@ public class GameNetPortal : Singleton<GameNetPortal>
             if (NetworkManager.Singleton.CustomMessagingManager != null) UnRegisterMessageHandlers();
             if (NetworkManager.Singleton.SceneManager != null) NetworkManager.Singleton.SceneManager.OnLoadComplete -= HandleOnSceneLoadComplete;
         }
+        OnRecieveConnectionResult = null;
+        OnKickedOutAction = null;
     }
 
 
 
-    public void RegisterMessageHandlers()
+    void RegisterMessageHandlers()
     {
         NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler(SERVER_TO_CLIENT_CONNECTIONRESULT, (recieverClientId, reader) =>
         {
@@ -208,7 +490,7 @@ public class GameNetPortal : Singleton<GameNetPortal>
 
 
 
-    public void ServerToClientConnectResult(ulong clientId, ConnectStatus status)
+    void ServerToClientConnectResult(ulong clientId, ConnectStatus status)
     {
         var writer = new FastBufferWriter(sizeof(ConnectStatus), Allocator.Temp);
         writer.WriteValueSafe(status);
@@ -219,18 +501,5 @@ public class GameNetPortal : Singleton<GameNetPortal>
     {
         yield return new WaitForSeconds(0.5f);
         NetworkManager.Singleton.DisconnectClient(clientId);
-    }
-
-
-
-    public void StartHost()
-    {
-        NetworkManager.Singleton.StartHost();
-    }
-
-    public void StartClient()
-    {
-        NetworkManager.Singleton.StartClient();
-        RegisterMessageHandlers();
     }
 }

@@ -15,10 +15,7 @@ class NitroBoost : SkillAssist
         boost_duration = levelData.FreeFloat2;
     }
 
-    JetAudioController jetAudioController;
-    BurnerController burnerController;
     WindController wind;
-    CameraController cameraController;
 
     public override void Generator()
     {
@@ -28,19 +25,13 @@ class NitroBoost : SkillAssist
         GeneratePrefab();
 
         Transform afterBurners = attack.fighterCondition.body.transform.Find("AfterBurners");
-        jetAudioController = afterBurners.GetComponent<JetAudioController>();
-        burnerController = afterBurners.GetComponent<BurnerController>();
         wind = prefabs[0].GetComponent<WindController>();
-        PlayerMovement playerMovement = GetComponentInParent<PlayerMovement>();
-        if (playerMovement != null) cameraController = playerMovement.cameraController;
     }
 
     public override void Activator(int[] transfer = null)
     {
         // Play effect.
         const float accel_duration = 0.2f;
-        jetAudioController.ChangeJetPitch(1, accel_duration);
-        burnerController.Boost(0.04f, accel_duration, emit_trail: true);
         wind.WindGenerator(2, 15);
 
         if (BattleInfo.isMulti && !attack.IsOwner) return;
@@ -48,7 +39,12 @@ class NitroBoost : SkillAssist
         base.Activator();
         MeterDecreaser(boost_duration, EndProccess);
         attack.fighterCondition.PauseGradingSpeed(attack.fighterCondition.defaultSpeed * speed_magnif, accel_duration);
-        if (cameraController != null) cameraController.ViewChanger(100, accel_duration);
+
+        if (attack.IsLocalPlayer)
+        {
+            CameraController.I.ChangeView(100, accel_duration);
+        }
+
         if (BattleInfo.isMulti)
         {
             if (IsHost) attack.SkillActivatorClientRpc(NetworkManager.Singleton.LocalClientId, skillNo);
@@ -60,8 +56,6 @@ class NitroBoost : SkillAssist
     {
         // Stop effect.
         const float decelerate_duration = 1.5f;
-        jetAudioController.ResetJetPitch(decelerate_duration);
-        burnerController.ResetBoost(decelerate_duration);
         wind.ResetWind();
 
         if (BattleInfo.isMulti && !attack.IsOwner) return;
@@ -69,7 +63,11 @@ class NitroBoost : SkillAssist
         // Reset fighter condition.
         base.EndProccess();
         attack.fighterCondition.ResumeGradingSpeed();
-        if (cameraController != null) cameraController.ResetView(decelerate_duration);
+
+        if (attack.IsLocalPlayer)
+        {
+            CameraController.I.ResetView(decelerate_duration);
+        }
 
         // Send RPC to all clones to end this skill.
         if (BattleInfo.isMulti) attack.SkillEndProccessServerRpc(NetworkManager.Singleton.LocalClientId, skillNo);
@@ -77,14 +75,16 @@ class NitroBoost : SkillAssist
 
     public override void ForceTermination()
     {
-        jetAudioController.ResetJetPitch();
-        burnerController.ResetBoost();
         wind.ResetWind();
 
         if (BattleInfo.isMulti && !attack.IsOwner) return;
 
         base.ForceTermination();
         attack.fighterCondition.ResumeGradingSpeed();
-        if (cameraController != null) cameraController.ResetView();
+
+        if (attack.IsLocalPlayer)
+        {
+            CameraController.I.ResetView();
+        }
     }
 }

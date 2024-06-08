@@ -6,6 +6,15 @@ using NaughtyAttributes;
 [RequireComponent(typeof(Collider), typeof(Rigidbody))]
 public abstract class Weapon : Utilities
 {
+    public bool weapon_ready
+    {
+        get
+        {
+            return (!gameObject.activeSelf && !hitEffect.activeSelf);
+        }
+    }
+
+
     // 武器によって固定の要素 ///////////////////////////////////////////////////////////////////////////////////////////
     [BoxGroup("Penetrate"), SerializeField, OnValueChanged("WhenPenetrateRange")]
     bool penetrate;
@@ -18,6 +27,7 @@ public abstract class Weapon : Utilities
         }
     }
 
+
     enum AttackRange { Single, Range }
 
     [BoxGroup("AttackRange"), SerializeField, OnValueChanged("WhenPenetrateRange")]
@@ -28,27 +38,21 @@ public abstract class Weapon : Utilities
     float rangeRadius;
     enum LockonType { Zero, Random, Self }
 
+
     [BoxGroup("Homing"), SerializeField]
     LockonType lockonType;
 
 
-    [BoxGroup("BlastImpact"), SerializeField, InfoBox("Particle System - Stop Action = Disabled (Only Parent)"), InfoBox("Audio Source (Blast Sound) - Play On Awake = On")]
+    [BoxGroup("BlastImpact"), SerializeField, InfoBox("ParticleSystem/StopAction = Disabled (Only Parent)"), InfoBox("AudioSource(Blast Sound)/PlayOnAwake = On")]
     GameObject blastImpact;
 
-    [BoxGroup("Trail"), SerializeField]
-    GameObject trail;
-    Vector3 trail_startPos;
-    Quaternion trail_startRot;
 
-    [BoxGroup("HitEffect"), SerializeField, ValidateInput("HasHitEffectWhenRange", "範囲攻撃に Hit Effect は必須です")]
+    [BoxGroup("HitEffect"), SerializeField, InfoBox("AudioSource/PlayOnAwake = OFF (toggled on in Awake)"), ValidateInput("HasHitEffectWhenRange", "範囲攻撃に Hit Effect は必須です")]
     GameObject hitEffect;
     List<GameObject> hitEffects;    // penetrate用
 
     [BoxGroup("HitEffect"), SerializeField, ShowIf("HasHitEffect")]
     float hitDuration;
-
-    [BoxGroup("HitEffect"), SerializeField, ShowIf("HasHitEffect")]
-    AudioSource hitSound;
     bool HasHitEffectWhenRange(GameObject obj)
     {
         if (IsRange() && !HasHitEffect()) return false;
@@ -57,6 +61,7 @@ public abstract class Weapon : Utilities
     bool HasHitEffect() { return hitEffect != null; }
     Vector3 hit_startPos;
     Quaternion hit_startRot;
+
 
     [BoxGroup("DefaultTarget"), SerializeField]
     bool hasDefaultTarget = false;
@@ -97,14 +102,15 @@ public abstract class Weapon : Utilities
 
     // Skillからセット //////////////////////////////////////////////////////////////////////////////////////////////////
     GameObject owner;    // owner is figherbody, not Fighter
+    bool isSkill;
     string skill_name;
     System.Func<float> StayMotion = null;
     Attack attack;
-    [SerializeField] GameObject targetObject = null;
+    GameObject targetObject = null;
 
 
-    int enemy_body_layer, enemy_shield_layer;
-    LayerMask enemy_mask;    // enemy_mask = ボディ + シールド
+    int enemy_body_layer, enemy_shield_layer, enemy_terminal_layer;
+    LayerMask enemy_mask;    // enemy_mask = ボディ + シールド + ターミナル
 
     Transform parent;    // 帰る場所
 
@@ -118,7 +124,12 @@ public abstract class Weapon : Utilities
     Quaternion startRot;
 
     List<GameObject> alreadyBombed;
-    ParticleSystem parent_particle;
+
+    // Referenced from zako attack when changing team.
+    public ParticleSystem parent_particle;
+
+    Team team => attack.fighterCondition.fighterTeam.Value;
+    int fighterNo => attack.fighterCondition.fighterNo.Value;
 
 
 
@@ -130,19 +141,21 @@ public abstract class Weapon : Utilities
 
         parent = transform.parent;
 
-        if (attack.fighterCondition.fighterTeam.Value == Team.RED)
+        if (team == Team.RED)
         {
             gameObject.layer = LayerMask.NameToLayer("RedBullet");
             enemy_body_layer = LayerMask.NameToLayer("BlueBody");
             enemy_shield_layer = LayerMask.NameToLayer("BlueShield");
-            enemy_mask = (1 << 12) + (1 << 14);
+            enemy_terminal_layer = Terminal.blueLayer;
+            enemy_mask = (1 << 12) + (1 << 14) + (1 << 19) + (1 << 21);
         }
-        else if (attack.fighterCondition.fighterTeam.Value == Team.BLUE)
+        else if (team == Team.BLUE)
         {
             gameObject.layer = LayerMask.NameToLayer("BlueBullet");
             enemy_body_layer = LayerMask.NameToLayer("RedBody");
             enemy_shield_layer = LayerMask.NameToLayer("RedShield");
-            enemy_mask = (1 << 9) + (1 << 11);
+            enemy_terminal_layer = Terminal.redLayer;
+            enemy_mask = (1 << 9) + (1 << 11) + (1 << 19) + (1 << 20);
         }
         else Debug.LogError("AttackにTeamが割り当てられていません。ParticipantManagerでAttackにTeamが割り当てられているか確認してください。");
 
@@ -154,25 +167,22 @@ public abstract class Weapon : Utilities
             blastImpact.SetActive(false);
         }
 
-        if (trail != null)
-        {
-            trail_startPos = trail.transform.localPosition;
-            trail_startRot = trail.transform.localRotation;
-        }
-
         if (hitEffect != null)
         {
             hitEffect.SetActive(false);
             hit_startPos = hitEffect.transform.localPosition;
             hit_startRot = hitEffect.transform.localRotation;
+            // Set playOnAwake here, in order not to play hitSound as soon as the game starts.
+            if (hitEffect.TryGetComponent<AudioSource>(out AudioSource hitSound))
+            {
+                hitSound.playOnAwake = true;
+            }
             if (penetrate)
             {
                 hitEffects = new List<GameObject>();
                 hitEffects.Add(hitEffect);
             }
         }
-
-        parent_particle = GetComponent<ParticleSystem>();
     }
 
     protected virtual void FixedUpdate()
@@ -234,15 +244,12 @@ public abstract class Weapon : Utilities
                 }
             }
 
-            // Shieldでなかった場合
+            // ボディだった場合
             // ヒット：ボディ
             else if (hit_obj.layer == enemy_body_layer)
             {
                 // Get fighter's Receiver.
                 Receiver receiver = hit_obj.GetComponent<Receiver>();
-
-                // All weapons call this.
-                receiver.ExplosionEffectPlayer();
 
                 if (BattleInfo.isMulti)
                 {
@@ -250,8 +257,8 @@ public abstract class Weapon : Utilities
                     if (attack.IsOwner)
                     {
                         receiver.HPDownServerRpc(power_temp);
-                        receiver.LastShooterDetectorServerRpc(attack.fighterCondition.fighterNo.Value, skill_name);
-                        receiver.OnWeaponHitServerRpc(attack.fighterCondition.fighterNo.Value);
+                        receiver.LastShooterDetectorServerRpc(fighterNo, skill_name);
+                        receiver.OnWeaponHitServerRpc(fighterNo);
                         if (speedDown) receiver.SpeedDownServerRpc(speedGrade, speedDuration, speedProbability);
                         if (powerDown) receiver.PowerDownServerRpc(powerGrade, powerDuration, powerProbability);
                         if (defenceDown) receiver.DefenceDownServerRpc(defenceGrade, defenceDuration, defenceProbability);
@@ -260,11 +267,31 @@ public abstract class Weapon : Utilities
                 else
                 {
                     receiver.HPDown(power_temp);
-                    receiver.LastShooterDetector(attack.fighterCondition.fighterNo.Value, skill_name);
-                    receiver.OnWeaponHit(attack.fighterCondition.fighterNo.Value);
+                    receiver.LastShooterDetector(fighterNo, skill_name);
+                    receiver.OnWeaponHit(fighterNo);
                     if (speedDown) receiver.SpeedDown(speedGrade, speedDuration, speedProbability);
                     if (powerDown) receiver.PowerDown(powerGrade, powerDuration, powerProbability);
                     if (defenceDown) receiver.DefenceDown(defenceGrade, defenceDuration, defenceProbability);
+                }
+            }
+
+            // ターミナルだった場合
+            // ヒット：ターミナル
+            else if (hit_obj.layer == enemy_terminal_layer || hit_obj.layer == Terminal.defaultLayer)
+            {
+                // Get Terminal component.
+                Terminal terminal = hit_obj.GetComponent<Terminal>();
+
+                if (BattleInfo.isMulti)
+                {
+                    if (attack.IsOwner)
+                    {
+                        terminal.DamageServerRpc(power_temp, isSkill, fighterNo);
+                    }
+                }
+                else
+                {
+                    terminal.Damage(power_temp, isSkill, fighterNo);
                 }
             }
         }
@@ -379,7 +406,10 @@ public abstract class Weapon : Utilities
         // 弾をリジェクト ＋ 発射音、エフェクト再生
         if (lockonType == LockonType.Self) transform.parent = transform.root;
         else transform.parent = null;
-        if (blastImpact != null) blastImpact.SetActive(true);
+        if (blastImpact != null)
+        {
+            blastImpact.SetActive(true);
+        }
         if (hasDefaultTarget) default_target = speed * lifespan * owner.transform.forward;
     }
 
@@ -413,7 +443,8 @@ public abstract class Weapon : Utilities
             {
                 current_state = WeaponState.exploding;
                 OnStartExploding();
-                PlayHitEffect();
+                // Do not play hit effect when this is normal blast.
+                if (isSkill) PlayHitEffect();
             }
         }
     }
@@ -468,7 +499,7 @@ public abstract class Weapon : Utilities
                     }
                 }
 
-                // Shieldでなかった場合
+                // ボディだった場合
                 // ヒット：ボディ
                 else if (hit_obj.layer == enemy_body_layer)
                 {
@@ -480,17 +511,14 @@ public abstract class Weapon : Utilities
                         // Get fighter's Receiver.
                         Receiver receiver = hit_obj.GetComponent<Receiver>();
 
-                        // All weapons call this.
-                        receiver.ExplosionEffectPlayer();
-
                         if (BattleInfo.isMulti)
                         {
                             // Only the owner of this weapon requests to server to change parameters.
                             if (attack.IsOwner)
                             {
                                 receiver.HPDownServerRpc(power_temp);
-                                receiver.LastShooterDetectorServerRpc(attack.fighterCondition.fighterNo.Value, skill_name);
-                                receiver.OnWeaponHitServerRpc(attack.fighterCondition.fighterNo.Value);
+                                receiver.LastShooterDetectorServerRpc(fighterNo, skill_name);
+                                receiver.OnWeaponHitServerRpc(fighterNo);
                                 if (speedDown) receiver.SpeedDownServerRpc(speedGrade, speedDuration, speedProbability);
                                 if (powerDown) receiver.PowerDownServerRpc(powerGrade, powerDuration, powerProbability);
                                 if (defenceDown) receiver.DefenceDownServerRpc(defenceGrade, defenceDuration, defenceProbability);
@@ -499,11 +527,38 @@ public abstract class Weapon : Utilities
                         else
                         {
                             receiver.HPDown(power_temp);
-                            receiver.LastShooterDetector(attack.fighterCondition.fighterNo.Value, skill_name);
-                            receiver.OnWeaponHit(attack.fighterCondition.fighterNo.Value);
+                            receiver.LastShooterDetector(fighterNo, skill_name);
+                            receiver.OnWeaponHit(fighterNo);
                             if (speedDown) receiver.SpeedDown(speedGrade, speedDuration, speedProbability);
                             if (powerDown) receiver.PowerDown(powerGrade, powerDuration, powerProbability);
                             if (defenceDown) receiver.DefenceDown(defenceGrade, defenceDuration, defenceProbability);
+                        }
+                    }
+                }
+
+                // ターミナルだった場合
+                // ヒット：ターミナル
+                else if (hit_obj.layer == enemy_terminal_layer || hit_obj.layer == Terminal.defaultLayer)
+                {
+                    // まだダメージを与えていない敵だった場合
+                    if (!alreadyBombed.Contains(hit_obj))
+                    {
+                        alreadyBombed.Add(hit.gameObject);
+
+                        // Get Terminal component.
+                        Terminal terminal = hit_obj.GetComponent<Terminal>();
+
+                        if (BattleInfo.isMulti)
+                        {
+                            // Only the owner of this weapon requests to server to change parameters.
+                            if (attack.IsOwner)
+                            {
+                                terminal.DamageServerRpc(power_temp, isSkill, fighterNo);
+                            }
+                        }
+                        else
+                        {
+                            terminal.Damage(power_temp, isSkill, fighterNo);
                         }
                     }
                 }
@@ -574,10 +629,7 @@ public abstract class Weapon : Utilities
     protected virtual void PlayHitEffect()
     {
         // 親弾のエフェクトを停止
-        GetComponent<ParticleSystem>().Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-
-        // hit_soundを再生
-        if (hitSound != null) { hitSound.Play(); }
+        parent_particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 
         // hit_effect を リジェクト ＋ 再生
         hitEffect.transform.parent = null;
@@ -597,10 +649,11 @@ public abstract class Weapon : Utilities
 
     // Skillから呼ばれる ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void WeaponSetter
-    (GameObject owner, Attack attack, string skill_name, System.Func<float> StayMotion = null)
+    (GameObject owner, Attack attack, bool isSkill, string skill_name, System.Func<float> StayMotion = null)
     {
         this.owner = owner;
         this.attack = attack;
+        this.isSkill = isSkill;
         this.skill_name = skill_name;
         this.StayMotion = StayMotion;
     }
@@ -639,8 +692,8 @@ public abstract class Weapon : Utilities
 
 
 
-    /*void OnDrawGizmos()
+    void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(hitEffect.transform.position, rangeRadius);
-    }*/
+    }
 }
