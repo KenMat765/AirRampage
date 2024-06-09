@@ -16,143 +16,64 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
     public int zakoCountAll { get; private set; }
     [SerializeField] GameObject redPlayerPrefab, bluePlayerPrefab, redAiPrefab, blueAiPrefab, zakoPrefab;
 
-
-    public void FighterSetup(SpawnPointManager spawnPointManager) => StartCoroutine(fighterSetup(spawnPointManager));
-
-    IEnumerator fighterSetup(SpawnPointManager spawnPointManager)
+    public void FightersSetup(SpawnPointManager spawnPointManager) => StartCoroutine(fightersSetup(spawnPointManager));
+    IEnumerator fightersSetup(SpawnPointManager spawnPointManager)
     {
         zakoCountAll = spawnPointManager.zakoCountAll;
 
-        fighterInfos = new FighterInfo[GameInfo.max_player_count + (zakoCountAll)];
-        GameObject[] allFighters = new GameObject[GameInfo.max_player_count + (zakoCountAll)];
+        fighterInfos = new FighterInfo[GameInfo.max_player_count + zakoCountAll];
+        GameObject[] allFighters = new GameObject[GameInfo.max_player_count + zakoCountAll];
         GameObject myPlayer = null;
 
+        yield return new WaitUntil(() => IsSpawned);
 
-        // Multi Players ///////////////////////////////////////////////////////////////////////////////
-        if (BattleInfo.isMulti)
+        if (NetworkManager.Singleton.IsHost)
         {
-            if (NetworkManager.Singleton.IsHost)
-            {
-                // Generate Players and AIs.
-                SpawnAllFighters(spawnPointManager);
-                // Generate Zakos
-                SpawnAllZakos(spawnPointManager);
-            }
-
-            // Wait until spawning is finished.
-            yield return new WaitUntil(() => allSpawnComplete.Value);
-
-            // Get your own fighter.
-            myPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.gameObject;
-
-            // Get generated fighters on each client.
-            GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-            foreach (GameObject player in players)
-            {
-                int fighterNo = player.GetComponent<FighterCondition>().fighterNo.Value;
-                allFighters[fighterNo] = player;
-                if (player == myPlayer)
-                {
-                    myFighterNo = fighterNo;
-                }
-            }
-
-            GameObject[] ais = GameObject.FindGameObjectsWithTag("AI");
-            foreach (GameObject ai in ais)
-            {
-                int fighterNo = ai.GetComponent<FighterCondition>().fighterNo.Value;
-                allFighters[fighterNo] = ai;
-            }
-
-            GameObject[] zakos = GameObject.FindGameObjectsWithTag("Zako");
-            foreach (GameObject zako in zakos)
-            {
-                int fighterNo = zako.GetComponent<FighterCondition>().fighterNo.Value;
-                allFighters[fighterNo] = zako;
-            }
-        }
-
-
-        // Solo Players ////////////////////////////////////////////////////////////////////////////////
-        else
-        {
-            // Generate your fighter
-            SpawnPointFighter myPoint = spawnPointManager.GetSpawnPointFighter(0);
-            myPlayer = Instantiate(redPlayerPrefab, myPoint.transform.position, myPoint.transform.rotation);
-            allFighters[0] = myPlayer;
-            myPlayer.GetComponent<FighterCondition>().fighterNo.Value = 0;
-            myFighterNo = 0;
-
-            // Generate AIs
-            for (int no = 1; no < GameInfo.max_player_count; no++)
-            {
-                // GetTeamFromNo(int) only returns Team.RED or Team.BLUE.
-                Team team = GameInfo.GetTeamFromNo(no);
-                SpawnPointFighter point = spawnPointManager.GetSpawnPointFighter(no);
-                GameObject aiFighter;
-                if (team == Team.RED)
-                {
-                    aiFighter = Instantiate(redAiPrefab, point.transform.position, point.transform.rotation);
-                }
-                else
-                {
-                    aiFighter = Instantiate(blueAiPrefab, point.transform.position, point.transform.rotation);
-                }
-                allFighters[no] = aiFighter;
-                aiFighter.GetComponent<FighterCondition>().fighterNo.Value = no;
-            }
-
+            // Generate Players and AIs.
+            SpawnAllFighters(spawnPointManager);
             // Generate Zakos
-            int point_no = 0;
-            SpawnPointZako zako_point = spawnPointManager.GetSpawnPointZako(point_no);
-            int current_spawned = 0;
+            SpawnAllZakos(spawnPointManager);
+            // Tell every clients that spawning is finished.
+            allSpawnComplete.Value = true;
+        }
 
-            // First zako No is equal to max player count.
-            zako_point.from_inclusive.Value = GameInfo.max_player_count;
+        // Wait until spawning is finished.
+        yield return new WaitUntil(() => allSpawnComplete.Value);
 
-            for (int no = 0; no < zakoCountAll; no++)
+        // Get your own fighter.
+        myPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.gameObject;
+
+        // Get generated fighters on each client.
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        foreach (GameObject player in players)
+        {
+            int fighterNo = player.GetComponent<FighterCondition>().fighterNo.Value;
+            allFighters[fighterNo] = player;
+            if (player == myPlayer)
             {
-                int zakoNo = GameInfo.max_player_count + no;
-
-                // If spawned requested zakos, go to next spawn point.
-                if (current_spawned == zako_point.zakoCount)
-                {
-                    point_no++;
-                    zako_point = spawnPointManager.GetSpawnPointZako(point_no);
-                    current_spawned = 0;
-                    zako_point.from_inclusive.Value = zakoNo;
-                }
-
-                current_spawned++;
-
-                GameObject zako;
-                zako = Instantiate(zakoPrefab, zako_point.transform.position, zako_point.transform.rotation);
-
-                allFighters[zakoNo] = zako;
-
-                // Set fighterNo & fighterName at fighter condition.
-                ZakoCondition zako_condition = zako.GetComponent<ZakoCondition>();
-                zako_condition.fighterNo.Value = zakoNo;
-                zako_condition.fighterName.Value = "Zako";
-                // Team of zako is determined at each spawn points.
-                zako_condition.fighterTeam.Value = Team.NONE;
-                zako_condition.spawnPoint = zako_point;
-
-                // Add zako to Zako Spawn Points standbys.
-                zako_point.standbys.Add(zakoNo);
+                myFighterNo = fighterNo;
             }
         }
 
+        GameObject[] ais = GameObject.FindGameObjectsWithTag("AI");
+        foreach (GameObject ai in ais)
+        {
+            int fighterNo = ai.GetComponent<FighterCondition>().fighterNo.Value;
+            allFighters[fighterNo] = ai;
+        }
+
+        GameObject[] zakos = GameObject.FindGameObjectsWithTag("Zako");
+        foreach (GameObject zako in zakos)
+        {
+            int fighterNo = zako.GetComponent<FighterCondition>().fighterNo.Value;
+            allFighters[fighterNo] = zako;
+        }
 
         // Setup Player Camera ///////////////////////////////////////////////////////////////////////////
-        GameObject cameraRoot = myPlayer.transform.Find("CameraRoot").gameObject;
-        Camera playerCam = cameraRoot.GetComponentInChildren<Camera>();
-        cameraRoot.SetActive(true);
-        uGUIMannager.I.SetPlayerCamera(playerCam);
+        CameraController.I.fighterTrans = myPlayer.transform;
         CameraManager.SetupCameraInScene();
         GameObject cameraRadar = myPlayer.transform.Find("CameraRadar").gameObject;
         cameraRadar.SetActive(true);
-
 
         // Process for all fighters /////////////////////////////////////////////////////////////////////////
         for (int no = 0; no < GameInfo.max_player_count + zakoCountAll; no++)
@@ -176,12 +97,11 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
                 // Get battle data at fighterNo.
                 BattleInfo.ParticipantBattleData battleData = BattleInfo.battleDatas[no];
 
-                if (!BattleInfo.isMulti)
+                // Setup Abilities (do this before skill setup)
+                foreach (int abilityID in battleData.abilities)
                 {
-                    // Setup fighterCondition by battle data.
-                    fighterCondition.fighterNo.Value = battleData.fighterNo;
-                    fighterCondition.fighterName.Value = battleData.name;
-                    fighterCondition.fighterTeam.Value = battleData.team;
+                    Ability ability = AbilityDatabase.I.GetAbilityById(abilityID);
+                    ability.Introducer(fighterCondition);
                 }
 
                 // Setup Skills
@@ -209,11 +129,6 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
             // Set fighter name to fighterNo for easier reference to fighterNo.
             fighter.name = no.ToString();
 
-
-
-            // 
-            // 
-            // 
             // For AI Debug.
             // if (no == 3)
             // {
@@ -266,15 +181,15 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
                     fighter = Instantiate(bluePlayerPrefab, point.transform.position, point.transform.rotation);
                 }
 
-                // Set fighterNo & fighterName at fighter condition.
+                // Spawn fighter.
+                NetworkObject networkObject = fighter.GetComponent<NetworkObject>();
+                networkObject.SpawnAsPlayerObject(clientId, true);
+
+                // Set fighterNo & fighterName at fighter condition. (Initialize NetworkVariables AFTER spawning)
                 FighterCondition fighterCondition = fighter.GetComponent<FighterCondition>();
                 fighterCondition.fighterNo.Value = battleData.fighterNo;
                 fighterCondition.fighterName.Value = battleData.name;
                 fighterCondition.fighterTeam.Value = battleData.team;
-
-                // Spawn fighter.
-                NetworkObject networkObject = fighter.GetComponent<NetworkObject>();
-                networkObject.SpawnAsPlayerObject(clientId);
             }
 
 
@@ -293,15 +208,15 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
                     fighter = Instantiate(blueAiPrefab, point.transform.position, point.transform.rotation);
                 }
 
+                // Spawn fighter.
+                NetworkObject networkObject = fighter.GetComponent<NetworkObject>();
+                networkObject.Spawn(true);
+
                 // Set fighterNo at fighter & team condition.
                 FighterCondition fighterCondition = fighter.GetComponent<FighterCondition>();
                 fighterCondition.fighterNo.Value = battleData.fighterNo;
                 fighterCondition.fighterName.Value = battleData.name;
                 fighterCondition.fighterTeam.Value = battleData.team;
-
-                // Spawn fighter.
-                NetworkObject networkObject = fighter.GetComponent<NetworkObject>();
-                networkObject.Spawn();
             }
         }
     }
@@ -310,92 +225,141 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
     // Only the host calls this method.
     void SpawnAllZakos(SpawnPointManager spawnPointManager)
     {
-        int point_no = 0;
-        SpawnPointZako zako_point = spawnPointManager.GetSpawnPointZako(point_no);
-        int current_spawned = 0;
-
-        // First zako No is equal to max player count.
-        zako_point.from_inclusive.Value = GameInfo.max_player_count;
-
         for (int k = 0; k < spawnPointManager.zakoCountAll; k++)
         {
             int zakoNo = GameInfo.max_player_count + k;
 
-            // If spawned requested zakos, go to next spawn point.
-            if (current_spawned == zako_point.zakoCount)
-            {
-                point_no++;
-                zako_point = spawnPointManager.GetSpawnPointZako(point_no);
-                current_spawned = 0;
-                zako_point.from_inclusive.Value = zakoNo;
-            }
-
-            current_spawned++;
-
             // Create fighter.
             GameObject zako;
-            zako = Instantiate(zakoPrefab, zako_point.transform.position, zako_point.transform.rotation);
-
-            // Set fighterNo & fighterName at fighter condition.
-            ZakoCondition zako_condition = zako.GetComponent<ZakoCondition>();
-            zako_condition.fighterNo.Value = zakoNo;
-            zako_condition.fighterName.Value = "Zako";
-            // Team of zako is determined at each spawn points.
-            zako_condition.fighterTeam.Value = Team.NONE;
-            zako_condition.spawnPoint = zako_point;
+            zako = Instantiate(zakoPrefab);
 
             // Spawn fighter.
             NetworkObject zako_net = zako.GetComponent<NetworkObject>();
-            zako_net.Spawn();
+            zako_net.Spawn(true);
 
-            // Add zako to Zako Spawn Points standbys.
-            zako_point.standbys.Add(zakoNo);
+            // Set fighterNo & fighterName at fighter condition. (Initialize NetworkVariables AFTER spawning)
+            ZakoCondition zako_condition = zako.GetComponent<ZakoCondition>();
+            zako_condition.fighterNo.Value = zakoNo;
+            zako_condition.fighterName.Value = "Zako";
+            zako_condition.fighterTeam.Value = Team.NONE;
+
+            // Add zako to standbys of ZakoCentralManager.
+            ZakoCentralManager.I.standbyZakoNos.Add(zakoNo);
         }
-
-        // Zakos are spawned after players and AIs.
-        // Therefore, set allSpawnComplete true, after you spawned Zakos.
-        allSpawnComplete.Value = true;
     }
 
 
-    // Activate (or unactivate) all fighters.
-    public void AllFightersActivationHandler(bool activate)
+
+    /// <summary> Enable (or unable) controll of multiple fighters. </summary>
+    /// <param name="target"> 0:players, 1:zakos, else:all </param>
+    public void FightersActivationHandler(int target, bool activate)
     {
-        foreach (FighterInfo info in fighterInfos)
+        switch (target)
         {
-            info.fighterCondition.enabled = activate;
-            info.movement.enabled = activate;
-            info.attack.enabled = activate;
-            info.receiver.enabled = activate;
+            case 0:
+                for (int no = 0; no < GameInfo.max_player_count; no++) FighterActivationHandler(no, activate);
+                break;
+            case 1:
+                for (int no = GameInfo.max_player_count; no < fighterInfos.Length; no++) FighterActivationHandler(no, activate);
+                break;
+            default:
+                for (int no = 0; no < fighterInfos.Length; no++) FighterActivationHandler(no, activate);
+                break;
         }
     }
 
-    // Activate (or unactivate) fighters except zakos.
-    public void FightersActivationHandler(bool activate)
-    {
-        for (int id = 0; id < GameInfo.max_player_count; id++)
-        {
-            FighterActivationHandler(id, activate);
-        }
-    }
+    [ClientRpc] public void FightersActivationHandlerClientRpc(int target, bool activate) => FightersActivationHandler(target, activate);
 
-    // Activate (or unactivate) zakos.
-    public void ZakosActivationHandler(bool activate)
-    {
-        for (int id = GameInfo.max_player_count; id < GameInfo.max_player_count + zakoCountAll; id++)
-        {
-            FighterActivationHandler(id, activate);
-        }
-    }
 
-    // Activate (or unactivate) fighter by id.
-    public void FighterActivationHandler(int id, bool activate)
+    /// <summary> Activate (or unactivate) single fighter. </summary>
+    public void FighterActivationHandler(int no, bool activate)
     {
-        FighterInfo info = fighterInfos[id];
+        FighterInfo info = fighterInfos[no];
+        info.body.SetActive(activate);
         info.fighterCondition.enabled = activate;
         info.movement.enabled = activate;
         info.attack.enabled = activate;
         info.receiver.enabled = activate;
+        info.fighterCondition.radarIcon.Visualize(activate);
+    }
+
+    [ClientRpc] public void FighterActivationHandlerClientRpc(int no, bool activate) => FighterActivationHandler(no, activate);
+
+
+
+    /// <summary> Enable (or unable) controll of multiple fighters. </summary>
+    /// <param name="target"> 0:players, 1:zakos, else:all </param>
+    public void FightersControllHandler(int target, bool controllable)
+    {
+        switch (target)
+        {
+            case 0:
+                for (int no = 0; no < GameInfo.max_player_count; no++) FighterControllHandler(no, controllable);
+                break;
+            case 1:
+                for (int no = GameInfo.max_player_count; no < fighterInfos.Length; no++) FighterControllHandler(no, controllable);
+                break;
+            default:
+                for (int no = 0; no < fighterInfos.Length; no++) FighterControllHandler(no, controllable);
+                break;
+        }
+    }
+
+    /// <summary>Enable (or unable) controll of single fighter.</summary>
+    public void FighterControllHandler(int no, bool controllable) => fighterInfos[no].movement.Controllable(controllable);
+
+    [ClientRpc] public void FighterControllHandlerClientRpc(int no, bool controllable) => FighterControllHandler(no, controllable);
+
+
+
+    /// <summary> Enable (or unable) attack of multiple fighters. </summary>
+    /// <param name="target"> 0:players, 1:zakos, else:all </param>
+    public void FightersAttackHandler(int target, bool controllable)
+    {
+        switch (target)
+        {
+            case 0:
+                for (int no = 0; no < GameInfo.max_player_count; no++) FighterAttackHandler(no, controllable);
+                break;
+            case 1:
+                for (int no = GameInfo.max_player_count; no < fighterInfos.Length; no++) FighterAttackHandler(no, controllable);
+                break;
+            default:
+                for (int no = 0; no < fighterInfos.Length; no++) FighterAttackHandler(no, controllable);
+                break;
+        }
+    }
+
+    /// <summary>Enable (or unable) attack of single fighter.</summary>
+    public void FighterAttackHandler(int no, bool attackable) => fighterInfos[no].attack.attackable = attackable;
+
+    [ClientRpc] public void FighterAttackHandlerClientRpc(int no, bool attackable) => FighterAttackHandler(no, attackable);
+
+
+
+    /// <summary>Enable (or unable) attacks and damages of multiple fighters</summary>
+    /// <param name="target"> 0:players, 1:zakos, else:all </param>
+    public void FightersAcceptDamageHandler(int target, bool accept)
+    {
+        switch (target)
+        {
+            case 0:
+                for (int no = 0; no < GameInfo.max_player_count; no++) FighterAcceptDamageHandler(no, accept);
+                break;
+            case 1:
+                for (int no = GameInfo.max_player_count; no < fighterInfos.Length; no++) FighterAcceptDamageHandler(no, accept);
+                break;
+            default:
+                for (int no = 0; no < fighterInfos.Length; no++) FighterAcceptDamageHandler(no, accept);
+                break;
+        }
+    }
+
+    ///<summary>Enable (or unable) attacks and damages of single fighter</summary>
+    public void FighterAcceptDamageHandler(int no, bool accept)
+    {
+        Receiver receiver = fighterInfos[no].receiver;
+        receiver.acceptDamage = accept;
     }
 }
 

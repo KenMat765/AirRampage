@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
-public class SkySystem : Utilities
+public class SkySystem : MonoBehaviour
 {
     public bool flyFighter = true;
     Material sky_material;

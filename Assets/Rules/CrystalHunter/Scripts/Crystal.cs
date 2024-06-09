@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using NaughtyAttributes;
 using System.Linq;
-using Unity.VisualScripting;
 
 public class Crystal : MonoBehaviour
 {
