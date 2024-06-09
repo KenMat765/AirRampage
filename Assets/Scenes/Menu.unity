@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 1164104880}
-  m_IndirectSpecularColor: {r: 0.0039370656, g: 0.019576563, b: 0.08354334, a: 1}
+  m_IndirectSpecularColor: {r: 0.003842679, g: 0.019108271, b: 0.08175958, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -23060,7 +23060,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.39215687, b: 1, a: 1}
+  m_Color: {r: 0, g: 0.8784314, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -23792,7 +23792,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.6133089, g: 1, b: 0, a: 1}
+  m_Color: {r: 0, g: 0.8784314, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
