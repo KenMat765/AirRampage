@@ -170,7 +170,7 @@ public class SkillFactoryManager : MonoBehaviour
         }
         else // Newly unlocked
         {
-            resultTitleText.text = "new skill unlocked";
+            resultTitleText.text = "unlocked";
         }
         skillNameText.text = skillData.GetName();
         skillIcon.sprite = skillData.GetSprite();

@@ -116,7 +116,7 @@ public class PlayerInfo
     // スキルの数だけ手動で追加する必要がある
     public bool[] skl_unlock =
     {
-        true, true, true, true, true, true,
+        false, false, false, false, false, false,
         true, true, true, true, true, true,
         true
     };
@@ -148,9 +148,9 @@ public class PlayerInfo
 
     public bool[] abi_unlock =
     {
-        true, true, true, true, true, true,
-        true, true, true, true, true, true,
-        true, true, true, true, true, true,
+        false, false, false, false, false, false,
+        false, false, false, false, false, false,
+        false, false, false, false, false, false,
         true, true, true, true, true, true,
         true, true, true, true, true, true,
         true, true, true, true, true, true,
