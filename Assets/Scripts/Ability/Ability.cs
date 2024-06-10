@@ -4,8 +4,26 @@ using UnityEngine;
 
 public abstract class Ability : MonoBehaviour
 {
-    public abstract string Name { get; protected set; }
-    public abstract int Weight { get; protected set; }
-    public abstract string Explanation { get; protected set; }
+    [SerializeField] protected string abilityName;
+    public string Name
+    {
+        get { return abilityName; }
+        set { abilityName = value; }
+    }
+
+    [SerializeField] protected int abilityWeight;
+    public int Weight
+    {
+        get { return abilityWeight; }
+        set { abilityWeight = value; }
+    }
+
+    [SerializeField] protected string abilityExplanation;
+    public string Explanation
+    {
+        get { return abilityExplanation; }
+        set { abilityExplanation = value; }
+    }
+
     public abstract void Introducer(FighterCondition condition);
 }
