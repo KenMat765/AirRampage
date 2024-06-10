@@ -20,4 +20,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/OnlineLobby.unity
     guid: a9c7d5884818342be8fa48a4558351e0
+  - enabled: 1
+    path: Assets/Scenes/AbilityFactory.unity
+    guid: 6fd84b5eb367a4abb8ceeffb21987464
+  - enabled: 1
+    path: Assets/Scenes/SkillFactory.unity
+    guid: d2f3b8f0ee59544acabaaeb284448c53
   m_configObjects: {}

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6308391744543566907}
   - component: {fileID: 6308391744543566906}
   m_Layer: 0
-  m_Name: Lightning_Yellow
+  m_Name: Lightning
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -55,7 +55,7 @@ ParticleSystemRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: aa2ad9478a94c7744bf78948a91e3422, type: 2}
-  - {fileID: 2100000, guid: f03e5cf7b67022c42a5d04577eb2b82b, type: 2}
+  - {fileID: 2100000, guid: 1df3cabed42a09e40826cb1972bee8e5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

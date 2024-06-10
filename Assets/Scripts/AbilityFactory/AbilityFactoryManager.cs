@@ -159,7 +159,8 @@ public class AbilityFactoryManager : MonoBehaviour
         }
         else // Newly unlocked
         {
-            resultTitleText.text = "new ability" + Environment.NewLine + "unlocked";
+            // resultTitleText.text = "new ability" + Environment.NewLine + "unlocked";
+            resultTitleText.text = "unlocked";
         }
         abilityNameText.text = abilityData.Name;
         weightText.text = abilityData.Weight.ToString();
