@@ -199,7 +199,7 @@ public class SkillDeckList : MonoBehaviour
             {
                 equip_btn.interactable = false;
                 coin_obj.SetActive(false);
-                explain_text.text = "Maximum Level Reached";
+                explain_text.text = "Upgrade Complete";
             }
         }
         for (int k = 0; k < 4; k++)

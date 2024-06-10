@@ -15,10 +15,15 @@ MonoBehaviour:
   skillName: Shield
   skillNameJp: "\u30B7\u30FC\u30EB\u30C9"
   skillId: 4
-  skillSprite: {fileID: 21300000, guid: 8e7ed6e076a994568971bcd897981df1, type: 3}
+  skillType: 2
   skillColor: {r: 0, g: 0.14901961, b: 1, a: 1}
+  skillSprite: {fileID: 21300000, guid: 8e7ed6e076a994568971bcd897981df1, type: 3}
   skillPrefabRed: {fileID: 6469998242396099355, guid: 7e53204cc37b8437482961a31c105e1c, type: 3}
   skillPrefabBlue: {fileID: 4937875629945146425, guid: 827c2986ce509c241ab3879f2ac97a3c, type: 3}
   skillScript: {fileID: 1273100762769375016, guid: 67564f1642fc147beaa8e93bbd59d522, type: 3}
   skillInformation: 
-  skillType: 2
+  skillFeatures:
+  - 
+  - 
+  - 
+  - 

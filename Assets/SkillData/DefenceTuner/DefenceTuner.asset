@@ -22,3 +22,8 @@ MonoBehaviour:
   skillPrefabBlue: {fileID: 3683190215569967417, guid: 8ee692a4f4345470297601d9570cfd26, type: 3}
   skillScript: {fileID: 5502061410376814275, guid: b4396e512004b47c0bba3c5ea72e6b6d, type: 3}
   skillInformation: 
+  skillFeatures:
+  - 
+  - 
+  - 
+  - 

@@ -21,6 +21,11 @@ MonoBehaviour:
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
+    <EnhanceDetails>k__BackingField:
+    - 
+    - 
+    - 
+    - 
     Power: 5
     Speed: 15
     Lifespan: 8
@@ -45,6 +50,11 @@ MonoBehaviour:
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
+    <EnhanceDetails>k__BackingField:
+    - 
+    - 
+    - 
+    - 
     Power: 5
     Speed: 15
     Lifespan: 8
@@ -69,6 +79,11 @@ MonoBehaviour:
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
+    <EnhanceDetails>k__BackingField:
+    - 
+    - 
+    - 
+    - 
     Power: 10
     Speed: 15
     Lifespan: 12
@@ -93,6 +108,11 @@ MonoBehaviour:
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
+    <EnhanceDetails>k__BackingField:
+    - 
+    - 
+    - 
+    - 
     Power: 10
     Speed: 15
     Lifespan: 12
@@ -117,6 +137,11 @@ MonoBehaviour:
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
+    <EnhanceDetails>k__BackingField:
+    - 
+    - 
+    - 
+    - 
     Power: 15
     Speed: 15
     Lifespan: 15
@@ -141,36 +166,42 @@ MonoBehaviour:
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
+    <EnhanceDetails>k__BackingField: []
     RepairAmount: 0
   healLevelData2:
     <ChargeTime>k__BackingField: 0
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
+    <EnhanceDetails>k__BackingField: []
     RepairAmount: 0
   healLevelData3:
     <ChargeTime>k__BackingField: 0
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
+    <EnhanceDetails>k__BackingField: []
     RepairAmount: 0
   healLevelData4:
     <ChargeTime>k__BackingField: 0
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
+    <EnhanceDetails>k__BackingField: []
     RepairAmount: 0
   healLevelData5:
     <ChargeTime>k__BackingField: 0
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
+    <EnhanceDetails>k__BackingField: []
     RepairAmount: 0
   assistLevelData1:
     <ChargeTime>k__BackingField: 0
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
+    <EnhanceDetails>k__BackingField: []
     SpeedGrade: 0
     PowerGrade: 0
     DefenceGrade: 0
@@ -182,6 +213,7 @@ MonoBehaviour:
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
+    <EnhanceDetails>k__BackingField: []
     SpeedGrade: 0
     PowerGrade: 0
     DefenceGrade: 0
@@ -193,6 +225,7 @@ MonoBehaviour:
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
+    <EnhanceDetails>k__BackingField: []
     SpeedGrade: 0
     PowerGrade: 0
     DefenceGrade: 0
@@ -204,6 +237,7 @@ MonoBehaviour:
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
+    <EnhanceDetails>k__BackingField: []
     SpeedGrade: 0
     PowerGrade: 0
     DefenceGrade: 0
@@ -215,6 +249,7 @@ MonoBehaviour:
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
+    <EnhanceDetails>k__BackingField: []
     SpeedGrade: 0
     PowerGrade: 0
     DefenceGrade: 0
@@ -226,6 +261,7 @@ MonoBehaviour:
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
+    <EnhanceDetails>k__BackingField: []
     Speed: 0
     Lifespan: 0
     WeaponCount: 0
@@ -249,6 +285,7 @@ MonoBehaviour:
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
+    <EnhanceDetails>k__BackingField: []
     Speed: 0
     Lifespan: 0
     WeaponCount: 0
@@ -272,6 +309,7 @@ MonoBehaviour:
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
+    <EnhanceDetails>k__BackingField: []
     Speed: 0
     Lifespan: 0
     WeaponCount: 0
@@ -295,6 +333,7 @@ MonoBehaviour:
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
+    <EnhanceDetails>k__BackingField: []
     Speed: 0
     Lifespan: 0
     WeaponCount: 0
@@ -318,6 +357,7 @@ MonoBehaviour:
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
+    <EnhanceDetails>k__BackingField: []
     Speed: 0
     Lifespan: 0
     WeaponCount: 0
