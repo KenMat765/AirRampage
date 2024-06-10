@@ -15,10 +15,15 @@ MonoBehaviour:
   skillName: SpeedTuner
   skillNameJp: "\u30B9\u30D4\u30FC\u30C9\u30C1\u30E5\u30FC\u30CA"
   skillId: 9
-  skillSprite: {fileID: 21300000, guid: 7c3fc561b958c4ca6ac8408f2c6d431e, type: 3}
+  skillType: 2
   skillColor: {r: 0, g: 0.14901961, b: 1, a: 1}
+  skillSprite: {fileID: 21300000, guid: 7c3fc561b958c4ca6ac8408f2c6d431e, type: 3}
   skillPrefabRed: {fileID: 7144759960244023167, guid: c3aa76d0e7c5d4deb95d51c868fcb3c9, type: 3}
   skillPrefabBlue: {fileID: 7144759960244023167, guid: c3aa76d0e7c5d4deb95d51c868fcb3c9, type: 3}
   skillScript: {fileID: -2445841009788449415, guid: a824ef5c54f19460080dfe5b498fa6e3, type: 3}
   skillInformation: 
-  skillType: 2
+  skillFeatures:
+  - 
+  - 
+  - 
+  - 

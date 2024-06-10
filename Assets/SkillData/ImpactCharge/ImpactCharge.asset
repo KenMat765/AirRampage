@@ -17,8 +17,13 @@ MonoBehaviour:
   skillId: 0
   skillType: 0
   skillColor: {r: 1, g: 0, b: 0, a: 1}
-  skillSprite: {fileID: 21300000, guid: 0166e88ec3d57460abf60b2db527f5b8, type: 3}
+  skillSprite: {fileID: 21300000, guid: e2793b4b2c2ef4a14b0723f6a9543286, type: 3}
   skillPrefabRed: {fileID: 7898366259939944697, guid: bf0ba32f3afd9db4abc7299b8b60f6bf, type: 3}
   skillPrefabBlue: {fileID: 2642933353904130311, guid: 2f92ab78c1b264f8cb76787c3436d735, type: 3}
   skillScript: {fileID: -3083893537962140918, guid: f96a4e7794a95d54aae788b1a6f323a7, type: 3}
-  skillInformation: 
+  skillInformation: Information of Skill
+  skillFeatures:
+  - feature1
+  - feature2
+  - feature3
+  - feature4

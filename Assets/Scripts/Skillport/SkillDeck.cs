@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using TMPro;
 
 public class SkillDeck : Utilities
 {
@@ -13,7 +14,7 @@ public class SkillDeck : Utilities
 
     Image[] lines = new Image[GameInfo.max_skill_count];
     Image[] line2s = new Image[GameInfo.max_skill_count];
-    Text[] skill_names = new Text[GameInfo.max_skill_count];
+    TextMeshProUGUI[] skill_names = new TextMeshProUGUI[GameInfo.max_skill_count];
     Text[] change_texts = new Text[GameInfo.max_skill_count];
     Image[] change_btn_imgs = new Image[GameInfo.max_skill_count];
     Text[] remove_texts = new Text[GameInfo.max_skill_count];
@@ -39,7 +40,7 @@ public class SkillDeck : Utilities
             lines[k] = icon_imgs[k].transform.Find("Line").GetComponent<Image>();
             line2s[k] = icon_imgs[k].transform.Find("Line2").GetComponent<Image>();
 
-            skill_names[k] = lines[k].transform.Find("SkillName").GetComponent<Text>();
+            skill_names[k] = lines[k].transform.Find("SkillName").GetComponent<TextMeshProUGUI>();
 
             change_btn_imgs[k] = lines[k].transform.Find("Change_Btn").GetComponent<Image>();
             change_texts[k] = change_btn_imgs[k].transform.Find("Change").GetComponent<Text>();
@@ -243,7 +244,7 @@ public class SkillDeck : Utilities
                     icon_imgs[k].color = data.GetColor();
                     skill_imgs[k].sprite = data.GetSprite();
                     skill_imgs[k].color = new Color(1, 1, 1, 0.45f);
-                    skill_names[k].text = data.GetNameJp();
+                    skill_names[k].text = data.GetName();
                 }
             }
         }

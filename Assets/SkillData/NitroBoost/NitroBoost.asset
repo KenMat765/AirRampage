@@ -15,10 +15,15 @@ MonoBehaviour:
   skillName: NitroBoost
   skillNameJp: "\u30CB\u30C8\u30ED\u30D6\u30FC\u30B9\u30C8"
   skillId: 1
-  skillSprite: {fileID: 21300000, guid: 7d44a6fc91f4b284eb46b4839702bb32, type: 3}
+  skillType: 2
   skillColor: {r: 0, g: 0.14755607, b: 1, a: 1}
+  skillSprite: {fileID: 21300000, guid: 7d44a6fc91f4b284eb46b4839702bb32, type: 3}
   skillPrefabRed: {fileID: 3566236888971852006, guid: b6ac5285046900941950c32b760fd9bf, type: 3}
   skillPrefabBlue: {fileID: 3566236888971852006, guid: b6ac5285046900941950c32b760fd9bf, type: 3}
   skillScript: {fileID: 1660418534946592127, guid: 9b1b2a2aea99db1479317691fac1ff60, type: 3}
   skillInformation: 
-  skillType: 2
+  skillFeatures:
+  - 
+  - 
+  - 
+  - 
