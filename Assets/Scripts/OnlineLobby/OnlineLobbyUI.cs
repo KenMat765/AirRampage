@@ -305,6 +305,7 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
                 sequence.Join(lobbyCodeObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => lobbyCodeObj.SetActive(false)));
                 sequence.Join(teamObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => teamObj.SetActive(false)));
                 sequence.Join(ruleObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => ruleObj.SetActive(false)));
+                sequence.Join(participantObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => participantObj.SetActive(false)));
                 sequence.Join(publicPrivateObj.transform.DOScaleX(0, 0));
                 sequence.AppendInterval(tweenInterval);
                 sequence.Append(publicPrivateObj.transform.DOScaleX(1, tweenDuration).OnComplete(() => returnButton.interactable = true));
@@ -433,6 +434,8 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
             // All Participants
             case Page.RULE:
                 #region Rule
+                // Enable skill deck changing.
+                LobbyLinkedData.I.acceptDataChange = true;
                 sequence.AppendCallback(() => { ruleObj.SetActive(true); });
                 sequence.Join(teamObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => teamObj.SetActive(false)));
                 sequence.Join(participantObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => participantObj.SetActive(false)));
@@ -457,8 +460,6 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
             // All Participants
             case Page.PARTICIPANT:
                 #region Participant
-                // Enable skill deck changing.
-                LobbyLinkedData.I.acceptDataChange = true;
                 sequence.AppendCallback(() => { participantObj.SetActive(true); });
                 sequence.Join(teamObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => teamObj.SetActive(false)));
                 sequence.Join(ruleObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => ruleObj.SetActive(false)));
