@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using DG.Tweening;
+using Cysharp.Threading.Tasks;
 
 public class SortieLobbyManager : NetworkSingleton<SortieLobbyManager>
 {
@@ -51,6 +52,10 @@ public class SortieLobbyManager : NetworkSingleton<SortieLobbyManager>
         // Determine participants.
         LobbyLinkedData.I.DetermineParticipants();
 
+        // Wait for few seconds for LobbyLinkedData to synchronize.
+        int wait_milisec = 2000;
+        await UniTask.Delay(wait_milisec);
+
         // Callback called on every participants.
         OnParticipantDeterminedClientRpc();
     }
@@ -63,7 +68,14 @@ public class SortieLobbyManager : NetworkSingleton<SortieLobbyManager>
         myData = (LobbyParticipantData)LobbyLinkedData.I.GetParticipantDataByClientId(client_id);
 
         // Change the page of OnlineLobbyUI.
-        OnlineLobbyUI.I.SetPage(OnlineLobbyUI.Page.RULE);
+        if (IsHost)
+        {
+            OnlineLobbyUI.I.SetPage(OnlineLobbyUI.Page.RULE);
+        }
+        else
+        {
+            OnlineLobbyUI.I.SetPage(OnlineLobbyUI.Page.PARTICIPANT);
+        }
 
         // Prepare all fighters.
         Team myTeam = myData.team;

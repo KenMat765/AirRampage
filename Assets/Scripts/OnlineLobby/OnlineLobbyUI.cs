@@ -227,7 +227,6 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
 
                 case Page.PARTICIPANT:
                     RefreshAllParticipantsSkill();
-                    RefreshAllParticipantsNames();
                     break;
             }
         });
@@ -461,6 +460,7 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
                 // Enable skill deck changing.
                 LobbyLinkedData.I.acceptDataChange = true;
                 sequence.AppendCallback(() => { participantObj.SetActive(true); });
+                sequence.Join(teamObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => teamObj.SetActive(false)));
                 sequence.Join(ruleObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => ruleObj.SetActive(false)));
                 sequence.Join(participantObj.transform.DOScaleX(0, 0));
                 sequence.AppendInterval(tweenInterval);
@@ -920,6 +920,7 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
     // Automaticaly called when participant data changed. (Called on every participants)
     void RefreshAllParticipantsNames()
     {
+        int myNumber = SortieLobbyManager.I.myData.number;
         Team myTeam = SortieLobbyManager.I.myData.team;
         for (int blockNo = 0; blockNo < GameInfo.team_member_count; blockNo++)
         {
@@ -939,8 +940,9 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
                 LobbyParticipantData lobby_data = (LobbyParticipantData)nullable_data;
                 NameUISetter(blockNo, lobby_data.name.Value);
 
+                Debug.Log($"MyNo:{myNumber} BlockNo:{lobby_data.number}");
+
                 // My block Id
-                int myNumber = SortieLobbyManager.I.myData.number;
                 if (lobby_data.number == myNumber)
                 {
                     if (!arrows[blockNo].activeSelf)

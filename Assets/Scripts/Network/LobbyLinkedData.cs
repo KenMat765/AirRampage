@@ -22,6 +22,7 @@ public class LobbyLinkedData : NetworkSingleton<LobbyLinkedData>
     /// </summary>
     public NetworkList<LobbyParticipantData> participantDatas; // !! DO NOT initialize NetworkList here, otherwise memory leak occurs on build !!
     public int participantCount { get { return participantDatas.Count; } }
+    public bool participantDetermined { get; set; } = false;
 
     public override void OnNetworkSpawn()
     {
@@ -225,6 +226,9 @@ public class LobbyLinkedData : NetworkSingleton<LobbyLinkedData>
             LobbyParticipantData ai_lobby_data = AiUtilities.GenerateAILobbyData(number, ai_member_num, ai_names[number], ai_team);
             participantDatas.Add(ai_lobby_data);
         }
+
+        // Set participantsDetermined to true.
+        participantDetermined = true;
     }
 }
 

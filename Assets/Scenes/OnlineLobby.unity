@@ -16697,7 +16697,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Change Skill Deck
+  m_text: Ready for Battle
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0c4dedfa293ef424d869cfda410bb63e, type: 2}
   m_sharedMaterial: {fileID: -8354251792819549299, guid: 0c4dedfa293ef424d869cfda410bb63e, type: 2}
