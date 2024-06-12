@@ -90,31 +90,31 @@ public class FadeCanvas : Singleton<FadeCanvas>
 
     public float StartBlink()
     {
-        const float start_duration = 0.2f;
-        const float start_alpha = 0.5f;
-        const float end_alpha = 0.7f;
-        const float loop_interval = 0.5f;
+        // const float start_duration = 0.2f;
+        // const float start_alpha = 0.5f;
+        // const float end_alpha = 0.7f;
+        // const float loop_interval = 0.5f;
 
-        blink_seq = DOTween.Sequence();
-        blink_seq.Join(logo.DOFade(end_alpha, loop_interval));
-        blink_seq.Join(nowLoading.DOFade(end_alpha, loop_interval));
-        blink_seq.SetLoops(-1, LoopType.Yoyo);
+        // blink_seq = DOTween.Sequence();
+        // blink_seq.Join(logo.DOFade(end_alpha, loop_interval));
+        // blink_seq.Join(nowLoading.DOFade(end_alpha, loop_interval));
+        // blink_seq.SetLoops(-1, LoopType.Yoyo);
 
-        start_seq = DOTween.Sequence();
-        start_seq.Join(logo.DOFade(start_alpha, start_duration));
-        start_seq.Join(nowLoading.DOFade(start_alpha, start_duration));
+        // start_seq = DOTween.Sequence();
+        // start_seq.Join(logo.DOFade(start_alpha, start_duration));
+        // start_seq.Join(nowLoading.DOFade(start_alpha, start_duration));
 
-        start_seq.Play()
-            .OnComplete(() => blink_seq.Play());
+        // start_seq.Play()
+        //     .OnComplete(() => blink_seq.Play());
 
         return blinkDuration;
     }
 
     public void StopBlink()
     {
-        if (blink_seq.IsActive() && blink_seq.IsPlaying()) blink_seq.Kill();
-        logo.color = new Color(1, 1, 1, 0);
-        nowLoading.color = new Color(1, 1, 1, 0);
+        // if (blink_seq.IsActive() && blink_seq.IsPlaying()) blink_seq.Kill();
+        // logo.color = new Color(1, 1, 1, 0);
+        // nowLoading.color = new Color(1, 1, 1, 0);
     }
 }
 
