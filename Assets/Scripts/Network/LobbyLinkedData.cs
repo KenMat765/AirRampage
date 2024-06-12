@@ -17,28 +17,6 @@ public class LobbyLinkedData : NetworkSingleton<LobbyLinkedData>
         participantDatas = new NetworkList<LobbyParticipantData>();
     }
 
-    // For Debug.
-    [SerializeField] bool is_null;
-    [SerializeField] int participant_count;
-    [SerializeField] bool[] is_readys = new bool[8];
-    void Update()
-    {
-        is_null = participantDatas == null;
-        participant_count = participantCount;
-        for (int k = 0; k < 8; k++)
-        {
-            if (k < participantCount)
-            {
-                is_readys[k] = participantDatas[k].isReady;
-            }
-            else
-            {
-                is_readys[k] = false;
-            }
-        }
-    }
-    // For Debug.
-
     /// <summary>
     /// !! Index is NOT equal to fighter number !!
     /// </summary>
@@ -142,6 +120,10 @@ public class LobbyLinkedData : NetworkSingleton<LobbyLinkedData>
 
     public bool IsEveryoneReady()
     {
+        if (participantDatas.Count == 0)
+        {
+            return false;
+        }
         foreach (LobbyParticipantData data in participantDatas)
         {
             if (!data.isReady) return false;
@@ -193,7 +175,7 @@ public class LobbyLinkedData : NetworkSingleton<LobbyLinkedData>
         return true;
     }
 
-    /// <summary>Determines participants number, member_number (Host only method)</summary>
+    /// <summary>Determines participants number & member_number, and generate AIs for absence. (Host only method)</summary>
     public void DetermineParticipants()
     {
         if (!IsHost)
@@ -202,7 +184,7 @@ public class LobbyLinkedData : NetworkSingleton<LobbyLinkedData>
             return;
         }
 
-        // Determine players.
+        // Determine players' number & member number.
         int member_number_red = 0;
         int member_number_blue = 0;
         for (int number = 0; number < participantCount; number++)

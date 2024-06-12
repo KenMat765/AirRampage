@@ -8,35 +8,19 @@ public class SortieLobbyManager : NetworkSingleton<SortieLobbyManager>
 {
     protected override bool dont_destroy_on_load { get; set; } = false;
 
-
     // Skill deck number selected.
-    public static int myDeckNum = 0;
+    public int myDeckNum { get; set; } = 0;
 
-
-    // === CONSTANT LobbyParticipantData properties === //
-    public static int myNumber = 0;         // my number is 0 when solo
-    public static int myMemberNumber = 0;   // my member number is 0 when solo
-    public static string myName { get { return PlayerInfo.I.myName; } }
-    public static ulong myClientId;
-    public static Team myTeam = Team.RED;   // my team is RED when solo
-    public static string myAbilityCode;
-    public static void Init()
-    {
-        myClientId = NetworkManager.Singleton.LocalClientId;
-        LobbyParticipantData myData = (LobbyParticipantData)LobbyLinkedData.I.GetParticipantDataByClientId(myClientId);
-        myNumber = myData.number;
-        myMemberNumber = myData.memberNo;
-        myTeam = myData.team;
-        myAbilityCode = myData.abilityCode.ToString();
-    }
+    // Cache of your own lobby data.
+    public LobbyParticipantData myData { get; private set; }
 
 
     void Start()
     {
-        if (NetworkManager.Singleton.IsHost)
+        // When participant pressed "Ready for battle" button, lobby_data's "isReady" toggles and this method is called.
+        LobbyLinkedData.I.AddOnValueChangedAction((NetworkListEvent<LobbyParticipantData> listEvent) =>
         {
-            // When participant pressed "Ready for battle" button, lobby_data's "isReady" toggles and this method is called.
-            LobbyLinkedData.I.AddOnValueChangedAction((NetworkListEvent<LobbyParticipantData> listEvent) =>
+            if (NetworkManager.Singleton.IsHost)
             {
                 // Start game when everyone is ready.
                 if (LobbyLinkedData.I.IsEveryoneReady())
@@ -44,10 +28,45 @@ public class SortieLobbyManager : NetworkSingleton<SortieLobbyManager>
                     LobbyLinkedData.I.acceptDataChange = false;
                     GameStarterClientRpc(BattleInfo.rule, BattleInfo.stage, BattleInfo.time_sec);
                 }
-            });
+            }
+        });
+    }
+
+
+
+    // Participant Determined /////////////////////////////////////////////////////////////////////////////////////////
+    public async void OnParticipantDetermined()
+    {
+        // Only the host can determine the participants.
+        if (!IsHost)
+        {
+            Debug.LogError("Only the host can determine participants.");
+            return;
         }
 
+        // Kill Lobby.
+        LobbyLinkedData.I.acceptDataChange = false;
+        await GameNetPortal.I.KillJoinedLobby();
+
+        // Determine participants.
+        LobbyLinkedData.I.DetermineParticipants();
+
+        // Callback called on every participants.
+        OnParticipantDeterminedClientRpc();
+    }
+
+    [ClientRpc]
+    void OnParticipantDeterminedClientRpc()
+    {
+        // Cache your own lobby data to SortieLobbyManager & Change page.
+        ulong client_id = NetworkManager.Singleton.LocalClientId;
+        myData = (LobbyParticipantData)LobbyLinkedData.I.GetParticipantDataByClientId(client_id);
+
+        // Change the page of OnlineLobbyUI.
+        OnlineLobbyUI.I.SetPage(OnlineLobbyUI.Page.RULE);
+
         // Prepare all fighters.
+        Team myTeam = myData.team;
         for (int m_num = 0; m_num < GameInfo.team_member_count; m_num++)
         {
             int number = -1;
@@ -114,12 +133,12 @@ public class SortieLobbyManager : NetworkSingleton<SortieLobbyManager>
         }
 
         // Exit menu & return button UI.
-        SortieLobbyUI.I.ExitMenuReturn().Play();
+        OnlineLobbyUI.I.ExitMenuReturn().Play();
 
         // Sortie all fighters and fade out.
         bool sortied = false;
         float fadeout_duration = 0;
-        LobbyFighter.I.SortieAllFighters(myTeam, () =>
+        LobbyFighter.I.SortieAllFighters(myData.team, () =>
         {
             sortied = true;
             DOVirtual.DelayedCall(1, () => fadeout_duration = FadeCanvas.I.FadeOut(FadeType.left)).Play();

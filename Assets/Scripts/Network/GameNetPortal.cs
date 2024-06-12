@@ -395,6 +395,19 @@ public class GameNetPortal : Singleton<GameNetPortal>
     void HandleOnServerStopped(bool stopHost)
     {
         Debug.Log($"<color=red>Server Stopped</color> {stopHost}");
+
+        string scene_name = SceneManager.GetActiveScene().name;
+        switch (scene_name)
+        {
+            case "OnlineLobby":
+                // Disable all fighters in my team.
+                Team my_team = SortieLobbyManager.I.myData.team;
+                if (my_team != Team.NONE)
+                {
+                    LobbyFighter.I.DisableAllFighters(my_team);
+                }
+                break;
+        }
     }
 
     void HandleOnClientConnected(ulong clientId)
@@ -433,26 +446,18 @@ public class GameNetPortal : Singleton<GameNetPortal>
         // Disconnected client
         else
         {
-            // // If still at OnlineLobby.
-            // if (SceneManager.GetActiveScene().name == "OnlineLobby")
-            // {
-            //     if (joinedLobby != null)
-            //     {
-            //         await ExitJoinedLobby();
-            //     }
-            //     if (NetworkManager.Singleton.IsClient)
-            //     {
-            //         NetworkManager.Singleton.Shutdown();
-            //         await UniTask.WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
-            //     }
-            //     OnKickedOutAction?.Invoke();
-            // }
-
-            // // If kicked out after entered SortieLobby or battle scenes.
-            // else
-            // {
-            //     SceneManager2.I.LoadScene2(GameScenes.ONLINELOBBY);
-            // }
+            string scene_name = SceneManager.GetActiveScene().name;
+            switch (scene_name)
+            {
+                case "OnlineLobby":
+                    // Disable all fighters in my team.
+                    Team my_team = SortieLobbyManager.I.myData.team;
+                    if (my_team != Team.NONE)
+                    {
+                        LobbyFighter.I.DisableAllFighters(my_team);
+                    }
+                    break;
+            }
         }
     }
 
@@ -461,6 +466,7 @@ public class GameNetPortal : Singleton<GameNetPortal>
         if (NetworkManager.Singleton)
         {
             NetworkManager.Singleton.OnServerStarted -= HandleOnServerStarted;
+            NetworkManager.Singleton.OnServerStopped -= HandleOnServerStopped;
             NetworkManager.Singleton.OnClientConnectedCallback -= HandleOnClientConnected;
             NetworkManager.Singleton.OnClientDisconnectCallback -= HandleOnClientDisconnect;
             NetworkManager.Singleton.ConnectionApprovalCallback -= ApprovalCheck;

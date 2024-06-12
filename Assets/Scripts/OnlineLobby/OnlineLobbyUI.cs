@@ -6,28 +6,27 @@ using DG.Tweening;
 using TMPro;
 using Unity.Netcode;
 using Cysharp.Threading.Tasks;
+using System;
 
 public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
 {
     protected override bool dont_destroy_on_load { get; set; } = false;
-
-    // Migrated from SortieLobby.
-    [SerializeField] GameObject sortieCanvas;
-    [SerializeField] SortieLobbyManager sortieLobbyManager;
 
     #region UIs
     RectTransform menuRect, returnRect;
     Button returnButton, teamButton;
     TextMeshProUGUI teamButtonText;
     TMP_InputField codeInputField;
-    GameObject hostClientObject, publicPrivateObject, joinLobbyObject, lobbyCodeObject, teamObject;
+    GameObject hostClientObj, publicPrivateObj, joinLobbyObj, lobbyCodeObj, teamObj;
     TextMeshProUGUI[] redNames = new TextMeshProUGUI[GameInfo.max_player_count];
     TextMeshProUGUI[] blueNames = new TextMeshProUGUI[GameInfo.max_player_count];
+    GameObject ruleObj, participantObj;
+    TextMeshProUGUI ruleText, stageText, timeText;
+    TextMeshProUGUI readyText;
+    [SerializeField] Color nameColor, myNameColor, selectedNameColor, selectedMyNameColor;
     #endregion
 
-    [SerializeField] Color nameColor, myNameColor, selectedNameColor, selectedMyNameColor;
-
-    #region status
+    #region Lobby Status
     TextMeshProUGUI statusText;
     Tween statusAnim;
     enum Status { CREATING_ROOM, ENTERING_ROOM, FAILED_CREATING_ROOM, FAILED_ENTERING_ROOM, LOBBY_CODE }
@@ -86,17 +85,45 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
     }
     #endregion
 
-    const float tweenDuration = 0.1f, tweenInterval = 0.4f;
+    #region Game Settings
+    Rule rule = Rule.BATTLEROYAL;
+    Stage stage = Stage.SPACE;
+    int time_sec = GameInfo.min_time_sec;
+    #endregion
 
-    enum Page { HOST_CLIENT, PUBLIC_PRIVATE, JOIN_LOBBY, LOBBY_CODE, TEAM }
+    #region UI Animation
+    const float tweenDuration = 0.1f;
+    const float tweenInterval = 0.4f;
+    public Sequence EnterMenuReturn()
+    {
+        var seq = DOTween.Sequence();
+        seq.Join(menuRect.DOScaleY(1, tweenDuration));
+        seq.Join(returnRect.DOAnchorPosX(100, tweenDuration));
+        seq.AppendCallback(() => returnButton.interactable = true);
+        return seq;
+    }
+    public Sequence ExitMenuReturn()
+    {
+        var seq = DOTween.Sequence();
+        seq.AppendCallback(() => returnButton.interactable = false);
+        seq.Join(menuRect.DOScaleY(0, tweenDuration));
+        seq.Join(returnRect.DOAnchorPosX(-100, tweenDuration));
+        return seq;
+    }
+    #endregion
+
+    # region Page
+    public enum Page { HOST_CLIENT, PUBLIC_PRIVATE, JOIN_LOBBY, LOBBY_CODE, TEAM, RULE, PARTICIPANT }
     Page page;
     bool pageChanged = false;
-    void SetPage(Page next)
+    public void SetPage(Page next)
     {
         page = next;
         pageChanged = true;
     }
+    #endregion
 
+    #region Player State
     ulong clientId { get { return NetworkManager.Singleton.LocalClientId; } }
     bool selectedTeam = false;
     bool selectedHost
@@ -104,14 +131,17 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
         get { return BattleInfo.isHost; }
         set { BattleInfo.isHost = value; }
     }
+    #endregion
 
     /// <summary>Boolean to prevent creating multiple lobbies when pressed button in a row.</summary>
     bool accessingLobby = false;
 
 
-
     void Start()
     {
+        #region Get UIs
+
+        #region Menu & Return
         menuRect = transform.Find("Menu").GetComponent<RectTransform>();
         returnRect = transform.Find("Return").GetComponent<RectTransform>();
         returnButton = returnRect.GetComponent<Button>();
@@ -125,57 +155,105 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
             ExitLobbyUI();
         });
         returnButton.interactable = false;
+        #endregion
 
-        hostClientObject = menuRect.Find("HostClient").gameObject;
-        publicPrivateObject = menuRect.Find("PublicPrivate").gameObject;
-        joinLobbyObject = menuRect.Find("JoinLobby").gameObject;
-        lobbyCodeObject = menuRect.Find("LobbyCode").gameObject;
-        teamObject = menuRect.Find("Team").gameObject;
-        hostClientObject.SetActive(true);
-        publicPrivateObject.SetActive(false);
-        joinLobbyObject.SetActive(false);
-        lobbyCodeObject.SetActive(false);
-        teamObject.SetActive(false);
+        #region Lobby
+        hostClientObj = menuRect.Find("HostClient").gameObject;
+        publicPrivateObj = menuRect.Find("PublicPrivate").gameObject;
+        joinLobbyObj = menuRect.Find("JoinLobby").gameObject;
+        lobbyCodeObj = menuRect.Find("LobbyCode").gameObject;
+        teamObj = menuRect.Find("Team").gameObject;
+        codeInputField = lobbyCodeObj.transform.Find("InputField").GetComponent<TMP_InputField>();
+        teamButton = teamObj.transform.Find("StartButton").GetComponent<Button>();
+        teamButtonText = teamObj.transform.Find("StartButton/Text (TMP)").GetComponent<TextMeshProUGUI>();
+        statusText = menuRect.Find("StatusText").GetComponent<TextMeshProUGUI>();
+        statusText.text = "";
+        hostClientObj.SetActive(true);
+        publicPrivateObj.SetActive(false);
+        joinLobbyObj.SetActive(false);
+        lobbyCodeObj.SetActive(false);
+        teamObj.SetActive(false);
+        #endregion
 
-        codeInputField = lobbyCodeObject.transform.Find("InputField").GetComponent<TMP_InputField>();
+        #region Fighter
         for (int k = 0; k < GameInfo.max_player_count; k++)
         {
-            redNames[k] = teamObject.transform.Find("Players/Red").GetChild(k).GetComponent<TextMeshProUGUI>();
-            blueNames[k] = teamObject.transform.Find("Players/Blue").GetChild(k).GetComponent<TextMeshProUGUI>();
+            redNames[k] = teamObj.transform.Find("Players/Red").GetChild(k).GetComponent<TextMeshProUGUI>();
+            blueNames[k] = teamObj.transform.Find("Players/Blue").GetChild(k).GetComponent<TextMeshProUGUI>();
             redNames[k].text = "";
             blueNames[k].text = "";
         }
-        teamButton = teamObject.transform.Find("StartButton").GetComponent<Button>();
-        teamButtonText = teamObject.transform.Find("StartButton/Text (TMP)").GetComponent<TextMeshProUGUI>();
-        statusText = menuRect.Find("StatusText").GetComponent<TextMeshProUGUI>();
-        statusText.text = "";
+        #endregion
 
+        #region Game Settings & Skill Select
+        ruleObj = menuRect.Find("GameSettings").gameObject;
+        participantObj = menuRect.Find("Participant").gameObject;
+        ruleText = ruleObj.transform.Find("Rule/Text (TMP)").GetComponent<TextMeshProUGUI>();
+        stageText = ruleObj.transform.Find("Stage/Text (TMP)").GetComponent<TextMeshProUGUI>();
+        timeText = ruleObj.transform.Find("Time/Text (TMP)").GetComponent<TextMeshProUGUI>();
+        readyText = participantObj.transform.Find("ConfirmButton").GetComponentInChildren<TextMeshProUGUI>();
+        ruleObj.SetActive(false);
+        participantObj.SetActive(false);
+        ruleText.text = rule.ToString();
+        stageText.text = stage.ToString();
+        int time_min = time_sec / 60;
+        timeText.text = time_min.ToString() + " minutes";
+        for (int k = 0; k < GameInfo.team_member_count; k++)
+        {
+            Transform nameBlock_trans = participantObj.transform.Find($"NameBlock{k}");
+            names[k] = nameBlock_trans.Find("Name").GetComponent<TextMeshProUGUI>();
+            arrows[k] = nameBlock_trans.Find("Arrows").gameObject;
+            skillDecks[k].skills = new SkillUI[GameInfo.max_skill_count];
+            for (int m = 0; m < skillDecks[k].skills.Length; m++)
+            {
+                Transform frame_trans = nameBlock_trans.Find($"SkillIcon{m}");
+                skillDecks[k].skills[m].frame = frame_trans.GetComponent<Image>();
+                skillDecks[k].skills[m].icon = frame_trans.Find("Image").GetComponent<Image>();
+            }
+        }
+        #endregion
+
+        #endregion
+
+        #region Set Callbacks to LobbyLinkedData & GameNetPortal
         LobbyLinkedData.I.acceptDataChange = true;
         LobbyLinkedData.I.AddOnValueChangedAction((NetworkListEvent<LobbyParticipantData> listEvent) =>
         {
-            RefreshTeamUI();
+            switch (page)
+            {
+                case Page.TEAM:
+                    RefreshTeamUI();
+                    break;
+
+                case Page.PARTICIPANT:
+                    RefreshAllParticipantsSkill();
+                    RefreshAllParticipantsNames();
+                    break;
+            }
         });
         GameNetPortal.I.OnKickedOutAction += () =>
         {
             SetPage(Page.JOIN_LOBBY);
         };
+        #endregion
 
-        DOVirtual.DelayedCall(0.5f, () =>
+        #region Menu & Return Enter Animation.
+        Sequence seq = DOTween.Sequence();
+        seq.AppendInterval(0.5f);
+        seq.Append(EnterMenuReturn());
+        seq.OnComplete(() =>
         {
-            menuRect.DOScaleY(1, tweenDuration)
-                .OnComplete(() =>
-                {
-                    hostClientObject.transform.DOScaleX(1, tweenDuration);
-                    page = Page.HOST_CLIENT;
-                });
-            returnRect.DOAnchorPosX(100, tweenDuration)
-                .OnComplete(() => returnButton.interactable = true);
-        }).Play();
+            hostClientObj.transform.DOScaleX(1, tweenDuration);
+            page = Page.HOST_CLIENT;
+        });
+        seq.Play();
+        #endregion
     }
+
 
     void Update()
     {
-        // === Check if host can the start game === //
+        // === Check if host can the start the game === //
         if (selectedHost)
         {
             if (page == Page.TEAM)
@@ -202,13 +280,13 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
         switch (page)
         {
             case Page.HOST_CLIENT:
-                sequence.AppendCallback(() => { hostClientObject.SetActive(true); });
-                sequence.Join(publicPrivateObject.transform.DOScaleX(0, tweenDuration).OnComplete(() => publicPrivateObject.SetActive(false)));
-                sequence.Join(joinLobbyObject.transform.DOScaleX(0, tweenDuration).OnComplete(() => joinLobbyObject.SetActive(false)));
-                sequence.Join(hostClientObject.transform.DOScaleX(0, 0));
+                #region Host or Client
+                sequence.AppendCallback(() => { hostClientObj.SetActive(true); });
+                sequence.Join(publicPrivateObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => publicPrivateObj.SetActive(false)));
+                sequence.Join(joinLobbyObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => joinLobbyObj.SetActive(false)));
+                sequence.Join(hostClientObj.transform.DOScaleX(0, 0));
                 sequence.AppendInterval(tweenInterval);
-                sequence.Append(hostClientObject.transform.DOScaleX(1, tweenDuration).OnComplete(() => returnButton.interactable = true));
-
+                sequence.Append(hostClientObj.transform.DOScaleX(1, tweenDuration).OnComplete(() => returnButton.interactable = true));
                 returnButton.onClick.RemoveAllListeners();
                 returnButton.onClick.AddListener(() =>
                 {
@@ -217,53 +295,58 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
                     NetworkManager.Singleton.Shutdown(); // Shutdown (Stop host or client)
                     ExitLobbyUI();
                 });
+                #endregion
                 break;
 
             // Host
             case Page.PUBLIC_PRIVATE:
-                sequence.AppendCallback(() => { publicPrivateObject.SetActive(true); accessingLobby = false; });
-                sequence.Join(hostClientObject.transform.DOScaleX(0, tweenDuration).OnComplete(() => hostClientObject.SetActive(false)));
-                sequence.Join(lobbyCodeObject.transform.DOScaleX(0, tweenDuration).OnComplete(() => lobbyCodeObject.SetActive(false)));
-                sequence.Join(teamObject.transform.DOScaleX(0, tweenDuration).OnComplete(() => teamObject.SetActive(false)));
-                sequence.Join(publicPrivateObject.transform.DOScaleX(0, 0));
+                #region Public or Private
+                sequence.AppendCallback(() => { publicPrivateObj.SetActive(true); accessingLobby = false; });
+                sequence.Join(hostClientObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => hostClientObj.SetActive(false)));
+                sequence.Join(lobbyCodeObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => lobbyCodeObj.SetActive(false)));
+                sequence.Join(teamObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => teamObj.SetActive(false)));
+                sequence.Join(ruleObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => ruleObj.SetActive(false)));
+                sequence.Join(publicPrivateObj.transform.DOScaleX(0, 0));
                 sequence.AppendInterval(tweenInterval);
-                sequence.Append(publicPrivateObject.transform.DOScaleX(1, tweenDuration).OnComplete(() => returnButton.interactable = true));
-
+                sequence.Append(publicPrivateObj.transform.DOScaleX(1, tweenDuration).OnComplete(() => returnButton.interactable = true));
                 returnButton.onClick.RemoveAllListeners();
                 returnButton.onClick.AddListener(() =>
                 {
                     returnButton.interactable = false;
                     SetPage(Page.HOST_CLIENT);
                 });
+                #endregion
                 break;
 
             // Client
             case Page.JOIN_LOBBY:
-                sequence.AppendCallback(() => { joinLobbyObject.SetActive(true); accessingLobby = false; });
-                sequence.Join(hostClientObject.transform.DOScaleX(0, tweenDuration).OnComplete(() => hostClientObject.SetActive(false)));
-                sequence.Join(lobbyCodeObject.transform.DOScaleX(0, tweenDuration).OnComplete(() => lobbyCodeObject.SetActive(false)));
-                sequence.Join(teamObject.transform.DOScaleX(0, tweenDuration).OnComplete(() => teamObject.SetActive(false)));
-                sequence.Join(joinLobbyObject.transform.DOScaleX(0, 0));
+                #region Join Lobby
+                sequence.AppendCallback(() => { joinLobbyObj.SetActive(true); accessingLobby = false; });
+                sequence.Join(hostClientObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => hostClientObj.SetActive(false)));
+                sequence.Join(lobbyCodeObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => lobbyCodeObj.SetActive(false)));
+                sequence.Join(teamObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => teamObj.SetActive(false)));
+                sequence.Join(participantObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => participantObj.SetActive(false)));
+                sequence.Join(joinLobbyObj.transform.DOScaleX(0, 0));
                 sequence.AppendInterval(tweenInterval);
-                sequence.Append(joinLobbyObject.transform.DOScaleX(1, tweenDuration).OnComplete(() => returnButton.interactable = true));
-
+                sequence.Append(joinLobbyObj.transform.DOScaleX(1, tweenDuration).OnComplete(() => returnButton.interactable = true));
                 returnButton.onClick.RemoveAllListeners();
                 returnButton.onClick.AddListener(() =>
                 {
                     returnButton.interactable = false;
                     SetPage(Page.HOST_CLIENT);
                 });
+                #endregion
                 break;
 
             // Client
             case Page.LOBBY_CODE:
-                sequence.AppendCallback(() => { lobbyCodeObject.SetActive(true); accessingLobby = false; });
-                sequence.Join(joinLobbyObject.transform.DOScaleX(0, tweenDuration).OnComplete(() => joinLobbyObject.SetActive(false)));
-                sequence.Join(teamObject.transform.DOScaleX(0, tweenDuration).OnComplete(() => teamObject.SetActive(false)));
-                sequence.Join(lobbyCodeObject.transform.DOScaleX(0, 0));
+                #region Lobby Code
+                sequence.AppendCallback(() => { lobbyCodeObj.SetActive(true); accessingLobby = false; });
+                sequence.Join(joinLobbyObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => joinLobbyObj.SetActive(false)));
+                sequence.Join(teamObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => teamObj.SetActive(false)));
+                sequence.Join(lobbyCodeObj.transform.DOScaleX(0, 0));
                 sequence.AppendInterval(tweenInterval);
-                sequence.Append(lobbyCodeObject.transform.DOScaleX(1, tweenDuration).OnComplete(() => returnButton.interactable = true));
-
+                sequence.Append(lobbyCodeObj.transform.DOScaleX(1, tweenDuration).OnComplete(() => returnButton.interactable = true));
                 returnButton.onClick.RemoveAllListeners();
                 if (selectedHost)
                 {
@@ -281,18 +364,21 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
                         SetPage(Page.JOIN_LOBBY);
                     });
                 }
+                #endregion
                 break;
 
-            // Both
+            // All Participants
             case Page.TEAM:
-                sequence.AppendCallback(() => { teamObject.SetActive(true); });
-                sequence.Join(publicPrivateObject.transform.DOScaleX(0, tweenDuration).OnComplete(() => publicPrivateObject.SetActive(false)));
-                sequence.Join(joinLobbyObject.transform.DOScaleX(0, tweenDuration).OnComplete(() => joinLobbyObject.SetActive(false)));
-                sequence.Join(lobbyCodeObject.transform.DOScaleX(0, tweenDuration).OnComplete(() => lobbyCodeObject.SetActive(false)));
-                sequence.Join(teamObject.transform.DOScaleX(0, 0));
+                #region Team
+                // Enable team changing.
+                LobbyLinkedData.I.acceptDataChange = true;
+                sequence.AppendCallback(() => { teamObj.SetActive(true); });
+                sequence.Join(publicPrivateObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => publicPrivateObj.SetActive(false)));
+                sequence.Join(joinLobbyObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => joinLobbyObj.SetActive(false)));
+                sequence.Join(lobbyCodeObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => lobbyCodeObj.SetActive(false)));
+                sequence.Join(teamObj.transform.DOScaleX(0, 0));
                 sequence.AppendInterval(tweenInterval);
-                sequence.Append(teamObject.transform.DOScaleX(1, tweenDuration).OnComplete(() => returnButton.interactable = true));
-
+                sequence.Append(teamObj.transform.DOScaleX(1, tweenDuration).OnComplete(() => returnButton.interactable = true));
                 returnButton.onClick.RemoveAllListeners();
                 teamButton.onClick.RemoveAllListeners();
                 if (selectedHost)
@@ -308,18 +394,9 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
                         await UniTask.WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
                         SetPage(Page.PUBLIC_PRIVATE);
                     });
-                    teamButton.onClick.AddListener(async () =>
+                    teamButton.onClick.AddListener(() =>
                     {
-                        // Close Lobby & determine participants.
-                        LobbyLinkedData.I.acceptDataChange = false;
-                        await GameNetPortal.I.KillJoinedLobby();
-                        LobbyLinkedData.I.DetermineParticipants();
-
-                        // === Change to SortieLobby === //
-                        sortieCanvas.SetActive(true);
-                        SortieLobbyManager.Init();
-                        sortieLobbyManager.enabled = true;
-                        gameObject.SetActive(false);
+                        SortieLobbyManager.I.OnParticipantDetermined();
                     });
                 }
                 else
@@ -351,15 +428,76 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
 
                 // Show Lobby Code.
                 SetStatusText(Status.LOBBY_CODE, false, GameNetPortal.I.joinedLobby.LobbyCode);
+                #endregion
+                break;
 
+            // All Participants
+            case Page.RULE:
+                #region Rule
+                sequence.AppendCallback(() => { ruleObj.SetActive(true); });
+                sequence.Join(teamObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => teamObj.SetActive(false)));
+                sequence.Join(participantObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => participantObj.SetActive(false)));
+                sequence.Join(ruleObj.transform.DOScaleX(0, 0));
+                sequence.AppendInterval(tweenInterval);
+                sequence.Append(ruleObj.transform.DOScaleX(1, tweenDuration).OnComplete(() => returnButton.interactable = true));
+                returnButton.onClick.RemoveAllListeners();
+                returnButton.onClick.AddListener(async () =>
+                {
+                    returnButton.interactable = false;
+
+                    // Shutdown to exit from Relay.
+                    NetworkManager.Singleton.Shutdown();
+                    await UniTask.WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
+
+                    // Change page.
+                    SetPage(Page.PUBLIC_PRIVATE);
+                });
+                #endregion
+                break;
+
+            // All Participants
+            case Page.PARTICIPANT:
+                #region Participant
+                // Enable skill deck changing.
+                LobbyLinkedData.I.acceptDataChange = true;
+                sequence.AppendCallback(() => { participantObj.SetActive(true); });
+                sequence.Join(ruleObj.transform.DOScaleX(0, tweenDuration).OnComplete(() => ruleObj.SetActive(false)));
+                sequence.Join(participantObj.transform.DOScaleX(0, 0));
+                sequence.AppendInterval(tweenInterval);
+                sequence.Append(participantObj.transform.DOScaleX(1, tweenDuration).OnComplete(() => returnButton.interactable = true));
+                returnButton.onClick.RemoveAllListeners();
+                if (selectedHost)
+                {
+                    returnButton.onClick.AddListener(() =>
+                    {
+                        returnButton.interactable = false;
+                        SetPage(Page.RULE);
+                    });
+                }
+                else
+                {
+                    returnButton.onClick.AddListener(async () =>
+                    {
+                        returnButton.interactable = false;
+
+                        // Shutdown to exit from Relay.
+                        NetworkManager.Singleton.Shutdown();
+                        await UniTask.WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
+
+                        // Change page.
+                        SetPage(Page.JOIN_LOBBY);
+                    });
+                }
+                RefreshAllParticipantsSkill();
+                RefreshAllParticipantsNames();
+                #endregion
                 break;
         }
         sequence.Play();
     }
 
 
-
-    // ====== On Button Pressed Methods ====== //
+    #region On Button Pressed Callbacks
     public void Host()
     {
         selectedHost = true;
@@ -503,8 +641,41 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
         accessingLobby = false;
     }
 
+    public void OnTeamArrowPressed(int team_id)
+    {
+        // If already selected team, do nothing.
+        if (selectedTeam)
+        {
+            return;
+        }
 
-    // ====== Team ====== //
+        // Return if same team.
+        LobbyParticipantData lobby_data = LobbyLinkedData.I.GetParticipantDataByClientId(clientId).Value;
+        Team new_team = (Team)team_id;
+        Team current_team = lobby_data.team;
+        if (new_team == current_team)
+        {
+            return;
+        }
+
+        // Update lobby player data.
+        LobbyLinkedData.I.RequestServerModifyParticipantData(clientId, team: new_team);
+    }
+
+    public void OnRuleSettingsButton()
+    {
+        DetermineSettings();
+        SetPage(Page.PARTICIPANT);
+    }
+
+    public void OnReadyForBattle()
+    {
+        ReadyForBattle();
+    }
+
+    #endregion
+
+    #region Team
     /// <summary>When team was NONE, resets the UI.</summary>
     void TeamUISetter(int number, Team team, string name, Color color)
     {
@@ -576,37 +747,256 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
             }
         }
     }
+    #endregion
 
-    public void OnTeamArrowPressed(int team_id)
+    #region Settings
+    void DetermineSettings()
     {
-        // If already selected team, do nothing.
-        if (selectedTeam)
-        {
-            return;
-        }
-
-        // Return if same team.
-        LobbyParticipantData lobby_data = LobbyLinkedData.I.GetParticipantDataByClientId(clientId).Value;
-        Team new_team = (Team)team_id;
-        Team current_team = lobby_data.team;
-        if (new_team == current_team)
-        {
-            return;
-        }
-
-        // Update lobby player data.
-        LobbyLinkedData.I.RequestServerModifyParticipantData(clientId, team: new_team);
+        BattleInfo.rule = rule;
+        BattleInfo.stage = stage;
+        BattleInfo.time_sec = time_sec;
     }
 
+    // Rule ///////////////////////////////////////////////////////////////////////////////
+    public void OnRuleArrowPressed(int delta_id)
+    {
+        // Change stage of BattleInfo
+        int rule_id = (int)rule;
+        int rule_count = Enum.GetNames(typeof(Rule)).Length;
+        rule_id += delta_id;
+        if (rule_id < 0) rule_id += rule_count;
+        else if (rule_count <= rule_id) rule_id -= rule_count;
+        rule = (Rule)rule_id;
+
+        // Change UI
+        ruleText.text = rule.ToString();
+    }
+
+    // Stage //////////////////////////////////////////////////////////////////////////////
+    public void OnStageArrowPressed(int delta_id)
+    {
+        // Change stage of BattleInfo
+        int stage_id = (int)stage;
+        int stage_count = Enum.GetNames(typeof(Stage)).Length;
+        stage_id += delta_id;
+        if (stage_id < 0) stage_id += stage_count;
+        else if (stage_count <= stage_id) stage_id -= stage_count;
+        stage = (Stage)stage_id;
+
+        // Change UI
+        stageText.text = stage.ToString();
+    }
+
+    // Time ///////////////////////////////////////////////////////////////////////////////
+    public void OnTimeArrowPressed(int delta_sec)
+    {
+        // Change stage of BattleInfo
+        time_sec += delta_sec;
+        if (GameInfo.max_time_sec < time_sec)
+        {
+            time_sec = GameInfo.min_time_sec;
+        }
+        else if (time_sec < GameInfo.min_time_sec)
+        {
+            time_sec = GameInfo.max_time_sec;
+        }
+
+        // Change UI
+        int time_min = time_sec / 60;
+        timeText.text = time_min.ToString() + " minutes";
+    }
+    #endregion
+
+    #region Participant Page
+    struct SkillUI
+    {
+        public Image frame;
+        public Image icon;
+    }
+    struct SkillDeck
+    {
+        public SkillUI[] skills;
+    }
+    SkillDeck[] skillDecks = new SkillDeck[GameInfo.team_member_count];
+    GameObject[] arrows = new GameObject[GameInfo.team_member_count];
+    TextMeshProUGUI[] names = new TextMeshProUGUI[GameInfo.team_member_count];
+    bool isReady = false;
+
+    int myDeckNum
+    {
+        get { return SortieLobbyManager.I.myDeckNum; }
+        set { SortieLobbyManager.I.myDeckNum = value; }
+    }
+
+    public void SkillUISetter(int block, int?[] skill_ids)
+    {
+        for (int k = 0; k < GameInfo.max_skill_count; k++)
+        {
+            int? skill_id = skill_ids[k];
+            if (skill_id.HasValue)
+            {
+                SkillData skill_data = SkillDatabase.I.SearchSkillById((int)skill_id);
+                skillDecks[block].skills[k].icon.sprite = skill_data.GetSprite();
+                skillDecks[block].skills[k].icon.color = Color.white;
+                skillDecks[block].skills[k].frame.color = skill_data.GetColor();
+            }
+            else
+            {
+                skillDecks[block].skills[k].icon.sprite = null;
+                skillDecks[block].skills[k].icon.color = Color.clear;
+                skillDecks[block].skills[k].frame.color = Color.white;
+            }
+        }
+    }
+
+    public void SkillArrow(int direction)
+    {
+        if (isReady)
+        {
+            return;
+        }
+
+        myDeckNum += direction;
+        if (myDeckNum < 0) myDeckNum += GameInfo.deck_count;
+        else if (GameInfo.deck_count <= myDeckNum) myDeckNum -= GameInfo.deck_count;
+
+        // Get skill Ids & skill levels.
+        int?[] new_skillIds, new_skillLevels;
+        PlayerInfo.I.SkillIdsGetter(myDeckNum, out new_skillIds);
+        PlayerInfo.I.SkillLevelsGetter(myDeckNum, out new_skillLevels);
+
+        // Encode skill informations.
+        string new_skillCode;
+        LobbyParticipantData.SkillCodeEncoder(new_skillIds, new_skillLevels, out new_skillCode);
+
+        // Set new lobby data to LobbyLinkedData.
+        LobbyLinkedData.I.RequestServerModifyParticipantData(NetworkManager.Singleton.LocalClientId, skillCode: new_skillCode);
+
+        // LinkedDataの値が更新されるので、自動的にRefreshPlayerSkillIconsが呼ばれる
+    }
+
+    public void NameUISetter(int blockId, string name)
+    {
+        names[blockId].text = name;
+    }
+
+    // Updates all participants skills.
+    // Automaticaly called when participant data changed. (Called on every participants)
+    void RefreshAllParticipantsSkill()
+    {
+        Team myTeam = SortieLobbyManager.I.myData.team;
+        for (int block_id = 0; block_id < skillDecks.Length; block_id++)
+        {
+            int fighterNo = -1;
+            if (!LobbyLinkedData.I.TryGetNumber(myTeam, block_id, ref fighterNo))
+            {
+                Debug.LogError($"Could not get fighter number!! team : {myTeam}, block : {block_id}");
+                return;
+            }
+
+            LobbyParticipantData? data_nullable;
+            data_nullable = LobbyLinkedData.I.GetParticipantDataByNumber(fighterNo);
+            int?[] skillIds, skillLevels;
+
+            if (data_nullable.HasValue)
+            {
+                LobbyParticipantData data = data_nullable.Value;
+                LobbyParticipantData.SkillCodeDecoder(data.skillCode.ToString(), out skillIds, out skillLevels);
+                SkillUISetter(block_id, skillIds);
+            }
+            else
+            {
+                skillIds = new int?[GameInfo.max_skill_count];
+                for (int k = 0; k < skillIds.Length; k++)
+                {
+                    skillIds[k] = null;
+                }
+                SkillUISetter(block_id, skillIds);
+            }
+        }
+    }
+
+    // Updates all participants names.
+    // Automaticaly called when participant data changed. (Called on every participants)
+    void RefreshAllParticipantsNames()
+    {
+        Team myTeam = SortieLobbyManager.I.myData.team;
+        for (int blockNo = 0; blockNo < GameInfo.team_member_count; blockNo++)
+        {
+            // Get fighter number from team and block number.
+            int fighterNo = -1;
+            if (!LobbyLinkedData.I.TryGetNumber(myTeam, blockNo, ref fighterNo))
+            {
+                return;
+            }
+
+            // Get participant data from fighter number.
+            LobbyParticipantData? nullable_data = LobbyLinkedData.I.GetParticipantDataByNumber(fighterNo);
+
+            // Participant exists.
+            if (nullable_data.HasValue)
+            {
+                LobbyParticipantData lobby_data = (LobbyParticipantData)nullable_data;
+                NameUISetter(blockNo, lobby_data.name.Value);
+
+                // My block Id
+                int myNumber = SortieLobbyManager.I.myData.number;
+                if (lobby_data.number == myNumber)
+                {
+                    if (!arrows[blockNo].activeSelf)
+                    {
+                        arrows[blockNo].SetActive(true);
+                    }
+                }
+
+                // Not my block Id
+                else
+                {
+                    if (arrows[blockNo].activeSelf)
+                    {
+                        arrows[blockNo].SetActive(false);
+                    }
+                }
+            }
+
+            // No participant.
+            else
+            {
+                NameUISetter(blockNo, "");
+            }
+        }
+    }
+    #endregion
+
+    #region Ready for Battle
+    void ReadyForBattle()
+    {
+        isReady = !isReady;
+        LobbyLinkedData.I.RequestServerModifyParticipantData(NetworkManager.Singleton.LocalClientId, isReady: isReady);
+        if (isReady)
+        {
+            readyText.text = "Change Skill Deck";
+            returnButton.interactable = false;
+        }
+        else
+        {
+            readyText.text = "Ready For Battle";
+            returnButton.interactable = true;
+        }
+    }
+    #endregion
+
+    #region Exit Lobby
     void ExitLobbyUI()
     {
         returnButton.interactable = false;
         returnRect.DOAnchorPosX(-100, tweenDuration);
-        hostClientObject.transform.DOScaleX(0, tweenDuration);
+        hostClientObj.transform.DOScaleX(0, tweenDuration);
         DOVirtual.DelayedCall(tweenDuration, () =>
         {
             menuRect.DOScaleY(0, tweenDuration);
             SceneManager2.I.LoadSceneAsync2(GameScenes.MENU, FadeType.gradually);
         }).Play();
     }
+    #endregion
 }
