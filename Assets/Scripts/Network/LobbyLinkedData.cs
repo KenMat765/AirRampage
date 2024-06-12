@@ -17,33 +17,12 @@ public class LobbyLinkedData : NetworkSingleton<LobbyLinkedData>
         participantDatas = new NetworkList<LobbyParticipantData>();
     }
 
-    // For Debug.
-    [SerializeField] bool is_null;
-    [SerializeField] int participant_count;
-    [SerializeField] bool[] is_readys = new bool[8];
-    void Update()
-    {
-        is_null = participantDatas == null;
-        participant_count = participantCount;
-        for (int k = 0; k < 8; k++)
-        {
-            if (k < participantCount)
-            {
-                is_readys[k] = participantDatas[k].isReady;
-            }
-            else
-            {
-                is_readys[k] = false;
-            }
-        }
-    }
-    // For Debug.
-
     /// <summary>
     /// !! Index is NOT equal to fighter number !!
     /// </summary>
     public NetworkList<LobbyParticipantData> participantDatas; // !! DO NOT initialize NetworkList here, otherwise memory leak occurs on build !!
     public int participantCount { get { return participantDatas.Count; } }
+    public bool participantDetermined { get; set; } = false;
 
     public override void OnNetworkSpawn()
     {
@@ -142,6 +121,10 @@ public class LobbyLinkedData : NetworkSingleton<LobbyLinkedData>
 
     public bool IsEveryoneReady()
     {
+        if (participantDatas.Count == 0)
+        {
+            return false;
+        }
         foreach (LobbyParticipantData data in participantDatas)
         {
             if (!data.isReady) return false;
@@ -193,7 +176,7 @@ public class LobbyLinkedData : NetworkSingleton<LobbyLinkedData>
         return true;
     }
 
-    /// <summary>Determines participants number, member_number (Host only method)</summary>
+    /// <summary>Determines participants number & member_number, and generate AIs for absence. (Host only method)</summary>
     public void DetermineParticipants()
     {
         if (!IsHost)
@@ -202,7 +185,7 @@ public class LobbyLinkedData : NetworkSingleton<LobbyLinkedData>
             return;
         }
 
-        // Determine players.
+        // Determine players' number & member number.
         int member_number_red = 0;
         int member_number_blue = 0;
         for (int number = 0; number < participantCount; number++)
@@ -243,6 +226,9 @@ public class LobbyLinkedData : NetworkSingleton<LobbyLinkedData>
             LobbyParticipantData ai_lobby_data = AiUtilities.GenerateAILobbyData(number, ai_member_num, ai_names[number], ai_team);
             participantDatas.Add(ai_lobby_data);
         }
+
+        // Set participantsDetermined to true.
+        participantDetermined = true;
     }
 }
 

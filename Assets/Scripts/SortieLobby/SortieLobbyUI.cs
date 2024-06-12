@@ -29,17 +29,9 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
     // Skill deck number selected.
     int myDeckNum
     {
-        get { return SortieLobbyManager.myDeckNum; }
-        set { SortieLobbyManager.myDeckNum = value; }
+        get { return SortieLobbyManager.I.myDeckNum; }
+        set { SortieLobbyManager.I.myDeckNum = value; }
     }
-
-    // CONSTANT LobbyParticipantData properties.
-    int myNumber { get { return SortieLobbyManager.myNumber; } }
-    int myMemberNumber { get { return SortieLobbyManager.myNumber; } }
-    string myName { get { return SortieLobbyManager.myName; } }
-    ulong myClientId { get { return SortieLobbyManager.myClientId; } }
-    Team myTeam { get { return SortieLobbyManager.myTeam; } }
-    string myAbilityCode { get { return SortieLobbyManager.myAbilityCode; } }
 
 
     void Start()
@@ -334,6 +326,7 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
     // Automaticaly called when participant data changed. (Called on every participants)
     void RefreshAllParticipantsSkill()
     {
+        Team myTeam = SortieLobbyManager.I.myData.team;
         for (int block_id = 0; block_id < skillDecks.Length; block_id++)
         {
             int fighterNo = -1;
@@ -369,6 +362,7 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
     // Automaticaly called when participant data changed. (Called on every participants)
     void RefreshAllParticipantsNames()
     {
+        Team myTeam = SortieLobbyManager.I.myData.team;
         for (int blockNo = 0; blockNo < GameInfo.team_member_count; blockNo++)
         {
             // Get fighter number from team and block number.
@@ -388,6 +382,7 @@ public class SortieLobbyUI : Singleton<SortieLobbyUI>
                 NameUISetter(blockNo, lobby_data.name.Value);
 
                 // My block Id
+                int myNumber = SortieLobbyManager.I.myData.number;
                 if (lobby_data.number == myNumber)
                 {
                     if (!arrows[blockNo].activeSelf)

@@ -22,7 +22,6 @@ public class GameNetPortal : Singleton<GameNetPortal>
     public ConnectStatus connectStatus;
     Action<ConnectStatus> OnRecieveConnectionResult;
     List<LobbyParticipantData> clientDataQueue = new List<LobbyParticipantData>();
-    bool isHost { get { return BattleInfo.isHost; } }
 
     /// <summary>
     /// Called when client was kicked out from Relay. (!! This is NOT called for the host !!)
@@ -109,7 +108,7 @@ public class GameNetPortal : Singleton<GameNetPortal>
     async void RefreshLobbyHeatbeat()
     {
         // This method is only for host.
-        if (!isHost)
+        if (!NetworkManager.Singleton.IsHost)
         {
             return;
         }
@@ -389,12 +388,31 @@ public class GameNetPortal : Singleton<GameNetPortal>
     void HandleOnServerStarted()
     {
         Debug.Log("<color=green>Server Started</color>");
-        LobbyLinkedData.I.participantDatas.Clear();   // Clear all participants lobby data.
+
+        // Initialize LobbyLinkedData properties.
+        LobbyLinkedData.I.participantDatas.Clear();
+        LobbyLinkedData.I.participantDetermined = false;
     }
 
+    // Called only at server.
     void HandleOnServerStopped(bool stopHost)
     {
         Debug.Log($"<color=red>Server Stopped</color> {stopHost}");
+
+        string scene_name = SceneManager.GetActiveScene().name;
+        switch (scene_name)
+        {
+            case "OnlineLobby":
+                // Disable all fighters in my team. (for Host)
+                Team my_team = SortieLobbyManager.I.myData.team;
+                if (my_team != Team.NONE)
+                {
+                    LobbyFighter.I.DisableAllFighters(my_team);
+                }
+                // Go back to public or private lobby select page.
+                OnlineLobbyUI.I.SetPage(OnlineLobbyUI.Page.PUBLIC_PRIVATE);
+                break;
+        }
     }
 
     void HandleOnClientConnected(ulong clientId)
@@ -423,36 +441,47 @@ public class GameNetPortal : Singleton<GameNetPortal>
     {
         Debug.Log($"<color=red>Client Disconnected</color> {clientId}");
 
+        // Current scene name.
+        string scene_name = SceneManager.GetActiveScene().name;
+
         // Server.
         if (NetworkManager.Singleton.IsHost)
         {
-            // Remove disconnected client's lobby data.
-            LobbyLinkedData.I.RemoveParticipantData(clientId);
+            switch (scene_name)
+            {
+                case "OnlineLobby":
+                    // If participants were already determined (At page: Rule or Participant)
+                    if (LobbyLinkedData.I.participantDetermined)
+                    {
+                        // Stop the Host (this kicks out all participants)
+                        NetworkManager.Singleton.Shutdown();
+                    }
+                    // If still at the Team page.
+                    else
+                    {
+                        // Remove disconnected client's lobby data.
+                        LobbyLinkedData.I.RemoveParticipantData(clientId);
+                    }
+                    break;
+            }
         }
 
-        // Disconnected client
+        // Disconnected Client.
         else
         {
-            // // If still at OnlineLobby.
-            // if (SceneManager.GetActiveScene().name == "OnlineLobby")
-            // {
-            //     if (joinedLobby != null)
-            //     {
-            //         await ExitJoinedLobby();
-            //     }
-            //     if (NetworkManager.Singleton.IsClient)
-            //     {
-            //         NetworkManager.Singleton.Shutdown();
-            //         await UniTask.WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
-            //     }
-            //     OnKickedOutAction?.Invoke();
-            // }
-
-            // // If kicked out after entered SortieLobby or battle scenes.
-            // else
-            // {
-            //     SceneManager2.I.LoadScene2(GameScenes.ONLINELOBBY);
-            // }
+            switch (scene_name)
+            {
+                case "OnlineLobby":
+                    // Disable all fighters in my team. (for Clients)
+                    Team my_team = SortieLobbyManager.I.myData.team;
+                    if (my_team != Team.NONE)
+                    {
+                        LobbyFighter.I.DisableAllFighters(my_team);
+                    }
+                    // Go back to join lobby page.
+                    OnlineLobbyUI.I.SetPage(OnlineLobbyUI.Page.JOIN_LOBBY);
+                    break;
+            }
         }
     }
 
@@ -461,6 +490,7 @@ public class GameNetPortal : Singleton<GameNetPortal>
         if (NetworkManager.Singleton)
         {
             NetworkManager.Singleton.OnServerStarted -= HandleOnServerStarted;
+            NetworkManager.Singleton.OnServerStopped -= HandleOnServerStopped;
             NetworkManager.Singleton.OnClientConnectedCallback -= HandleOnClientConnected;
             NetworkManager.Singleton.OnClientDisconnectCallback -= HandleOnClientDisconnect;
             NetworkManager.Singleton.ConnectionApprovalCallback -= ApprovalCheck;
