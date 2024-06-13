@@ -455,8 +455,7 @@ public abstract class FighterCondition : NetworkBehaviour
     // Combo & CP (Concentration Point) ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Variables
-    //public float cp { get; set; }               // CP currently have.
-    public float cp;
+    public float cp { get; set; }               // CP currently have.
     public int combo { get; set; }
     protected float combo_timer;
     float zone_timer;
@@ -659,16 +658,16 @@ public abstract class FighterCondition : NetworkBehaviour
 
 
     // Special Abilities //////////////////////////////////////////////////////////////////////////////////////////////
-    [BoxGroup("Abilities")] public bool has_shadowStep = false;
-    [BoxGroup("Abilities")] public bool has_boostStep = false;
-    [BoxGroup("Abilities")] public bool has_skillBoost = false;
-    [BoxGroup("Abilities")] public bool has_skillKeep = false;
-    [BoxGroup("Abilities")] public bool has_technician_1 = false;
-    [BoxGroup("Abilities")] public bool has_technician_2 = false;
-    [BoxGroup("Abilities")] public bool has_quickRepair = false;
-    [BoxGroup("Abilities")] public bool has_comboKeep = false;
-    [BoxGroup("Abilities")] public bool has_deepAbsorb = false;
-    [BoxGroup("Abilities")] public bool has_comboBoostA = false;
-    [BoxGroup("Abilities")] public bool has_comboBoostD = false;
-    [BoxGroup("Abilities")] public bool has_comboBoostS = false;
+    public bool has_shadowStep { get; set; } = false;
+    public bool has_boostStep { get; set; } = false;
+    public bool has_skillBoost { get; set; } = false;
+    public bool has_skillKeep { get; set; } = false;
+    public bool has_technician_1 { get; set; } = false;
+    public bool has_technician_2 { get; set; } = false;
+    public bool has_quickRepair { get; set; } = false;
+    public bool has_comboKeep { get; set; } = false;
+    public bool has_deepAbsorb { get; set; } = false;
+    public bool has_comboBoostA { get; set; } = false;
+    public bool has_comboBoostD { get; set; } = false;
+    public bool has_comboBoostS { get; set; } = false;
 }
