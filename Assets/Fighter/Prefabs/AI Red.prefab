@@ -150,7 +150,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1634502660656484}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d7e9875122e5546a0b4bbd17ee8b33d9, type: 3}
   m_Name: 
@@ -162,7 +162,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1634502660656484}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 223282543bc274178b0ad18bd30cec05, type: 3}
   m_Name: 
@@ -204,7 +204,7 @@ GameObject:
   - component: {fileID: 7260632517496643834}
   m_Layer: 17
   m_Name: AI Red
-  m_TagString: Player
+  m_TagString: AI
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -269,7 +269,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1189554975
+  GlobalObjectIdHash: 75575338
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -316,15 +316,15 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1670119433932643}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fcdf116e6097f495a8abc4654d226802, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   body: {fileID: 1634502660656484}
-  movement: {fileID: 0}
-  attack: {fileID: 0}
-  receiver: {fileID: 0}
+  movement: {fileID: 7260632517496643834}
+  attack: {fileID: 1058749907071328082}
+  receiver: {fileID: 3430642439028620820}
   radarIcon: {fileID: 3627874878998011375}
   fighterNo:
     m_InternalValue: 0
@@ -380,7 +380,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1670119433932643}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 478cab0a25e364f0f9691399b5b8add4, type: 3}
   m_Name: 
@@ -388,7 +388,7 @@ MonoBehaviour:
   finalDestination: {x: 0, y: 0, z: 0}
   nextDestination: {x: 0, y: 0, z: 0}
   burnerController: {fileID: 6042251533966865366}
-  rollSpark: {fileID: 0}
+  rollSpark: {fileID: 3047577493787709471}
   condition: 1
   prev_condition: 1
 --- !u!1001 &608152692306536542
@@ -588,6 +588,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 322cfe08a3a784b15af8ec51263f281f, type: 3}
+--- !u!198 &3047577493787709471 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 3587960193528452080, guid: 322cfe08a3a784b15af8ec51263f281f, type: 3}
+  m_PrefabInstance: {fileID: 1982099903025791983}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3333890428854371622 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3874660226045101769, guid: 322cfe08a3a784b15af8ec51263f281f, type: 3}

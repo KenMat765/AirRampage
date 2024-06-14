@@ -41,13 +41,11 @@ public class AiReceiver : Receiver
         base.OnDeath(destroyerNo, destroyerSkillName);
 
         string my_name = fighterCondition.fighterName.Value.ToString();
-        Color arrowColor = Color.gray;
-        if (fighterCondition.fighterTeam.Value == Team.RED) arrowColor = Color.blue;
-        else if (fighterCondition.fighterTeam.Value == Team.BLUE) arrowColor = Color.red;
+        Team my_team = fighterCondition.fighterTeam.Value;
 
         if (destroyerSkillName == "Crystal")
         {
-            uGUIMannager.I.BookRepo("Crystal", my_name, arrowColor, null);
+            uGUIMannager.I.BookRepo("Crystal", my_name, my_team, null);
             return;
         }
 
@@ -56,7 +54,7 @@ public class AiReceiver : Receiver
         if (destroyerSkillName == "NormalBlast") skill_sprite = null;
         else skill_sprite = SkillDatabase.I.SearchSkillByName(destroyerSkillName.ToString()).GetSprite();
 
-        uGUIMannager.I.BookRepo(destroyer_name, my_name, arrowColor, skill_sprite);
+        uGUIMannager.I.BookRepo(destroyer_name, my_name, my_team, skill_sprite);
 
         underAttack = false;
     }
@@ -65,7 +63,7 @@ public class AiReceiver : Receiver
     // Damage ///////////////////////////////////////////////////////////////////////////////////////////////////////
     public override void OnWeaponHit(int fighterNo)
     {
-        base.OnWeaponHit(fighterNo);
+        // base.OnWeaponHit(fighterNo);
         if (!underAttack)
         {
             hitTimer = 5;

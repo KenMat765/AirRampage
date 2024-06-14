@@ -9395,7 +9395,7 @@ MonoBehaviour:
   movement: {fileID: 4290537579717849159}
   attack: {fileID: 4261731771400978922}
   receiver: {fileID: 710287870623200186}
-  radarIcon: {fileID: 0}
+  radarIcon: {fileID: 7226467974988038721}
   fighterNo:
     m_InternalValue: 0
   fighterName:

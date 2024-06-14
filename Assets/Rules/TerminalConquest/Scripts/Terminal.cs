@@ -210,7 +210,7 @@ public abstract class Terminal : NetworkBehaviour
     [SerializeField] Transform[] subtargetsAround;
     [SerializeField] float detectDistance;
 
-    [ContextMenu("GetSubtargetsAround")]
+    [NaughtyAttributes.Button("GetSubtargetsAround")]
     void GetSubtargetsAround()
     {
         Collider[] subtarget_cols = Physics.OverlapSphere(transform.position, detectDistance, 1 << 7);

@@ -941,8 +941,6 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
                 LobbyParticipantData lobby_data = (LobbyParticipantData)nullable_data;
                 NameUISetter(blockNo, lobby_data.name.Value);
 
-                Debug.Log($"MyNo:{myNumber} BlockNo:{lobby_data.number}");
-
                 // My block Id
                 if (lobby_data.number == myNumber)
                 {
