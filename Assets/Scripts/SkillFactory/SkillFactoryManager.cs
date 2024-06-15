@@ -30,6 +30,7 @@ public class SkillFactoryManager : MonoBehaviour
     Image skillIcon;
     Image[] featureLines = new Image[featureCount];
     TextMeshProUGUI[] featureTexts = new TextMeshProUGUI[featureCount];
+    GameObject lineNewObj;
     TextMeshProUGUI typeText;
     TextMeshProUGUI explanationText;
 
@@ -65,7 +66,8 @@ public class SkillFactoryManager : MonoBehaviour
             featureLines[k] = line_trans.GetComponent<Image>();
             featureTexts[k] = line_trans.Find("Feature").GetComponent<TextMeshProUGUI>();
         }
-        typeText = result.Find("Type").GetComponent<TextMeshProUGUI>();
+        lineNewObj = result.Find("LineNew").gameObject;
+        typeText = result.Find("LineType/Type").GetComponent<TextMeshProUGUI>();
         explanationText = result.Find("ExplanationFrame/Explanation").GetComponent<TextMeshProUGUI>();
 
         // Show status and hide result & glass
@@ -167,10 +169,12 @@ public class SkillFactoryManager : MonoBehaviour
         if (unlocked) // Already unlocked
         {
             resultTitleText.text = "";
+            lineNewObj.SetActive(false);
         }
         else // Newly unlocked
         {
             resultTitleText.text = "unlocked";
+            lineNewObj.SetActive(true);
         }
         skillNameText.text = skillData.GetNameDisp();
         skillIcon.sprite = skillData.GetSprite();
@@ -181,17 +185,17 @@ public class SkillFactoryManager : MonoBehaviour
             featureTexts[k].text = skill_feature;
             if (skill_feature != "")
             {
-                featureLines[k].DOFade(1, 0);
-                featureTexts[k].DOFade(1, 0);
+                featureLines[k].FadeColor(1);
+                featureTexts[k].FadeColor(1);
             }
             else
             {
-                featureLines[k].DOFade(0, 0);
-                featureTexts[k].DOFade(0, 0);
+                featureLines[k].FadeColor(0);
+                featureTexts[k].FadeColor(0);
             }
         }
         typeText.text = skillData.GetSkillType().ToString();
-        typeText.color = skillData.GetColor();
+        // typeText.color = skillData.GetColor();
         explanationText.text = skillData.GetInfomation();
     }
 
