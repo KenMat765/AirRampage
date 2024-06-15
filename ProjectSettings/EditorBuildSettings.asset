@@ -12,18 +12,18 @@ EditorBuildSettings:
     path: Assets/Scenes/SkillPort.unity
     guid: ea0249fccac2901479deb7c702181236
   - enabled: 1
-    path: Assets/Scenes/Offline.unity
-    guid: 9fc0d4010bbf28b4594072e72b8655ab
+    path: Assets/Scenes/AbilityPort.unity
+    guid: e85b9ec17f50d4a5e8afbd56173f0daa
   - enabled: 1
-    path: Assets/Scenes/SortieLobby.unity
-    guid: 353156177d7964dd98a9f7a53ee90e79
-  - enabled: 1
-    path: Assets/Scenes/OnlineLobby.unity
-    guid: a9c7d5884818342be8fa48a4558351e0
+    path: Assets/Scenes/SkillFactory.unity
+    guid: d2f3b8f0ee59544acabaaeb284448c53
   - enabled: 1
     path: Assets/Scenes/AbilityFactory.unity
     guid: 6fd84b5eb367a4abb8ceeffb21987464
   - enabled: 1
-    path: Assets/Scenes/SkillFactory.unity
-    guid: d2f3b8f0ee59544acabaaeb284448c53
+    path: Assets/Scenes/OnlineLobby.unity
+    guid: a9c7d5884818342be8fa48a4558351e0
+  - enabled: 1
+    path: Assets/Scenes/Space.unity
+    guid: 320e619d864da4beea1ca60d306f9dd2
   m_configObjects: {}

@@ -18,12 +18,12 @@ MonoBehaviour:
   skillType: 0
   skillColor: {r: 1, g: 0, b: 0, a: 1}
   skillSprite: {fileID: 21300000, guid: d6005269057804ea59c976caf35c2ce3, type: 3}
-  skillPrefabRed: {fileID: 1588079050117656121, guid: 306936fbb9eec48e5b9ec9c129130c4e, type: 3}
-  skillPrefabBlue: {fileID: 2196127432211435588, guid: c4c7b10b5eb6c4ede8dc02ee013354e1, type: 3}
+  skillPrefabRed: {fileID: 1802182117782613, guid: f2c702783a6bc417281ff521ed1059eb, type: 3}
+  skillPrefabBlue: {fileID: 1972767913230003, guid: a4f046283ee084701888d9e96549b356, type: 3}
   skillScript: {fileID: 3078515944989789901, guid: 71b8cc405d77a42d5877225dac414bc4, type: 3}
-  skillInformation: 
+  skillInformation: Surround yourself with blades that damage enemies on contact.
   skillFeatures:
-  - 
-  - 
+  - Features
+  - Penetrate
   - 
   - 

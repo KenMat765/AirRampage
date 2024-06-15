@@ -26,6 +26,7 @@ public class Receiver : NetworkBehaviour
             return;
         }
 
+        // Give combo to destroyer.
         FighterCondition destroyer_condition = ParticipantManager.I.fighterInfos[destroyerNo].fighterCondition;
         destroyer_condition.Combo(fighterCondition.my_cp);
     }

@@ -51,7 +51,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
 
     #region Combo
     TextMeshProUGUI combo, cp_bonus;
-    [SerializeField] TMP_ColorGradient combo_green, combo_yellow, combo_red;
+    [SerializeField] TMP_ColorGradient gradv_green, gradv_yellow, gradv_red, gradv_blue, gradv_gray;
     bool combo_seqPlaying, combo_displayed;
     public float default_combo_disp_timer { get; set; }
     float combo_disp_timer;
@@ -84,7 +84,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
     #endregion
 
     #region Destroy Report
-    Text destroyerTex, destroyedTex;
+    TextMeshProUGUI destroyerTex, destroyedTex;
     Image arrow, skill_icon;
     bool destroy_seqPlaying;
     List<Sequence> destroy_sequences = new List<Sequence>();
@@ -92,7 +92,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
     #endregion
 
     #region Killed Report
-    Text killed, reviveIn, reviveCount;
+    TextMeshProUGUI killed, reviveIn, reviveCount;
     #endregion
 
     #region Participant HPs
@@ -184,45 +184,45 @@ public class uGUIMannager : Singleton<uGUIMannager>
         #endregion
 
         #region Result
-        returnButton = result.Find("ReturnButton").GetComponent<Button>();
-        returnButtonText = result.Find("ReturnButton/Text").GetComponent<TextMeshProUGUI>();
-        switch (BattleInfo.rule)
-        {
-            case Rule.BATTLEROYAL:
-                Transform result_royal = result.Find("Result_Royal");
-                result_redScore = result_royal.Find("RedScore").GetComponent<TextMeshProUGUI>();
-                result_blueScore = result_royal.Find("BlueScore").GetComponent<TextMeshProUGUI>();
-                fighter_names = result_royal.Find("Names").GetComponentsInChildren<TextMeshProUGUI>();
-                fighter_scores = result_royal.Find("Scores").GetComponentsInChildren<TextMeshProUGUI>();
-                for (int no = 0; no < GameInfo.max_player_count; no++) fighter_names[no].text = BattleInfo.battleDatas[no].name;
-                foreach (TextMeshProUGUI score in fighter_scores) score.text = "";
-                break;
+        // returnButton = result.Find("ReturnButton").GetComponent<Button>();
+        // returnButtonText = result.Find("ReturnButton/Text").GetComponent<TextMeshProUGUI>();
+        // switch (BattleInfo.rule)
+        // {
+        //     case Rule.BATTLEROYAL:
+        //         Transform result_royal = result.Find("Result_Royal");
+        //         result_redScore = result_royal.Find("RedScore").GetComponent<TextMeshProUGUI>();
+        //         result_blueScore = result_royal.Find("BlueScore").GetComponent<TextMeshProUGUI>();
+        //         fighter_names = result_royal.Find("Names").GetComponentsInChildren<TextMeshProUGUI>();
+        //         fighter_scores = result_royal.Find("Scores").GetComponentsInChildren<TextMeshProUGUI>();
+        //         for (int no = 0; no < GameInfo.max_player_count; no++) fighter_names[no].text = BattleInfo.battleDatas[no].name;
+        //         foreach (TextMeshProUGUI score in fighter_scores) score.text = "";
+        //         break;
 
-            case Rule.TERMINALCONQUEST:
-                Transform result_terminal = result.Find("Result_Terminal");
-                result_redScore = result_terminal.Find("RedScore").GetComponent<TextMeshProUGUI>();
-                result_blueScore = result_terminal.Find("BlueScore").GetComponent<TextMeshProUGUI>();
-                redTitle = result.Find("RedTitle").GetComponent<TextMeshProUGUI>();
-                blueTitle = result.Find("BlueTitle").GetComponent<TextMeshProUGUI>();
-                occupation = result_terminal.Find("Occupation").GetComponent<TextMeshProUGUI>();
-                occupation.color = Color.clear;
-                break;
+        //     case Rule.TERMINALCONQUEST:
+        //         Transform result_terminal = result.Find("Result_Terminal");
+        //         result_redScore = result_terminal.Find("RedScore").GetComponent<TextMeshProUGUI>();
+        //         result_blueScore = result_terminal.Find("BlueScore").GetComponent<TextMeshProUGUI>();
+        //         redTitle = result.Find("RedTitle").GetComponent<TextMeshProUGUI>();
+        //         blueTitle = result.Find("BlueTitle").GetComponent<TextMeshProUGUI>();
+        //         occupation = result_terminal.Find("Occupation").GetComponent<TextMeshProUGUI>();
+        //         occupation.color = Color.clear;
+        //         break;
 
-            case Rule.CRYSTALHUNTER:
-                Transform result_crystal = result.Find("Result_Crystal");
-                result_redScore = result_crystal.Find("RedScore").GetComponent<TextMeshProUGUI>();
-                result_blueScore = result_crystal.Find("BlueScore").GetComponent<TextMeshProUGUI>();
-                redTitle = result.Find("RedTitle").GetComponent<TextMeshProUGUI>();
-                blueTitle = result.Find("BlueTitle").GetComponent<TextMeshProUGUI>();
-                occupation = result_crystal.Find("Occupation").GetComponent<TextMeshProUGUI>();
-                occupation.color = Color.clear;
-                break;
-        }
-        result.DOScaleX(0, 0);
-        returnButton.interactable = false;
-        returnButtonText.color = Color.gray;
-        result_redScore.text = "";
-        result_blueScore.text = "";
+        //     case Rule.CRYSTALHUNTER:
+        //         Transform result_crystal = result.Find("Result_Crystal");
+        //         result_redScore = result_crystal.Find("RedScore").GetComponent<TextMeshProUGUI>();
+        //         result_blueScore = result_crystal.Find("BlueScore").GetComponent<TextMeshProUGUI>();
+        //         redTitle = result.Find("RedTitle").GetComponent<TextMeshProUGUI>();
+        //         blueTitle = result.Find("BlueTitle").GetComponent<TextMeshProUGUI>();
+        //         occupation = result_crystal.Find("Occupation").GetComponent<TextMeshProUGUI>();
+        //         occupation.color = Color.clear;
+        //         break;
+        // }
+        // result.DOScaleX(0, 0);
+        // returnButton.interactable = false;
+        // returnButtonText.color = Color.gray;
+        // result_redScore.text = "";
+        // result_blueScore.text = "";
         #endregion
 
         #region Lock On
@@ -230,8 +230,8 @@ public class uGUIMannager : Singleton<uGUIMannager>
         #endregion
 
         #region Destroy Report
-        destroyerTex = destroyRepo.Find("Destroyer").GetComponent<Text>();
-        destroyedTex = destroyRepo.Find("Destroyed").GetComponent<Text>();
+        destroyerTex = destroyRepo.Find("Destroyer").GetComponent<TextMeshProUGUI>();
+        destroyedTex = destroyRepo.Find("Destroyed").GetComponent<TextMeshProUGUI>();
         arrow = destroyRepo.Find("Arrow").GetComponent<Image>();
         skill_icon = destroyRepo.Find("SkillIcon").GetComponent<Image>();
         destroyedTex.text = "";
@@ -239,9 +239,9 @@ public class uGUIMannager : Singleton<uGUIMannager>
         #endregion
 
         #region Killed Report
-        killed = killedRepo.Find("Killed").GetComponent<Text>();
-        reviveIn = killedRepo.Find("Revive_In").GetComponent<Text>();
-        reviveCount = killedRepo.Find("Revive_Count").GetComponent<Text>();
+        killed = killedRepo.Find("Killed").GetComponent<TextMeshProUGUI>();
+        reviveIn = killedRepo.Find("Revive_In").GetComponent<TextMeshProUGUI>();
+        reviveCount = killedRepo.Find("Revive_Count").GetComponent<TextMeshProUGUI>();
         #endregion
 
         #region Participant HPs
@@ -525,14 +525,39 @@ public class uGUIMannager : Singleton<uGUIMannager>
         }
     }
 
-    public void BookRepo(string destroyer, string destroyed, Color arrowColor, Sprite skill_sprite)
+    public void BookRepo(string destroyer, string destroyed, Team destroyed_team, Sprite skill_sprite)
     {
         Sequence newSeq = DOTween.Sequence()
             .OnStart(() =>
             {
+                // Set text.
                 destroyerTex.text = destroyer;
                 destroyedTex.text = destroyed;
-                arrow.color = arrowColor;
+
+                // Set color.
+                arrow.color = Color.white;
+                switch (destroyed_team)
+                {
+                    case Team.NONE:
+                        destroyerTex.colorGradientPreset = gradv_gray;
+                        destroyedTex.colorGradientPreset = gradv_gray;
+                        // arrow.color = Color.gray;
+                        break;
+
+                    case Team.RED:
+                        destroyerTex.colorGradientPreset = gradv_blue;
+                        destroyedTex.colorGradientPreset = gradv_red;
+                        // arrow.color = Color.blue;
+                        break;
+
+                    case Team.BLUE:
+                        destroyerTex.colorGradientPreset = gradv_red;
+                        destroyedTex.colorGradientPreset = gradv_blue;
+                        // arrow.color = Color.red;
+                        break;
+                }
+
+                // Set skill icon.
                 if (skill_sprite != null)
                 {
                     skill_icon.sprite = skill_sprite;
@@ -551,25 +576,25 @@ public class uGUIMannager : Singleton<uGUIMannager>
                 destroy_seqPlaying = false;
             });
 
-        newSeq.Append(destroyRepo.DOLocalMoveX(-720, 0.2f));
+        newSeq.Append(destroyRepo.DOAnchorPosX(175, 0.2f));
 
-        newSeq.Append(arrow.DOColor(Color.clear, 0.2f).SetLoops(5, LoopType.Yoyo));
-        newSeq.Join(destroyerTex.DOColor(Color.clear, 0.2f).SetLoops(5, LoopType.Yoyo));
-        newSeq.Join(destroyedTex.DOColor(Color.clear, 0.2f).SetLoops(5, LoopType.Yoyo));
+        newSeq.Append(arrow.DOFade(0, 0.2f).SetLoops(5, LoopType.Yoyo));
+        newSeq.Join(destroyerTex.DOFade(0, 0.2f).SetLoops(5, LoopType.Yoyo));
+        newSeq.Join(destroyedTex.DOFade(0, 0.2f).SetLoops(5, LoopType.Yoyo));
         if (skill_sprite != null)
         {
-            newSeq.Join(skill_icon.DOColor(Color.clear, 0.2f).SetLoops(5, LoopType.Yoyo));
+            newSeq.Join(skill_icon.DOFade(0, 0.2f).SetLoops(5, LoopType.Yoyo));
         }
 
-        newSeq.Append(arrow.DOColor(arrowColor, 0.2f));
-        newSeq.Join(destroyerTex.DOColor(Color.white, 0.2f));
-        newSeq.Join(destroyedTex.DOColor(Color.white, 0.2f));
+        newSeq.Append(arrow.DOFade(1, 0.2f));
+        newSeq.Join(destroyerTex.DOFade(1, 0.2f));
+        newSeq.Join(destroyedTex.DOFade(1, 0.2f));
         if (skill_sprite != null)
         {
-            newSeq.Join(skill_icon.DOColor(Color.white, 0.2f));
+            newSeq.Join(skill_icon.DOFade(1, 0.2f));
         }
 
-        newSeq.Append(destroyRepo.DOLocalMoveX(-1100, 0.2f).SetDelay(3));
+        newSeq.Append(destroyRepo.DOAnchorPosX(-175, 0.2f).SetDelay(3));
 
         destroy_sequences.Add(newSeq);
     }
@@ -940,22 +965,22 @@ public class uGUIMannager : Singleton<uGUIMannager>
             cp_bonus.text = "CP BONUS x" + cp_magnif.ToString("f1");
             if (3 <= combo_count && combo_count <= 6)
             {
-                combo.colorGradientPreset = combo_green;
-                cp_bonus.colorGradientPreset = combo_green;
+                combo.colorGradientPreset = gradv_green;
+                cp_bonus.colorGradientPreset = gradv_green;
             }
             else if (7 <= combo_count && combo_count <= 10)
             {
-                combo.colorGradientPreset = combo_yellow;
-                cp_bonus.colorGradientPreset = combo_yellow;
+                combo.colorGradientPreset = gradv_yellow;
+                cp_bonus.colorGradientPreset = gradv_yellow;
             }
             else if (11 <= combo_count)
             {
-                combo.colorGradientPreset = combo_red;
-                cp_bonus.colorGradientPreset = combo_red;
+                combo.colorGradientPreset = gradv_red;
+                cp_bonus.colorGradientPreset = gradv_red;
             }
         });
         newSeq.Append(comboRepo.DOAnchorPosX(300, 0));
-        newSeq.Append(comboRepo.DOAnchorPosX(-150, 0.2f).SetEase(Ease.OutExpo));
+        newSeq.Append(comboRepo.DOAnchorPosX(-175, 0.2f).SetEase(Ease.OutExpo));
         newSeq.OnComplete(() =>
         {
             combo_sequences.Remove(combo_currSeq);

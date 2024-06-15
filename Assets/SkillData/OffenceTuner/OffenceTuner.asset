@@ -21,9 +21,9 @@ MonoBehaviour:
   skillPrefabRed: {fileID: 4530704219661545942, guid: 1e1ecb45da96b4a06be4a07d71e2b95a, type: 3}
   skillPrefabBlue: {fileID: 4530704219661545942, guid: 1e1ecb45da96b4a06be4a07d71e2b95a, type: 3}
   skillScript: {fileID: 4310564539533291669, guid: cc9234f53312043819c7de53dc22804f, type: 3}
-  skillInformation: 
+  skillInformation: Increases attack for a certain period of time.
   skillFeatures:
-  - 
-  - 
+  - Features
+  - Attack UP
   - 
   - 

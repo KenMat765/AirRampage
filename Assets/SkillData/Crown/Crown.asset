@@ -21,9 +21,9 @@ MonoBehaviour:
   skillPrefabRed: {fileID: 8298676130664417805, guid: 9ccafa43bdbc74c8980b5b3b947f3703, type: 3}
   skillPrefabBlue: {fileID: 1205101602126402896, guid: 9898a1e0aebd8314bb6d53e92769e5c7, type: 3}
   skillScript: {fileID: 6939685626458819323, guid: be018ebfa7ff0c44e930637b8dd08bd4, type: 3}
-  skillInformation: 
+  skillInformation: Fires multiple high-damage projectiles.
   skillFeatures:
-  - 
-  - 
+  - Features
+  - Area Attack
   - 
   - 

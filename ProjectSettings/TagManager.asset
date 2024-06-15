@@ -18,20 +18,20 @@ TagManager:
   - UI
   - Terrain
   - SubTarget
-  - 
+  - Crystal
   - RedBody
   - RedBullet
   - RedShield
   - BlueBody
   - BlueBullet
   - BlueShield
-  - 
+  - CrystalArea
   - RadarIcon
   - RedFighter
   - BlueFighter
-  - 
-  - 
-  - 
+  - Terminal
+  - RedTerminal
+  - BlueTerminal
   - 
   - 
   - 

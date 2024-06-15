@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a3a424fb66c24646aef30ac8f987be3, type: 3}
   m_Name: ImpactCharge
   m_EditorClassIdentifier: 
-  skillName: ImpactCharge
-  skillNameJp: "\u30A4\u30F3\u30D1\u30AF\u30C8\u30C1\u30E3\u30FC\u30B8"
+  skillName: ImpactBomb
+  skillNameJp: "\u30A4\u30F3\u30D1\u30AF\u30C8\u30DC\u30E0"
   skillId: 0
   skillType: 0
   skillColor: {r: 1, g: 0, b: 0, a: 1}
@@ -21,9 +21,9 @@ MonoBehaviour:
   skillPrefabRed: {fileID: 7898366259939944697, guid: bf0ba32f3afd9db4abc7299b8b60f6bf, type: 3}
   skillPrefabBlue: {fileID: 2642933353904130311, guid: 2f92ab78c1b264f8cb76787c3436d735, type: 3}
   skillScript: {fileID: -3083893537962140918, guid: f96a4e7794a95d54aae788b1a6f323a7, type: 3}
-  skillInformation: Information of Skill
+  skillInformation: Fire homing bomb that damages nearby enemies.
   skillFeatures:
-  - feature1
-  - feature2
-  - feature3
-  - feature4
+  - Features
+  - Area Attack
+  - Homing
+  - 

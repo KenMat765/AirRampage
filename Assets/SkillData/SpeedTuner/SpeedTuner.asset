@@ -21,9 +21,9 @@ MonoBehaviour:
   skillPrefabRed: {fileID: 7144759960244023167, guid: c3aa76d0e7c5d4deb95d51c868fcb3c9, type: 3}
   skillPrefabBlue: {fileID: 7144759960244023167, guid: c3aa76d0e7c5d4deb95d51c868fcb3c9, type: 3}
   skillScript: {fileID: -2445841009788449415, guid: a824ef5c54f19460080dfe5b498fa6e3, type: 3}
-  skillInformation: 
+  skillInformation: Increases speed for a certain period of time.
   skillFeatures:
-  - 
-  - 
+  - Features
+  - Speed UP
   - 
   - 

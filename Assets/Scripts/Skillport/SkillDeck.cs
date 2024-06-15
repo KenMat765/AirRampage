@@ -15,11 +15,11 @@ public class SkillDeck : Utilities
     Image[] lines = new Image[GameInfo.max_skill_count];
     Image[] line2s = new Image[GameInfo.max_skill_count];
     TextMeshProUGUI[] skill_names = new TextMeshProUGUI[GameInfo.max_skill_count];
-    Text[] change_texts = new Text[GameInfo.max_skill_count];
+    TextMeshProUGUI[] change_texts = new TextMeshProUGUI[GameInfo.max_skill_count];
     Image[] change_btn_imgs = new Image[GameInfo.max_skill_count];
-    Text[] remove_texts = new Text[GameInfo.max_skill_count];
+    TextMeshProUGUI[] remove_texts = new TextMeshProUGUI[GameInfo.max_skill_count];
     Image[] remove_btn_imgs = new Image[GameInfo.max_skill_count];
-    Text[] set_texts = new Text[GameInfo.max_skill_count];
+    TextMeshProUGUI[] set_texts = new TextMeshProUGUI[GameInfo.max_skill_count];
     Image[] set_btn_imgs = new Image[GameInfo.max_skill_count];
 
     public int current_deck_num { get; private set; } = 0;
@@ -43,13 +43,13 @@ public class SkillDeck : Utilities
             skill_names[k] = lines[k].transform.Find("SkillName").GetComponent<TextMeshProUGUI>();
 
             change_btn_imgs[k] = lines[k].transform.Find("Change_Btn").GetComponent<Image>();
-            change_texts[k] = change_btn_imgs[k].transform.Find("Change").GetComponent<Text>();
+            change_texts[k] = change_btn_imgs[k].transform.Find("Change").GetComponent<TextMeshProUGUI>();
 
             remove_btn_imgs[k] = lines[k].transform.Find("Remove_Btn").GetComponent<Image>();
-            remove_texts[k] = remove_btn_imgs[k].transform.Find("Remove").GetComponent<Text>();
+            remove_texts[k] = remove_btn_imgs[k].transform.Find("Remove").GetComponent<TextMeshProUGUI>();
 
             set_btn_imgs[k] = line2s[k].transform.Find("Set_Btn").GetComponent<Image>();
-            set_texts[k] = set_btn_imgs[k].transform.Find("Set").GetComponent<Text>();
+            set_texts[k] = set_btn_imgs[k].transform.Find("Set").GetComponent<TextMeshProUGUI>();
         }
 
         OnExit();

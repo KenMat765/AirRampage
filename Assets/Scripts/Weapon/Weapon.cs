@@ -404,8 +404,9 @@ public abstract class Weapon : Utilities
         }
 
         // 弾をリジェクト ＋ 発射音、エフェクト再生
-        if (lockonType == LockonType.Self) transform.parent = transform.root;
-        else transform.parent = null;
+        // if (lockonType == LockonType.Self) transform.parent = transform.root;
+        // else transform.parent = null;
+        transform.parent = null;
         if (blastImpact != null)
         {
             blastImpact.SetActive(true);

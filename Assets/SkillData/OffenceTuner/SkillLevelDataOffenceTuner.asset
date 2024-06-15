@@ -177,20 +177,20 @@ MonoBehaviour:
     <EnhanceDetails>k__BackingField: []
     RepairAmount: 0
   assistLevelData1:
-    <ChargeTime>k__BackingField: 20
+    <ChargeTime>k__BackingField: 25
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
     <EnhanceDetails>k__BackingField:
-    - 
-    - 
-    - 
+    - Enhancement
+    - Charge -5
+    - Duration +5
     - 
     SpeedGrade: 0
     PowerGrade: 1
     DefenceGrade: 0
     SpeedDuration: 0
-    PowerDuration: 10
+    PowerDuration: 20
     DefenceDuration: 0
   assistLevelData2:
     <ChargeTime>k__BackingField: 20
@@ -198,31 +198,31 @@ MonoBehaviour:
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
     <EnhanceDetails>k__BackingField:
-    - 
-    - 
+    - Enhancement
+    - Attack +1
     - 
     - 
     SpeedGrade: 0
     PowerGrade: 1
     DefenceGrade: 0
     SpeedDuration: 0
-    PowerDuration: 12
+    PowerDuration: 25
     DefenceDuration: 0
   assistLevelData3:
-    <ChargeTime>k__BackingField: 15
+    <ChargeTime>k__BackingField: 20
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
     <EnhanceDetails>k__BackingField:
-    - 
-    - 
-    - 
+    - Enhancement
+    - Charge -5
+    - Duration +5
     - 
     SpeedGrade: 0
     PowerGrade: 2
     DefenceGrade: 0
     SpeedDuration: 0
-    PowerDuration: 12
+    PowerDuration: 25
     DefenceDuration: 0
   assistLevelData4:
     <ChargeTime>k__BackingField: 15
@@ -230,23 +230,23 @@ MonoBehaviour:
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
     <EnhanceDetails>k__BackingField:
-    - 
-    - 
+    - Enhancement
+    - Attack +1
     - 
     - 
     SpeedGrade: 0
     PowerGrade: 2
     DefenceGrade: 0
     SpeedDuration: 0
-    PowerDuration: 15
+    PowerDuration: 30
     DefenceDuration: 0
   assistLevelData5:
-    <ChargeTime>k__BackingField: 10
+    <ChargeTime>k__BackingField: 15
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
     <EnhanceDetails>k__BackingField:
-    - 
+    - Max Quality
     - 
     - 
     - 
@@ -254,7 +254,7 @@ MonoBehaviour:
     PowerGrade: 3
     DefenceGrade: 0
     SpeedDuration: 0
-    PowerDuration: 15
+    PowerDuration: 30
     DefenceDuration: 0
   disturbLevelData1:
     <ChargeTime>k__BackingField: 0

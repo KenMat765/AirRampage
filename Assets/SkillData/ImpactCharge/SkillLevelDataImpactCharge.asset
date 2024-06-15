@@ -22,12 +22,12 @@ MonoBehaviour:
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
     <EnhanceDetails>k__BackingField:
+    - Enhancement
+    - Charge -5
     - 
     - 
-    - 
-    - 
-    Power: 15
-    Speed: 15
+    Power: 20
+    Speed: 65
     Lifespan: 2
     WeaponCount: 1
     HomingType: 2
@@ -46,17 +46,17 @@ MonoBehaviour:
     PowerDuration: 0
     DefenceDuration: 0
   attackLevelData2:
-    <ChargeTime>k__BackingField: 25
+    <ChargeTime>k__BackingField: 20
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
     <EnhanceDetails>k__BackingField:
-    - 
-    - 
-    - 
+    - Enhancement
+    - Power +5
+    - Speed +5
     - 
     Power: 20
-    Speed: 15
+    Speed: 65
     Lifespan: 2
     WeaponCount: 1
     HomingType: 2
@@ -80,12 +80,12 @@ MonoBehaviour:
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
     <EnhanceDetails>k__BackingField:
+    - Enhancement
+    - Charge -5
     - 
     - 
-    - 
-    - 
-    Power: 20
-    Speed: 20
+    Power: 25
+    Speed: 70
     Lifespan: 2
     WeaponCount: 1
     HomingType: 2
@@ -104,17 +104,17 @@ MonoBehaviour:
     PowerDuration: 0
     DefenceDuration: 0
   attackLevelData4:
-    <ChargeTime>k__BackingField: 20
+    <ChargeTime>k__BackingField: 15
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
     <EnhanceDetails>k__BackingField:
-    - 
-    - 
-    - 
+    - Enhancement
+    - Power +5
+    - Speed +5
     - 
     Power: 25
-    Speed: 20
+    Speed: 70
     Lifespan: 2
     WeaponCount: 1
     HomingType: 2
@@ -138,12 +138,12 @@ MonoBehaviour:
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
     <EnhanceDetails>k__BackingField:
+    - Max Quality
     - 
     - 
     - 
-    - 
-    Power: 25
-    Speed: 25
+    Power: 30
+    Speed: 75
     Lifespan: 2
     WeaponCount: 1
     HomingType: 2

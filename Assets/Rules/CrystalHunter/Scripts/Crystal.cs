@@ -26,7 +26,7 @@ public class Crystal : MonoBehaviour
     [SerializeField] ParticleSystem red_get, blue_get;
 
     [Button]
-    public void InitCrystal()
+    void InitCrystal()
     {
         red_crystal = transform.Find("Red").gameObject;
         blue_crystal = transform.Find("Blue").gameObject;

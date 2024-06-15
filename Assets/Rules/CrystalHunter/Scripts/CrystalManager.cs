@@ -16,7 +16,7 @@ public class CrystalManager : Singleton<CrystalManager>
     public CrystalArea red_crystalArea, blue_crystalArea;
 
     [Button]
-    public void InitCrystals()
+    void InitCrystals()
     {
         // Crystals
         for (int id = 0; id < crystal_count; id++)

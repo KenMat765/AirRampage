@@ -53,7 +53,7 @@ public class SortieLobbyManager : NetworkSingleton<SortieLobbyManager>
         LobbyLinkedData.I.DetermineParticipants();
 
         // Wait for few seconds for LobbyLinkedData to synchronize.
-        int wait_milisec = 2000;
+        int wait_milisec = 1000;
         await UniTask.Delay(wait_milisec);
 
         // Callback called on every participants.

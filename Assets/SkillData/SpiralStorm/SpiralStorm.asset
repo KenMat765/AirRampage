@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a3a424fb66c24646aef30ac8f987be3, type: 3}
   m_Name: SpiralStorm
   m_EditorClassIdentifier: 
-  skillName: SpiralStorm
-  skillNameJp: "\u30B9\u30D1\u30A4\u30E9\u30EB\u30B9\u30C8\u30FC\u30E0"
+  skillName: SpiralCanon
+  skillNameJp: "\u30B9\u30D1\u30A4\u30E9\u30EB\u30AD\u30E3\u30CE\u30F3"
   skillId: 5
   skillType: 3
   skillColor: {r: 0.55, g: 0, b: 1, a: 1}
@@ -21,9 +21,9 @@ MonoBehaviour:
   skillPrefabRed: {fileID: 5613718625986941779, guid: 2b95a7b9495c343e2bed673e6d10b219, type: 3}
   skillPrefabBlue: {fileID: 8269067930228738635, guid: 2915f9d1204924b6fa48e115aca647cc, type: 3}
   skillScript: {fileID: 5071728378287198796, guid: ee3772f1d07194748aad263e78b874ab, type: 3}
-  skillInformation: 
+  skillInformation: Fire homing projectile that slows down nearby enemies.
   skillFeatures:
-  - 
-  - 
-  - 
+  - Features
+  - Area Attack
+  - Speed Down
   - 
