@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: StarGazer
   m_EditorClassIdentifier: 
   skillName: StarGazer
-  skillNameJp: "\u30B9\u30BF\u30FC\u30B2\u30A4\u30B6\u30FC"
+  skillNameDisp: Star Gazer
   skillId: 6
   skillType: 0
   skillColor: {r: 1, g: 0, b: 0, a: 1}

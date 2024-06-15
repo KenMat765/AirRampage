@@ -244,7 +244,7 @@ public class SkillDeck : Utilities
                     icon_imgs[k].color = data.GetColor();
                     skill_imgs[k].sprite = data.GetSprite();
                     skill_imgs[k].color = new Color(1, 1, 1, 0.45f);
-                    skill_names[k].text = data.GetName();
+                    skill_names[k].text = data.GetNameDisp();
                 }
             }
         }

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SpeedTuner
   m_EditorClassIdentifier: 
   skillName: SpeedTuner
-  skillNameJp: "\u30B9\u30D4\u30FC\u30C9\u30C1\u30E5\u30FC\u30CA"
+  skillNameDisp: Speed Tuner
   skillId: 9
   skillType: 2
   skillColor: {r: 0, g: 0.14901961, b: 1, a: 1}

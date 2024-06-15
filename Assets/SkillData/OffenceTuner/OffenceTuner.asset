@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: OffenceTuner
   m_EditorClassIdentifier: 
   skillName: OffenceTuner
-  skillNameJp: "\u30AA\u30D5\u30A7\u30F3\u30B9\u30C1\u30E5\u30FC\u30CA"
+  skillNameDisp: Offence Tuner
   skillId: 7
   skillType: 2
   skillColor: {r: 0, g: 0.14901961, b: 1, a: 1}

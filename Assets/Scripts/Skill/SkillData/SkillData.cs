@@ -7,7 +7,7 @@ using NaughtyAttributes;
 public class SkillData : ScriptableObject
 {
     [SerializeField] string skillName;
-    [SerializeField] string skillNameJp;
+    [SerializeField] string skillNameDisp;
     [SerializeField] int skillId;
 
     [SerializeField, OnValueChanged("SetColorBySkillType")]
@@ -33,7 +33,7 @@ public class SkillData : ScriptableObject
     [SerializeField] string[] skillFeatures;
 
     public string GetName() { return skillName; }
-    public string GetNameJp() { return skillNameJp; }
+    public string GetNameDisp() { return skillNameDisp; }
     public int GetId() { return skillId; }
     public (int, int) GetPageOrder()
     {

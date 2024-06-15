@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: NitroBoost
   m_EditorClassIdentifier: 
   skillName: NitroBoost
-  skillNameJp: "\u30CB\u30C8\u30ED\u30D6\u30FC\u30B9\u30C8"
+  skillNameDisp: Nitro Boost
   skillId: 1
   skillType: 2
   skillColor: {r: 0, g: 0.14755607, b: 1, a: 1}

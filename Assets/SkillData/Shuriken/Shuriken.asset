@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Shuriken
   m_EditorClassIdentifier: 
   skillName: Shuriken
-  skillNameJp: "\u30B7\u30E5\u30EA\u30B1\u30F3"
+  skillNameDisp: Shuriken
   skillId: 11
   skillType: 0
   skillColor: {r: 1, g: 0, b: 0, a: 1}

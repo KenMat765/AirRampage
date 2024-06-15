@@ -162,7 +162,7 @@ public class SkillDeckList : MonoBehaviour
             case SkillType.disturb: type_text.text = "Disturb"; break;
             default: type_text.text = "Null"; break;
         }
-        name_text.text = data.GetName();
+        name_text.text = data.GetNameDisp();
         level_text.text = current_skill_level.ToString();
 
         string[] features;

@@ -172,7 +172,7 @@ public class SkillFactoryManager : MonoBehaviour
         {
             resultTitleText.text = "unlocked";
         }
-        skillNameText.text = skillData.GetName();
+        skillNameText.text = skillData.GetNameDisp();
         skillIcon.sprite = skillData.GetSprite();
         string[] skill_features = skillData.GetFeatures();
         for (int k = 0; k < featureCount; k++)

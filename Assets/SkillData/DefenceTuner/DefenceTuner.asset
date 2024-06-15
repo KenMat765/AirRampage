@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: DefenceTuner
   m_EditorClassIdentifier: 
   skillName: DefenceTuner
-  skillNameJp: "\u30C7\u30A3\u30D5\u30A7\u30F3\u30B9\u30C1\u30E5\u30FC\u30CA"
+  skillNameDisp: Defence Tuner
   skillId: 8
   skillType: 2
   skillColor: {r: 0, g: 0.15, b: 1, a: 1}

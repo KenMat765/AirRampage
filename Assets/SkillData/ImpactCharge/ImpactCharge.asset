@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a3a424fb66c24646aef30ac8f987be3, type: 3}
   m_Name: ImpactCharge
   m_EditorClassIdentifier: 
-  skillName: ImpactBomb
-  skillNameJp: "\u30A4\u30F3\u30D1\u30AF\u30C8\u30DC\u30E0"
+  skillName: ImpactCharge
+  skillNameDisp: Impact Bomb
   skillId: 0
   skillType: 0
   skillColor: {r: 1, g: 0, b: 0, a: 1}

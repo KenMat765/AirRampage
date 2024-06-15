@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: RepairDevice
   m_EditorClassIdentifier: 
   skillName: RepairDevice
-  skillNameJp: "\u30EA\u30DA\u30A2\u30C7\u30D0\u30A4\u30B9"
+  skillNameDisp: Repair Device
   skillId: 10
   skillType: 1
   skillColor: {r: 0, g: 1, b: 0, a: 1}

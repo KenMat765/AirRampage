@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Shield
   m_EditorClassIdentifier: 
   skillName: Shield
-  skillNameJp: "\u30B7\u30FC\u30EB\u30C9"
+  skillNameDisp: Shield
   skillId: 4
   skillType: 2
   skillColor: {r: 0, g: 0.14901961, b: 1, a: 1}

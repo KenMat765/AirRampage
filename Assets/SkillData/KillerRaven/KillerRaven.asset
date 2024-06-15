@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a3a424fb66c24646aef30ac8f987be3, type: 3}
   m_Name: KillerRaven
   m_EditorClassIdentifier: 
-  skillName: Muiti Missiles
-  skillNameJp: "\u30DE\u30EB\u30C1\u30DF\u30B5\u30A4\u30EB"
+  skillName: KillerRaven
+  skillNameDisp: Muiti Missiles
   skillId: 3
   skillType: 0
   skillColor: {r: 1, g: 0, b: 0, a: 1}

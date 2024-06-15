@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Crown
   m_EditorClassIdentifier: 
   skillName: Crown
-  skillNameJp: "\u30AF\u30E9\u30A6\u30F3"
+  skillNameDisp: Crown
   skillId: 2
   skillType: 0
   skillColor: {r: 1, g: 0, b: 0, a: 1}
