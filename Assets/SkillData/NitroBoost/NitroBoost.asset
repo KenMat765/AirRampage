@@ -21,9 +21,10 @@ MonoBehaviour:
   skillPrefabRed: {fileID: 3566236888971852006, guid: b6ac5285046900941950c32b760fd9bf, type: 3}
   skillPrefabBlue: {fileID: 3566236888971852006, guid: b6ac5285046900941950c32b760fd9bf, type: 3}
   skillScript: {fileID: 1660418534946592127, guid: 9b1b2a2aea99db1479317691fac1ff60, type: 3}
-  skillInformation: 
+  skillInformation: Temporarily increase speed significantly for a short period of
+    time.
   skillFeatures:
-  - 
-  - 
+  - Features
+  - Super Boost
   - 
   - 

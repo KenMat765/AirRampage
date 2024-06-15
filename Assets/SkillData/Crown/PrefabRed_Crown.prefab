@@ -29241,7 +29241,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   penetrate: 0
   attackRange: 1
-  rangeRadius: 1.5
+  rangeRadius: 15
   lockonType: 1
   blastImpact: {fileID: 0}
   hitEffect: {fileID: 7843742279046350138}

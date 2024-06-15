@@ -69,7 +69,7 @@ public class SkillDeckList : MonoBehaviour
         {
             Transform feature_trans = infoBoardImg.transform.Find($"Features/Feature{k + 1}");
             feature_texts[k] = feature_trans.Find("Text").GetComponent<TextMeshProUGUI>();
-            feature_texts[k].color = Color.clear;
+            feature_texts[k].FadeColor(0);
         }
 
         for (int order = 0; order < num_in_page; order++)
@@ -204,7 +204,7 @@ public class SkillDeckList : MonoBehaviour
         }
         for (int k = 0; k < 4; k++)
         {
-            feature_texts[k].color = Color.clear;
+            feature_texts[k].FadeColor(0);
             feature_texts[k].text = features[k];
         }
 
@@ -225,7 +225,8 @@ public class SkillDeckList : MonoBehaviour
                 for (int k = 0; k < 4; k++)
                 {
                     if (feature_texts[k].text == "") continue;
-                    feature_texts[k].DOColor(Color.white, d2);
+                    float alpha = (k == 0) ? 1.0f : 0.6f;
+                    feature_texts[k].DOFade(alpha, d2);
                 }
             });
     }
@@ -279,7 +280,7 @@ public class SkillDeckList : MonoBehaviour
         current_skill_id = null;
         for (int k = 0; k < 4; k++)
         {
-            feature_texts[k].color = Color.clear;
+            feature_texts[k].FadeColor(0);
         }
         coin_obj.SetActive(false);
     }

@@ -9701,7 +9701,7 @@ TrailRenderer:
   m_Time: 0.5
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 0.02
+    widthMultiplier: 0.8
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -9728,7 +9728,7 @@ TrailRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0.21176471, g: 0.49803922, b: 1, a: 0.78431374}
+      key0: {r: 0.21176471, g: 0.49803922, b: 1, a: 1}
       key1: {r: 0.69803923, g: 0.46666667, b: 1, a: 0}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
@@ -14627,7 +14627,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   penetrate: 0
   attackRange: 1
-  rangeRadius: 3
+  rangeRadius: 60
   lockonType: 0
   blastImpact: {fileID: 0}
   hitEffect: {fileID: 5357304231631435095}

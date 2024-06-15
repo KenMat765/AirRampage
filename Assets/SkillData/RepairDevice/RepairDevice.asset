@@ -21,9 +21,9 @@ MonoBehaviour:
   skillPrefabRed: {fileID: 2727339661821065541, guid: ec61d02558cf641b7a575bdec9c4e377, type: 3}
   skillPrefabBlue: {fileID: 2727339661821065541, guid: ec61d02558cf641b7a575bdec9c4e377, type: 3}
   skillScript: {fileID: 7097809608134057922, guid: bc60ddedeea2147be9ed3d571252668c, type: 3}
-  skillInformation: 
+  skillInformation: Restores your own HP.
   skillFeatures:
-  - 
-  - 
+  - Features
+  - Restore HP
   - 
   - 

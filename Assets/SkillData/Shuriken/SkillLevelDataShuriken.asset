@@ -17,47 +17,18 @@ MonoBehaviour:
   skillId: 11
   skillType: 0
   attackLevelData1:
-    <ChargeTime>k__BackingField: 15
+    <ChargeTime>k__BackingField: 20
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
     <EnhanceDetails>k__BackingField:
+    - Enhancement
+    - Shuriken +1
+    - Charge -5
     - 
-    - 
-    - 
-    - 
-    Power: 5
-    Speed: 15
-    Lifespan: 8
-    WeaponCount: 3
-    HomingType: 2
-    HomingAccuracy: 0.05
-    HomingAngle: 180
-    SpeedDown: 0
-    PowerDown: 0
-    DefenceDown: 0
-    SpeedGrade: 0
-    PowerGrade: 0
-    DefenceGrade: 0
-    SpeedDownProbability: 0
-    PowerDownProbability: 0
-    DefenceDownProbability: 0
-    SpeedDuration: 0
-    PowerDuration: 0
-    DefenceDuration: 0
-  attackLevelData2:
-    <ChargeTime>k__BackingField: 12
-    <FreeFloat1>k__BackingField: 0
-    <FreeFloat2>k__BackingField: 0
-    <FreeFloat3>k__BackingField: 0
-    <EnhanceDetails>k__BackingField:
-    - 
-    - 
-    - 
-    - 
-    Power: 5
-    Speed: 15
-    Lifespan: 8
+    Power: 8
+    Speed: 225
+    Lifespan: 12
     WeaponCount: 4
     HomingType: 2
     HomingAccuracy: 0.05
@@ -74,18 +45,18 @@ MonoBehaviour:
     SpeedDuration: 0
     PowerDuration: 0
     DefenceDuration: 0
-  attackLevelData3:
-    <ChargeTime>k__BackingField: 10
+  attackLevelData2:
+    <ChargeTime>k__BackingField: 15
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
     <EnhanceDetails>k__BackingField:
-    - 
-    - 
-    - 
-    - 
-    Power: 10
-    Speed: 15
+    - Enhancement
+    - Shuriken +1
+    - Power +4
+    - Lifespan +4
+    Power: 8
+    Speed: 225
     Lifespan: 12
     WeaponCount: 5
     HomingType: 2
@@ -103,19 +74,19 @@ MonoBehaviour:
     SpeedDuration: 0
     PowerDuration: 0
     DefenceDuration: 0
-  attackLevelData4:
-    <ChargeTime>k__BackingField: 8
+  attackLevelData3:
+    <ChargeTime>k__BackingField: 15
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
     <EnhanceDetails>k__BackingField:
+    - Enhancement
+    - Shuriken +1
+    - Charge -5
     - 
-    - 
-    - 
-    - 
-    Power: 10
-    Speed: 15
-    Lifespan: 12
+    Power: 12
+    Speed: 225
+    Lifespan: 16
     WeaponCount: 6
     HomingType: 2
     HomingAccuracy: 0.05
@@ -132,22 +103,51 @@ MonoBehaviour:
     SpeedDuration: 0
     PowerDuration: 0
     DefenceDuration: 0
-  attackLevelData5:
-    <ChargeTime>k__BackingField: 5
+  attackLevelData4:
+    <ChargeTime>k__BackingField: 10
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
     <EnhanceDetails>k__BackingField:
-    - 
-    - 
-    - 
-    - 
-    Power: 15
-    Speed: 15
-    Lifespan: 15
+    - Enhancement
+    - Shuriken +1
+    - Power +4
+    - Lifespan +4
+    Power: 12
+    Speed: 225
+    Lifespan: 16
     WeaponCount: 7
     HomingType: 2
     HomingAccuracy: 0.05
+    HomingAngle: 180
+    SpeedDown: 0
+    PowerDown: 0
+    DefenceDown: 0
+    SpeedGrade: 0
+    PowerGrade: 0
+    DefenceGrade: 0
+    SpeedDownProbability: 0
+    PowerDownProbability: 0
+    DefenceDownProbability: 0
+    SpeedDuration: 0
+    PowerDuration: 0
+    DefenceDuration: 0
+  attackLevelData5:
+    <ChargeTime>k__BackingField: 10
+    <FreeFloat1>k__BackingField: 0
+    <FreeFloat2>k__BackingField: 0
+    <FreeFloat3>k__BackingField: 0
+    <EnhanceDetails>k__BackingField:
+    - Max Quality
+    - 
+    - 
+    - 
+    Power: 16
+    Speed: 225
+    Lifespan: 20
+    WeaponCount: 8
+    HomingType: 2
+    HomingAccuracy: 0.04
     HomingAngle: 180
     SpeedDown: 0
     PowerDown: 0

@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a3a424fb66c24646aef30ac8f987be3, type: 3}
   m_Name: KillerRaven
   m_EditorClassIdentifier: 
-  skillName: KillerRaven
-  skillNameJp: "\u30AD\u30E9\u30FC\u30EC\u30A4\u30F4\u30F3"
+  skillName: Muiti Missiles
+  skillNameJp: "\u30DE\u30EB\u30C1\u30DF\u30B5\u30A4\u30EB"
   skillId: 3
   skillType: 0
   skillColor: {r: 1, g: 0, b: 0, a: 1}
@@ -21,9 +21,9 @@ MonoBehaviour:
   skillPrefabRed: {fileID: 2347681076049831130, guid: 83072db886b504219abf224efa3770da, type: 3}
   skillPrefabBlue: {fileID: 732069431975506923, guid: ece08ef3465781243905aed9f08e68f1, type: 3}
   skillScript: {fileID: 4967440002986129639, guid: a54806d5e3356d642813efd01ecc7d2d, type: 3}
-  skillInformation: 
+  skillInformation: Fire multiple homing missiles.
   skillFeatures:
-  - 
-  - 
+  - Features
+  - Homing
   - 
   - 

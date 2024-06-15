@@ -177,13 +177,13 @@ MonoBehaviour:
     <EnhanceDetails>k__BackingField: []
     RepairAmount: 0
   assistLevelData1:
-    <ChargeTime>k__BackingField: 35
-    <FreeFloat1>k__BackingField: 80
+    <ChargeTime>k__BackingField: 40
+    <FreeFloat1>k__BackingField: 90
     <FreeFloat2>k__BackingField: 3
     <FreeFloat3>k__BackingField: 0
     <EnhanceDetails>k__BackingField:
-    - 
-    - 
+    - Enhancement
+    - Charge -5
     - 
     - 
     SpeedGrade: 0
@@ -194,12 +194,12 @@ MonoBehaviour:
     DefenceDuration: 0
   assistLevelData2:
     <ChargeTime>k__BackingField: 35
-    <FreeFloat1>k__BackingField: 80
-    <FreeFloat2>k__BackingField: 2
+    <FreeFloat1>k__BackingField: 90
+    <FreeFloat2>k__BackingField: 3
     <FreeFloat3>k__BackingField: 0
     <EnhanceDetails>k__BackingField:
-    - 
-    - 
+    - Enhancement
+    - Durability + 15
     - 
     - 
     SpeedGrade: 0
@@ -209,13 +209,13 @@ MonoBehaviour:
     PowerDuration: 0
     DefenceDuration: 0
   assistLevelData3:
-    <ChargeTime>k__BackingField: 30
-    <FreeFloat1>k__BackingField: 100
-    <FreeFloat2>k__BackingField: 2
+    <ChargeTime>k__BackingField: 35
+    <FreeFloat1>k__BackingField: 105
+    <FreeFloat2>k__BackingField: 3
     <FreeFloat3>k__BackingField: 0
     <EnhanceDetails>k__BackingField:
-    - 
-    - 
+    - Enhancement
+    - Charge -5
     - 
     - 
     SpeedGrade: 0
@@ -225,13 +225,13 @@ MonoBehaviour:
     PowerDuration: 0
     DefenceDuration: 0
   assistLevelData4:
-    <ChargeTime>k__BackingField: 25
-    <FreeFloat1>k__BackingField: 100
-    <FreeFloat2>k__BackingField: 1
+    <ChargeTime>k__BackingField: 30
+    <FreeFloat1>k__BackingField: 105
+    <FreeFloat2>k__BackingField: 3
     <FreeFloat3>k__BackingField: 0
     <EnhanceDetails>k__BackingField:
-    - 
-    - 
+    - Enhancement
+    - Durability + 15
     - 
     - 
     SpeedGrade: 0
@@ -241,12 +241,12 @@ MonoBehaviour:
     PowerDuration: 0
     DefenceDuration: 0
   assistLevelData5:
-    <ChargeTime>k__BackingField: 20
+    <ChargeTime>k__BackingField: 30
     <FreeFloat1>k__BackingField: 120
-    <FreeFloat2>k__BackingField: 1
+    <FreeFloat2>k__BackingField: 3
     <FreeFloat3>k__BackingField: 0
     <EnhanceDetails>k__BackingField:
-    - 
+    - Max Quality
     - 
     - 
     - 

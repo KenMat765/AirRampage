@@ -21,9 +21,9 @@ MonoBehaviour:
   skillPrefabRed: {fileID: 8377585503487620652, guid: 46870c1e6ffdf4aee964ea3549a0c1cf, type: 3}
   skillPrefabBlue: {fileID: 7665510967987144312, guid: bd682c35925c34790bf4e7c7f25f16ad, type: 3}
   skillScript: {fileID: 5887637637093095, guid: 77cc13f165d464b499f9380761991eb6, type: 3}
-  skillInformation: 
+  skillInformation: Unleash a rain of bullets ahead of yourserlf.
   skillFeatures:
-  - 
-  - 
+  - Features
+  - Area Attack
   - 
   - 
