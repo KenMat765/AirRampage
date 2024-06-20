@@ -58,7 +58,7 @@ public class SettingsCapsule : MonoBehaviour
             fps30Toggle.isOn = false;
             fps60Toggle.isOn = true;
         }
-        bgmSlider.value = PlayerInfo.I.bgm;
+        bgmSlider.value = PlayerInfo.I.bgmRatio;
         volumeSlider.value = PlayerInfo.I.volume;
     }
 
@@ -103,7 +103,7 @@ public class SettingsCapsule : MonoBehaviour
     public void OnBGMSlider()
     {
         float bgm = bgmSlider.value;
-        PlayerInfo.I.bgm = bgm;
+        PlayerInfo.I.bgmRatio = bgm;
         AppSetup.SetBGM(bgm);
     }
 }

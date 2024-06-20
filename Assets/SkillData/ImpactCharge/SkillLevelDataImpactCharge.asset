@@ -24,7 +24,7 @@ MonoBehaviour:
     <EnhanceDetails>k__BackingField:
     - Enhancement
     - Charge -5
-    - 
+    - Lifespan +0.5
     - 
     Power: 20
     Speed: 65
@@ -57,7 +57,7 @@ MonoBehaviour:
     - 
     Power: 20
     Speed: 65
-    Lifespan: 2
+    Lifespan: 2.5
     WeaponCount: 1
     HomingType: 2
     HomingAccuracy: 0.2
@@ -82,11 +82,11 @@ MonoBehaviour:
     <EnhanceDetails>k__BackingField:
     - Enhancement
     - Charge -5
-    - 
+    - Lifespan +0.5
     - 
     Power: 25
     Speed: 70
-    Lifespan: 2
+    Lifespan: 2.5
     WeaponCount: 1
     HomingType: 2
     HomingAccuracy: 0.3
@@ -115,7 +115,7 @@ MonoBehaviour:
     - 
     Power: 25
     Speed: 70
-    Lifespan: 2
+    Lifespan: 3
     WeaponCount: 1
     HomingType: 2
     HomingAccuracy: 0.3
@@ -144,7 +144,7 @@ MonoBehaviour:
     - 
     Power: 30
     Speed: 75
-    Lifespan: 2
+    Lifespan: 3
     WeaponCount: 1
     HomingType: 2
     HomingAccuracy: 0.3

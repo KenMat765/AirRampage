@@ -106,29 +106,30 @@ public class CameraController : Singleton<CameraController>
     }
 
     // Flip時に上を向かせる
-    public void LookUp(float euler_angle, float lookup_half_time)
+    public Tween LookUp(float euler_angle, float lookup_half_time)
     {
-        if (viewType == ViewType.FPS) return;
+        if (viewType == ViewType.FPS) return null;
 
         control_rot = false;
-        transform.DOLocalRotate(new Vector3(euler_angle, 0, 0), lookup_half_time, RotateMode.LocalAxisAdd)
+        Tween tween = transform.DOLocalRotate(new Vector3(euler_angle, 0, 0), lookup_half_time, RotateMode.LocalAxisAdd)
             .SetLoops(2, LoopType.Yoyo)
             .SetEase(Ease.InOutQuad)
             .OnComplete(() => control_rot = true);
+        return tween;
     }
 
     // ブースト時に視野角を変化
-    public void ChangeView(float destination_view, float duration)
+    public Tween ChangeView(float destination_view, float duration)
     {
-        if (viewType == ViewType.FPS) return;
-        DOTween.To(() => cam.fieldOfView, (x) => cam.fieldOfView = x, destination_view, duration);
+        if (viewType == ViewType.FPS) return null;
+        return DOTween.To(() => cam.fieldOfView, (x) => cam.fieldOfView = x, destination_view, duration);
     }
 
     // Cameraを初期状態に戻す
-    public void ResetView(float duration = 0)
+    public Tween ResetView(float duration = 0)
     {
-        if (viewType == ViewType.FPS) return;
-        DOTween.To(() => cam.fieldOfView, (x) => cam.fieldOfView = x, default_view, duration);
+        if (viewType == ViewType.FPS) return null;
+        return DOTween.To(() => cam.fieldOfView, (x) => cam.fieldOfView = x, default_view, duration);
     }
 
     // Animator起動

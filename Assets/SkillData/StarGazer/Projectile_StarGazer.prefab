@@ -29,9 +29,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2594075540921562947}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 30.968187, y: 3.8024826, z: 14.784506}
-  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 8736310352666923401}
   - {fileID: 5713569789105816249}
@@ -4865,7 +4865,7 @@ MonoBehaviour:
   lockonType: 0
   blastImpact: {fileID: 0}
   hitEffect: {fileID: 4942182738563763819}
-  hitDuration: 0.6
+  hitDuration: 1.7
   hasDefaultTarget: 0
   defaultHomingAccuracy: 0
   parent_particle: {fileID: 8661893678211733634}
@@ -9813,10 +9813,10 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 0.5
+  m_Time: 0.3
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 0.06
+    widthMultiplier: 1.5
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -9892,6 +9892,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6299519950959870738, guid: d0739b8a1ad45fd42b50a684a17f1198, type: 3}
       propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6299519950959870738, guid: d0739b8a1ad45fd42b50a684a17f1198, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6299519950959870738, guid: d0739b8a1ad45fd42b50a684a17f1198, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6299519950959870738, guid: d0739b8a1ad45fd42b50a684a17f1198, type: 3}
+      propertyPath: m_LocalScale.z
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6299519950959870738, guid: d0739b8a1ad45fd42b50a684a17f1198, type: 3}

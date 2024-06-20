@@ -10,7 +10,7 @@ public class AppSetup
         LoadPlayerInfo();
         SetFPS(PlayerInfo.I.fps);
         SetVolume(PlayerInfo.I.volume);
-        SetBGM(PlayerInfo.I.bgm);
+        SetBGM(PlayerInfo.I.bgmRatio);
     }
 
     public static void SetFPS(int fps)

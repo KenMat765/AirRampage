@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Unity.Netcode;
-using DG.Tweening;
 using Cysharp.Threading.Tasks;
 using System;
 
@@ -14,6 +13,7 @@ public abstract class Movement : NetworkBehaviour
 
     // Used for death animation.
     Rigidbody rigidBody;
+    Transform explosion2Trans;
     AudioSource explosionSound1, explosionSound2;
     ParticleSystem explosion1, explosion2, explosionTrail;
 
@@ -39,6 +39,8 @@ public abstract class Movement : NetworkBehaviour
         // Stop falling, and play second explision effect.
         rigidBody.drag = float.PositiveInfinity;
         rigidBody.useGravity = false;
+        // Put out explosion2 from fighterbody before deactivating fighterbody.
+        explosion2Trans.parent = transform;
         explosion2.Play();
         explosionSound2.Play();
         explosionTrail.Stop();
@@ -50,6 +52,9 @@ public abstract class Movement : NetworkBehaviour
         // Return to start position.
         transform.position = start_pos;
         transform.rotation = start_rot;
+        // Put back explosion2.
+        explosion2Trans.parent = fighterCondition.body.transform;
+        explosion2Trans.localPosition = Vector3.zero;
     }
 
     // Must be called on every clients.
@@ -79,10 +84,13 @@ public abstract class Movement : NetworkBehaviour
         fighterCondition = GetComponent<FighterCondition>();
         start_pos = transform.position;
         start_rot = transform.rotation;
+
+        // For death animation.
         rigidBody = GetComponent<Rigidbody>();
-        Transform explosion_trans = transform.Find("Explosion");
+        Transform explosion_trans = fighterCondition.body.transform.Find("Explosion");
         Transform explosion_trans1 = explosion_trans.Find("ExplosionDead1");
         Transform explosion_trans2 = explosion_trans.Find("ExplosionDead2");
+        explosion2Trans = explosion_trans2;
         explosionSound1 = explosion_trans1.GetComponent<AudioSource>();
         explosionSound2 = explosion_trans2.GetComponent<AudioSource>();
         explosion1 = explosion_trans1.GetComponent<ParticleSystem>();
@@ -121,101 +129,37 @@ public abstract class Movement : NetworkBehaviour
     // KariCameraで使うためにpublic(後でprotectedに直す)
     public int uTurndirection { get; set; } = 1;
 
-    bool ready4action = true;
+    protected bool ready4action = true;
 
     protected void Uturn()
     {
         if (ready4action) StartCoroutine(uTurn());
         if (BattleInfo.isMulti && IsOwner) UturnServerRpc(OwnerClientId);
     }
-    protected virtual IEnumerator uTurn()
-    {
-        ready4action = false;
-        anim.SetInteger("FighterAnim", 2 * uTurndirection);
-
-        yield return new WaitForSeconds(0.33f);
-
-        uTurndirection *= -1;
-        anim.SetInteger("FighterAnim", uTurndirection);
-
-        yield return new WaitForSeconds(uturnTime - 0.33f);
-
-        ready4action = true;
-    }
+    protected virtual IEnumerator uTurn() { return null; }
 
     protected void Flip()
     {
         if (ready4action) StartCoroutine(flip());
-        if (BattleInfo.isMulti && IsOwner) FlipServerRpc(OwnerClientId);
+        if (IsOwner) FlipServerRpc(OwnerClientId);
     }
-    protected virtual IEnumerator flip()
+    protected virtual IEnumerator flip() { return null; }
+
+    protected float rollDistance = 15;
+
+    protected void LeftRoll(float freeze_time)
     {
-        ready4action = false;
-        anim.SetInteger("FighterAnim", 3 * uTurndirection);
-        float speed_temp = fighterCondition.speed;
-        fighterCondition.PauseGradingSpeed(0);
-
-        yield return new WaitForSeconds(1.2f);
-
-        fighterCondition.ResumeGradingSpeed();
-
-        yield return new WaitForSeconds(0.3f);
-
-        anim.SetInteger("FighterAnim", uTurndirection);
-
-        yield return new WaitForSeconds(flipTime - 1.5f + 3.0f);
-
-        ready4action = true;
+        if (ready4action) StartCoroutine(leftroll(freeze_time));
+        if (IsOwner) LeftRollServerRpc(OwnerClientId, freeze_time);
     }
+    protected virtual IEnumerator leftroll(float freeze_time) { return null; }
 
-    bool rollReady = true;
-    protected float roll_distance = 12;
-
-    protected void LeftRoll(float delay)
+    protected void RightRoll(float freeze_time)
     {
-        if (ready4action && rollReady) StartCoroutine(leftroll(delay));
-        if (BattleInfo.isMulti && IsOwner) LeftRoleServerRpc(OwnerClientId, delay);
+        if (ready4action) StartCoroutine(rightroll(freeze_time));
+        if (IsOwner) RightRollServerRpc(OwnerClientId, freeze_time);
     }
-    protected virtual IEnumerator leftroll(float delay)
-    {
-        ready4action = false;
-        rollReady = false;
-        anim.SetInteger("FighterAnim", 5 * uTurndirection);
-        transform.DOBlendableMoveBy(transform.right * roll_distance * uTurndirection * -1, rollTime)
-            .SetEase(Ease.OutQuint);
-
-        yield return new WaitForSeconds(rollTime);
-
-        anim.SetInteger("FighterAnim", uTurndirection);
-        ready4action = true;
-
-        yield return new WaitForSeconds(delay);
-
-        rollReady = true;
-    }
-
-    protected void RightRoll(float delay)
-    {
-        if (ready4action && rollReady) StartCoroutine(rightroll(delay));
-        if (BattleInfo.isMulti && IsOwner) RightRoleServerRpc(OwnerClientId, delay);
-    }
-    protected virtual IEnumerator rightroll(float delay)
-    {
-        ready4action = false;
-        rollReady = false;
-        anim.SetInteger("FighterAnim", 4 * uTurndirection);
-        transform.DOBlendableMoveBy(transform.right * roll_distance * uTurndirection, rollTime)
-            .SetEase(Ease.OutQuint);
-
-        yield return new WaitForSeconds(rollTime);
-
-        anim.SetInteger("FighterAnim", uTurndirection);
-        ready4action = true;
-
-        yield return new WaitForSeconds(delay);
-
-        rollReady = true;
-    }
+    protected virtual IEnumerator rightroll(float freeze_time) { return null; }
 
     protected virtual void FourActionExe() { }
 
@@ -224,9 +168,9 @@ public abstract class Movement : NetworkBehaviour
     [ServerRpc]
     void UturnServerRpc(ulong senderId) => UturnClientRpc(senderId);
     [ServerRpc]
-    void LeftRoleServerRpc(ulong senderId, float delay) => LeftRoleClientRpc(senderId, delay);
+    void LeftRollServerRpc(ulong senderId, float delay) => LeftRoleClientRpc(senderId, delay);
     [ServerRpc]
-    void RightRoleServerRpc(ulong senderId, float delay) => RightRoleClientRpc(senderId, delay);
+    void RightRollServerRpc(ulong senderId, float delay) => RightRoleClientRpc(senderId, delay);
     [ClientRpc]
     void FlipClientRpc(ulong senderId)
     {

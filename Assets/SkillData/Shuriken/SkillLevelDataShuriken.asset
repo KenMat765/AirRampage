@@ -27,11 +27,11 @@ MonoBehaviour:
     - Charge -5
     - 
     Power: 8
-    Speed: 225
+    Speed: 300
     Lifespan: 12
     WeaponCount: 4
     HomingType: 2
-    HomingAccuracy: 0.05
+    HomingAccuracy: 0.04
     HomingAngle: 180
     SpeedDown: 0
     PowerDown: 0
@@ -56,11 +56,11 @@ MonoBehaviour:
     - Power +4
     - Lifespan +4
     Power: 8
-    Speed: 225
+    Speed: 300
     Lifespan: 12
     WeaponCount: 5
     HomingType: 2
-    HomingAccuracy: 0.05
+    HomingAccuracy: 0.04
     HomingAngle: 180
     SpeedDown: 0
     PowerDown: 0
@@ -85,11 +85,11 @@ MonoBehaviour:
     - Charge -5
     - 
     Power: 12
-    Speed: 225
+    Speed: 300
     Lifespan: 16
     WeaponCount: 6
     HomingType: 2
-    HomingAccuracy: 0.05
+    HomingAccuracy: 0.04
     HomingAngle: 180
     SpeedDown: 0
     PowerDown: 0
@@ -114,11 +114,11 @@ MonoBehaviour:
     - Power +4
     - Lifespan +4
     Power: 12
-    Speed: 225
+    Speed: 300
     Lifespan: 16
     WeaponCount: 7
     HomingType: 2
-    HomingAccuracy: 0.05
+    HomingAccuracy: 0.04
     HomingAngle: 180
     SpeedDown: 0
     PowerDown: 0
@@ -143,7 +143,7 @@ MonoBehaviour:
     - 
     - 
     Power: 16
-    Speed: 225
+    Speed: 300
     Lifespan: 20
     WeaponCount: 8
     HomingType: 2

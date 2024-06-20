@@ -7,12 +7,16 @@ public class BGMManager : Singleton<BGMManager>
 {
     protected override bool dont_destroy_on_load { get; set; } = false;
     [SerializeField] AudioSource bgmAudio;
+    [SerializeField, Range(0f, 1f)] float maxVolume = 1.0f;
+
     void Start()
     {
-        bgmAudio.volume = PlayerInfo.I.bgm;
+        SetBGMVolume(PlayerInfo.I.bgmRatio);
     }
-    public void SetBGMVolume(float volume)
+
+    public void SetBGMVolume(float volume_ratio)
     {
+        float volume = maxVolume * volume_ratio;
         bgmAudio.volume = volume;
     }
 }

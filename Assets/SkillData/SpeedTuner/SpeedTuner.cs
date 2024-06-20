@@ -16,6 +16,7 @@ public class SpeedTuner : SkillAssist
     }
 
     ParticleSystem effect;
+    AudioSource audioSource;
 
     public override void Generator()
     {
@@ -24,11 +25,13 @@ public class SpeedTuner : SkillAssist
         SetPrefabLocalTransform(Vector3.zero, new Vector3(-90, 0, 0), new Vector3(0.035f, 0.035f, 0.035f));
         GeneratePrefab();
         effect = prefabs[0].GetComponent<ParticleSystem>();
+        audioSource = prefabs[0].GetComponent<AudioSource>();
     }
 
     public override void Activator(int[] transfer = null)
     {
         effect.Play();
+        audioSource.Play();
 
         // Grader must be called from the owner of this fighter only.
         if (BattleInfo.isMulti && !attack.IsOwner) return;

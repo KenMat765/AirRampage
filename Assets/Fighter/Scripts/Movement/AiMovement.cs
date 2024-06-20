@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using DG.Tweening;
 
 public class AiMovement : Movement
 {
@@ -59,12 +60,24 @@ public class AiMovement : Movement
     public override void OnRevival()
     {
         base.OnRevival();
+
+        // Reset u-turn.
         if (uTurndirection == -1) uTurndirection = 1;
+
+        // Stop burner effects.
+        burnerController.StopStaticBurner();
+        burnerController.StopSpark();
     }
 
 
+    bool can_rotate = true;
     protected override void Rotate()
     {
+        if (!can_rotate)
+        {
+            return;
+        }
+
         Vector3 targetAngle = Quaternion.LookRotation(((relative_to_next == Vector3.zero) ? transform.forward : relative_to_next) * uTurndirection).eulerAngles;
         if (relativeYAngle < -135)
         {
@@ -84,8 +97,11 @@ public class AiMovement : Movement
     }
 
 
+
+    // 4アクション ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     [SerializeField] BurnerController burnerController;
     [SerializeField] ParticleSystem rollSpark;
+    [SerializeField] AudioSource flipAudio, uturnAudio, rollAudio;
 
     protected override void FourActionExe()
     {
@@ -115,26 +131,120 @@ public class AiMovement : Movement
         }
     }
 
+    protected override IEnumerator uTurn()
+    {
+        // Disable 4actions.
+        ready4action = false;
+
+        // Start animation & effects.
+        anim.SetInteger("FighterAnim", 2 * uTurndirection);
+        burnerController.PlayImpact();
+        burnerController.PlaySpark();
+        uturnAudio.Play();
+
+        // Direction flips at this point.
+        yield return new WaitForSeconds(0.33f);
+        uTurndirection *= -1;
+        anim.SetInteger("FighterAnim", uTurndirection);
+
+        // U-turn animation finishes here.
+        yield return new WaitForSeconds(uturnTime - 0.33f);
+        ready4action = true;
+        burnerController.StopSpark();
+    }
+
     protected override IEnumerator flip()
     {
+        // Disable rotation & 4actions.
+        ready4action = false;
+        can_rotate = false;
+
+        // Animation & Effects.
+        anim.SetInteger("FighterAnim", 3 * uTurndirection);
         burnerController.PlayImpact();
-        return base.flip();
+        burnerController.PlayStaticBurner();
+        burnerController.PlaySpark();
+        flipAudio.Play();
+
+        // Stop moving.
+        float speed_temp = fighterCondition.speed;
+        fighterCondition.PauseGradingSpeed(0);
+
+        // Restart moving a bit faster than flip time.
+        float resume_offset = 0.3f;
+        yield return new WaitForSeconds(flipTime - resume_offset);
+        fighterCondition.ResumeGradingSpeed();
+        burnerController.StopStaticBurner();
+        burnerController.StopSpark();
+
+        // Flip completes here.
+        yield return new WaitForSeconds(resume_offset);
+        can_rotate = true;
+        anim.SetInteger("FighterAnim", uTurndirection);
+
+        // Enable 4actions after few seconds.
+        yield return new WaitForSeconds(3.0f);
+        ready4action = true;
     }
 
-    protected override IEnumerator leftroll(float delay)
+    protected override IEnumerator leftroll(float freeze_time)
     {
+        // Disable 4actions.
+        ready4action = false;
+
+        // Play animation & effects.
+        anim.SetInteger("FighterAnim", 5 * uTurndirection);
         burnerController.PlayImpact(Direction.right);
-        rollSpark.Play();
+        burnerController.PlaySpark();
         burnerController.PlayBurstAudio();
-        return base.leftroll(delay);
+        rollSpark.Play();
+        rollAudio.Play();
+
+        // Move transform & camera. (Owner only)
+        if (IsOwner)
+        {
+            transform.DOBlendableMoveBy(-transform.right * rollDistance * uTurndirection, rollTime)
+                .SetEase(Ease.OutQuint);
+        }
+
+        // Rolling ends here.
+        yield return new WaitForSeconds(rollTime);
+        anim.SetInteger("FighterAnim", uTurndirection);
+        burnerController.StopSpark();
+
+        // Wait for a while to enable 4actions.
+        yield return new WaitForSeconds(freeze_time);
+        ready4action = true;
     }
 
-    protected override IEnumerator rightroll(float delay)
+    protected override IEnumerator rightroll(float freeze_time)
     {
+        // Disable 4actions.
+        ready4action = false;
+
+        // Play animation & effects.
+        anim.SetInteger("FighterAnim", 4 * uTurndirection);
         burnerController.PlayImpact(Direction.left);
-        rollSpark.Play();
+        burnerController.PlaySpark();
         burnerController.PlayBurstAudio();
-        return base.rightroll(delay);
+        rollSpark.Play();
+        rollAudio.Play();
+
+        // Move transform & camera. (Owner only)
+        if (IsOwner)
+        {
+            transform.DOBlendableMoveBy(transform.right * rollDistance * uTurndirection, rollTime)
+                .SetEase(Ease.OutQuint);
+        }
+
+        // Rolling ends here.
+        yield return new WaitForSeconds(rollTime);
+        anim.SetInteger("FighterAnim", uTurndirection);
+        burnerController.StopSpark();
+
+        // Wait for a while to enable 4actions.
+        yield return new WaitForSeconds(freeze_time);
+        ready4action = true;
     }
 
 

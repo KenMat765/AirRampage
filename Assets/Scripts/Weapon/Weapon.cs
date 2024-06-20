@@ -436,16 +436,25 @@ public abstract class Weapon : Utilities
         elapsedTime += Time.deltaTime;
         if (elapsedTime > lifespan)
         {
-            if (hitEffect == null)
+            // Skill
+            if (isSkill)
             {
-                KillWeapon();
+                if (hitEffect == null)
+                {
+                    KillWeapon();
+                }
+                else
+                {
+                    current_state = WeaponState.exploding;
+                    OnStartExploding();
+                    PlayHitEffect();
+                }
             }
+
+            // Normal Bullet
             else
             {
-                current_state = WeaponState.exploding;
-                OnStartExploding();
-                // Do not play hit effect when this is normal blast.
-                if (isSkill) PlayHitEffect();
+                KillWeapon();
             }
         }
     }

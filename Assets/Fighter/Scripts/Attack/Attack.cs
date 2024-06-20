@@ -152,7 +152,7 @@ public abstract class Attack : NetworkBehaviour
 
     // Variables that may vary by Ability.
     public abstract float setInterval { get; set; }
-    public float power = 1, speed = 500, lifespan = 0.5f;
+    public float power = 1, speed = 150, lifespan = 1;
 
     protected void PoolNormalBullets(int quantity)
     {

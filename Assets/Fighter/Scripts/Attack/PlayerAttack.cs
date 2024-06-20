@@ -86,4 +86,12 @@ public class PlayerAttack : Attack
     {
         TerminateAllSkills();
     }
+
+
+
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, homingDist);
+    }
 }

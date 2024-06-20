@@ -116,7 +116,7 @@ public class PlayerInfo
     // スキルの数だけ手動で追加する必要がある
     public bool[] skl_unlock =
     {
-        false, false, false, false, false, false,
+        true, true, true, true, true, true,
         true, true, true, true, true, true,
         true
     };
@@ -149,14 +149,14 @@ public class PlayerInfo
     public bool[] abi_unlock =
     {
         true, true, true, true, true, true,
-        false, false, false, false, false, false,
-        false, false, false, false, false, false,
-        false, false, false, false, false, false,
-        false, false, false, false, false, false,
-        false, false, false, false, false, false,
-        false, false, false, false, false, false,
-        false, false, false, false, false, false,
-        false, false, false, false, false, false,
+        true, true, true, true, true, true,
+        true, true, true, true, true, true,
+        true, true, true, true, true, true,
+        true, true, true, true, true, true,
+        true, true, true, true, true, true,
+        true, true, true, true, true, true,
+        true, true, true, true, true, true,
+        true, true, true, true, true, true,
     };
 
     public bool[] abi_equip =
@@ -177,7 +177,7 @@ public class PlayerInfo
     public string myName = "Kari name";
     public float volume = 1.0f;
     public int fps = 60;
-    public float bgm = 1.0f;
+    public float bgmRatio = 1.0f;
     public bool postprocess = true;
     public int coins
     {

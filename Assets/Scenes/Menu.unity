@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 1164104880}
-  m_IndirectSpecularColor: {r: 0.016914135, g: 0.04934164, b: 0.12162308, a: 1}
+  m_IndirectSpecularColor: {r: 0.009869684, g: 0.029433211, b: 0.08908907, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -22322,8 +22322,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1196848839}
-  - component: {fileID: 1196848838}
   - component: {fileID: 1196848837}
+  - component: {fileID: 1196848838}
   m_Layer: 0
   m_Name: StageAudio
   m_TagString: Untagged
@@ -22344,6 +22344,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bgmAudio: {fileID: 1196848838}
+  maxVolume: 1
 --- !u!82 &1196848838
 AudioSource:
   m_ObjectHideFlags: 0

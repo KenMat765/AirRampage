@@ -2371,7 +2371,7 @@ Transform:
   m_GameObject: {fileID: 902525325017338881}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.085, y: 0, z: 0}
-  m_LocalScale: {x: 1.2, y: 1.2, z: 1.5}
+  m_LocalScale: {x: 1.2, y: 1.2, z: 1.35}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 906187335025332860}
@@ -4740,7 +4740,7 @@ MonoBehaviour:
   lockonType: 0
   blastImpact: {fileID: 0}
   hitEffect: {fileID: 902952762661376473}
-  hitDuration: 2.5
+  hitDuration: 0.5
   hasDefaultTarget: 0
   defaultHomingAccuracy: 0
   parent_particle: {fileID: 1027787262515479058}
@@ -9320,7 +9320,7 @@ Transform:
   m_GameObject: {fileID: 902875281014081629}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.085, y: 0, z: 0}
-  m_LocalScale: {x: 1.2, y: 1.2, z: 1.5}
+  m_LocalScale: {x: 1.2, y: 1.2, z: 1.35}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 906187335025332860}
@@ -13960,9 +13960,9 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: e049b95b200c036489c053b96c84a53a, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 03453c9e4532b439cac9b2e2f5103ced, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 0.5
+  m_Volume: 0.3
   m_Pitch: 1.2
   Loop: 0
   Mute: 0

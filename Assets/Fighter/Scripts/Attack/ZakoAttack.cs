@@ -1,14 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using NaughtyAttributes;
 
 public class ZakoAttack : Attack
 {
     // setInterval is not used in ZakoAttack.
-    // set setInterval to zero in order to stop WaitForSeconds in NormalRapid()
-    // protected override float setInterval { get; set; } = 1.0f;
+    // set setInterval to small number in order to stop WaitForSeconds in NormalRapid()
     public override float setInterval { get; set; } = 0.05f;
     protected override int rapidCount { get; set; } = 1;
+
+    [SerializeField, MinMaxSlider(0, 3)]
+    Vector2 minMaxInterval;
 
     [Header("Normal Bullet Color")]
     [SerializeField] Gradient bulletRed, bulletBlue;
@@ -32,7 +35,7 @@ public class ZakoAttack : Attack
             {
                 // Reset timer.
                 // blastTimer = setInterval;
-                blastTimer = Random.Range(0.4f, 1.0f);
+                blastTimer = Random.Range(minMaxInterval[0], minMaxInterval[1]);
 
                 // Determine target.
                 int targetNo = -1;

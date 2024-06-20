@@ -6,7 +6,9 @@ using DG.Tweening;
 public class BurnerController : MonoBehaviour
 {
     ParticleSystem.MainModule burner_particle_left, burner_particle_right;
+    ParticleSystem burner_particle_left_s, burner_particle_right_s;
     ParticleSystem burner_impact_left, burner_impact_right;
+    ParticleSystem spark_left, spark_right;
     float default_size;
     FighterCondition fighterCondition;  // Lookup speed from this.
     float prev_speed;
@@ -27,10 +29,21 @@ public class BurnerController : MonoBehaviour
         burner_particle_right = right_trans.GetComponent<ParticleSystem>().main;
         default_size = burner_particle_left.startSize.constant;
 
+        Transform left_trans_s = transform.Find("AfterBurnerLeft_S");
+        Transform right_trans_s = transform.Find("AfterBurnerRight_S");
+        burner_particle_left_s = left_trans_s.GetComponent<ParticleSystem>();
+        burner_particle_right_s = right_trans_s.GetComponent<ParticleSystem>();
+        StopStaticBurner();
+
         Transform impact_left_trans = transform.Find("BurnerImpactLeft");
         Transform impact_right_trans = transform.Find("BurnerImpactRight");
         burner_impact_left = impact_left_trans.GetComponent<ParticleSystem>();
         burner_impact_right = impact_right_trans.GetComponent<ParticleSystem>();
+
+        Transform spark_left_trans = transform.Find("SparkLeft");
+        Transform spark_right_trans = transform.Find("SparkRight");
+        spark_left = spark_left_trans.GetComponent<ParticleSystem>();
+        spark_right = spark_right_trans.GetComponent<ParticleSystem>();
 
         fighterCondition = transform.root.GetComponent<FighterCondition>();
 
@@ -92,5 +105,29 @@ public class BurnerController : MonoBehaviour
 
         left_seq.Kill();
         right_seq.Kill();
+    }
+
+    public void PlayStaticBurner()
+    {
+        burner_particle_left_s.Play();
+        burner_particle_right_s.Play();
+    }
+
+    public void StopStaticBurner()
+    {
+        burner_particle_left_s.Stop();
+        burner_particle_right_s.Stop();
+    }
+
+    public void PlaySpark()
+    {
+        spark_left.Play();
+        spark_right.Play();
+    }
+
+    public void StopSpark()
+    {
+        spark_left.Stop();
+        spark_right.Stop();
     }
 }

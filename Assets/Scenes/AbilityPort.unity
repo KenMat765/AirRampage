@@ -5992,8 +5992,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1551374503}
-  - component: {fileID: 1551374502}
   - component: {fileID: 1551374501}
+  - component: {fileID: 1551374502}
   m_Layer: 0
   m_Name: StageAudio
   m_TagString: Untagged
@@ -6014,6 +6014,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bgmAudio: {fileID: 1551374502}
+  maxVolume: 1
 --- !u!82 &1551374502
 AudioSource:
   m_ObjectHideFlags: 0

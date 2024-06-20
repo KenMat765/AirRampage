@@ -15,6 +15,7 @@ class NitroBoost : SkillAssist
         boost_duration = levelData.FreeFloat2;
     }
 
+    BurnerController burner;
     WindController wind;
 
     public override void Generator()
@@ -24,7 +25,7 @@ class NitroBoost : SkillAssist
         SetPrefabLocalTransform(Vector3.zero, Vector3.zero, new Vector3(1, 1, 1));
         GeneratePrefab();
 
-        Transform afterBurners = attack.fighterCondition.body.transform.Find("AfterBurners");
+        burner = attack.fighterCondition.body.GetComponentInChildren<BurnerController>();
         wind = prefabs[0].GetComponent<WindController>();
     }
 
@@ -32,6 +33,7 @@ class NitroBoost : SkillAssist
     {
         // Play effect.
         const float accel_duration = 0.2f;
+        burner.PlaySpark();
         wind.WindGenerator(2, 15);
 
         if (BattleInfo.isMulti && !attack.IsOwner) return;
@@ -56,6 +58,7 @@ class NitroBoost : SkillAssist
     {
         // Stop effect.
         const float decelerate_duration = 1.5f;
+        burner.StopSpark();
         wind.ResetWind();
 
         if (BattleInfo.isMulti && !attack.IsOwner) return;
@@ -75,6 +78,7 @@ class NitroBoost : SkillAssist
 
     public override void ForceTermination()
     {
+        burner.StopSpark();
         wind.ResetWind();
 
         if (BattleInfo.isMulti && !attack.IsOwner) return;

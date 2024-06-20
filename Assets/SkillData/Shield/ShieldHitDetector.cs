@@ -23,6 +23,7 @@ public class ShieldHitDetector : MonoBehaviour
     int enemy_bullet_layer;
 
     Tweener activate_tweener;
+    [SerializeField] AudioSource activateAudio;
 
 
     void Awake()
@@ -111,9 +112,10 @@ public class ShieldHitDetector : MonoBehaviour
         spr_collider.enabled = true;
         gameObject.SetActive(true);
 
-        // Play effect.
+        // Play effect & sound.
         mat.SetFloat(property_Id, -1);    // 破壊された瞬間に起動した時
         activate_tweener = mat.DOFloat(2, property_Id, activate_duration);
+        activateAudio.Play();
     }
 
     // Called from Shield.EndProccess().

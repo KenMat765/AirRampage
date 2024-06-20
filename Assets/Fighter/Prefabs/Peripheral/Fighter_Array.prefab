@@ -388,7 +388,7 @@ MonoBehaviour:
   final_destination: {x: 0, y: 0, z: 0}
   next_destination: {x: 0, y: 0, z: 0}
   detectDistance: 250
-  detectAngle: 60
+  detectAngle: 45
 --- !u!1 &1912328528740165
 GameObject:
   m_ObjectHideFlags: 0
