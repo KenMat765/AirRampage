@@ -18,8 +18,8 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
     TextMeshProUGUI teamButtonText;
     TMP_InputField codeInputField;
     GameObject hostClientObj, publicPrivateObj, joinLobbyObj, lobbyCodeObj, teamObj;
-    TextMeshProUGUI[] redNames = new TextMeshProUGUI[GameInfo.max_player_count];
-    TextMeshProUGUI[] blueNames = new TextMeshProUGUI[GameInfo.max_player_count];
+    TextMeshProUGUI[] redNames = new TextMeshProUGUI[GameInfo.MAX_PLAYER_COUNT];
+    TextMeshProUGUI[] blueNames = new TextMeshProUGUI[GameInfo.MAX_PLAYER_COUNT];
     GameObject ruleObj, participantObj;
     TextMeshProUGUI ruleText, stageText, timeText;
     TextMeshProUGUI readyText;
@@ -88,7 +88,7 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
     #region Game Settings
     Rule rule = Rule.BATTLEROYAL;
     Stage stage = Stage.SPACE;
-    int time_sec = GameInfo.min_time_sec;
+    int time_sec = GameInfo.MIN_TIME_SEC;
     #endregion
 
     #region UI Animation
@@ -176,7 +176,7 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
         #endregion
 
         #region Fighter
-        for (int k = 0; k < GameInfo.max_player_count; k++)
+        for (int k = 0; k < GameInfo.MAX_PLAYER_COUNT; k++)
         {
             redNames[k] = teamObj.transform.Find("Players/Red").GetChild(k).GetComponent<TextMeshProUGUI>();
             blueNames[k] = teamObj.transform.Find("Players/Blue").GetChild(k).GetComponent<TextMeshProUGUI>();
@@ -198,12 +198,12 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
         stageText.text = stage.ToString();
         int time_min = time_sec / 60;
         timeText.text = time_min.ToString() + " minutes";
-        for (int k = 0; k < GameInfo.team_member_count; k++)
+        for (int k = 0; k < GameInfo.TEAM_MEMBER_COUNT; k++)
         {
             Transform nameBlock_trans = participantObj.transform.Find($"NameBlock{k}");
             names[k] = nameBlock_trans.Find("Name").GetComponent<TextMeshProUGUI>();
             arrows[k] = nameBlock_trans.Find("Arrows").gameObject;
-            skillDecks[k].skills = new SkillUI[GameInfo.max_skill_count];
+            skillDecks[k].skills = new SkillUI[GameInfo.MAX_SKILL_COUNT];
             for (int m = 0; m < skillDecks[k].skills.Length; m++)
             {
                 Transform frame_trans = nameBlock_trans.Find($"SkillIcon{m}");
@@ -260,8 +260,8 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
                 if (GameNetPortal.I.joinedLobby != null)
                 {
                     bool team_member_within_capacity =
-                        LobbyLinkedData.I.GetTeamMemberCount(Team.RED) <= GameInfo.team_member_count &&
-                        LobbyLinkedData.I.GetTeamMemberCount(Team.BLUE) <= GameInfo.team_member_count;
+                        LobbyLinkedData.I.GetTeamMemberCount(Team.RED) <= GameInfo.TEAM_MEMBER_COUNT &&
+                        LobbyLinkedData.I.GetTeamMemberCount(Team.BLUE) <= GameInfo.TEAM_MEMBER_COUNT;
                     bool everyone_selected_team = LobbyLinkedData.I.EveryoneSelectedTeamExceptHost();
                     teamButton.interactable = team_member_within_capacity && everyone_selected_team;
                 }
@@ -529,7 +529,7 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
 
         // === Host Create Relay & Lobby === //
         SetStatusText(Status.CREATING_ROOM, true);
-        string join_code = await GameNetPortal.I.CreateRelayAsync(GameInfo.max_player_count); // Create Relay first to get join_code.
+        string join_code = await GameNetPortal.I.CreateRelayAsync(GameInfo.MAX_PLAYER_COUNT); // Create Relay first to get join_code.
         if (join_code != "")
         {
             bool created = await GameNetPortal.I.CreateLobbyAsync(is_private, join_code);
@@ -712,7 +712,7 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
     void RefreshTeamUI()
     {
         // Reset all numbers first.
-        for (int number = 0; number < GameInfo.max_player_count; number++)
+        for (int number = 0; number < GameInfo.MAX_PLAYER_COUNT; number++)
         {
             TeamUISetter(number, Team.NONE, "", nameColor);
         }
@@ -796,13 +796,13 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
     {
         // Change stage of BattleInfo
         time_sec += delta_sec;
-        if (GameInfo.max_time_sec < time_sec)
+        if (GameInfo.MAX_TIME_SEC < time_sec)
         {
-            time_sec = GameInfo.min_time_sec;
+            time_sec = GameInfo.MIN_TIME_SEC;
         }
-        else if (time_sec < GameInfo.min_time_sec)
+        else if (time_sec < GameInfo.MIN_TIME_SEC)
         {
-            time_sec = GameInfo.max_time_sec;
+            time_sec = GameInfo.MAX_TIME_SEC;
         }
 
         // Change UI
@@ -821,9 +821,9 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
     {
         public SkillUI[] skills;
     }
-    SkillDeck[] skillDecks = new SkillDeck[GameInfo.team_member_count];
-    GameObject[] arrows = new GameObject[GameInfo.team_member_count];
-    TextMeshProUGUI[] names = new TextMeshProUGUI[GameInfo.team_member_count];
+    SkillDeck[] skillDecks = new SkillDeck[GameInfo.TEAM_MEMBER_COUNT];
+    GameObject[] arrows = new GameObject[GameInfo.TEAM_MEMBER_COUNT];
+    TextMeshProUGUI[] names = new TextMeshProUGUI[GameInfo.TEAM_MEMBER_COUNT];
     bool isReady = false;
 
     int myDeckNum
@@ -834,7 +834,7 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
 
     public void SkillUISetter(int block, int?[] skill_ids)
     {
-        for (int k = 0; k < GameInfo.max_skill_count; k++)
+        for (int k = 0; k < GameInfo.MAX_SKILL_COUNT; k++)
         {
             int? skill_id = skill_ids[k];
             if (skill_id.HasValue)
@@ -861,8 +861,8 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
         }
 
         myDeckNum += direction;
-        if (myDeckNum < 0) myDeckNum += GameInfo.deck_count;
-        else if (GameInfo.deck_count <= myDeckNum) myDeckNum -= GameInfo.deck_count;
+        if (myDeckNum < 0) myDeckNum += GameInfo.DECK_COUNT;
+        else if (GameInfo.DECK_COUNT <= myDeckNum) myDeckNum -= GameInfo.DECK_COUNT;
 
         // Get skill Ids & skill levels.
         int?[] new_skillIds, new_skillLevels;
@@ -910,7 +910,7 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
             }
             else
             {
-                skillIds = new int?[GameInfo.max_skill_count];
+                skillIds = new int?[GameInfo.MAX_SKILL_COUNT];
                 for (int k = 0; k < skillIds.Length; k++)
                 {
                     skillIds[k] = null;
@@ -926,7 +926,7 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
     {
         int myNumber = SortieLobbyManager.I.myData.number;
         Team myTeam = SortieLobbyManager.I.myData.team;
-        for (int blockNo = 0; blockNo < GameInfo.team_member_count; blockNo++)
+        for (int blockNo = 0; blockNo < GameInfo.TEAM_MEMBER_COUNT; blockNo++)
         {
             // Get fighter number from team and block number.
             int fighterNo = -1;

@@ -126,9 +126,9 @@ public class SkillPortManager : Singleton<SkillPortManager>
         if (is_deck)
         {
             int deck_num = skillDeck.current_deck_num;
-            int?[] skillIds = new int?[GameInfo.max_skill_count];
+            int?[] skillIds = new int?[GameInfo.MAX_SKILL_COUNT];
             PlayerInfo.I.SkillIdsGetter(deck_num, out skillIds);
-            for (int k = 0; k < GameInfo.max_skill_count; k++)
+            for (int k = 0; k < GameInfo.MAX_SKILL_COUNT; k++)
             {
                 if (skillIds[k] == skillDeckList.current_skill_id)
                 {

@@ -27,7 +27,7 @@ public abstract class Attack : NetworkBehaviour
 
     // Skills ////////////////////////////////////////////////////////////////////////
     // These are set in Awake() of ParticipantManager
-    public Skill[] skills { get; set; } = new Skill[GameInfo.max_skill_count];
+    public Skill[] skills { get; set; } = new Skill[GameInfo.MAX_SKILL_COUNT];
     public void LockAllSkills(bool lock_skill)
     {
         foreach (Skill skill in skills)

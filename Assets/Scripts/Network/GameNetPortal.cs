@@ -42,7 +42,7 @@ public class GameNetPortal : Singleton<GameNetPortal>
         try
         {
             string lobbyName = "TestLobby";
-            int maxPlayers = GameInfo.max_player_count;
+            int maxPlayers = GameInfo.MAX_PLAYER_COUNT;
             CreateLobbyOptions createLobbyOptions = new CreateLobbyOptions()
             {
                 IsPrivate = isPrivate,
@@ -347,7 +347,7 @@ public class GameNetPortal : Singleton<GameNetPortal>
         }
 
         // Set connection status for client.
-        if (NetworkManager.Singleton.ConnectedClients.Count > GameInfo.max_player_count) connectStatus = ConnectStatus.SERVER_FULL;
+        if (NetworkManager.Singleton.ConnectedClients.Count > GameInfo.MAX_PLAYER_COUNT) connectStatus = ConnectStatus.SERVER_FULL;
         else connectStatus = ConnectStatus.SUCCESS;
 
         // Enter client even if connectStatus is not SUCCESS, in order to send connectStatus to client.

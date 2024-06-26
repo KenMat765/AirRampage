@@ -5,7 +5,7 @@ using System.Linq;
 
 public static class AbilityUtilities
 {
-    static int max_weight { get { return GameInfo.max_weight; } }
+    static int max_weight { get { return GameInfo.MAX_WEIGHT; } }
 
     public static List<Ability> RandomSelect()
     {

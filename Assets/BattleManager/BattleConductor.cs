@@ -79,7 +79,7 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
     }
 
     // Player count (= 8) + Zako (red & blue)
-    public static int[] individualScores = new int[GameInfo.max_player_count + 2];
+    public static int[] individualScores = new int[GameInfo.MAX_PLAYER_COUNT + 2];
     public const int score_fighter = 100;   // Score obtained when killed other player.
     public const int score_zako = 10;       // Score obtained when killed zako.
 
@@ -232,7 +232,7 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
     {
         Team my_team = fighterCondition.fighterTeam.Value;
         int my_no = fighterCondition.fighterNo.Value;
-        bool is_zako = my_no >= GameInfo.max_player_count;
+        bool is_zako = my_no >= GameInfo.MAX_PLAYER_COUNT;
 
         switch (BattleInfo.rule)
         {
@@ -242,7 +242,7 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
                 GiveScoreToOpponentTeam(my_team, my_score);
 
                 // If killer is Fighter.
-                if (0 <= destroyerNo && destroyerNo < GameInfo.max_player_count)
+                if (0 <= destroyerNo && destroyerNo < GameInfo.MAX_PLAYER_COUNT)
                 {
                     individualScores[destroyerNo] += my_score;
                 }
@@ -255,11 +255,11 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
                     switch (destroyer_team)
                     {
                         case Team.RED:
-                            individualScores[GameInfo.max_player_count] += my_score;
+                            individualScores[GameInfo.MAX_PLAYER_COUNT] += my_score;
                             break;
 
                         case Team.BLUE:
-                            individualScores[GameInfo.max_player_count + 1] += my_score;
+                            individualScores[GameInfo.MAX_PLAYER_COUNT + 1] += my_score;
                             break;
 
                         default:

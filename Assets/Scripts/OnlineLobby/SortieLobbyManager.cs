@@ -82,7 +82,7 @@ public class SortieLobbyManager : NetworkSingleton<SortieLobbyManager>
 
         // Prepare all fighters.
         Team myTeam = myData.team;
-        for (int m_num = 0; m_num < GameInfo.team_member_count; m_num++)
+        for (int m_num = 0; m_num < GameInfo.TEAM_MEMBER_COUNT; m_num++)
         {
             int number = -1;
             if (LobbyLinkedData.I.TryGetNumber(myTeam, m_num, ref number))

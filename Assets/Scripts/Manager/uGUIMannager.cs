@@ -46,9 +46,9 @@ public class uGUIMannager : Singleton<uGUIMannager>
     public static Vector2 normBlastDiffPos { get; private set; }
     [SerializeField] float blast_diff_pos_max_mag = 200;
 
-    Image[] skill_fills = new Image[GameInfo.max_skill_count];
-    Button[] skill_btns = new Button[GameInfo.max_skill_count];
-    Image[] skill_imgs = new Image[GameInfo.max_skill_count];
+    Image[] skill_fills = new Image[GameInfo.MAX_SKILL_COUNT];
+    Button[] skill_btns = new Button[GameInfo.MAX_SKILL_COUNT];
+    Image[] skill_imgs = new Image[GameInfo.MAX_SKILL_COUNT];
     #endregion
 
     #region Combo
@@ -159,7 +159,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
         #endregion
 
         #region Blast and Skills
-        for (int k = 0; k < GameInfo.max_skill_count; k++)
+        for (int k = 0; k < GameInfo.MAX_SKILL_COUNT; k++)
         {
             Transform skill_transform = blastAndSkills.Find("SkillButton" + k);
             skill_fills[k] = skill_transform.Find("Fill").GetComponent<Image>();
@@ -194,7 +194,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
                 result_blueScore = result.Find("BlueScore").GetComponent<TextMeshProUGUI>();
                 fighter_names = result_royal.Find("Names").GetComponentsInChildren<TextMeshProUGUI>();
                 fighter_scores = result_royal.Find("Scores").GetComponentsInChildren<TextMeshProUGUI>();
-                for (int k = 0; k < GameInfo.max_player_count; k++) fighter_names[k].text = BattleInfo.battleDatas[k].name;
+                for (int k = 0; k < GameInfo.MAX_PLAYER_COUNT; k++) fighter_names[k].text = BattleInfo.battleDatas[k].name;
                 foreach (TextMeshProUGUI score in fighter_scores) score.text = "";
                 break;
 
@@ -251,7 +251,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
         HPs_white = HP_objects.Select(h => h.transform.Find("HP_white").GetComponent<Image>()).ToArray();
         Image[] team_icons = HP_objects.Select(h => h.transform.Find("Team").GetComponent<Image>()).ToArray();
         TextMeshProUGUI[] name_icons = HP_objects.Select(h => h.transform.Find("Name").GetComponent<TextMeshProUGUI>()).ToArray();
-        for (int no = 0; no < GameInfo.max_player_count; no++)
+        for (int no = 0; no < GameInfo.MAX_PLAYER_COUNT; no++)
         {
             string name = ParticipantManager.I.fighterInfos[no].fighterCondition.fighterName.Value.ToString();
             name_icons[no].text = name;
@@ -469,7 +469,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
     void HpOnHead()
     {
         // Playerは除く
-        for (int id = 0; id < GameInfo.max_player_count; id++)
+        for (int id = 0; id < GameInfo.MAX_PLAYER_COUNT; id++)
         {
             if (id != ParticipantManager.I.myFighterNo)
             {
@@ -612,7 +612,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
 
     void SkillButtonSetup()
     {
-        for (int k = 0; k < GameInfo.max_skill_count; k++)
+        for (int k = 0; k < GameInfo.MAX_SKILL_COUNT; k++)
         {
             int m = k;
 
@@ -648,14 +648,14 @@ public class uGUIMannager : Singleton<uGUIMannager>
         // Playerが死んでいた場合 return
         if (playerInfo.fighterCondition.isDead)
         {
-            for (int k = 0; k < GameInfo.max_skill_count; k++)
+            for (int k = 0; k < GameInfo.MAX_SKILL_COUNT; k++)
             {
                 if (skill_btns[k].interactable) { skill_btns[k].interactable = false; }
             }
             return;
         }
 
-        for (int k = 0; k < GameInfo.max_skill_count; k++)
+        for (int k = 0; k < GameInfo.MAX_SKILL_COUNT; k++)
         {
             Skill skill = playerInfo.attack.skills[k];
             if (skill != null)
@@ -751,7 +751,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
         // Used for animating score texts.
         redScore = 0;
         blueScore = 0;
-        scores_float = new float[GameInfo.max_player_count + 2]; // Player count (= 8) + Zako (red & blue)
+        scores_float = new float[GameInfo.MAX_PLAYER_COUNT + 2]; // Player count (= 8) + Zako (red & blue)
 
         // Animation settings.
         const float open_result_duration = 0.3f;
@@ -767,10 +767,10 @@ public class uGUIMannager : Singleton<uGUIMannager>
         switch (BattleInfo.rule)
         {
             case Rule.BATTLEROYAL:
-                for (int no = 0; no < GameInfo.max_player_count + 2; no++)
+                for (int no = 0; no < GameInfo.MAX_PLAYER_COUNT + 2; no++)
                 {
                     // === Scores for zakos === //
-                    if (no >= GameInfo.max_player_count)
+                    if (no >= GameInfo.MAX_PLAYER_COUNT)
                     {
                         // Just set scores to UI.
                         int zako_no = no;
@@ -796,7 +796,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
                     Team team = battle_data.team;
 
                     // Set fighter names to UI. (fighter_names: {red0, ... ,red3, blue0, ... ,blue3})
-                    int ui_idx = team == Team.RED ? member_no : GameInfo.team_member_count + member_no;
+                    int ui_idx = team == Team.RED ? member_no : GameInfo.TEAM_MEMBER_COUNT + member_no;
                     fighter_names[ui_idx].text = fighter_name;
 
                     // Set individual scores to UI.

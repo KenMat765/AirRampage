@@ -6,27 +6,28 @@ using UnityEngine;
 public class GameInfo : MonoBehaviour
 {
     // Number of players.
-    public static int max_player_count { get; } = 8;
-    public static int team_member_count { get; } = max_player_count / 2;
+    public const int MAX_PLAYER_COUNT = 8;
+    public const int TEAM_MEMBER_COUNT = MAX_PLAYER_COUNT / 2;
 
     // Skills.
-    public static int max_skill_count { get; } = 5;
-    public static int deck_count { get; } = 4;
+    public const int MAX_SKILL_COUNT = 5;
+    public const int DECK_COUNT = 4;
 
     // Ability.
-    public static int max_weight { get; } = 100;
+    public const int MAX_WEIGHT = 100;
 
     // Coins.
-    public static int s_generate_coin { get; } = 300;
-    public static int a_generate_coin { get; } = 100;
+    public const int S_GENERATE_COIN = 300;
+    public const int A_GENERATE_COIN = 100;
     public static int[] upgrade_coin { get; } = { 100, 200, 300, 400 };
 
     // Game Time.
-    public static int max_time_sec { get; } = 600;  // seconds
-    public static int min_time_sec { get; } = 180;  // seconds
+    public const int MAX_TIME_SEC = 600;  // seconds
+    public const int MIN_TIME_SEC = 180;  // seconds
 
     // LayerMask.
     public static LayerMask terrainMask { get; } = 1 << 6;
+    public static LayerMask structureMask { get; } = 1 << 22;
 }
 
 public enum Team { RED, BLUE, NONE }

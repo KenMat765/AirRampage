@@ -287,7 +287,7 @@ public class AbilityPortManager : Singleton<AbilityPortManager>
             current_page = page;
         }
 
-        int weight_remain = GameInfo.max_weight - current_weight;
+        int weight_remain = GameInfo.MAX_WEIGHT - current_weight;
 
         for (int pallet_index = 0; pallet_index < pallet_num; pallet_index++)
         {
@@ -401,7 +401,7 @@ public class AbilityPortManager : Singleton<AbilityPortManager>
     void UpdateStatusUI()
     {
         const float d = 0.15f;
-        total_weight_meter.DOFillAmount((float)current_weight / GameInfo.max_weight, d);
+        total_weight_meter.DOFillAmount((float)current_weight / GameInfo.MAX_WEIGHT, d);
         hp_meter.DOFillAmount((hp - 90.0f) / 10 / 11, d);
         atk_meter.DOFillAmount((atk - 90.0f) / 10 / 11, d);
         def_meter.DOFillAmount((def - 90.0f) / 10 / 11, d);
