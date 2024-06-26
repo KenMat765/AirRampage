@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6803959061206218712}
   - component: {fileID: 8757377012184630034}
   - component: {fileID: 1531453103912312181}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: LD_Bridge_Slope
   m_TagString: Untagged
   m_Icon: {fileID: 0}

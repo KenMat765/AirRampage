@@ -455,17 +455,17 @@ public abstract class FighterCondition : NetworkBehaviour
     // Combo & CP (Concentration Point) ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Variables
-    public float cp { get; set; }               // CP currently have.
+    public float cp { get; set; }   // CP currently have.
     public int combo { get; set; }
     protected float combo_timer;
     float zone_timer;
     public bool isZone { get; set; }
 
     // Constants
-    public float full_cp { get; set; } = 10000;          // CP necessary to get in the Zone.
-    public abstract float my_cp { get; set; }   // CP to give when killed.
-    protected float dec_cp_per_sec = 50;
-    protected float cp_maintain = 0f;    // 0.0 (maintain none) ~ 1.0 (maintain all)
+    public float full_cp { get; set; } = 10000; // CP necessary to get in the Zone.
+    public abstract float my_cp { get; set; }   // CP to give to opponent when killed.
+    protected float dec_cp_per_sec = 5;
+    protected float cp_maintain = 0f;   // 0.0 (maintain none) ~ 1.0 (maintain all)
     protected float default_combo_timer;
     protected float default_zone_timer = 5;
 

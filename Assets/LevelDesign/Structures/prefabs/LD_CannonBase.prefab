@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2010506259780776008}
   - component: {fileID: 4324079629670171778}
   - component: {fileID: 3153542433960941578}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: LD_CannonBase
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -178,6 +178,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: bfa0c88303d11445491443902bfe3e43, type: 3}
       propertyPath: m_Name
       value: LD_CannonMuzzle
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: bfa0c88303d11445491443902bfe3e43, type: 3}
+      propertyPath: m_Layer
+      value: 22
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: bfa0c88303d11445491443902bfe3e43, type: 3}
       propertyPath: m_StaticEditorFlags

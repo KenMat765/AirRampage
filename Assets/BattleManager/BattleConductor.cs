@@ -34,7 +34,7 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
     [ClientRpc] void EveryOneIsReadyClientRpc() => everyone_ready = true;
 
 
-    // Score.
+    // ===== Scores ===== //
     NetworkVariable<float> redScore = new NetworkVariable<float>();
     public float RedScore
     {
@@ -78,16 +78,13 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
         }
     }
 
+    // Player count (= 8) + Zako (red & blue)
     public static int[] individualScores = new int[GameInfo.max_player_count + 2];
+    public const int score_fighter = 100;   // Score obtained when killed other player.
+    public const int score_zako = 10;       // Score obtained when killed zako.
 
 
-    // 
-    // 
-    // Leave scores constant between fighters for now.
-    public const int score_fighter = 200;
-    public const int score_zako = 50;
-
-
+    // GameObjects unique to each game rule. (Objects of different rules are destroyed at the begining of the game)
     [SerializeField] GameObject[] royalOnlyObjects;
     [SerializeField] GameObject[] terminalOnlyObjects;
     [SerializeField] GameObject[] crystalOnlyObjects;
@@ -107,7 +104,7 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
     IEnumerator GameSetup()
     {
         // Push UI to sides before fading in to the scene.
-        uGUIMannager.I.EnterUI(false, true);
+        uGUIMannager.I.EnterExitUI(false, true);
 
         // Destroy unnecessary GameObjects & Select SpawnPointManager which corresponds to the game rule.
         switch (BattleInfo.rule)
@@ -180,7 +177,7 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
         ParticipantManager.I.FightersAcceptDamageHandler(-1, true);
         if (BattleInfo.rule == Rule.TERMINALCONQUEST) TerminalManager.I.TerminalsAcceptDamageHandler(true);
         else if (BattleInfo.rule == Rule.CRYSTALHUNTER) CrystalManager.I.AcceptCrystalHandler(true);
-        uGUIMannager.I.EnterUI(true, false);
+        uGUIMannager.I.EnterExitUI(true, false);
         gameInProgress = true;
     }
 
@@ -213,8 +210,9 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
         if (BattleInfo.rule == Rule.TERMINALCONQUEST) TerminalManager.I.TerminalsAcceptDamageHandler(false);
         else if (BattleInfo.rule == Rule.CRYSTALHUNTER) CrystalManager.I.AcceptCrystalHandler(false);
 
-        // Push UI to sides.
-        uGUIMannager.I.EnterUI(false, false);
+        // Push UI to sides & clean up screen.
+        uGUIMannager.I.EnterExitUI(false, false);
+        uGUIMannager.I.CleanUpScreen();
 
         // Disable uGUIManager.
         uGUIMannager.I.enabled = false;
@@ -230,31 +228,17 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
     }
 
 
-    [ClientRpc]
-    public void ReturnToMenuClientRpc()
-    {
-        IEnumerator returnToMenu()
-        {
-            float fadeout_duration = FadeCanvas.I.FadeOut(FadeType.gradually);
-            yield return new WaitForSeconds(fadeout_duration);
-            float blink_duration = FadeCanvas.I.StartBlink();
-            yield return new WaitForSeconds(blink_duration);
-            NetworkManager.SceneManager.LoadScene("Menu", UnityEngine.SceneManagement.LoadSceneMode.Single);
-        }
-        StartCoroutine(returnToMenu());
-    }
-
-
     public void OnFighterDestroyed(FighterCondition fighterCondition, int destroyerNo, string destroyerSkillName)
     {
         Team my_team = fighterCondition.fighterTeam.Value;
         int my_no = fighterCondition.fighterNo.Value;
+        bool is_zako = my_no >= GameInfo.max_player_count;
 
         switch (BattleInfo.rule)
         {
             case Rule.BATTLEROYAL:
                 // Give score to destroyer's team.
-                int my_score = (gameObject.tag == "Zako") ? score_zako : score_fighter;
+                int my_score = is_zako ? score_zako : score_fighter;
                 GiveScoreToOpponentTeam(my_team, my_score);
 
                 // If killer is Fighter.

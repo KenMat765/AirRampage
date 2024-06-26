@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 7127121383156010329}
   - component: {fileID: 7127121383156010327}
   - component: {fileID: 7127121383156010328}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: Terminal1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -114,7 +114,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3884558887
+  GlobalObjectIdHash: 4264732481
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 0

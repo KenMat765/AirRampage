@@ -1257,7 +1257,7 @@ GameObject:
   - component: {fileID: 6163156587480348530}
   - component: {fileID: 8242459277412729784}
   - component: {fileID: 7323570610316877619}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: LD_Building
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -7,6 +7,8 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using Unity.Netcode;
+using Cysharp.Threading.Tasks;
 
 public class uGUIMannager : Singleton<uGUIMannager>
 {
@@ -67,8 +69,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
     #endregion
 
     #region Result
-    Button returnButton;
-    TextMeshProUGUI returnButtonText;
+    Button confirmButton;
     TextMeshProUGUI result_redScore, result_blueScore;
     TextMeshProUGUI[] fighter_names;
     TextMeshProUGUI[] fighter_scores;
@@ -184,45 +185,43 @@ public class uGUIMannager : Singleton<uGUIMannager>
         #endregion
 
         #region Result
-        // returnButton = result.Find("ReturnButton").GetComponent<Button>();
-        // returnButtonText = result.Find("ReturnButton/Text").GetComponent<TextMeshProUGUI>();
-        // switch (BattleInfo.rule)
-        // {
-        //     case Rule.BATTLEROYAL:
-        //         Transform result_royal = result.Find("Result_Royal");
-        //         result_redScore = result_royal.Find("RedScore").GetComponent<TextMeshProUGUI>();
-        //         result_blueScore = result_royal.Find("BlueScore").GetComponent<TextMeshProUGUI>();
-        //         fighter_names = result_royal.Find("Names").GetComponentsInChildren<TextMeshProUGUI>();
-        //         fighter_scores = result_royal.Find("Scores").GetComponentsInChildren<TextMeshProUGUI>();
-        //         for (int no = 0; no < GameInfo.max_player_count; no++) fighter_names[no].text = BattleInfo.battleDatas[no].name;
-        //         foreach (TextMeshProUGUI score in fighter_scores) score.text = "";
-        //         break;
+        confirmButton = result.Find("ConfirmButton").GetComponent<Button>();
+        switch (BattleInfo.rule)
+        {
+            case Rule.BATTLEROYAL:
+                Transform result_royal = result.Find("Result_Royal");
+                result_redScore = result.Find("RedScore").GetComponent<TextMeshProUGUI>();
+                result_blueScore = result.Find("BlueScore").GetComponent<TextMeshProUGUI>();
+                fighter_names = result_royal.Find("Names").GetComponentsInChildren<TextMeshProUGUI>();
+                fighter_scores = result_royal.Find("Scores").GetComponentsInChildren<TextMeshProUGUI>();
+                for (int k = 0; k < GameInfo.max_player_count; k++) fighter_names[k].text = BattleInfo.battleDatas[k].name;
+                foreach (TextMeshProUGUI score in fighter_scores) score.text = "";
+                break;
 
-        //     case Rule.TERMINALCONQUEST:
-        //         Transform result_terminal = result.Find("Result_Terminal");
-        //         result_redScore = result_terminal.Find("RedScore").GetComponent<TextMeshProUGUI>();
-        //         result_blueScore = result_terminal.Find("BlueScore").GetComponent<TextMeshProUGUI>();
-        //         redTitle = result.Find("RedTitle").GetComponent<TextMeshProUGUI>();
-        //         blueTitle = result.Find("BlueTitle").GetComponent<TextMeshProUGUI>();
-        //         occupation = result_terminal.Find("Occupation").GetComponent<TextMeshProUGUI>();
-        //         occupation.color = Color.clear;
-        //         break;
+                // case Rule.TERMINALCONQUEST:
+                //     Transform result_terminal = result.Find("Result_Terminal");
+                //     result_redScore = result_terminal.Find("RedScore").GetComponent<TextMeshProUGUI>();
+                //     result_blueScore = result_terminal.Find("BlueScore").GetComponent<TextMeshProUGUI>();
+                //     redTitle = result.Find("RedTitle").GetComponent<TextMeshProUGUI>();
+                //     blueTitle = result.Find("BlueTitle").GetComponent<TextMeshProUGUI>();
+                //     occupation = result_terminal.Find("Occupation").GetComponent<TextMeshProUGUI>();
+                //     occupation.color = Color.clear;
+                //     break;
 
-        //     case Rule.CRYSTALHUNTER:
-        //         Transform result_crystal = result.Find("Result_Crystal");
-        //         result_redScore = result_crystal.Find("RedScore").GetComponent<TextMeshProUGUI>();
-        //         result_blueScore = result_crystal.Find("BlueScore").GetComponent<TextMeshProUGUI>();
-        //         redTitle = result.Find("RedTitle").GetComponent<TextMeshProUGUI>();
-        //         blueTitle = result.Find("BlueTitle").GetComponent<TextMeshProUGUI>();
-        //         occupation = result_crystal.Find("Occupation").GetComponent<TextMeshProUGUI>();
-        //         occupation.color = Color.clear;
-        //         break;
-        // }
-        // result.DOScaleX(0, 0);
-        // returnButton.interactable = false;
-        // returnButtonText.color = Color.gray;
-        // result_redScore.text = "";
-        // result_blueScore.text = "";
+                // case Rule.CRYSTALHUNTER:
+                //     Transform result_crystal = result.Find("Result_Crystal");
+                //     result_redScore = result_crystal.Find("RedScore").GetComponent<TextMeshProUGUI>();
+                //     result_blueScore = result_crystal.Find("BlueScore").GetComponent<TextMeshProUGUI>();
+                //     redTitle = result.Find("RedTitle").GetComponent<TextMeshProUGUI>();
+                //     blueTitle = result.Find("BlueTitle").GetComponent<TextMeshProUGUI>();
+                //     occupation = result_crystal.Find("Occupation").GetComponent<TextMeshProUGUI>();
+                //     occupation.color = Color.clear;
+                //     break;
+        }
+        result.DOScaleX(0, 0);
+        confirmButton.interactable = false;
+        result_redScore.text = "";
+        result_blueScore.text = "";
         #endregion
 
         #region Lock On
@@ -298,7 +297,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
         HpOnHead();
         GameTimeManager();
         ScoreManager();
-        ScreenColorManager();
+        ScreenManager();
         ReportDestroy();
         SkillButtonUpdate();
         DotLighter();
@@ -307,7 +306,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
     }
 
 
-    public void EnterUI(bool enter, bool immediate)
+    public void EnterExitUI(bool enter, bool immediate)
     {
         Vector2 status_point = new Vector2(320, -120);
         Vector2 controllStick_point = new Vector2(330, 275);
@@ -333,6 +332,22 @@ public class uGUIMannager : Singleton<uGUIMannager>
         seq.Join(radar.DOAnchorPos(radar_point, duration).SetEase(ease));
         seq.Join(timeAndScores.DOAnchorPos(timeAndScores_point, duration).SetEase(ease));
         seq.Play();
+    }
+
+    public void CleanUpScreen()
+    {
+        // Clear screen color.
+        screen_color.color = Color.clear;
+
+        // Hide KilledRepo.
+        reviveCount.color = Color.clear;
+        reviveCount.text = "";
+        killed.color = Color.clear;
+        reviveIn.color = Color.clear;
+
+        // Hide Zone.
+        zone_back.FadeColor(0);
+        zone_text.FadeColor(0);
     }
 
 
@@ -488,18 +503,9 @@ public class uGUIMannager : Singleton<uGUIMannager>
 
     public void ScreenColorSetter(Color color) { screen_color.color = color; }
 
-
-    void ScreenColorManager()
+    void ScreenManager()
     {
-        if (!playerInfo.fighterCondition.isDead)
-        {
-            screen_color.color = Color.Lerp(screen_color.color, Color.clear, 0.2f);
-            reviveCount.color = Color.clear;
-            reviveCount.text = "";
-            killed.color = Color.clear;
-            reviveIn.color = Color.clear;
-        }
-        else
+        if (playerInfo.fighterCondition.isDead)
         {
             screen_color.color = new Color(1, 0, 0, 0.5f);
             reviveCount.text = Mathf.Ceil(playerInfo.fighterCondition.revivalTime - playerInfo.fighterCondition.revive_timer).ToString();
@@ -509,6 +515,15 @@ public class uGUIMannager : Singleton<uGUIMannager>
                 reviveCount.color = Color.white;
                 reviveIn.color = Color.white;
             }
+        }
+        else
+        {
+            // Gradually reset screen color.
+            screen_color.color = Color.Lerp(screen_color.color, Color.clear, 0.2f);
+            reviveCount.color = Color.clear;
+            reviveCount.text = "";
+            killed.color = Color.clear;
+            reviveIn.color = Color.clear;
         }
     }
 
@@ -738,38 +753,78 @@ public class uGUIMannager : Singleton<uGUIMannager>
 
     public void ShowResult()
     {
-        // Reuse these variables.
+        // Used for animating score texts.
         redScore = 0;
         blueScore = 0;
-        scores_float = new float[GameInfo.max_player_count];
+        scores_float = new float[GameInfo.max_player_count + 2]; // Player count (= 8) + Zako (red & blue)
 
-        float open_result_duration = 0.3f;
-        float interval = 0.5f;
-        float score_update_duration = 1.2f;
-
+        // Animation settings.
+        const float open_result_duration = 0.3f;
+        const float interval = 0.5f;
+        const float score_update_duration = 1.2f;
         Ease open_ease = Ease.OutQuart;
 
+        // Create Animation.
         Sequence seq = DOTween.Sequence();
         seq.Append(result.DOScaleX(1, open_result_duration).SetEase(open_ease));
         seq.AppendInterval(interval);
-        if (BattleInfo.rule == Rule.BATTLEROYAL)
+
+        switch (BattleInfo.rule)
         {
-            for (int no = 0; no < GameInfo.max_player_count; no += 2)
-            {
-                int No = no;
-                seq.Append(DOTween.To(() => scores_float[No], (value) => scores_float[No] = value, BattleConductor.individualScores[No], score_update_duration)
-                    .OnUpdate(() => fighter_scores[No].text = Mathf.CeilToInt(scores_float[No]).ToString()));
-                seq.Join(DOTween.To(() => scores_float[No + 1], (value) => scores_float[No + 1] = value, BattleConductor.individualScores[No + 1], score_update_duration)
-                    .OnUpdate(() => fighter_scores[No + 1].text = Mathf.CeilToInt(scores_float[No + 1]).ToString()));
-                seq.AppendInterval(interval);
-            }
+            case Rule.BATTLEROYAL:
+                for (int no = 0; no < GameInfo.max_player_count + 2; no++)
+                {
+                    // === Scores for zakos === //
+                    if (no >= GameInfo.max_player_count)
+                    {
+                        // Just set scores to UI.
+                        int zako_no = no;
+                        seq.Join(DOTween.To(() => scores_float[zako_no], (value) => scores_float[zako_no] = value, BattleConductor.individualScores[zako_no], score_update_duration)
+                            .OnUpdate(() => fighter_scores[zako_no].text = Mathf.CeilToInt(scores_float[zako_no]).ToString()));
+                        continue;
+                    }
+
+                    // === Scores for fighters === //
+
+                    // Check if battle data exists.
+                    BattleInfo.ParticipantBattleData? nullable_data = BattleInfo.GetBattleDataByFighterNo(no);
+                    if (!nullable_data.HasValue)
+                    {
+                        Debug.LogError($"Could not get battle data of fighterNo: {no}");
+                        continue;
+                    }
+
+                    // Get battle data of fighter.
+                    BattleInfo.ParticipantBattleData battle_data = nullable_data.Value;
+                    int member_no = battle_data.memberNo;
+                    string fighter_name = battle_data.name;
+                    Team team = battle_data.team;
+
+                    // Set fighter names to UI. (fighter_names: {red0, ... ,red3, blue0, ... ,blue3})
+                    int ui_idx = team == Team.RED ? member_no : GameInfo.team_member_count + member_no;
+                    fighter_names[ui_idx].text = fighter_name;
+
+                    // Set individual scores to UI.
+                    int fighter_no = no;
+                    seq.Join(DOTween.To(() => scores_float[fighter_no], (value) => scores_float[fighter_no] = value, BattleConductor.individualScores[fighter_no], score_update_duration)
+                        .OnUpdate(() => fighter_scores[ui_idx].text = Mathf.CeilToInt(scores_float[fighter_no]).ToString()));
+                }
+                break;
+
+                // case Rule.TERMINALCONQUEST:
+                //     break;
+
+                // case Rule.CRYSTALHUNTER:
+                //     break;
         }
+
+        seq.AppendInterval(interval);
         seq.Append(DOTween.To(() => redScore, (value) => redScore = value, BattleConductor.I.RedScore, score_update_duration)
             .OnUpdate(() => result_redScore.text = Mathf.CeilToInt(redScore).ToString()));
         seq.Join(DOTween.To(() => blueScore, (value) => blueScore = value, BattleConductor.I.BlueScore, score_update_duration)
             .OnUpdate(() => result_blueScore.text = Mathf.CeilToInt(blueScore).ToString()));
         seq.AppendInterval(interval);
-        seq.AppendCallback(() => { returnButton.interactable = true; returnButtonText.color = Color.white; });
+        seq.AppendCallback(() => confirmButton.interactable = true);
         seq.Play();
     }
 
@@ -799,7 +854,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
         Sequence seq = DOTween.Sequence();
         seq.Append(result.DOScaleX(1, open_result_duration).SetEase(open_ease));
         seq.AppendInterval(interval);
-        seq.AppendCallback(() => { returnButton.interactable = true; returnButtonText.color = Color.white; });
+        seq.AppendCallback(() => confirmButton.interactable = true);
         seq.Play();
     }
 
@@ -849,12 +904,17 @@ public class uGUIMannager : Singleton<uGUIMannager>
     }
 
 
-    public void OnPressedReturn()
+    public async void OnPressedConfirm()
     {
-        if (BattleInfo.isHost)
+        // Disconnect from server.
+        if (NetworkManager.Singleton)
         {
-            BattleConductor.I.ReturnToMenuClientRpc();
+            NetworkManager.Singleton.Shutdown();
+            await UniTask.WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
         }
+
+        // Go back to menu scene.
+        SceneManager2.I.LoadSceneAsync2(GameScenes.MENU, FadeType.gradually);
     }
 
 
