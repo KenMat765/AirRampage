@@ -27,7 +27,6 @@ public abstract class Movement : NetworkBehaviour
     IEnumerator DeathAnimation()
     {
         // Start falling, and play first explision effect.
-        rigidBody.drag = 0;
         rigidBody.useGravity = true;
         explosion1.Play();
         explosionSound1.Play();
@@ -37,7 +36,6 @@ public abstract class Movement : NetworkBehaviour
         yield return new WaitForSeconds(2.0f);
 
         // Stop falling, and play second explision effect.
-        rigidBody.drag = float.PositiveInfinity;
         rigidBody.useGravity = false;
         // Put out explosion2 from fighterbody before deactivating fighterbody.
         explosion2Trans.parent = transform;
@@ -112,10 +110,15 @@ public abstract class Movement : NetworkBehaviour
     protected void MoveForward()
     {
         float speed = fighterCondition.speed;
-        transform.position = Vector3.MoveTowards(
-            transform.position,
-            transform.position + (transform.forward * speed * Time.deltaTime * uTurndirection),
-            speed);
+
+        // Move by transform (Slip-through occurs)
+        // transform.position = Vector3.MoveTowards(
+        //     transform.position,
+        //     transform.position + (transform.forward * speed * Time.deltaTime * uTurndirection),
+        //     speed);
+
+        // Move by rigidbody (Slip-through does not occur)
+        rigidBody.velocity = transform.forward * speed * uTurndirection;
     }
 
     protected abstract void Rotate();

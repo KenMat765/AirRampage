@@ -174,7 +174,7 @@ public class PlayerInfo
 
 
     // === Settings === //
-    public string myName = "Kari name";
+    public string myName = "Player";
     public float volume = 1.0f;
     public int fps = 60;
     public float bgmRatio = 1.0f;

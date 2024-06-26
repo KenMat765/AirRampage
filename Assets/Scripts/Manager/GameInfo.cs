@@ -14,7 +14,7 @@ public class GameInfo : MonoBehaviour
     public static int a_generate_coin { get; } = 100;
     public static int[] upgrade_coin { get; } = { 100, 200, 300, 400 };
     public static int max_time_sec { get; } = 600;  // seconds
-    public static int min_time_sec { get; } = 10;  // seconds
+    public static int min_time_sec { get; } = 180;  // seconds
     public static LayerMask terrainMask { get; } = 1 << 6;
 }
 

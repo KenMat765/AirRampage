@@ -33,7 +33,13 @@ public class PlayerMovement : Movement
         Rotate();
         FourActionExe();
 
+        // For Debug.
 #if UNITY_EDITOR
+        if (!can_rotate)
+        {
+            return;
+        }
+
         float maxRotSpeed = 40;
         float maxTiltX = 55;  //縦
         float maxTiltZ = 60;  //左右
@@ -42,20 +48,20 @@ public class PlayerMovement : Movement
 
         if (Input.anyKey)
         {
-            if (Input.GetKey(KeyCode.UpArrow))
+            if (Input.GetKey(KeyCode.W))
             {
                 targetRotX += maxTiltX;
             }
-            if (Input.GetKey(KeyCode.DownArrow))
+            if (Input.GetKey(KeyCode.S))
             {
                 targetRotX -= maxTiltX;
             }
-            if (Input.GetKey(KeyCode.RightArrow))
+            if (Input.GetKey(KeyCode.D))
             {
                 relativeRotY = maxRotSpeed;
                 targetRotZ = maxTiltZ;
             }
-            if (Input.GetKey(KeyCode.LeftArrow))
+            if (Input.GetKey(KeyCode.A))
             {
                 relativeRotY = maxRotSpeed * -1;
                 targetRotZ = maxTiltZ * -1;
@@ -277,10 +283,10 @@ public class PlayerMovement : Movement
         else if (CSManager.swipeRight) { RightRoll(0.2f); }
 
 #if UNITY_EDITOR
-        if (Input.GetKeyDown(KeyCode.S)) { Uturn(); }
-        else if (Input.GetKeyDown(KeyCode.W)) { Flip(); }
-        else if (Input.GetKeyDown(KeyCode.A)) { LeftRoll(0.2f); }
-        else if (Input.GetKeyDown(KeyCode.D)) { RightRoll(0.2f); }
+        if (Input.GetKeyDown(KeyCode.DownArrow)) { Uturn(); }
+        else if (Input.GetKeyDown(KeyCode.UpArrow)) { Flip(); }
+        else if (Input.GetKeyDown(KeyCode.LeftArrow)) { LeftRoll(0.2f); }
+        else if (Input.GetKeyDown(KeyCode.RightArrow)) { RightRoll(0.2f); }
 #endif
     }
 }

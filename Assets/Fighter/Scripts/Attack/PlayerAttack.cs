@@ -12,6 +12,7 @@ public class PlayerAttack : Attack
     [SerializeField] float blastRange = 30;
     [SerializeField] float sensitivity = 0.2f;
     Quaternion muzzleRot;
+    bool isBlasting = false;
 
     void FixedUpdate()
     {
@@ -27,8 +28,15 @@ public class PlayerAttack : Attack
 #else
         if (uGUIMannager.onBlast)
 #endif
-        // if (uGUIMannager.onBlast)
         {
+            // On start blasting (= isBlasting is false)
+            if (!isBlasting)
+            {
+                isBlasting = true;
+                blastTimer = setInterval;       // Reset blast timer.
+                muzzleRot = transform.rotation; // Reset muzzle rotation.
+            }
+
             // Determine blast direction.
             int k = 30;
             Vector2 diff_pos = uGUIMannager.normBlastDiffPos;
@@ -37,31 +45,32 @@ public class PlayerAttack : Attack
             Quaternion targetRot = Quaternion.Euler(target_xAngle, target_yAngle, 0);
             muzzleRot = Quaternion.Slerp(muzzleRot, targetRot, sensitivity);
 
+            // Count down blast timer.
             blastTimer -= Time.deltaTime;
             if (blastTimer < 0)
             {
-                // Set timer.
+                // Reset timer.
                 blastTimer = setInterval;
 
-                // Determine target.
-                int targetNo = -1;
-                if (homingCount > 0) targetNo = homingTargetNos[0];
-                GameObject target = null;
-                if (targetNo != -1) target = ParticipantManager.I.fighterInfos[targetNo].body;
-
                 // Blast normal bullets for yourself.
-                // NormalRapid(rapidCount, target); // Pre-Homing
-                NormalRapid(rapidCount, null); // No Pre-Homing
+                NormalRapid(rapidCount, null);
 
-                // If multiplayer, send to all clones to blast bullets.
-                // NormalRapidServerRpc(OwnerClientId, rapidCount, targetNo); // Pre-Homing
-                NormalRapidServerRpc(OwnerClientId, rapidCount, -1); // No Pre-Homing
+                // Send to all clones to blast bullets.
+                NormalRapidServerRpc(OwnerClientId, rapidCount, -1);
+
+                // === Pre-Homing (Automatically looks at opponent) === //
+                // Determine target.
+                // int targetNo = -1;
+                // if (homingCount > 0) targetNo = homingTargetNos[0];
+                // GameObject target = null;
+                // if (targetNo != -1) target = ParticipantManager.I.fighterInfos[targetNo].body;
+                // NormalRapid(rapidCount, target);
+                // NormalRapidServerRpc(OwnerClientId, rapidCount, targetNo);
             }
         }
-        else
+        else if (isBlasting)
         {
-            blastTimer = setInterval;
-            muzzleRot = transform.rotation;
+            isBlasting = false;
         }
     }
 
