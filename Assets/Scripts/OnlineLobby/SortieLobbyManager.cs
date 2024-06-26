@@ -36,6 +36,7 @@ public class SortieLobbyManager : NetworkSingleton<SortieLobbyManager>
 
 
     // Participant Determined /////////////////////////////////////////////////////////////////////////////////////////
+    public bool determinationInProgress { get; private set; } = false;
     public async void OnParticipantDetermined()
     {
         // Only the host can determine the participants.
@@ -44,6 +45,8 @@ public class SortieLobbyManager : NetworkSingleton<SortieLobbyManager>
             Debug.LogError("Only the host can determine participants.");
             return;
         }
+
+        determinationInProgress = true;
 
         // Kill Lobby.
         LobbyLinkedData.I.acceptDataChange = false;
@@ -89,6 +92,8 @@ public class SortieLobbyManager : NetworkSingleton<SortieLobbyManager>
             }
         }
         LobbyFighter.I.PrepareAllFighters(myTeam);
+
+        determinationInProgress = false;
     }
 
 

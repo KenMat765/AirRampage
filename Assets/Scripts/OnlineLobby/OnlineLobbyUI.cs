@@ -396,7 +396,10 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
                     });
                     teamButton.onClick.AddListener(() =>
                     {
-                        SortieLobbyManager.I.OnParticipantDetermined();
+                        if (!SortieLobbyManager.I.determinationInProgress)
+                        {
+                            SortieLobbyManager.I.OnParticipantDetermined();
+                        }
                     });
                 }
                 else
