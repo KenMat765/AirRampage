@@ -191,4 +191,5 @@ public class PlayerInfo
         }
     }
     [SerializeField] int Coins = 9999;
+    public ViewType viewType = ViewType.TPS_FAR;
 }

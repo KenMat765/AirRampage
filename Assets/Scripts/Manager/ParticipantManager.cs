@@ -69,12 +69,6 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
             allFighters[fighterNo] = zako;
         }
 
-        // Setup Player Camera ///////////////////////////////////////////////////////////////////////////
-        CameraController.I.fighterTrans = myPlayer.transform;
-        CameraManager.SetupCameraInScene();
-        GameObject cameraRadar = myPlayer.transform.Find("CameraRadar").gameObject;
-        cameraRadar.SetActive(true);
-
         // Process for all fighters /////////////////////////////////////////////////////////////////////////
         for (int no = 0; no < GameInfo.max_player_count + zakoCountAll; no++)
         {
@@ -136,6 +130,11 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
             // }
         }
 
+        // Setup Player Camera ///////////////////////////////////////////////////////////////////////////
+        CameraController.I.SetupPlayerCamera(myPlayer.transform, PlayerInfo.I.viewType);
+        CameraManager.SetupCameraInScene();
+        GameObject cameraRadar = myPlayer.transform.Find("CameraRadar").gameObject;
+        cameraRadar.SetActive(true);
 
         // All set complete !!
         infoSetComplete = true;
