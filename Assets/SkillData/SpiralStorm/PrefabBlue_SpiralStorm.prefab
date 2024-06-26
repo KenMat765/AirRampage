@@ -14790,6 +14790,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: SpiralImpact
       objectReference: {fileID: 0}
+    - target: {fileID: 7255365049575932006, guid: b49c90c949df547d2bfe815e26ba0ef2, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7255365049575932006, guid: b49c90c949df547d2bfe815e26ba0ef2, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.g
+      value: 0.58431375
+      objectReference: {fileID: 0}
+    - target: {fileID: 7255365049575932006, guid: b49c90c949df547d2bfe815e26ba0ef2, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.r
+      value: 0.23921569
+      objectReference: {fileID: 0}
+    - target: {fileID: 7255365049575932006, guid: b49c90c949df547d2bfe815e26ba0ef2, type: 3}
+      propertyPath: InitialModule.startColor.minColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7255365049575932006, guid: b49c90c949df547d2bfe815e26ba0ef2, type: 3}
+      propertyPath: InitialModule.startColor.minColor.g
+      value: 0.28627452
+      objectReference: {fileID: 0}
+    - target: {fileID: 7255365049575932006, guid: b49c90c949df547d2bfe815e26ba0ef2, type: 3}
+      propertyPath: InitialModule.startColor.minColor.r
+      value: 0.56078434
+      objectReference: {fileID: 0}
     - target: {fileID: 7384347056453382413, guid: b49c90c949df547d2bfe815e26ba0ef2, type: 3}
       propertyPath: m_RootOrder
       value: 3

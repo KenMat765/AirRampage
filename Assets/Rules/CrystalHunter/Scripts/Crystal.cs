@@ -91,7 +91,7 @@ public class Crystal : MonoBehaviour
                 Vector3 target_pos = body_pos + Vector3.up * y_offset;
                 GoToTarget(target_pos, maxChaseSpeed);
                 fighterCondition.HPDecreaser(hpDecreaseSpeed * Time.deltaTime);
-                fighterCondition.receiver.LastShooterDetector(id, "Crystal");
+                fighterCondition.receiver.LastShooterDetector(-1, Receiver.SPECIFIC_DEATH_CRYSTAL);
                 break;
 
             case State.RETURNING:

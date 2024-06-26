@@ -35,9 +35,9 @@ public class AiCondition : FighterCondition
 
 
     public override float revivalTime { get; set; } = 7;
-    protected override void Revival()
+    protected override void OnRevival()
     {
-        base.Revival();
+        base.OnRevival();
         uGUIMannager.I.ResetHP_UI(fighterNo.Value);
         radarIcon.Visualize(true);
     }

@@ -193,6 +193,7 @@ public abstract class Attack : NetworkBehaviour
     ///<param name="target"> Put null when there are no targets. </param>
     protected virtual void NormalBlast(GameObject target = null)
     {
+        if (fighterCondition.isDead) return;
         if (!attackable) return;
 
         Weapon bullet = normalWeapons[GetNormalBulletIndex()];

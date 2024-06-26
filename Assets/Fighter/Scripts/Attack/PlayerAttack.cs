@@ -76,6 +76,7 @@ public class PlayerAttack : Attack
 
     protected override void NormalBlast(GameObject target = null)
     {
+        if (fighterCondition.isDead) return;
         if (!attackable) return;
 
         Weapon bullet = normalWeapons[GetNormalBulletIndex()];

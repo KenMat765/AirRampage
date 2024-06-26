@@ -201,7 +201,23 @@ public abstract class Movement : NetworkBehaviour
 
 
 
-    // AIのみ使用 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Collision Detection ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    [SerializeField] LayerMask obstacleLayer;   // terrain + structures
+    void OnCollisionEnter(Collision col)
+    {
+        // Get layer of collided object.
+        int col_layer = 1 << col.gameObject.layer;
+
+        // Crash when collided to obstacles.
+        if ((obstacleLayer & col_layer) != 0)
+        {
+            fighterCondition.Death(-1, Receiver.SPECIFIC_DEATH_COLLISION);
+        }
+    }
+
+
+
+    // AIのみ使用 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     protected float rotationSpeed { get; set; }
     protected const float distanceBorder = 25f;
     protected float sqr_distanceBorder { get { return distanceBorder * distanceBorder; } }

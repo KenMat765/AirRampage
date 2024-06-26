@@ -508,9 +508,9 @@ public class uGUIMannager : Singleton<uGUIMannager>
         if (playerInfo.fighterCondition.isDead)
         {
             screen_color.color = new Color(1, 0, 0, 0.5f);
-            reviveCount.text = Mathf.Ceil(playerInfo.fighterCondition.revivalTime - playerInfo.fighterCondition.revive_timer).ToString();
+            reviveCount.text = Mathf.Ceil(playerInfo.fighterCondition.revivalTime - playerInfo.fighterCondition.reviveTimer).ToString();
             killed.color = Color.Lerp(killed.color, Color.white, 0.1f);
-            if (playerInfo.fighterCondition.revive_timer > playerInfo.fighterCondition.revivalTime - 5)
+            if (playerInfo.fighterCondition.reviveTimer > playerInfo.fighterCondition.revivalTime - 5)
             {
                 reviveCount.color = Color.white;
                 reviveIn.color = Color.white;
@@ -540,7 +540,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
         }
     }
 
-    public void BookRepo(string destroyer, string destroyed, Team destroyed_team, Sprite skill_sprite)
+    public void BookRepo(string destroyer, string destroyed, Team destroyed_team, string causeOfDeath)
     {
         Sequence newSeq = DOTween.Sequence()
             .OnStart(() =>
@@ -553,34 +553,35 @@ public class uGUIMannager : Singleton<uGUIMannager>
                 arrow.color = Color.white;
                 switch (destroyed_team)
                 {
-                    case Team.NONE:
-                        destroyerTex.colorGradientPreset = gradv_gray;
-                        destroyedTex.colorGradientPreset = gradv_gray;
-                        // arrow.color = Color.gray;
-                        break;
-
                     case Team.RED:
                         destroyerTex.colorGradientPreset = gradv_blue;
                         destroyedTex.colorGradientPreset = gradv_red;
-                        // arrow.color = Color.blue;
                         break;
 
                     case Team.BLUE:
                         destroyerTex.colorGradientPreset = gradv_red;
                         destroyedTex.colorGradientPreset = gradv_blue;
-                        // arrow.color = Color.red;
                         break;
                 }
 
-                // Set skill icon.
-                if (skill_sprite != null)
+                // Specific cause of death.
+                if (Receiver.specificDeath.Contains(causeOfDeath))
                 {
-                    skill_icon.sprite = skill_sprite;
-                    skill_icon.color = Color.white;
+                    destroyerTex.colorGradientPreset = gradv_gray;
+                    skill_icon.enabled = false;
                 }
+                // Killed by normal blast.
+                else if (causeOfDeath == Receiver.DEATH_NORMAL_BLAST)
+                {
+                    skill_icon.enabled = false;
+                }
+                // Killed by skills.
                 else
                 {
-                    skill_icon.color = Color.clear;
+                    Sprite skill_sprite = SkillDatabase.I.SearchSkillByName(causeOfDeath).GetSprite();
+                    skill_icon.sprite = skill_sprite;
+                    skill_icon.color = Color.white;
+                    skill_icon.enabled = true;
                 }
             })
             .OnComplete(() =>
@@ -596,18 +597,12 @@ public class uGUIMannager : Singleton<uGUIMannager>
         newSeq.Append(arrow.DOFade(0, 0.2f).SetLoops(5, LoopType.Yoyo));
         newSeq.Join(destroyerTex.DOFade(0, 0.2f).SetLoops(5, LoopType.Yoyo));
         newSeq.Join(destroyedTex.DOFade(0, 0.2f).SetLoops(5, LoopType.Yoyo));
-        if (skill_sprite != null)
-        {
-            newSeq.Join(skill_icon.DOFade(0, 0.2f).SetLoops(5, LoopType.Yoyo));
-        }
+        newSeq.Join(skill_icon.DOFade(0, 0.2f).SetLoops(5, LoopType.Yoyo));
 
         newSeq.Append(arrow.DOFade(1, 0.2f));
         newSeq.Join(destroyerTex.DOFade(1, 0.2f));
         newSeq.Join(destroyedTex.DOFade(1, 0.2f));
-        if (skill_sprite != null)
-        {
-            newSeq.Join(skill_icon.DOFade(1, 0.2f));
-        }
+        newSeq.Join(skill_icon.DOFade(1, 0.2f));
 
         newSeq.Append(destroyRepo.DOAnchorPosX(-175, 0.2f).SetDelay(3));
 

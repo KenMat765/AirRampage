@@ -10,11 +10,6 @@ using NaughtyAttributes;
 // このクラスのプロパティをもとに、Movement、Attack、Receiverを動かす
 public abstract class FighterCondition : NetworkBehaviour
 {
-    void Awake()
-    {
-        col = GetComponent<Collider>();
-    }
-
     protected virtual void Start()
     {
         // Only the owner refers to HP, speed, defence, and power.
@@ -33,13 +28,11 @@ public abstract class FighterCondition : NetworkBehaviour
 
         if (isDead)
         {
-            revive_timer += Time.deltaTime;
-            if (revive_timer > revivalTime)
+            reviveTimer += Time.deltaTime;
+            if (reviveTimer > revivalTime)
             {
-                revive_timer = 0;
+                reviveTimer = 0;
                 Revival();
-                if (IsHost) RevivalClientRpc(OwnerClientId);
-                else RevivalServerRpc(OwnerClientId);
             }
         }
 
@@ -48,8 +41,6 @@ public abstract class FighterCondition : NetworkBehaviour
             if (HP <= 0)
             {
                 Death(receiver.lastShooterNo, receiver.lastSkillName);
-                if (IsHost) DeathClientRpc(OwnerClientId, receiver.lastShooterNo, receiver.lastSkillName);
-                else DeathServerRpc(OwnerClientId, receiver.lastShooterNo, receiver.lastSkillName);
                 return;
             }
             SpeedTimeUpdate();
@@ -586,38 +577,58 @@ public abstract class FighterCondition : NetworkBehaviour
 
     // Death & Revival //////////////////////////////////////////////////////////////////////////////////////////////
     public abstract float revivalTime { get; set; }
-    public float revive_timer { get; private set; }
+    public float reviveTimer { get; private set; }
 
-    // Collider needs to be disabled, in order not to be detected by other fighter as homing target.
-    Collider col;
-
-    // Should be called on every clients.
-    protected virtual void Death(int destroyerNo, string destroyerSkillName)
+    // Processes run at the time of death. (Should be called on every clients)
+    protected virtual void OnDeath(int destroyerNo, string causeOfDeath)
     {
         isDead = true;
-        col.enabled = false;
 
         movement.OnDeath();
         attack.OnDeath();
-        receiver.OnDeath(destroyerNo, destroyerSkillName);
+        receiver.OnDeath(destroyerNo, causeOfDeath);
         radarIcon.Visualize(false);
 
-        // Only the server handles from here.
-        if (!IsHost) return;
-
-        BattleConductor.I.OnFighterDestroyed(this, destroyerNo, destroyerSkillName);
+        if (IsHost)
+        {
+            BattleConductor.I.OnFighterDestroyed(this, destroyerNo, causeOfDeath);
+        }
     }
 
-    // Should be called on every clients.
-    protected virtual void Revival()
+    // Method to call OnDeath() at all clients.
+    public void Death(int destroyerNo, string causeOfDeath)
+    {
+        // Call for yourself.
+        OnDeath(destroyerNo, causeOfDeath);
+
+        // Call for clones at other clients.
+        if (IsHost)
+            DeathClientRpc(OwnerClientId, destroyerNo, causeOfDeath);
+        else
+            DeathServerRpc(OwnerClientId, destroyerNo, causeOfDeath);
+    }
+
+    [ServerRpc]
+    void DeathServerRpc(ulong senderId, int destroyerNo, string causeOfDeath)
+    {
+        DeathClientRpc(senderId, destroyerNo, causeOfDeath);
+    }
+
+    [ClientRpc]
+    void DeathClientRpc(ulong senderId, int destroyerNo, string causeOfDeath)
+    {
+        if (NetworkManager.Singleton.LocalClientId == senderId) return;
+        OnDeath(destroyerNo, causeOfDeath);
+    }
+
+    // Processes run at the time of revival. (Should be called on every clients)
+    protected virtual void OnRevival()
     {
         isDead = false;
 
         movement.OnRevival();
         attack.OnRevival();
         receiver.OnRevival();
-
-        col.enabled = true;
 
         if (IsOwner)
         {
@@ -629,30 +640,30 @@ public abstract class FighterCondition : NetworkBehaviour
         }
     }
 
-    [ServerRpc]
-    protected void DeathServerRpc(ulong senderId, int destroyerNo, string destroyerSkillName)
+    // Method to call OnRevival() at all clients.
+    public void Revival()
     {
-        DeathClientRpc(senderId, destroyerNo, destroyerSkillName);
+        // Call for yourself.
+        OnRevival();
+
+        // Call for clones at other clients.
+        if (IsHost)
+            RevivalClientRpc(OwnerClientId);
+        else
+            RevivalServerRpc(OwnerClientId);
     }
 
-    [ClientRpc]
-    protected void DeathClientRpc(ulong senderId, int destroyerNo, string destroyerSkillName)
-    {
-        if (NetworkManager.Singleton.LocalClientId == senderId) return;
-        Death(destroyerNo, destroyerSkillName);
-    }
-
     [ServerRpc]
-    protected void RevivalServerRpc(ulong senderId)
+    void RevivalServerRpc(ulong senderId)
     {
         RevivalClientRpc(senderId);
     }
 
     [ClientRpc]
-    protected void RevivalClientRpc(ulong senderId)
+    void RevivalClientRpc(ulong senderId)
     {
         if (NetworkManager.Singleton.LocalClientId == senderId) return;
-        Revival();
+        OnRevival();
     }
 
 
