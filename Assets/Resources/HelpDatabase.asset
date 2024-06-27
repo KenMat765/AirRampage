@@ -13,4 +13,15 @@ MonoBehaviour:
   m_Name: HelpDatabase
   m_EditorClassIdentifier: 
   helps:
+  - {fileID: 11400000, guid: 460f8650b35d240b8bc0e8ca7cf6ba3d, type: 2}
   - {fileID: 11400000, guid: bb3711ed89b524bdc9e7286024f0db21, type: 2}
+  - {fileID: 11400000, guid: 4905a1eb413c24635a3e015fa989914a, type: 2}
+  - {fileID: 11400000, guid: 1352607dc95284ac2b6d923b78a5f016, type: 2}
+  - {fileID: 11400000, guid: 7c9a01b688b6f4bf298e655332e590d3, type: 2}
+  - {fileID: 11400000, guid: b4b9c9ffa70cc4d62afb132e07445b7f, type: 2}
+  - {fileID: 11400000, guid: 3bdb2e4e90f604341b02c4c2ab51e6d5, type: 2}
+  - {fileID: 11400000, guid: a9e546c0de8834266891d6723391baa8, type: 2}
+  - {fileID: 11400000, guid: c880fbdf33fac44fa905b1686e6e5b6c, type: 2}
+  - {fileID: 11400000, guid: 226a481a0f58f4615b5b02e23215fdf8, type: 2}
+  - {fileID: 11400000, guid: 193a35e705b7e404e9c2e2c4d34aa421, type: 2}
+  - {fileID: 11400000, guid: 04d7d9d4585ea48abb56755958ef80e5, type: 2}

@@ -10,17 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9d000b4cd65cb4a30b0f2c19c211c007, type: 3}
-  m_Name: HD_SwipeActions
+  m_Name: HD_Skills
   m_EditorClassIdentifier: 
-  helpTitle: Swipe Actions
-  helpExplanation: 'By swiping in the up, down, left, or right directions, you can
-    trigger special actions.
-
-    Up: Summersalt
-
-    Down: U-turn
-
-    Left: Left-step
-
-    Right:
-    Right-step'
+  helpTitle: Skills
+  helpExplanation: Special skills that can be used during combat. Up to five can
+    be set in SkillPort. They charge over time and can be activated by pressing the
+    button at the bottom right of the screen.

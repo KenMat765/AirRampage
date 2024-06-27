@@ -10,17 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9d000b4cd65cb4a30b0f2c19c211c007, type: 3}
-  m_Name: HD_SwipeActions
+  m_Name: HD_Factory
   m_EditorClassIdentifier: 
-  helpTitle: Swipe Actions
-  helpExplanation: 'By swiping in the up, down, left, or right directions, you can
-    trigger special actions.
+  helpTitle: Factory
+  helpExplanation: 'In the factory you can manufacture the following items by using
+    coins:
 
-    Up: Summersalt
+    Skills
 
-    Down: U-turn
-
-    Left: Left-step
-
-    Right:
-    Right-step'
+    Abilities'

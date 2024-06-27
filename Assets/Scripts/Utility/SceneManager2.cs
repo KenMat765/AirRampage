@@ -73,30 +73,7 @@ public class SceneManager2 : Singleton<SceneManager2>
         if (beforeSceneUnload != null) { beforeSceneUnload(); }
         StartCoroutine(SceneLoader(gameScene, fadeOutType));
     }
-    public void LoadSceneAsync2(Stage stage, FadeType fadeOutType)
-    {
-        if (beforeSceneUnload != null) { beforeSceneUnload(); }
-        GameScenes gameScene;
-        switch (stage)
-        {
-            case Stage.NULL_SPACE:
-                gameScene = GameScenes.SPACE;
-                break;
 
-            case Stage.SUNSET_CITY:
-                gameScene = GameScenes.SUNSETCITY;
-                break;
-
-            // case Stage.SNOWPEAK:
-            //     gameScene = GameScenes.SNOWPEAK;
-            //     break;
-
-            default:
-                Debug.LogError("Could not associate stage with game scene!!", gameObject);
-                return;
-        }
-        StartCoroutine(SceneLoader(gameScene, fadeOutType));
-    }
     IEnumerator SceneLoader(GameScenes gameScene, FadeType fadeOutType)
     {
         float fadeout_duration = FadeCanvas.I.FadeOut(fadeOutType);
