@@ -218,10 +218,8 @@ public abstract class Movement : NetworkBehaviour
     [SerializeField] LayerMask obstacleMask;  // Layer which kills instantly when collided (terrain & structures)
     void OnCollisionEnter(Collision col)
     {
-        if (fighterCondition.isDead)
-        {
-            return;
-        }
+        if (!IsOwner) return;
+        if (fighterCondition.isDead) return;
 
         // Get layer of collided object.
         int col_layer = 1 << col.gameObject.layer;

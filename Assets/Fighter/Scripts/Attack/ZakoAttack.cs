@@ -21,7 +21,7 @@ public class ZakoAttack : Attack
     {
         if (!attackable) return;
 
-        if (BattleInfo.isMulti && !IsHost) return;
+        if (!IsHost) return;
 
         // Normal Blast. ////////////////////////////////////////////////////////////////////////////////////////
         if (blastTimer > 0) blastTimer -= Time.deltaTime;

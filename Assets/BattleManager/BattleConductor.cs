@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using System.Data;
 
 // Should be called at the very first in scene.
 [DefaultExecutionOrder(-1)]
@@ -78,10 +79,10 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
         }
     }
 
-    // Player count (= 8) + Zako (red & blue)
-    public static int[] individualScores = new int[GameInfo.MAX_PLAYER_COUNT + 2];
-    public const int score_fighter = 100;   // Score obtained when killed other player.
-    public const int score_zako = 10;       // Score obtained when killed zako.
+    // Scores of each fighers & zakos of each team.
+    public static int[] individualScores;
+    public const int score_fighter = 500;   // Score obtained when killed other player.
+    public const int score_zako = 50;       // Score obtained when killed zako.
 
 
     // GameObjects unique to each game rule. (Objects of different rules are destroyed at the begining of the game)
@@ -103,6 +104,9 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
 
     IEnumerator GameSetup()
     {
+        // Init individual scores. [Player count (= 8) + Zako (red & blue)]
+        individualScores = new int[GameInfo.MAX_PLAYER_COUNT + 2];
+
         // Push UI to sides before fading in to the scene.
         uGUIMannager.I.EnterExitUI(false, true);
 

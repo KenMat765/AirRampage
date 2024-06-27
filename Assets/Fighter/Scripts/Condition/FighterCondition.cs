@@ -452,12 +452,12 @@ public abstract class FighterCondition : NetworkBehaviour
     public bool isZone { get; set; }
 
     // Constants
-    public float full_cp { get; set; } = 10000; // CP necessary to get in the Zone.
+    public float full_cp { get; set; } = 10; // CP necessary to get in the Zone.
     public abstract float my_cp { get; set; }   // CP to give to opponent when killed.
-    protected float dec_cp_per_sec = 5;
+    protected float dec_cp_per_sec = 5; // Decreasing amount of CP over time.
     protected float cp_maintain = 0f;   // 0.0 (maintain none) ~ 1.0 (maintain all)
-    protected float default_combo_timer;
-    protected float default_zone_timer = 5;
+    protected float default_combo_timer;    // Time until the combo runs out.
+    protected float default_zone_timer = 30;    // Duration of zone.
 
     protected void CPStart()
     {

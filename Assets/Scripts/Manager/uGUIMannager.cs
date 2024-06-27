@@ -936,7 +936,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
         zone_anim.Join(DOTween.To(() => viginette.intensity.value, (x) => viginette.intensity.value = x, 0.3f, 0.25f).SetEase(Ease.OutExpo));
 
         zone_anim.Append(zone_text.rectTransform.DOAnchorPosX(-50, 0.25f).SetEase(Ease.OutExpo));
-        zone_anim.Join(zone_text.DOColor(Color.red, 0.25f).SetEase(Ease.OutExpo));
+        zone_anim.Join(zone_text.DOFade(1, 0.25f).SetEase(Ease.OutExpo));
 
         zone_anim.Append(zone_text.rectTransform.DOAnchorPosX(50, 0.5f));
 
