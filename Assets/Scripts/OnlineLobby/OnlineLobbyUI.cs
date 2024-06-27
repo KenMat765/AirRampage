@@ -86,8 +86,8 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
     #endregion
 
     #region Game Settings
-    Rule rule = Rule.BATTLEROYAL;
-    Stage stage = Stage.SPACE;
+    Rule rule = Rule.BATTLE_ROYAL;
+    Stage stage = Stage.NULL_SPACE;
     int time_sec = GameInfo.MIN_TIME_SEC;
     #endregion
 
@@ -194,8 +194,8 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
         readyText = participantObj.transform.Find("ConfirmButton").GetComponentInChildren<TextMeshProUGUI>();
         ruleObj.SetActive(false);
         participantObj.SetActive(false);
-        ruleText.text = rule.ToString();
-        stageText.text = stage.ToString();
+        ruleText.text = rule.ToString().Replace("_", " ");
+        stageText.text = stage.ToString().Replace("_", " ");
         int time_min = time_sec / 60;
         timeText.text = time_min.ToString() + " minutes";
         for (int k = 0; k < GameInfo.TEAM_MEMBER_COUNT; k++)
@@ -773,7 +773,7 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
         rule = (Rule)rule_id;
 
         // Change UI
-        ruleText.text = rule.ToString();
+        ruleText.text = rule.ToString().Replace("_", " ");
     }
 
     // Stage //////////////////////////////////////////////////////////////////////////////
@@ -788,7 +788,7 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
         stage = (Stage)stage_id;
 
         // Change UI
-        stageText.text = stage.ToString();
+        stageText.text = stage.ToString().Replace("_", " ");
     }
 
     // Time ///////////////////////////////////////////////////////////////////////////////

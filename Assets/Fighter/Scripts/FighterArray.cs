@@ -54,12 +54,12 @@ public class FighterArray : MonoBehaviour
 
         switch (BattleInfo.rule)
         {
-            case Rule.BATTLEROYAL:
+            case Rule.BATTLE_ROYAL:
                 // Go to random subtarget position when started.
                 SetDestination(SubTarget.GetRandomPosition());
                 break;
 
-            case Rule.TERMINALCONQUEST:
+            case Rule.TERMINAL_CONQUEST:
                 float my_team_point_per_sec = 0;
                 float opponent_team_point_per_sec = 0;
                 switch (team)
@@ -103,7 +103,7 @@ public class FighterArray : MonoBehaviour
         }
 
         DetectFighters();
-        if (BattleInfo.rule == Rule.TERMINALCONQUEST) DetectTerminals();
+        if (BattleInfo.rule == Rule.TERMINAL_CONQUEST) DetectTerminals();
         ChangeCondition();
         OnEachCondition();
         MoveTowardNextDestination();
@@ -128,7 +128,7 @@ public class FighterArray : MonoBehaviour
         prev_condition = condition;
         switch (BattleInfo.rule)
         {
-            case Rule.BATTLEROYAL:
+            case Rule.BATTLE_ROYAL:
 
                 // When there are opponents in front.
                 if (detected_fighters_nos.Count > 0)
@@ -151,7 +151,7 @@ public class FighterArray : MonoBehaviour
                 }
                 break;
 
-            case Rule.TERMINALCONQUEST:
+            case Rule.TERMINAL_CONQUEST:
                 // Set target to terminal.
                 // Judge whether ally team is currently winning or not.
                 float my_team_point_per_sec = 0;

@@ -18,7 +18,7 @@ public class SceneManager2 : Singleton<SceneManager2>
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-    string[] battleScenes = { "Space", "Canyon" };
+    string[] battleScenes = { "Space", "SunsetCity" };
 
     private void OnSceneLoaded(Scene loadedScene, LoadSceneMode sceneMode)
     {
@@ -54,8 +54,8 @@ public class SceneManager2 : Singleton<SceneManager2>
                 SceneManager.LoadScene("SortieLobby");
                 break;
 
-            case GameScenes.CANYON:
-                SceneManager.LoadScene("Canyon");
+            case GameScenes.SUNSETCITY:
+                SceneManager.LoadScene("SunsetCity");
                 break;
 
             case GameScenes.SPACE:
@@ -79,17 +79,17 @@ public class SceneManager2 : Singleton<SceneManager2>
         GameScenes gameScene;
         switch (stage)
         {
-            case Stage.CANYON:
-                gameScene = GameScenes.CANYON;
-                break;
-
-            case Stage.SNOWPEAK:
-                gameScene = GameScenes.SNOWPEAK;
-                break;
-
-            case Stage.SPACE:
+            case Stage.NULL_SPACE:
                 gameScene = GameScenes.SPACE;
                 break;
+
+            case Stage.SUNSET_CITY:
+                gameScene = GameScenes.SUNSETCITY;
+                break;
+
+            // case Stage.SNOWPEAK:
+            //     gameScene = GameScenes.SNOWPEAK;
+            //     break;
 
             default:
                 Debug.LogError("Could not associate stage with game scene!!", gameObject);
@@ -135,8 +135,8 @@ public class SceneManager2 : Singleton<SceneManager2>
                 async = SceneManager.LoadSceneAsync("SortieLobby");
                 break;
 
-            case GameScenes.CANYON:
-                async = SceneManager.LoadSceneAsync("Canyon");
+            case GameScenes.SUNSETCITY:
+                async = SceneManager.LoadSceneAsync("SunsetCity");
                 break;
 
             case GameScenes.SPACE:
@@ -178,7 +178,7 @@ public enum GameScenes
     ABILITYFACTORY,
     ONLINELOBBY,
     SORTIELOBBY,
-    CANYON,
+    SUNSETCITY,
     SPACE,
     SNOWPEAK
 }

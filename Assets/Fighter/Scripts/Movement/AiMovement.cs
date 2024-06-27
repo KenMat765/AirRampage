@@ -69,10 +69,10 @@ public class AiMovement : Movement
             switch (BattleInfo.rule)
             {
                 // Start going to random position when Battle Royal.
-                case Rule.BATTLEROYAL: SetFinalDestination(SubTarget.GetRandomPosition()); break;
+                case Rule.BATTLE_ROYAL: SetFinalDestination(SubTarget.GetRandomPosition()); break;
 
                 // Start going to random opponent terminal.
-                case Rule.TERMINALCONQUEST:
+                case Rule.TERMINAL_CONQUEST:
                     targetTerminal = TerminalManager.I.GetOpponentTerminals(fighterCondition.fighterTeam.Value).RandomChoice();
                     SetFinalDestination(targetTerminal.transform.position, true);
                     break;
@@ -325,7 +325,7 @@ public class AiMovement : Movement
         {
             switch (BattleInfo.rule)
             {
-                case Rule.BATTLEROYAL:
+                case Rule.BATTLE_ROYAL:
                     // When there are opponents in front.
                     if (aiAttack.homingCount > 0)
                     {
@@ -347,7 +347,7 @@ public class AiMovement : Movement
                     }
                     break;
 
-                case Rule.TERMINALCONQUEST:
+                case Rule.TERMINAL_CONQUEST:
                     // Set target to terminal.
                     // Judge whether ally team is currently winning or not.
                     float my_team_point_per_sec = 0;

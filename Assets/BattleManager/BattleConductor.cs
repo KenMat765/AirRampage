@@ -109,19 +109,19 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
         // Destroy unnecessary GameObjects & Select SpawnPointManager which corresponds to the game rule.
         switch (BattleInfo.rule)
         {
-            case Rule.BATTLEROYAL:
+            case Rule.BATTLE_ROYAL:
                 foreach (GameObject obj in royalOnlyObjects) if (obj.TryGetComponent<SpawnPointManager>(out spawnPointManager)) break;
                 foreach (GameObject obj in terminalOnlyObjects) Destroy(obj);
                 foreach (GameObject obj in crystalOnlyObjects) Destroy(obj);
                 break;
 
-            case Rule.TERMINALCONQUEST:
+            case Rule.TERMINAL_CONQUEST:
                 foreach (GameObject obj in royalOnlyObjects) Destroy(obj);
                 foreach (GameObject obj in terminalOnlyObjects) if (obj.TryGetComponent<SpawnPointManager>(out spawnPointManager)) break;
                 foreach (GameObject obj in crystalOnlyObjects) Destroy(obj);
                 break;
 
-            case Rule.CRYSTALHUNTER:
+            case Rule.CRYSTAL_HUNTER:
                 foreach (GameObject obj in royalOnlyObjects) Destroy(obj);
                 foreach (GameObject obj in terminalOnlyObjects) Destroy(obj);
                 foreach (GameObject obj in crystalOnlyObjects) if (obj.TryGetComponent<SpawnPointManager>(out spawnPointManager)) break;
@@ -142,8 +142,8 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
         spawnPointManager.SetupSpawnPoints();
 
         // After setup spawnpoints, setup terminals.
-        if (BattleInfo.rule == Rule.TERMINALCONQUEST) TerminalManager.I.SetupTerminals();
-        else if (BattleInfo.rule == Rule.CRYSTALHUNTER) CrystalManager.I.SetupCrystals();
+        if (BattleInfo.rule == Rule.TERMINAL_CONQUEST) TerminalManager.I.SetupTerminals();
+        else if (BattleInfo.rule == Rule.CRYSTAL_HUNTER) CrystalManager.I.SetupCrystals();
 
         // Set all zakos deactivated.
         ParticipantManager.I.FightersActivationHandler(1, false);
@@ -175,8 +175,8 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
         ParticipantManager.I.FightersControllHandler(0, true);
         ParticipantManager.I.FightersAttackHandler(0, true);
         ParticipantManager.I.FightersAcceptDamageHandler(-1, true);
-        if (BattleInfo.rule == Rule.TERMINALCONQUEST) TerminalManager.I.TerminalsAcceptDamageHandler(true);
-        else if (BattleInfo.rule == Rule.CRYSTALHUNTER) CrystalManager.I.AcceptCrystalHandler(true);
+        if (BattleInfo.rule == Rule.TERMINAL_CONQUEST) TerminalManager.I.TerminalsAcceptDamageHandler(true);
+        else if (BattleInfo.rule == Rule.CRYSTAL_HUNTER) CrystalManager.I.AcceptCrystalHandler(true);
         uGUIMannager.I.EnterExitUI(true, false);
         gameInProgress = true;
     }
@@ -207,8 +207,8 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
         ParticipantManager.I.FightersControllHandler(-1, false);
         ParticipantManager.I.FightersAttackHandler(-1, false);
         ParticipantManager.I.FightersAcceptDamageHandler(-1, false);
-        if (BattleInfo.rule == Rule.TERMINALCONQUEST) TerminalManager.I.TerminalsAcceptDamageHandler(false);
-        else if (BattleInfo.rule == Rule.CRYSTALHUNTER) CrystalManager.I.AcceptCrystalHandler(false);
+        if (BattleInfo.rule == Rule.TERMINAL_CONQUEST) TerminalManager.I.TerminalsAcceptDamageHandler(false);
+        else if (BattleInfo.rule == Rule.CRYSTAL_HUNTER) CrystalManager.I.AcceptCrystalHandler(false);
 
         // Push UI to sides & clean up screen.
         uGUIMannager.I.EnterExitUI(false, false);
@@ -236,7 +236,7 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
 
         switch (BattleInfo.rule)
         {
-            case Rule.BATTLEROYAL:
+            case Rule.BATTLE_ROYAL:
                 // Give score to destroyer's team.
                 int my_score = is_zako ? score_zako : score_fighter;
                 GiveScoreToOpponentTeam(my_team, my_score);
@@ -275,7 +275,7 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
                 }
                 break;
 
-            case Rule.TERMINALCONQUEST:
+            case Rule.TERMINAL_CONQUEST:
                 float protection_decrease = 0.25f;
                 List<Terminal> owner_terminals;
                 if (TerminalManager.I.TryGetOwnerTerminals(my_no, out owner_terminals))
@@ -287,7 +287,7 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
                 }
                 break;
 
-            case Rule.CRYSTALHUNTER:
+            case Rule.CRYSTAL_HUNTER:
                 for (int crystal_id = 0; crystal_id < CrystalManager.crystal_count; crystal_id++)
                 {
                     int carrier_no = CrystalManager.I.carrierNos[crystal_id];

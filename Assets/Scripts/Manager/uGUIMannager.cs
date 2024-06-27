@@ -188,7 +188,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
         confirmButton = result.Find("ConfirmButton").GetComponent<Button>();
         switch (BattleInfo.rule)
         {
-            case Rule.BATTLEROYAL:
+            case Rule.BATTLE_ROYAL:
                 Transform result_royal = result.Find("Result_Royal");
                 result_redScore = result.Find("RedScore").GetComponent<TextMeshProUGUI>();
                 result_blueScore = result.Find("BlueScore").GetComponent<TextMeshProUGUI>();
@@ -276,9 +276,9 @@ public class uGUIMannager : Singleton<uGUIMannager>
         finish.DOColor(Color.clear, 0);
         switch (BattleInfo.rule)
         {
-            case Rule.BATTLEROYAL: rule.text = "Battle Royal"; break;
-            case Rule.TERMINALCONQUEST: rule.text = "Termial Conquest"; break;
-            case Rule.CRYSTALHUNTER: rule.text = "Crystal Hunter"; break;
+            case Rule.BATTLE_ROYAL: rule.text = "Battle Royal"; break;
+            case Rule.TERMINAL_CONQUEST: rule.text = "Termial Conquest"; break;
+            case Rule.CRYSTAL_HUNTER: rule.text = "Crystal Hunter"; break;
         }
         #endregion
 
@@ -766,7 +766,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
 
         switch (BattleInfo.rule)
         {
-            case Rule.BATTLEROYAL:
+            case Rule.BATTLE_ROYAL:
                 for (int no = 0; no < GameInfo.MAX_PLAYER_COUNT + 2; no++)
                 {
                     // === Scores for zakos === //

@@ -45,11 +45,11 @@ public class AiAttack : Attack
         SetHomingTargetNos();
 
         // Search for Attackable Terminals. /////////////////////////////////////////////////////////////////////
-        if (BattleInfo.rule == Rule.TERMINALCONQUEST) SearchAttackableTerminals();
+        if (BattleInfo.rule == Rule.TERMINAL_CONQUEST) SearchAttackableTerminals();
 
 
         // Normal Blast. ////////////////////////////////////////////////////////////////////////////////////////
-        if (homingCount > 0 || (BattleInfo.rule == Rule.TERMINALCONQUEST && attackableTerminals.Count > 0))
+        if (homingCount > 0 || (BattleInfo.rule == Rule.TERMINAL_CONQUEST && attackableTerminals.Count > 0))
         {
             blastTimer -= Time.deltaTime;
             if (blastTimer < 0)
@@ -99,7 +99,7 @@ public class AiAttack : Attack
                 {
                     case SkillType.attack:
                         // Activate when fighters in front is more than thresh, or attackable terminals are in front.
-                        if (homingCount >= target_thresh || (BattleInfo.rule == Rule.TERMINALCONQUEST && attackableTerminals.Count > 0))
+                        if (homingCount >= target_thresh || (BattleInfo.rule == Rule.TERMINAL_CONQUEST && attackableTerminals.Count > 0))
                         {
                             skill.Activator();
                             elapsed_times[skill_num] = 0;

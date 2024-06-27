@@ -31,7 +31,7 @@ public class ZakoAttack : Attack
             ZakoCondition condition = (ZakoCondition)fighterCondition;
             List<int> fighter_nos = condition.fighterArray.detected_fighters_nos;
             List<int> terminal_nos = condition.fighterArray.detected_terminal_nos;
-            if (fighter_nos.Count > 0 || (BattleInfo.rule == Rule.TERMINALCONQUEST && terminal_nos.Count > 0))
+            if (fighter_nos.Count > 0 || (BattleInfo.rule == Rule.TERMINAL_CONQUEST && terminal_nos.Count > 0))
             {
                 // Reset timer.
                 // blastTimer = setInterval;

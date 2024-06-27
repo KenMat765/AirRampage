@@ -34,6 +34,6 @@ public class GameInfo : MonoBehaviour
 
 public enum Team { RED, BLUE, NONE }
 
-public enum Rule { CRYSTALHUNTER, BATTLEROYAL, TERMINALCONQUEST, }
+public enum Rule { CRYSTAL_HUNTER, BATTLE_ROYAL, TERMINAL_CONQUEST, }
 
-public enum Stage { SPACE, CANYON, SNOWPEAK }
+public enum Stage { NULL_SPACE, SUNSET_CITY /*SNOWPEAK*/ }

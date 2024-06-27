@@ -171,9 +171,9 @@ public class SortieLobbyManager : NetworkSingleton<SortieLobbyManager>
             string stage_str;
             switch (BattleInfo.stage)
             {
-                case global::Stage.CANYON: stage_str = "Canyon"; break;
-                case global::Stage.SPACE: stage_str = "Space"; break;
-                case global::Stage.SNOWPEAK: stage_str = "SnowPeak"; break;
+                case global::Stage.SUNSET_CITY: stage_str = "SunsetCity"; break;
+                case global::Stage.NULL_SPACE: stage_str = "Space"; break;
+                // case global::Stage.SNOWPEAK: stage_str = "SnowPeak"; break;
                 default: stage_str = "Space"; break;    // Fallback : Space
             }
             NetworkManager.SceneManager.LoadScene(stage_str, UnityEngine.SceneManagement.LoadSceneMode.Single);
