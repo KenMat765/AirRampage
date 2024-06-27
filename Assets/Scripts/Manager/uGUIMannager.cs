@@ -565,7 +565,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
                 }
 
                 // Specific cause of death.
-                if (Receiver.specificDeath.Contains(causeOfDeath))
+                if (Receiver.IsSpecificDeath(causeOfDeath))
                 {
                     destroyerTex.colorGradientPreset = gradv_gray;
                     skill_icon.enabled = false;

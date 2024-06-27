@@ -4,7 +4,6 @@ using UnityEngine;
 using DG.Tweening;
 using Unity.Netcode;
 using Unity.Collections;
-using NaughtyAttributes;
 
 // Fighterの状態を保持するクラス
 // このクラスのプロパティをもとに、Movement、Attack、Receiverを動かす
@@ -61,7 +60,7 @@ public abstract class FighterCondition : NetworkBehaviour
 
 
     // Layer Masks //////////////////////////////////////////////////////////////////////////////////////////////////
-    public static LayerMask obstacles_mask { get { return GameInfo.terrainMask + Terminal.defaultMask + Terminal.redMask + Terminal.blueMask; } }
+    public static LayerMask obstacles_mask { get; private set; } = GameInfo.terrainMask + GameInfo.structureMask + Terminal.allMask;
     public LayerMask fighters_mask { get; private set; }
     public LayerMask terminals_mask { get; private set; }
     protected void SetLayerMasks(Team my_team)
@@ -70,13 +69,13 @@ public abstract class FighterCondition : NetworkBehaviour
         switch (my_team)
         {
             case Team.RED:
-                fighters_mask = 1 << 18;
-                terminals_mask = (1 << 19) + (1 << 21);
+                fighters_mask = GameInfo.blueFighterMask;
+                terminals_mask = Terminal.defaultMask + Terminal.blueMask;
                 break;
 
             case Team.BLUE:
-                fighters_mask = 1 << 17;
-                terminals_mask = (1 << 19) + (1 << 20);
+                fighters_mask = GameInfo.redFighterMask;
+                terminals_mask = Terminal.defaultMask + Terminal.redMask;
                 break;
 
             default: Debug.LogError("FighterConditionにチームが設定されていません!!"); break;
@@ -582,6 +581,10 @@ public abstract class FighterCondition : NetworkBehaviour
     // Processes run at the time of death. (Should be called on every clients)
     protected virtual void OnDeath(int destroyerNo, string causeOfDeath)
     {
+        if (isDead)
+        {
+            return;
+        }
         isDead = true;
 
         movement.OnDeath();

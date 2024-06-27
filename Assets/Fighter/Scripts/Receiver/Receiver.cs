@@ -15,13 +15,12 @@ public class Receiver : NetworkBehaviour
     // Collider needs to be disabled, in order not to be detected by other fighter as homing target.
     Collider col;
 
-    // Death by normal blast.
+    // Causes of death.
     public const string DEATH_NORMAL_BLAST = "NormalBlast";
-
-    // Specific cause of death (Death other than enemy attacks)
-    public const string SPECIFIC_DEATH_CRYSTAL = "Crystal Kill";
-    public const string SPECIFIC_DEATH_COLLISION = "Collision Crash";
-    public static string[] specificDeath = { SPECIFIC_DEATH_CRYSTAL, SPECIFIC_DEATH_COLLISION };
+    public const string SPECIFIC_DEATH_CRYSTAL = "Crystal Kill";        // Specific death (Death other than enemy attacks)
+    public const string SPECIFIC_DEATH_COLLISION = "Collision Crash";   // Specific death (Death other than enemy attacks)
+    static string[] specificDeath = { SPECIFIC_DEATH_CRYSTAL, SPECIFIC_DEATH_COLLISION };
+    public static bool IsSpecificDeath(string causeOfDeath) { return specificDeath.Contains(causeOfDeath); }
 
 
     void Awake()
@@ -38,7 +37,7 @@ public class Receiver : NetworkBehaviour
         col.enabled = false;
 
         // If specific cause of death. (Not killed by enemy)
-        if (specificDeath.Contains(causeOfDeath))
+        if (IsSpecificDeath(causeOfDeath))
         {
             return;
         }
@@ -60,7 +59,7 @@ public class Receiver : NetworkBehaviour
         Team my_team = fighterCondition.fighterTeam.Value;
 
         // Specific cause of death.
-        if (specificDeath.Contains(causeOfDeath))
+        if (IsSpecificDeath(causeOfDeath))
         {
             uGUIMannager.I.BookRepo(causeOfDeath, my_name, my_team, causeOfDeath);
             return;

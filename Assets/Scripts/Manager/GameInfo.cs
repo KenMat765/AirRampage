@@ -26,6 +26,8 @@ public class GameInfo : MonoBehaviour
     public const int MIN_TIME_SEC = 180;  // seconds
 
     // LayerMask.
+    public static LayerMask redFighterMask { get; } = 1 << 17;
+    public static LayerMask blueFighterMask { get; } = 1 << 18;
     public static LayerMask terrainMask { get; } = 1 << 6;
     public static LayerMask structureMask { get; } = 1 << 22;
 }

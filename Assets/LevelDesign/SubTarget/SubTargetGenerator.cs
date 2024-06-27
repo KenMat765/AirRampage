@@ -6,18 +6,20 @@ using NaughtyAttributes;
 public class SubTargetGenerator : MonoBehaviour
 {
     [Header("Terrain Information")]
+    [SerializeField] Terrain terrain;
     [SerializeField] Texture2D heightMap;
-    [SerializeField, ShowIf("NoHeightMap")] float heightOffset;
     bool NoHeightMap() { return !heightMap; }
-    [SerializeField] float terrainWidth;
-    [SerializeField] float terrainLength;
-    [SerializeField] float terrainHeight;
+    float terrainWidth { get { return terrain.terrainData.size.x; } }
+    float terrainLength { get { return terrain.terrainData.size.z; } }
+    float terrainHeight { get { return terrain.terrainData.size.y; } }
+    Vector3 terrainPosition { get { return terrain.transform.position; } }
 
 
     [Header("Generate Settings")]
+    [SerializeField] float minHeight;
+    [SerializeField] float maxHeight;
+    [SerializeField] float width, length;
     [SerializeField] float widthStep, lengthStep;
-    [SerializeField] float minHeight, maxHeight;
-    [SerializeField] float left, right, up, down;
 
 
     [Header("Offset Range")]
@@ -30,17 +32,34 @@ public class SubTargetGenerator : MonoBehaviour
     [SerializeField] GameObject subtargetParent;
 
 
+    [Header("RayCast")]
+    [SerializeField] LayerMask obstacleLayer;
+    [SerializeField] QueryTriggerInteraction queryTriggerInteraction;
+
+
     void OnDrawGizmos()
     {
-        Vector3 center = new Vector3(terrainWidth / 2f + (left - right), (maxHeight + minHeight) / 2, terrainLength / 2f + (down - up));
-        Vector3 size = new Vector3(terrainWidth - left - right, maxHeight - minHeight, terrainLength - up - down);
+        // Draw generate area.
+        Vector3 generator_pos = transform.position;
+        Vector3 center = new Vector3(generator_pos.x, (maxHeight + minHeight) / 2, generator_pos.z);
+        Vector3 size = new Vector3(width, maxHeight - minHeight, length);
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireCube(center, size);
+
+        // Draw max & min point of terrain.
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(min_point, 50);
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(max_point, 50);
     }
 
 
-    [ContextMenu("Generate Sub Targets")]
-    void GenerateSubTargets()
+    // Sub-Target Generation ///////////////////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// Generate sub-targets by raycast. (Used when terrain & structures exists)
+    /// </summary>
+    [Button("Generate Sub-targets by Raycast")]
+    void GenerateSubTargetsRaycast()
     {
         if (widthStep == 0 || lengthStep == 0)
         {
@@ -54,80 +73,133 @@ public class SubTargetGenerator : MonoBehaviour
             return;
         }
 
-        Vector2 start = new Vector2(left, down);
-        Vector2 end = new Vector2(terrainWidth, terrainLength) - new Vector2(right, up);
+        // Start & End position of grid.
+        Vector3 generator_pos = transform.position;
+        Vector2 start = new Vector2(generator_pos.x - width / 2, generator_pos.z - length / 2);
+        Vector2 end = new Vector2(generator_pos.x + width / 2, generator_pos.z + length / 2);
 
+        // Check height by raycast and create sub-target for each grid.
         for (float l = start.y; l <= end.y; l += lengthStep)
             for (float w = start.x; w <= end.x; w += widthStep)
             {
-                float height;
-
-                if (heightMap == null)
+                // Cast a ray downward from maxHeight at each grid.
+                Vector3 ray_origin = new Vector3(w, maxHeight, l);
+                Ray ray = new Ray(ray_origin, Vector3.down);
+                RaycastHit hit;
+                float max_ray_dist = maxHeight - minHeight;
+                if (Physics.Raycast(ray, out hit, max_ray_dist, obstacleLayer, queryTriggerInteraction))
                 {
-                    height = heightOffset;
+                    // Get height of hit point.
+                    float height = hit.point.y;
+
+                    // Add random offset to height.
+                    float offset = Random.Range(minOffset, maxOffset);
+                    float h = height + offset;
+                    if (h > maxHeight) h = maxHeight;
+                    else if (h < minHeight) h = minHeight;
+
+                    // Create sub-target.
+                    Vector3 position = new Vector3(w, h, l);
+                    Instantiate(subTargetPrefab, position, Quaternion.identity, subtargetParent.transform);
                 }
-
-                else
-                {
-                    Vector2 terrain_coord = new Vector2(w, l);
-                    Vector2 pixel_coord = Terrain2Pixel(terrain_coord);
-
-                    int pixel_x = Mathf.FloorToInt(pixel_coord.x);
-                    int pixel_y = Mathf.FloorToInt(pixel_coord.y);
-                    Color pixel_color = heightMap.GetPixel(pixel_x, pixel_y);
-
-                    height = HeightDecoder(pixel_color);
-                }
-
-                float offset = Random.Range(minOffset, maxOffset);
-                float h = height + offset;
-                if (h > maxHeight) h = maxHeight;
-                else if (h < minHeight) h = minHeight;
-
-                Vector3 position = new Vector3(w, h, l);
-                Instantiate(subTargetPrefab, position, Quaternion.identity, subtargetParent.transform);
             }
     }
 
-
-    [ContextMenu("Analyze Terrain")]
-    void AnalyzeTerrain()
+    /// <summary>
+    /// Generate sub-targets inside generate area (Can be used when there are no terrains & structures)
+    /// </summary>
+    [Button("Generate Sub-targets Inside Area")]
+    void GenerateSubTargetsInsideArea()
     {
-        if (heightMap == null)
-        {
-            Debug.LogWarning("HeightMapを指定してください!!");
-            return;
-        }
-
         if (widthStep == 0 || lengthStep == 0)
         {
             Debug.LogWarning("Stepが0になっています!!");
             return;
         }
 
-        float min = 1000;
-        float max = 0;
-        for (float l = 0; l <= terrainLength; l += lengthStep)
-            for (float w = 0; w <= terrainWidth; w += widthStep)
+        if (!subtargetParent)
+        {
+            Debug.LogWarning("SubtargetParentが指定されていません!!");
+            return;
+        }
+
+        // Start & End position of grid.
+        Vector3 generator_pos = transform.position;
+        Vector2 start = new Vector2(generator_pos.x - width / 2, generator_pos.z - length / 2);
+        Vector2 end = new Vector2(generator_pos.x + width / 2, generator_pos.z + length / 2);
+
+        // Check height by raycast and create sub-target for each grid.
+        for (float l = start.y; l <= end.y; l += lengthStep)
+            for (float w = start.x; w <= end.x; w += widthStep)
             {
-                Vector2 terrain_coord = new Vector2(w, l);
-                Vector2 pixel_coord = Terrain2Pixel(terrain_coord);
+                // Get middle height of generate area.
+                float height = (maxHeight + minHeight) / 2;
 
-                int pixel_x = Mathf.FloorToInt(pixel_coord.x);
-                int pixel_y = Mathf.FloorToInt(pixel_coord.y);
-                Color pixel_color = heightMap.GetPixel(pixel_x, pixel_y);
+                // Add random offset to height.
+                float offset = Random.Range(minOffset, maxOffset);
+                float h = height + offset;
+                if (h > maxHeight) h = maxHeight;
+                else if (h < minHeight) h = minHeight;
 
-                float height = HeightDecoder(pixel_color);
-
-                if (height < min) min = height;
-                if (max < height) max = height;
+                // Create sub-target.
+                Vector3 position = new Vector3(w, h, l);
+                Instantiate(subTargetPrefab, position, Quaternion.identity, subtargetParent.transform);
             }
-
-        Debug.Log($"Max : {max}");
-        Debug.Log($"Min : {min}");
     }
 
 
+    // Terrain Analyze /////////////////////////////////////////////////////////////////////////////////////////////////////
+    Vector3 max_point, min_point;
+
+    [Button("Analyze Terrain")]
+    void AnalyzeTerrain()
+    {
+        if (widthStep == 0 || lengthStep == 0)
+        {
+            Debug.LogWarning("Stepが0になっています!!");
+            return;
+        }
+
+        // Max & Min height of the terrain.
+        float max_height = 0;
+        float min_height = float.PositiveInfinity;
+
+        // Start & End position of grid.
+        Vector2 start = new Vector2(terrainPosition.x - terrainWidth / 2, terrainPosition.z - terrainLength / 2);
+        Vector2 end = new Vector2(terrainPosition.x + terrainWidth / 2, terrainPosition.z + terrainLength / 2);
+
+        for (float l = start.y; l <= end.y; l += lengthStep)
+            for (float w = start.x; w <= end.x; w += widthStep)
+            {
+                // Cast a ray downward from maxHeight at each grid.
+                Vector3 ray_origin = new Vector3(w, terrainPosition.y + terrainHeight, l);
+                Ray ray = new Ray(ray_origin, Vector3.down);
+                RaycastHit hit;
+                if (Physics.Raycast(ray, out hit, terrainHeight * 2, GameInfo.terrainMask))
+                {
+                    // Get height of hit point and compare with current min & max height.
+                    float height = hit.point.y;
+                    if (height < min_height)
+                    {
+                        min_height = height;
+                        min_point = new Vector3(w, height, l);
+                    }
+                    else if (max_height < height)
+                    {
+                        max_height = height;
+                        max_point = new Vector3(w, height, l);
+                    }
+                }
+            }
+
+        Debug.Log($"Max : {max_height}");
+        Debug.Log($"Min : {min_height}");
+    }
+
+
+    /// <summary>
+    /// Get pixel coord from terrain coord.
+    /// </summary>
     Vector2 Terrain2Pixel(Vector2 terrain)
     {
         Vector2 pixel;
@@ -137,6 +209,9 @@ public class SubTargetGenerator : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// Decode height from pixel color of heightmap.
+    /// </summary>
     float HeightDecoder(Color pixel_color)
     {
         float gray = pixel_color.grayscale;

@@ -26,4 +26,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Space.unity
     guid: 320e619d864da4beea1ca60d306f9dd2
+  - enabled: 1
+    path: Assets/Scenes/Canyon.unity
+    guid: a97af903c0b3d47658d8c5e221e7eff9
   m_configObjects: {}

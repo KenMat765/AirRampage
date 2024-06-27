@@ -61,7 +61,7 @@ MonoBehaviour:
   cam_tps_near: {fileID: 7184948266018047805}
   cam_tps_far: {fileID: 7184948266018047802}
   defaultShiftSpeed: 100
-  rotationSpeed: 0.5
+  rotationSpeed: 2
   xAxis: 0
   yAxis: 0
   zAxis: 1
@@ -82,7 +82,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7184948266018047386
 Transform:
   m_ObjectHideFlags: 0
@@ -192,7 +192,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7184948266018047360
 Transform:
   m_ObjectHideFlags: 0
@@ -323,7 +323,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7184948266018047308
 Transform:
   m_ObjectHideFlags: 0

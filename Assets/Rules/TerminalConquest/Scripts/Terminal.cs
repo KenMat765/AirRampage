@@ -50,15 +50,16 @@ public abstract class Terminal : NetworkBehaviour
 
     int lastShooterNo = -1;
 
-    // Terminal Layers.
-    public static int defaultLayer { get { return LayerMask.NameToLayer("Terminal"); } }
-    public static int redLayer { get { return LayerMask.NameToLayer("RedTerminal"); } }
-    public static int blueLayer { get { return LayerMask.NameToLayer("BlueTerminal"); } }
+    // Terminal LayerIndexes. (Index of the layers. Ex: terrain=6, structure=22, ...)
+    public static int defaultLayer { get; private set; } = 19;
+    public static int redLayer { get; private set; } = 20;
+    public static int blueLayer { get; private set; } = 21;
 
-    // Terminal LayerMasks.
-    public static LayerMask defaultMask { get { return 1 << 19; } }
-    public static LayerMask redMask { get { return 1 << 20; } }
-    public static LayerMask blueMask { get { return 1 << 21; } }
+    // Terminal LayerMasks. (Mask of the layers. Equals to 1 << layerIndex)
+    public static LayerMask defaultMask { get; private set; } = 1 << defaultLayer;
+    public static LayerMask redMask { get; private set; } = 1 << redLayer;
+    public static LayerMask blueMask { get; private set; } = 1 << blueLayer;
+    public static LayerMask allMask { get; private set; } = defaultMask + redMask + blueMask;
 
     // Terminal Material.
     Material material;

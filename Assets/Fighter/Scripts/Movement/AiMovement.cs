@@ -6,6 +6,11 @@ using DG.Tweening;
 
 public class AiMovement : Movement
 {
+    // Emergency Avoidance
+    const float AVOID_DISTANCE = 80;    // Perform an avoidance if the distance is less than this value.
+    bool avoiding = false;
+
+
     protected override void Awake()
     {
         base.Awake();
@@ -25,11 +30,30 @@ public class AiMovement : Movement
 
     protected override void FixedUpdate()
     {
-        if (BattleInfo.isMulti && !IsHost) return;
+        // Only the host can control AI.
+        if (!IsHost) return;
 
         base.FixedUpdate();
 
         if (fighterCondition.isDead || !controllable) return;
+
+        // Emergency Avoidance (Check for obstacles in front to avoid crashing in to it)
+        if (!avoiding)
+        {
+            if (ObstacleIsInFront(AVOID_DISTANCE))
+            {
+                // For Debug.
+                // Debug.Log("<color=green>Avoid</color>", gameObject);
+
+                // Set avoiding to true, and reset it after u-turn is finished.
+                avoiding = true;
+                DOVirtual.DelayedCall(uturnTime, () => avoiding = false).Play();
+                // U-Turn to avoid obstacle.
+                Uturn();
+                // Reset next destination.
+                SetNextDestination();
+            }
+        }
 
         ChangeCondition();
         ActionOnEachCondition();
@@ -81,16 +105,16 @@ public class AiMovement : Movement
         Vector3 targetAngle = Quaternion.LookRotation(((relative_to_next == Vector3.zero) ? transform.forward : relative_to_next) * uTurndirection).eulerAngles;
         if (relativeYAngle < -135)
         {
-            targetAngle.z = ((-maxTiltZ / 45) * relativeYAngle - 4 * maxTiltZ) * uTurndirection * -1;
+            targetAngle.z = (-maxTiltZ / 45 * relativeYAngle - 4 * maxTiltZ) * uTurndirection * -1;
         }
         else if (-135 <= relativeYAngle && relativeYAngle <= 135)
         {
             float normY = relativeYAngle / 135;
-            targetAngle.z = (maxTiltZ / 2) * (Mathf.Pow(normY, 3) - 3 * normY) * uTurndirection;
+            targetAngle.z = maxTiltZ / 2 * (Mathf.Pow(normY, 3) - 3 * normY) * uTurndirection;
         }
         else
         {
-            targetAngle.z = ((-maxTiltZ / 45) * relativeYAngle + 4 * maxTiltZ) * uTurndirection * -1;
+            targetAngle.z = (-maxTiltZ / 45 * relativeYAngle + 4 * maxTiltZ) * uTurndirection * -1;
         }
         Quaternion lookRotation = Quaternion.Euler(targetAngle);
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
@@ -105,7 +129,7 @@ public class AiMovement : Movement
 
     protected override void FourActionExe()
     {
-        if (Vector3.SqrMagnitude(relative_to_next) >= sqr_distanceBorder)
+        if (Vector3.SqrMagnitude(relative_to_next) >= SQR_DISTANCE_BORDER)
         {
             if (relativeYAngle >= -60 && relativeYAngle <= -45)
             {
@@ -284,7 +308,7 @@ public class AiMovement : Movement
                 if (relativeAngle >= -30 && relativeAngle <= 30) condition = Conditions.COUNTER;
                 else if (relativeAngle <= -135 || relativeAngle >= 135)
                 {
-                    if (Vector3.SqrMagnitude(relativePos) < sqr_distanceBorder) condition = Conditions.FLIP;
+                    if (Vector3.SqrMagnitude(relativePos) < SQR_DISTANCE_BORDER) condition = Conditions.FLIP;
                     // else condition = Conditions.FARESCAPE;
                     else condition = Conditions.COUNTER;
                 }
@@ -398,13 +422,16 @@ public class AiMovement : Movement
     }
 
 
+    // Rotation speed differs by each condition.
+    const float QUICK_ROTATIONSPEED = 2f;
+    const float SLOW_ROTATIONSPEED = 0.5f;
     void ActionOnEachCondition()
     {
         switch (condition)
         {
             // Not Under Attack.
             case Conditions.ATTACK:
-                rotationSpeed = Mathf.Lerp(rotationSpeed, 0.8f, 0.1f);
+                rotationSpeed = QUICK_ROTATIONSPEED;
                 if (targetFighter != null)
                 {
                     SetFinalDestination(targetFighter.transform.position);
@@ -412,7 +439,7 @@ public class AiMovement : Movement
                 break;
 
             case Conditions.SEARCH:
-                rotationSpeed = Mathf.Lerp(rotationSpeed, 0.8f, 0.05f);
+                rotationSpeed = QUICK_ROTATIONSPEED;
 
                 if (arrived_at_final_destination)
                 {
@@ -432,12 +459,12 @@ public class AiMovement : Movement
 
             // Under Attack.
             case Conditions.GOBACK:
-                rotationSpeed = Mathf.Lerp(rotationSpeed, 0.5f, 0.1f);
-                SetFinalDestination(aiReceiver.shooterPos + aiReceiver.currentShooter.transform.forward * -distanceBorder);
+                rotationSpeed = SLOW_ROTATIONSPEED;
+                SetFinalDestination(aiReceiver.shooterPos + aiReceiver.currentShooter.transform.forward * -DISTANCE_BORDER);
                 break;
 
             case Conditions.FARESCAPE:
-                rotationSpeed = Mathf.Lerp(rotationSpeed, 0.8f, 0.1f);
+                rotationSpeed = QUICK_ROTATIONSPEED;
                 if (arrived_at_final_destination) SetFinalDestination(SubTarget.GetRandomPosition());
                 break;
 
@@ -446,14 +473,14 @@ public class AiMovement : Movement
                 break;
 
             case Conditions.COUNTER:
-                rotationSpeed = Mathf.Lerp(rotationSpeed, 0.8f, 0.5f);
+                rotationSpeed = QUICK_ROTATIONSPEED;
                 SetFinalDestination(aiReceiver.shooterPos);
                 break;
 
 
             // Only On Terminal Conquest.
             case Conditions.ATTACK_TERMINAL:
-                rotationSpeed = Mathf.Lerp(rotationSpeed, 0.8f, 0.1f);
+                rotationSpeed = QUICK_ROTATIONSPEED;
 
                 if (arrived_at_final_destination)
                 {
@@ -472,7 +499,7 @@ public class AiMovement : Movement
                 break;
 
             case Conditions.DEFENCE_TERMINAL:
-                rotationSpeed = Mathf.Lerp(rotationSpeed, 0.8f, 0.1f);
+                rotationSpeed = SLOW_ROTATIONSPEED;
 
                 if (arrived_at_final_destination)
                 {
@@ -501,19 +528,24 @@ public class AiMovement : Movement
     {
         if (!controllable) return;
 
+        Transform trans = transform;
+
         Gizmos.color = Color.blue;
-        Gizmos.DrawLine(transform.position, transform.position + relative_to_final);
+        Gizmos.DrawLine(trans.position, trans.position + relative_to_final);
 
         if (bypassing)
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawLine(transform.position, transform.position + relative_to_next);
+            Gizmos.DrawLine(trans.position, trans.position + relative_to_next);
         }
 
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, searchRadius_orig);
+        // Gizmos.color = Color.green;
+        // Gizmos.DrawWireSphere(trans.position, searchRadius_orig);
 
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(transform.position, distanceBorder);
+        // Gizmos.color = Color.cyan;
+        // Gizmos.DrawWireSphere(trans.position, distanceBorder);
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(trans.position + trans.forward * uTurndirection * AVOID_DISTANCE, CAST_RADIUS);
     }
 }

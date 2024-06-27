@@ -37,6 +37,6 @@ public class ZakoMovement : Movement
     public override void OnDeath()
     {
         base.OnDeath();
-        controllable = false;
+        Controllable(false);
     }
 }

@@ -228,7 +228,7 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
     }
 
 
-    public void OnFighterDestroyed(FighterCondition fighterCondition, int destroyerNo, string destroyerSkillName)
+    public void OnFighterDestroyed(FighterCondition fighterCondition, int destroyerNo, string causeOfDeath)
     {
         Team my_team = fighterCondition.fighterTeam.Value;
         int my_no = fighterCondition.fighterNo.Value;
@@ -241,8 +241,14 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
                 int my_score = is_zako ? score_zako : score_fighter;
                 GiveScoreToOpponentTeam(my_team, my_score);
 
+                // If specific cause of death.
+                if (destroyerNo < 0)
+                {
+                    // Do nothing.
+                }
+
                 // If killer is Fighter.
-                if (0 <= destroyerNo && destroyerNo < GameInfo.MAX_PLAYER_COUNT)
+                else if (0 <= destroyerNo && destroyerNo < GameInfo.MAX_PLAYER_COUNT)
                 {
                     individualScores[destroyerNo] += my_score;
                 }

@@ -122,12 +122,6 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
 
             // Set fighter name to fighterNo for easier reference to fighterNo.
             fighter.name = no.ToString();
-
-            // For AI Debug.
-            // if (no == 3)
-            // {
-            //     fighter.transform.Find("Kari Camera").gameObject.SetActive(true);
-            // }
         }
 
         // Setup Player Camera ///////////////////////////////////////////////////////////////////////////
