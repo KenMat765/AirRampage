@@ -21,8 +21,8 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
     {
         zakoCountAll = spawnPointManager.zakoCountAll;
 
-        fighterInfos = new FighterInfo[GameInfo.max_player_count + zakoCountAll];
-        GameObject[] allFighters = new GameObject[GameInfo.max_player_count + zakoCountAll];
+        fighterInfos = new FighterInfo[GameInfo.MAX_PLAYER_COUNT + zakoCountAll];
+        GameObject[] allFighters = new GameObject[GameInfo.MAX_PLAYER_COUNT + zakoCountAll];
         GameObject myPlayer = null;
 
         yield return new WaitUntil(() => IsSpawned);
@@ -69,14 +69,8 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
             allFighters[fighterNo] = zako;
         }
 
-        // Setup Player Camera ///////////////////////////////////////////////////////////////////////////
-        CameraController.I.fighterTrans = myPlayer.transform;
-        CameraManager.SetupCameraInScene();
-        GameObject cameraRadar = myPlayer.transform.Find("CameraRadar").gameObject;
-        cameraRadar.SetActive(true);
-
         // Process for all fighters /////////////////////////////////////////////////////////////////////////
-        for (int no = 0; no < GameInfo.max_player_count + zakoCountAll; no++)
+        for (int no = 0; no < GameInfo.MAX_PLAYER_COUNT + zakoCountAll; no++)
         {
             // Get necessary components.
             GameObject fighter = allFighters[no];
@@ -92,7 +86,7 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
             fighterInfos[no] = info;
 
             // Only for Players & AIs
-            if (no < GameInfo.max_player_count)
+            if (no < GameInfo.MAX_PLAYER_COUNT)
             {
                 // Get battle data at fighterNo.
                 BattleInfo.ParticipantBattleData battleData = BattleInfo.battleDatas[no];
@@ -105,7 +99,7 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
                 }
 
                 // Setup Skills
-                for (int skillNo = 0; skillNo < GameInfo.max_skill_count; skillNo++)
+                for (int skillNo = 0; skillNo < GameInfo.MAX_SKILL_COUNT; skillNo++)
                 {
                     int? skillId_nullable = battleData.skillIds[skillNo];
                     if (skillId_nullable.HasValue)
@@ -128,14 +122,13 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
 
             // Set fighter name to fighterNo for easier reference to fighterNo.
             fighter.name = no.ToString();
-
-            // For AI Debug.
-            // if (no == 3)
-            // {
-            //     fighter.transform.Find("Kari Camera").gameObject.SetActive(true);
-            // }
         }
 
+        // Setup Player Camera ///////////////////////////////////////////////////////////////////////////
+        CameraController.I.SetupPlayerCamera(myPlayer.transform, PlayerInfo.I.viewType);
+        CameraManager.SetupCameraInScene();
+        GameObject cameraRadar = myPlayer.transform.Find("CameraRadar").gameObject;
+        cameraRadar.SetActive(true);
 
         // All set complete !!
         infoSetComplete = true;
@@ -146,7 +139,7 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
     // Only the host calls this method.
     void SpawnAllFighters(SpawnPointManager spawnPointManager)
     {
-        for (int no = 0; no < GameInfo.max_player_count; no++)
+        for (int no = 0; no < GameInfo.MAX_PLAYER_COUNT; no++)
         {
             BattleInfo.ParticipantBattleData? battleData_nullable = BattleInfo.GetBattleDataByFighterNo(no);
             if (!battleData_nullable.HasValue)
@@ -227,7 +220,7 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
     {
         for (int k = 0; k < spawnPointManager.zakoCountAll; k++)
         {
-            int zakoNo = GameInfo.max_player_count + k;
+            int zakoNo = GameInfo.MAX_PLAYER_COUNT + k;
 
             // Create fighter.
             GameObject zako;
@@ -257,10 +250,10 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
         switch (target)
         {
             case 0:
-                for (int no = 0; no < GameInfo.max_player_count; no++) FighterActivationHandler(no, activate);
+                for (int no = 0; no < GameInfo.MAX_PLAYER_COUNT; no++) FighterActivationHandler(no, activate);
                 break;
             case 1:
-                for (int no = GameInfo.max_player_count; no < fighterInfos.Length; no++) FighterActivationHandler(no, activate);
+                for (int no = GameInfo.MAX_PLAYER_COUNT; no < fighterInfos.Length; no++) FighterActivationHandler(no, activate);
                 break;
             default:
                 for (int no = 0; no < fighterInfos.Length; no++) FighterActivationHandler(no, activate);
@@ -294,10 +287,10 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
         switch (target)
         {
             case 0:
-                for (int no = 0; no < GameInfo.max_player_count; no++) FighterControllHandler(no, controllable);
+                for (int no = 0; no < GameInfo.MAX_PLAYER_COUNT; no++) FighterControllHandler(no, controllable);
                 break;
             case 1:
-                for (int no = GameInfo.max_player_count; no < fighterInfos.Length; no++) FighterControllHandler(no, controllable);
+                for (int no = GameInfo.MAX_PLAYER_COUNT; no < fighterInfos.Length; no++) FighterControllHandler(no, controllable);
                 break;
             default:
                 for (int no = 0; no < fighterInfos.Length; no++) FighterControllHandler(no, controllable);
@@ -319,10 +312,10 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
         switch (target)
         {
             case 0:
-                for (int no = 0; no < GameInfo.max_player_count; no++) FighterAttackHandler(no, controllable);
+                for (int no = 0; no < GameInfo.MAX_PLAYER_COUNT; no++) FighterAttackHandler(no, controllable);
                 break;
             case 1:
-                for (int no = GameInfo.max_player_count; no < fighterInfos.Length; no++) FighterAttackHandler(no, controllable);
+                for (int no = GameInfo.MAX_PLAYER_COUNT; no < fighterInfos.Length; no++) FighterAttackHandler(no, controllable);
                 break;
             default:
                 for (int no = 0; no < fighterInfos.Length; no++) FighterAttackHandler(no, controllable);
@@ -344,10 +337,10 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
         switch (target)
         {
             case 0:
-                for (int no = 0; no < GameInfo.max_player_count; no++) FighterAcceptDamageHandler(no, accept);
+                for (int no = 0; no < GameInfo.MAX_PLAYER_COUNT; no++) FighterAcceptDamageHandler(no, accept);
                 break;
             case 1:
-                for (int no = GameInfo.max_player_count; no < fighterInfos.Length; no++) FighterAcceptDamageHandler(no, accept);
+                for (int no = GameInfo.MAX_PLAYER_COUNT; no < fighterInfos.Length; no++) FighterAcceptDamageHandler(no, accept);
                 break;
             default:
                 for (int no = 0; no < fighterInfos.Length; no++) FighterAcceptDamageHandler(no, accept);

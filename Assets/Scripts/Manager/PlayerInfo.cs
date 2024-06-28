@@ -14,7 +14,7 @@ public class PlayerInfo
     // === Skill === //
 
     /// <Summary> returns -1 if null. </Summary>
-    public string[] deck_skill_ids = new string[GameInfo.deck_count];
+    public string[] deck_skill_ids = new string[GameInfo.DECK_COUNT];
 
     public void SkillIdSetter(int deckNo, int skillNo, int? skillId)
     {
@@ -33,9 +33,9 @@ public class PlayerInfo
 
     public void SkillIdsGetter(int deckNumber, out int?[] skillIds)
     {
-        skillIds = new int?[GameInfo.max_skill_count];
+        skillIds = new int?[GameInfo.MAX_SKILL_COUNT];
         int[] skillIds_temp = StringToSkillIds(deck_skill_ids[deckNumber]);
-        for (int k = 0; k < GameInfo.max_skill_count; k++)
+        for (int k = 0; k < GameInfo.MAX_SKILL_COUNT; k++)
         {
             if (skillIds_temp[k] == -1)
             {
@@ -50,9 +50,9 @@ public class PlayerInfo
 
     public void SkillLevelsGetter(int deckNumber, out int?[] skillLevels)
     {
-        skillLevels = new int?[GameInfo.max_skill_count];
+        skillLevels = new int?[GameInfo.MAX_SKILL_COUNT];
         int[] skillIds_temp = StringToSkillIds(deck_skill_ids[deckNumber]);
-        for (int k = 0; k < GameInfo.max_skill_count; k++)
+        for (int k = 0; k < GameInfo.MAX_SKILL_COUNT; k++)
         {
             int skillId_temp = skillIds_temp[k];
             if (skillId_temp == -1)
@@ -81,7 +81,7 @@ public class PlayerInfo
     // "1/4/-1/3/2/" -> [1,4,-1,3,2]
     int[] StringToSkillIds(string skillIds_str)
     {
-        int[] result = new int[GameInfo.max_skill_count];
+        int[] result = new int[GameInfo.MAX_SKILL_COUNT];
 
         // Input will be null when there are no save data.
         if (skillIds_str == null || skillIds_str == "")
@@ -174,7 +174,7 @@ public class PlayerInfo
 
 
     // === Settings === //
-    public string myName = "Kari name";
+    public string myName = "Player";
     public float volume = 1.0f;
     public int fps = 60;
     public float bgmRatio = 1.0f;
@@ -191,4 +191,5 @@ public class PlayerInfo
         }
     }
     [SerializeField] int Coins = 9999;
+    public ViewType viewType = ViewType.TPS_FAR;
 }

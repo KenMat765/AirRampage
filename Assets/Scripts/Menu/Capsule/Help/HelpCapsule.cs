@@ -20,7 +20,12 @@ public class HelpCapsule : MonoBehaviour
     int current_page
     {
         get { return Current_Page; }
-        set { Current_Page = value % max_page; }
+        set
+        {
+            Current_Page = value;
+            if (Current_Page < 0) Current_Page += max_page;
+            else if (Current_Page >= max_page) Current_Page -= max_page;
+        }
     }
     int Current_Page = 0;
     int current_id = -1;

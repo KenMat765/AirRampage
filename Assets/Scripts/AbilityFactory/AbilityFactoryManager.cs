@@ -126,7 +126,7 @@ public class AbilityFactoryManager : MonoBehaviour
         circleFill.fillAmount = unlock_count / (float)all_count;
 
         int coins_have = PlayerInfo.I.coins;
-        int coins_need = GameInfo.a_generate_coin;
+        int coins_need = GameInfo.A_GENERATE_COIN;
         coinHaveText.text = coins_have.ToString();
         coinNeedText.text = coins_need.ToString();
 
@@ -181,7 +181,7 @@ public class AbilityFactoryManager : MonoBehaviour
 
         // Update PlayerInfo
         PlayerInfo.I.abi_unlock[abilityId] = true;
-        PlayerInfo.I.coins -= GameInfo.a_generate_coin;
+        PlayerInfo.I.coins -= GameInfo.A_GENERATE_COIN;
         SaveManager.SaveData<PlayerInfo>(PlayerInfo.I);
 
         // Animation

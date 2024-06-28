@@ -4,17 +4,11 @@ using UnityEngine;
 using DG.Tweening;
 using Unity.Netcode;
 using Unity.Collections;
-using NaughtyAttributes;
 
 // Fighterの状態を保持するクラス
 // このクラスのプロパティをもとに、Movement、Attack、Receiverを動かす
 public abstract class FighterCondition : NetworkBehaviour
 {
-    void Awake()
-    {
-        col = GetComponent<Collider>();
-    }
-
     protected virtual void Start()
     {
         // Only the owner refers to HP, speed, defence, and power.
@@ -33,13 +27,11 @@ public abstract class FighterCondition : NetworkBehaviour
 
         if (isDead)
         {
-            revive_timer += Time.deltaTime;
-            if (revive_timer > revivalTime)
+            reviveTimer += Time.deltaTime;
+            if (reviveTimer > revivalTime)
             {
-                revive_timer = 0;
+                reviveTimer = 0;
                 Revival();
-                if (IsHost) RevivalClientRpc(OwnerClientId);
-                else RevivalServerRpc(OwnerClientId);
             }
         }
 
@@ -48,8 +40,6 @@ public abstract class FighterCondition : NetworkBehaviour
             if (HP <= 0)
             {
                 Death(receiver.lastShooterNo, receiver.lastSkillName);
-                if (IsHost) DeathClientRpc(OwnerClientId, receiver.lastShooterNo, receiver.lastSkillName);
-                else DeathServerRpc(OwnerClientId, receiver.lastShooterNo, receiver.lastSkillName);
                 return;
             }
             SpeedTimeUpdate();
@@ -70,7 +60,7 @@ public abstract class FighterCondition : NetworkBehaviour
 
 
     // Layer Masks //////////////////////////////////////////////////////////////////////////////////////////////////
-    public static LayerMask obstacles_mask { get { return GameInfo.terrainMask + Terminal.defaultMask + Terminal.redMask + Terminal.blueMask; } }
+    public static LayerMask obstacles_mask { get; private set; } = GameInfo.terrainMask + GameInfo.structureMask + Terminal.allMask;
     public LayerMask fighters_mask { get; private set; }
     public LayerMask terminals_mask { get; private set; }
     protected void SetLayerMasks(Team my_team)
@@ -79,13 +69,13 @@ public abstract class FighterCondition : NetworkBehaviour
         switch (my_team)
         {
             case Team.RED:
-                fighters_mask = 1 << 18;
-                terminals_mask = (1 << 19) + (1 << 21);
+                fighters_mask = GameInfo.blueFighterMask;
+                terminals_mask = Terminal.defaultMask + Terminal.blueMask;
                 break;
 
             case Team.BLUE:
-                fighters_mask = 1 << 17;
-                terminals_mask = (1 << 19) + (1 << 20);
+                fighters_mask = GameInfo.redFighterMask;
+                terminals_mask = Terminal.defaultMask + Terminal.redMask;
                 break;
 
             default: Debug.LogError("FighterConditionにチームが設定されていません!!"); break;
@@ -455,19 +445,19 @@ public abstract class FighterCondition : NetworkBehaviour
     // Combo & CP (Concentration Point) ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Variables
-    public float cp { get; set; }               // CP currently have.
+    public float cp { get; set; }   // CP currently have.
     public int combo { get; set; }
     protected float combo_timer;
     float zone_timer;
     public bool isZone { get; set; }
 
     // Constants
-    public float full_cp { get; set; } = 10000;          // CP necessary to get in the Zone.
-    public abstract float my_cp { get; set; }   // CP to give when killed.
-    protected float dec_cp_per_sec = 50;
-    protected float cp_maintain = 0f;    // 0.0 (maintain none) ~ 1.0 (maintain all)
-    protected float default_combo_timer;
-    protected float default_zone_timer = 5;
+    public float full_cp { get; set; } = 10; // CP necessary to get in the Zone.
+    public abstract float my_cp { get; set; }   // CP to give to opponent when killed.
+    protected float dec_cp_per_sec = 5; // Decreasing amount of CP over time.
+    protected float cp_maintain = 0f;   // 0.0 (maintain none) ~ 1.0 (maintain all)
+    protected float default_combo_timer;    // Time until the combo runs out.
+    protected float default_zone_timer = 30;    // Duration of zone.
 
     protected void CPStart()
     {
@@ -586,38 +576,62 @@ public abstract class FighterCondition : NetworkBehaviour
 
     // Death & Revival //////////////////////////////////////////////////////////////////////////////////////////////
     public abstract float revivalTime { get; set; }
-    public float revive_timer { get; private set; }
+    public float reviveTimer { get; private set; }
 
-    // Collider needs to be disabled, in order not to be detected by other fighter as homing target.
-    Collider col;
-
-    // Should be called on every clients.
-    protected virtual void Death(int destroyerNo, string destroyerSkillName)
+    // Processes run at the time of death. (Should be called on every clients)
+    protected virtual void OnDeath(int destroyerNo, string causeOfDeath)
     {
+        if (isDead)
+        {
+            return;
+        }
         isDead = true;
-        col.enabled = false;
 
         movement.OnDeath();
         attack.OnDeath();
-        receiver.OnDeath(destroyerNo, destroyerSkillName);
+        receiver.OnDeath(destroyerNo, causeOfDeath);
         radarIcon.Visualize(false);
 
-        // Only the server handles from here.
-        if (!IsHost) return;
-
-        BattleConductor.I.OnFighterDestroyed(this, destroyerNo, destroyerSkillName);
+        if (IsHost)
+        {
+            BattleConductor.I.OnFighterDestroyed(this, destroyerNo, causeOfDeath);
+        }
     }
 
-    // Should be called on every clients.
-    protected virtual void Revival()
+    // Method to call OnDeath() at all clients.
+    public void Death(int destroyerNo, string causeOfDeath)
+    {
+        // Call for yourself.
+        OnDeath(destroyerNo, causeOfDeath);
+
+        // Call for clones at other clients.
+        if (IsHost)
+            DeathClientRpc(OwnerClientId, destroyerNo, causeOfDeath);
+        else
+            DeathServerRpc(OwnerClientId, destroyerNo, causeOfDeath);
+    }
+
+    [ServerRpc]
+    void DeathServerRpc(ulong senderId, int destroyerNo, string causeOfDeath)
+    {
+        DeathClientRpc(senderId, destroyerNo, causeOfDeath);
+    }
+
+    [ClientRpc]
+    void DeathClientRpc(ulong senderId, int destroyerNo, string causeOfDeath)
+    {
+        if (NetworkManager.Singleton.LocalClientId == senderId) return;
+        OnDeath(destroyerNo, causeOfDeath);
+    }
+
+    // Processes run at the time of revival. (Should be called on every clients)
+    protected virtual void OnRevival()
     {
         isDead = false;
 
         movement.OnRevival();
         attack.OnRevival();
         receiver.OnRevival();
-
-        col.enabled = true;
 
         if (IsOwner)
         {
@@ -629,30 +643,30 @@ public abstract class FighterCondition : NetworkBehaviour
         }
     }
 
-    [ServerRpc]
-    protected void DeathServerRpc(ulong senderId, int destroyerNo, string destroyerSkillName)
+    // Method to call OnRevival() at all clients.
+    public void Revival()
     {
-        DeathClientRpc(senderId, destroyerNo, destroyerSkillName);
+        // Call for yourself.
+        OnRevival();
+
+        // Call for clones at other clients.
+        if (IsHost)
+            RevivalClientRpc(OwnerClientId);
+        else
+            RevivalServerRpc(OwnerClientId);
     }
 
-    [ClientRpc]
-    protected void DeathClientRpc(ulong senderId, int destroyerNo, string destroyerSkillName)
-    {
-        if (NetworkManager.Singleton.LocalClientId == senderId) return;
-        Death(destroyerNo, destroyerSkillName);
-    }
-
     [ServerRpc]
-    protected void RevivalServerRpc(ulong senderId)
+    void RevivalServerRpc(ulong senderId)
     {
         RevivalClientRpc(senderId);
     }
 
     [ClientRpc]
-    protected void RevivalClientRpc(ulong senderId)
+    void RevivalClientRpc(ulong senderId)
     {
         if (NetworkManager.Singleton.LocalClientId == senderId) return;
-        Revival();
+        OnRevival();
     }
 
 

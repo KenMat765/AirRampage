@@ -7,6 +7,8 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using Unity.Netcode;
+using Cysharp.Threading.Tasks;
 
 public class uGUIMannager : Singleton<uGUIMannager>
 {
@@ -44,9 +46,9 @@ public class uGUIMannager : Singleton<uGUIMannager>
     public static Vector2 normBlastDiffPos { get; private set; }
     [SerializeField] float blast_diff_pos_max_mag = 200;
 
-    Image[] skill_fills = new Image[GameInfo.max_skill_count];
-    Button[] skill_btns = new Button[GameInfo.max_skill_count];
-    Image[] skill_imgs = new Image[GameInfo.max_skill_count];
+    Image[] skill_fills = new Image[GameInfo.MAX_SKILL_COUNT];
+    Button[] skill_btns = new Button[GameInfo.MAX_SKILL_COUNT];
+    Image[] skill_imgs = new Image[GameInfo.MAX_SKILL_COUNT];
     #endregion
 
     #region Combo
@@ -67,8 +69,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
     #endregion
 
     #region Result
-    Button returnButton;
-    TextMeshProUGUI returnButtonText;
+    Button confirmButton;
     TextMeshProUGUI result_redScore, result_blueScore;
     TextMeshProUGUI[] fighter_names;
     TextMeshProUGUI[] fighter_scores;
@@ -158,7 +159,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
         #endregion
 
         #region Blast and Skills
-        for (int k = 0; k < GameInfo.max_skill_count; k++)
+        for (int k = 0; k < GameInfo.MAX_SKILL_COUNT; k++)
         {
             Transform skill_transform = blastAndSkills.Find("SkillButton" + k);
             skill_fills[k] = skill_transform.Find("Fill").GetComponent<Image>();
@@ -184,45 +185,43 @@ public class uGUIMannager : Singleton<uGUIMannager>
         #endregion
 
         #region Result
-        // returnButton = result.Find("ReturnButton").GetComponent<Button>();
-        // returnButtonText = result.Find("ReturnButton/Text").GetComponent<TextMeshProUGUI>();
-        // switch (BattleInfo.rule)
-        // {
-        //     case Rule.BATTLEROYAL:
-        //         Transform result_royal = result.Find("Result_Royal");
-        //         result_redScore = result_royal.Find("RedScore").GetComponent<TextMeshProUGUI>();
-        //         result_blueScore = result_royal.Find("BlueScore").GetComponent<TextMeshProUGUI>();
-        //         fighter_names = result_royal.Find("Names").GetComponentsInChildren<TextMeshProUGUI>();
-        //         fighter_scores = result_royal.Find("Scores").GetComponentsInChildren<TextMeshProUGUI>();
-        //         for (int no = 0; no < GameInfo.max_player_count; no++) fighter_names[no].text = BattleInfo.battleDatas[no].name;
-        //         foreach (TextMeshProUGUI score in fighter_scores) score.text = "";
-        //         break;
+        confirmButton = result.Find("ConfirmButton").GetComponent<Button>();
+        switch (BattleInfo.rule)
+        {
+            case Rule.BATTLE_ROYAL:
+                Transform result_royal = result.Find("Result_Royal");
+                result_redScore = result.Find("RedScore").GetComponent<TextMeshProUGUI>();
+                result_blueScore = result.Find("BlueScore").GetComponent<TextMeshProUGUI>();
+                fighter_names = result_royal.Find("Names").GetComponentsInChildren<TextMeshProUGUI>();
+                fighter_scores = result_royal.Find("Scores").GetComponentsInChildren<TextMeshProUGUI>();
+                for (int k = 0; k < GameInfo.MAX_PLAYER_COUNT; k++) fighter_names[k].text = BattleInfo.battleDatas[k].name;
+                foreach (TextMeshProUGUI score in fighter_scores) score.text = "";
+                break;
 
-        //     case Rule.TERMINALCONQUEST:
-        //         Transform result_terminal = result.Find("Result_Terminal");
-        //         result_redScore = result_terminal.Find("RedScore").GetComponent<TextMeshProUGUI>();
-        //         result_blueScore = result_terminal.Find("BlueScore").GetComponent<TextMeshProUGUI>();
-        //         redTitle = result.Find("RedTitle").GetComponent<TextMeshProUGUI>();
-        //         blueTitle = result.Find("BlueTitle").GetComponent<TextMeshProUGUI>();
-        //         occupation = result_terminal.Find("Occupation").GetComponent<TextMeshProUGUI>();
-        //         occupation.color = Color.clear;
-        //         break;
+                // case Rule.TERMINALCONQUEST:
+                //     Transform result_terminal = result.Find("Result_Terminal");
+                //     result_redScore = result_terminal.Find("RedScore").GetComponent<TextMeshProUGUI>();
+                //     result_blueScore = result_terminal.Find("BlueScore").GetComponent<TextMeshProUGUI>();
+                //     redTitle = result.Find("RedTitle").GetComponent<TextMeshProUGUI>();
+                //     blueTitle = result.Find("BlueTitle").GetComponent<TextMeshProUGUI>();
+                //     occupation = result_terminal.Find("Occupation").GetComponent<TextMeshProUGUI>();
+                //     occupation.color = Color.clear;
+                //     break;
 
-        //     case Rule.CRYSTALHUNTER:
-        //         Transform result_crystal = result.Find("Result_Crystal");
-        //         result_redScore = result_crystal.Find("RedScore").GetComponent<TextMeshProUGUI>();
-        //         result_blueScore = result_crystal.Find("BlueScore").GetComponent<TextMeshProUGUI>();
-        //         redTitle = result.Find("RedTitle").GetComponent<TextMeshProUGUI>();
-        //         blueTitle = result.Find("BlueTitle").GetComponent<TextMeshProUGUI>();
-        //         occupation = result_crystal.Find("Occupation").GetComponent<TextMeshProUGUI>();
-        //         occupation.color = Color.clear;
-        //         break;
-        // }
-        // result.DOScaleX(0, 0);
-        // returnButton.interactable = false;
-        // returnButtonText.color = Color.gray;
-        // result_redScore.text = "";
-        // result_blueScore.text = "";
+                // case Rule.CRYSTALHUNTER:
+                //     Transform result_crystal = result.Find("Result_Crystal");
+                //     result_redScore = result_crystal.Find("RedScore").GetComponent<TextMeshProUGUI>();
+                //     result_blueScore = result_crystal.Find("BlueScore").GetComponent<TextMeshProUGUI>();
+                //     redTitle = result.Find("RedTitle").GetComponent<TextMeshProUGUI>();
+                //     blueTitle = result.Find("BlueTitle").GetComponent<TextMeshProUGUI>();
+                //     occupation = result_crystal.Find("Occupation").GetComponent<TextMeshProUGUI>();
+                //     occupation.color = Color.clear;
+                //     break;
+        }
+        result.DOScaleX(0, 0);
+        confirmButton.interactable = false;
+        result_redScore.text = "";
+        result_blueScore.text = "";
         #endregion
 
         #region Lock On
@@ -252,7 +251,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
         HPs_white = HP_objects.Select(h => h.transform.Find("HP_white").GetComponent<Image>()).ToArray();
         Image[] team_icons = HP_objects.Select(h => h.transform.Find("Team").GetComponent<Image>()).ToArray();
         TextMeshProUGUI[] name_icons = HP_objects.Select(h => h.transform.Find("Name").GetComponent<TextMeshProUGUI>()).ToArray();
-        for (int no = 0; no < GameInfo.max_player_count; no++)
+        for (int no = 0; no < GameInfo.MAX_PLAYER_COUNT; no++)
         {
             string name = ParticipantManager.I.fighterInfos[no].fighterCondition.fighterName.Value.ToString();
             name_icons[no].text = name;
@@ -277,9 +276,9 @@ public class uGUIMannager : Singleton<uGUIMannager>
         finish.DOColor(Color.clear, 0);
         switch (BattleInfo.rule)
         {
-            case Rule.BATTLEROYAL: rule.text = "Battle Royal"; break;
-            case Rule.TERMINALCONQUEST: rule.text = "Termial Conquest"; break;
-            case Rule.CRYSTALHUNTER: rule.text = "Crystal Hunter"; break;
+            case Rule.BATTLE_ROYAL: rule.text = "Battle Royal"; break;
+            case Rule.TERMINAL_CONQUEST: rule.text = "Termial Conquest"; break;
+            case Rule.CRYSTAL_HUNTER: rule.text = "Crystal Hunter"; break;
         }
         #endregion
 
@@ -298,7 +297,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
         HpOnHead();
         GameTimeManager();
         ScoreManager();
-        ScreenColorManager();
+        ScreenManager();
         ReportDestroy();
         SkillButtonUpdate();
         DotLighter();
@@ -307,7 +306,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
     }
 
 
-    public void EnterUI(bool enter, bool immediate)
+    public void EnterExitUI(bool enter, bool immediate)
     {
         Vector2 status_point = new Vector2(320, -120);
         Vector2 controllStick_point = new Vector2(330, 275);
@@ -333,6 +332,22 @@ public class uGUIMannager : Singleton<uGUIMannager>
         seq.Join(radar.DOAnchorPos(radar_point, duration).SetEase(ease));
         seq.Join(timeAndScores.DOAnchorPos(timeAndScores_point, duration).SetEase(ease));
         seq.Play();
+    }
+
+    public void CleanUpScreen()
+    {
+        // Clear screen color.
+        screen_color.color = Color.clear;
+
+        // Hide KilledRepo.
+        reviveCount.color = Color.clear;
+        reviveCount.text = "";
+        killed.color = Color.clear;
+        reviveIn.color = Color.clear;
+
+        // Hide Zone.
+        zone_back.FadeColor(0);
+        zone_text.FadeColor(0);
     }
 
 
@@ -454,7 +469,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
     void HpOnHead()
     {
         // Playerは除く
-        for (int id = 0; id < GameInfo.max_player_count; id++)
+        for (int id = 0; id < GameInfo.MAX_PLAYER_COUNT; id++)
         {
             if (id != ParticipantManager.I.myFighterNo)
             {
@@ -488,27 +503,27 @@ public class uGUIMannager : Singleton<uGUIMannager>
 
     public void ScreenColorSetter(Color color) { screen_color.color = color; }
 
-
-    void ScreenColorManager()
+    void ScreenManager()
     {
-        if (!playerInfo.fighterCondition.isDead)
+        if (playerInfo.fighterCondition.isDead)
         {
+            screen_color.color = new Color(1, 0, 0, 0.5f);
+            reviveCount.text = Mathf.Ceil(playerInfo.fighterCondition.revivalTime - playerInfo.fighterCondition.reviveTimer).ToString();
+            killed.color = Color.Lerp(killed.color, Color.white, 0.1f);
+            if (playerInfo.fighterCondition.reviveTimer > playerInfo.fighterCondition.revivalTime - 5)
+            {
+                reviveCount.color = Color.white;
+                reviveIn.color = Color.white;
+            }
+        }
+        else
+        {
+            // Gradually reset screen color.
             screen_color.color = Color.Lerp(screen_color.color, Color.clear, 0.2f);
             reviveCount.color = Color.clear;
             reviveCount.text = "";
             killed.color = Color.clear;
             reviveIn.color = Color.clear;
-        }
-        else
-        {
-            screen_color.color = new Color(1, 0, 0, 0.5f);
-            reviveCount.text = Mathf.Ceil(playerInfo.fighterCondition.revivalTime - playerInfo.fighterCondition.revive_timer).ToString();
-            killed.color = Color.Lerp(killed.color, Color.white, 0.1f);
-            if (playerInfo.fighterCondition.revive_timer > playerInfo.fighterCondition.revivalTime - 5)
-            {
-                reviveCount.color = Color.white;
-                reviveIn.color = Color.white;
-            }
         }
     }
 
@@ -525,7 +540,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
         }
     }
 
-    public void BookRepo(string destroyer, string destroyed, Team destroyed_team, Sprite skill_sprite)
+    public void BookRepo(string destroyer, string destroyed, Team destroyed_team, string causeOfDeath)
     {
         Sequence newSeq = DOTween.Sequence()
             .OnStart(() =>
@@ -538,34 +553,35 @@ public class uGUIMannager : Singleton<uGUIMannager>
                 arrow.color = Color.white;
                 switch (destroyed_team)
                 {
-                    case Team.NONE:
-                        destroyerTex.colorGradientPreset = gradv_gray;
-                        destroyedTex.colorGradientPreset = gradv_gray;
-                        // arrow.color = Color.gray;
-                        break;
-
                     case Team.RED:
                         destroyerTex.colorGradientPreset = gradv_blue;
                         destroyedTex.colorGradientPreset = gradv_red;
-                        // arrow.color = Color.blue;
                         break;
 
                     case Team.BLUE:
                         destroyerTex.colorGradientPreset = gradv_red;
                         destroyedTex.colorGradientPreset = gradv_blue;
-                        // arrow.color = Color.red;
                         break;
                 }
 
-                // Set skill icon.
-                if (skill_sprite != null)
+                // Specific cause of death.
+                if (Receiver.IsSpecificDeath(causeOfDeath))
                 {
-                    skill_icon.sprite = skill_sprite;
-                    skill_icon.color = Color.white;
+                    destroyerTex.colorGradientPreset = gradv_gray;
+                    skill_icon.enabled = false;
                 }
+                // Killed by normal blast.
+                else if (causeOfDeath == Receiver.DEATH_NORMAL_BLAST)
+                {
+                    skill_icon.enabled = false;
+                }
+                // Killed by skills.
                 else
                 {
-                    skill_icon.color = Color.clear;
+                    Sprite skill_sprite = SkillDatabase.I.SearchSkillByName(causeOfDeath).GetSprite();
+                    skill_icon.sprite = skill_sprite;
+                    skill_icon.color = Color.white;
+                    skill_icon.enabled = true;
                 }
             })
             .OnComplete(() =>
@@ -581,18 +597,12 @@ public class uGUIMannager : Singleton<uGUIMannager>
         newSeq.Append(arrow.DOFade(0, 0.2f).SetLoops(5, LoopType.Yoyo));
         newSeq.Join(destroyerTex.DOFade(0, 0.2f).SetLoops(5, LoopType.Yoyo));
         newSeq.Join(destroyedTex.DOFade(0, 0.2f).SetLoops(5, LoopType.Yoyo));
-        if (skill_sprite != null)
-        {
-            newSeq.Join(skill_icon.DOFade(0, 0.2f).SetLoops(5, LoopType.Yoyo));
-        }
+        newSeq.Join(skill_icon.DOFade(0, 0.2f).SetLoops(5, LoopType.Yoyo));
 
         newSeq.Append(arrow.DOFade(1, 0.2f));
         newSeq.Join(destroyerTex.DOFade(1, 0.2f));
         newSeq.Join(destroyedTex.DOFade(1, 0.2f));
-        if (skill_sprite != null)
-        {
-            newSeq.Join(skill_icon.DOFade(1, 0.2f));
-        }
+        newSeq.Join(skill_icon.DOFade(1, 0.2f));
 
         newSeq.Append(destroyRepo.DOAnchorPosX(-175, 0.2f).SetDelay(3));
 
@@ -602,7 +612,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
 
     void SkillButtonSetup()
     {
-        for (int k = 0; k < GameInfo.max_skill_count; k++)
+        for (int k = 0; k < GameInfo.MAX_SKILL_COUNT; k++)
         {
             int m = k;
 
@@ -638,14 +648,14 @@ public class uGUIMannager : Singleton<uGUIMannager>
         // Playerが死んでいた場合 return
         if (playerInfo.fighterCondition.isDead)
         {
-            for (int k = 0; k < GameInfo.max_skill_count; k++)
+            for (int k = 0; k < GameInfo.MAX_SKILL_COUNT; k++)
             {
                 if (skill_btns[k].interactable) { skill_btns[k].interactable = false; }
             }
             return;
         }
 
-        for (int k = 0; k < GameInfo.max_skill_count; k++)
+        for (int k = 0; k < GameInfo.MAX_SKILL_COUNT; k++)
         {
             Skill skill = playerInfo.attack.skills[k];
             if (skill != null)
@@ -738,38 +748,78 @@ public class uGUIMannager : Singleton<uGUIMannager>
 
     public void ShowResult()
     {
-        // Reuse these variables.
+        // Used for animating score texts.
         redScore = 0;
         blueScore = 0;
-        scores_float = new float[GameInfo.max_player_count];
+        scores_float = new float[GameInfo.MAX_PLAYER_COUNT + 2]; // Player count (= 8) + Zako (red & blue)
 
-        float open_result_duration = 0.3f;
-        float interval = 0.5f;
-        float score_update_duration = 1.2f;
-
+        // Animation settings.
+        const float open_result_duration = 0.3f;
+        const float interval = 0.5f;
+        const float score_update_duration = 1.2f;
         Ease open_ease = Ease.OutQuart;
 
+        // Create Animation.
         Sequence seq = DOTween.Sequence();
         seq.Append(result.DOScaleX(1, open_result_duration).SetEase(open_ease));
         seq.AppendInterval(interval);
-        if (BattleInfo.rule == Rule.BATTLEROYAL)
+
+        switch (BattleInfo.rule)
         {
-            for (int no = 0; no < GameInfo.max_player_count; no += 2)
-            {
-                int No = no;
-                seq.Append(DOTween.To(() => scores_float[No], (value) => scores_float[No] = value, BattleConductor.individualScores[No], score_update_duration)
-                    .OnUpdate(() => fighter_scores[No].text = Mathf.CeilToInt(scores_float[No]).ToString()));
-                seq.Join(DOTween.To(() => scores_float[No + 1], (value) => scores_float[No + 1] = value, BattleConductor.individualScores[No + 1], score_update_duration)
-                    .OnUpdate(() => fighter_scores[No + 1].text = Mathf.CeilToInt(scores_float[No + 1]).ToString()));
-                seq.AppendInterval(interval);
-            }
+            case Rule.BATTLE_ROYAL:
+                for (int no = 0; no < GameInfo.MAX_PLAYER_COUNT + 2; no++)
+                {
+                    // === Scores for zakos === //
+                    if (no >= GameInfo.MAX_PLAYER_COUNT)
+                    {
+                        // Just set scores to UI.
+                        int zako_no = no;
+                        seq.Join(DOTween.To(() => scores_float[zako_no], (value) => scores_float[zako_no] = value, BattleConductor.individualScores[zako_no], score_update_duration)
+                            .OnUpdate(() => fighter_scores[zako_no].text = Mathf.CeilToInt(scores_float[zako_no]).ToString()));
+                        continue;
+                    }
+
+                    // === Scores for fighters === //
+
+                    // Check if battle data exists.
+                    BattleInfo.ParticipantBattleData? nullable_data = BattleInfo.GetBattleDataByFighterNo(no);
+                    if (!nullable_data.HasValue)
+                    {
+                        Debug.LogError($"Could not get battle data of fighterNo: {no}");
+                        continue;
+                    }
+
+                    // Get battle data of fighter.
+                    BattleInfo.ParticipantBattleData battle_data = nullable_data.Value;
+                    int member_no = battle_data.memberNo;
+                    string fighter_name = battle_data.name;
+                    Team team = battle_data.team;
+
+                    // Set fighter names to UI. (fighter_names: {red0, ... ,red3, blue0, ... ,blue3})
+                    int ui_idx = team == Team.RED ? member_no : GameInfo.TEAM_MEMBER_COUNT + member_no;
+                    fighter_names[ui_idx].text = fighter_name;
+
+                    // Set individual scores to UI.
+                    int fighter_no = no;
+                    seq.Join(DOTween.To(() => scores_float[fighter_no], (value) => scores_float[fighter_no] = value, BattleConductor.individualScores[fighter_no], score_update_duration)
+                        .OnUpdate(() => fighter_scores[ui_idx].text = Mathf.CeilToInt(scores_float[fighter_no]).ToString()));
+                }
+                break;
+
+                // case Rule.TERMINALCONQUEST:
+                //     break;
+
+                // case Rule.CRYSTALHUNTER:
+                //     break;
         }
+
+        seq.AppendInterval(interval);
         seq.Append(DOTween.To(() => redScore, (value) => redScore = value, BattleConductor.I.RedScore, score_update_duration)
             .OnUpdate(() => result_redScore.text = Mathf.CeilToInt(redScore).ToString()));
         seq.Join(DOTween.To(() => blueScore, (value) => blueScore = value, BattleConductor.I.BlueScore, score_update_duration)
             .OnUpdate(() => result_blueScore.text = Mathf.CeilToInt(blueScore).ToString()));
         seq.AppendInterval(interval);
-        seq.AppendCallback(() => { returnButton.interactable = true; returnButtonText.color = Color.white; });
+        seq.AppendCallback(() => confirmButton.interactable = true);
         seq.Play();
     }
 
@@ -799,7 +849,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
         Sequence seq = DOTween.Sequence();
         seq.Append(result.DOScaleX(1, open_result_duration).SetEase(open_ease));
         seq.AppendInterval(interval);
-        seq.AppendCallback(() => { returnButton.interactable = true; returnButtonText.color = Color.white; });
+        seq.AppendCallback(() => confirmButton.interactable = true);
         seq.Play();
     }
 
@@ -849,12 +899,17 @@ public class uGUIMannager : Singleton<uGUIMannager>
     }
 
 
-    public void OnPressedReturn()
+    public async void OnPressedConfirm()
     {
-        if (BattleInfo.isHost)
+        // Disconnect from server.
+        if (NetworkManager.Singleton)
         {
-            BattleConductor.I.ReturnToMenuClientRpc();
+            NetworkManager.Singleton.Shutdown();
+            await UniTask.WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
         }
+
+        // Go back to menu scene.
+        SceneManager2.I.LoadSceneAsync2(GameScenes.MENU, FadeType.gradually);
     }
 
 
@@ -881,7 +936,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
         zone_anim.Join(DOTween.To(() => viginette.intensity.value, (x) => viginette.intensity.value = x, 0.3f, 0.25f).SetEase(Ease.OutExpo));
 
         zone_anim.Append(zone_text.rectTransform.DOAnchorPosX(-50, 0.25f).SetEase(Ease.OutExpo));
-        zone_anim.Join(zone_text.DOColor(Color.red, 0.25f).SetEase(Ease.OutExpo));
+        zone_anim.Join(zone_text.DOFade(1, 0.25f).SetEase(Ease.OutExpo));
 
         zone_anim.Append(zone_text.rectTransform.DOAnchorPosX(50, 0.5f));
 

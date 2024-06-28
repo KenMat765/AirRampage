@@ -13,4 +13,14 @@ MonoBehaviour:
   m_Name: HD_SwipeActions
   m_EditorClassIdentifier: 
   helpTitle: Swipe Actions
-  helpExplanation: aaa
+  helpExplanation: 'By swiping in the up, down, left, or right directions, you can
+    trigger special actions.
+
+    Up: Summersalt
+
+    Down: U-turn
+
+    Left: Left-step
+
+    Right:
+    Right-step'

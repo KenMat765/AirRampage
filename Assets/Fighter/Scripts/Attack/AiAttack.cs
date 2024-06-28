@@ -40,16 +40,16 @@ public class AiAttack : Attack
         if (!attackable) return;
 
         // Only the owner (= host) executes the following processes.
-        if (BattleInfo.isMulti && !IsHost) return;
+        if (!IsHost) return;
 
         SetHomingTargetNos();
 
         // Search for Attackable Terminals. /////////////////////////////////////////////////////////////////////
-        if (BattleInfo.rule == Rule.TERMINALCONQUEST) SearchAttackableTerminals();
+        if (BattleInfo.rule == Rule.TERMINAL_CONQUEST) SearchAttackableTerminals();
 
 
         // Normal Blast. ////////////////////////////////////////////////////////////////////////////////////////
-        if (homingCount > 0 || (BattleInfo.rule == Rule.TERMINALCONQUEST && attackableTerminals.Count > 0))
+        if (homingCount > 0 || (BattleInfo.rule == Rule.TERMINAL_CONQUEST && attackableTerminals.Count > 0))
         {
             blastTimer -= Time.deltaTime;
             if (blastTimer < 0)
@@ -70,9 +70,8 @@ public class AiAttack : Attack
 
                 // Blast normal bullets for yourself.
                 NormalRapid(rapidCount, target);
-
-                // If multiplayer, send to all clones to blast bullets.
-                if (BattleInfo.isMulti) NormalRapidClientRpc(OwnerClientId, targetNo, rapidCount);
+                // Send to all clones to blast bullets.
+                NormalRapidClientRpc(OwnerClientId, targetNo, rapidCount);
             }
         }
         else
@@ -95,11 +94,12 @@ public class AiAttack : Attack
                 if (elapsed_times[skill_num] < wait_times[skill_num]) return;
 
                 // 待機時間を過ぎていて、かつType毎の条件を満たしていればスキルを発動
+                string skill_name = skillData.GetName();
                 switch (skillData.GetSkillType())
                 {
                     case SkillType.attack:
                         // Activate when fighters in front is more than thresh, or attackable terminals are in front.
-                        if (homingCount >= target_thresh || (BattleInfo.rule == Rule.TERMINALCONQUEST && attackableTerminals.Count > 0))
+                        if (homingCount >= target_thresh || (BattleInfo.rule == Rule.TERMINAL_CONQUEST && attackableTerminals.Count > 0))
                         {
                             skill.Activator();
                             elapsed_times[skill_num] = 0;
@@ -108,8 +108,8 @@ public class AiAttack : Attack
                         break;
 
                     case SkillType.heal:
-                        // 自分の状態に応じて分岐
-                        if (skillData.GetName() == "RepairDevice")
+                        // For RepairDevice, activate when your HP is less than 50%.
+                        if (skill_name == "RepairDevice")
                         {
                             if (fighterCondition.HP < fighterCondition.defaultHP / 2)
                             {
@@ -119,14 +119,24 @@ public class AiAttack : Attack
                         break;
 
                     case SkillType.assist:
-                        // 無条件に起動 
-                        skill.Activator();
-                        elapsed_times[skill_num] = 0;
-                        wait_times[skill_num] = Random.Range(min_wait_time, max_wait_time);
+                        // For NitroBoost, activate only when destination is far enough.
+                        if (skill_name == "NitroBoost")
+                        {
+                            const float DISTANCE_THRESH = 800;
+                            float distance_to_destination = Vector3.Magnitude(fighterCondition.movement.relative_to_next);
+                            if (distance_to_destination > DISTANCE_THRESH) skill.Activator();
+                        }
+                        // For other assist skills, activate as soon as it's charged.
+                        else
+                        {
+                            skill.Activator();
+                            elapsed_times[skill_num] = 0;
+                            wait_times[skill_num] = Random.Range(min_wait_time, max_wait_time);
+                        }
                         break;
 
                     case SkillType.disturb:
-                        // 標的がtarget_thresh機以上だったらスキル発動
+                        // Activate when opponents in front is more than thresh.
                         if (homingCount >= target_thresh)
                         {
                             skill.Activator();

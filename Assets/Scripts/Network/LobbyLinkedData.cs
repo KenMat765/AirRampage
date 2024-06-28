@@ -207,11 +207,11 @@ public class LobbyLinkedData : NetworkSingleton<LobbyLinkedData>
 
         // Generate AI lobby data for absences.
         string[] ai_names = AiUtilities.aiNames.RandomizeOrder().ToArray();
-        for (int number = participantCount; number < GameInfo.max_player_count; number++)
+        for (int number = participantCount; number < GameInfo.MAX_PLAYER_COUNT; number++)
         {
             Team ai_team;
             int ai_member_num;
-            if (member_number_red < GameInfo.team_member_count)
+            if (member_number_red < GameInfo.TEAM_MEMBER_COUNT)
             {
                 ai_team = Team.RED;
                 ai_member_num = member_number_red;
@@ -293,7 +293,7 @@ public struct LobbyParticipantData : INetworkSerializable, IEquatable<LobbyParti
     public static void SkillCodeEncoder(int?[] skillIds, int?[] skillLevels, out string skillCode)
     {
         skillCode = "";
-        for (int k = 0; k < GameInfo.max_skill_count; k++)
+        for (int k = 0; k < GameInfo.MAX_SKILL_COUNT; k++)
         {
             if (skillIds[k].HasValue)
             {
@@ -310,8 +310,8 @@ public struct LobbyParticipantData : INetworkSerializable, IEquatable<LobbyParti
     // 1-2/10-5/n-n... : skillId-Level/skillId-Level/...
     public static void SkillCodeDecoder(string skillCode, out int?[] skillIds, out int?[] skillLevels)
     {
-        skillIds = new int?[GameInfo.max_skill_count];
-        skillLevels = new int?[GameInfo.max_skill_count];
+        skillIds = new int?[GameInfo.MAX_SKILL_COUNT];
+        skillLevels = new int?[GameInfo.MAX_SKILL_COUNT];
         int skillNumber = 0;
         bool decodingSkillId = true;
         string skillId_cashe = "";

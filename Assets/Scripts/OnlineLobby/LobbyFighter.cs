@@ -75,7 +75,7 @@ public class LobbyFighter : Singleton<LobbyFighter>
     IEnumerator prepareAllFighters(Team team, Action callback)
     {
         PrepareFighter(team, 0);
-        for (int member_num = 1; member_num < GameInfo.team_member_count; member_num++)
+        for (int member_num = 1; member_num < GameInfo.TEAM_MEMBER_COUNT; member_num++)
         {
             yield return new WaitForSeconds(interval);
             PrepareFighter(team, member_num);
@@ -118,7 +118,7 @@ public class LobbyFighter : Singleton<LobbyFighter>
     IEnumerator sortieAllFighters(Team team, Action callback)
     {
         SortieFighter(team, 0);
-        for (int k = 1; k < GameInfo.team_member_count; k++)
+        for (int k = 1; k < GameInfo.TEAM_MEMBER_COUNT; k++)
         {
             yield return new WaitForSeconds(interval);
             SortieFighter(team, k);
@@ -159,7 +159,7 @@ public class LobbyFighter : Singleton<LobbyFighter>
     IEnumerator disableAllFighters(Team team, Action callback)
     {
         DisableFighter(team, 0);
-        for (int k = 1; k < GameInfo.team_member_count; k++)
+        for (int k = 1; k < GameInfo.TEAM_MEMBER_COUNT; k++)
         {
             yield return new WaitForSeconds(interval);
             DisableFighter(team, k);

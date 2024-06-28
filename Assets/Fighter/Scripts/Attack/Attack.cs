@@ -27,7 +27,7 @@ public abstract class Attack : NetworkBehaviour
 
     // Skills ////////////////////////////////////////////////////////////////////////
     // These are set in Awake() of ParticipantManager
-    public Skill[] skills { get; set; } = new Skill[GameInfo.max_skill_count];
+    public Skill[] skills { get; set; } = new Skill[GameInfo.MAX_SKILL_COUNT];
     public void LockAllSkills(bool lock_skill)
     {
         foreach (Skill skill in skills)
@@ -63,7 +63,7 @@ public abstract class Attack : NetworkBehaviour
 
 
     // Lock On ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    public List<int> homingTargetNos { get; private set; } = new List<int>();    // homingTargets = ボディ or シールド。 プロパティにするとおかしくなる(?)。
+    public List<int> homingTargetNos { get; private set; } = new List<int>();    // homingTargets = body or shield
     public int homingCount { get { return homingTargetNos.Count; } }
 
     [Header("Homing")]
@@ -75,7 +75,7 @@ public abstract class Attack : NetworkBehaviour
         Vector3 my_position = transform.position;
         Vector3 bullet_position = originalNormalBullet.transform.position;
 
-        // Detect Fighter-Root GameObject in order to detect target regardless of oponents shield activation.
+        // Detect Fighter-Root to detect target regardless of opponents shield activation. (Collider of body is disabled when activating shield)
         Collider[] colliders = Physics.OverlapSphere(bullet_position, homingDist, fighterCondition.fighters_mask);
 
         // Detect targets, and set them to homingTargetNos.
@@ -93,7 +93,10 @@ public abstract class Attack : NetworkBehaviour
                 !Physics.Raycast(my_position, p.transform.position - my_position, Vector3.Magnitude(p.transform.position - my_position), FighterCondition.obstacles_mask))
 
                 // Get fighter number of target from its name.
-                .Select(r => int.Parse(r.name)).ToList();
+                .Select(r => int.Parse(r.name))
+
+                // Filter dead fighters.
+                .Where(no => !ParticipantManager.I.fighterInfos[no].fighterCondition.isDead).ToList();
         }
         else
         {
@@ -193,6 +196,7 @@ public abstract class Attack : NetworkBehaviour
     ///<param name="target"> Put null when there are no targets. </param>
     protected virtual void NormalBlast(GameObject target = null)
     {
+        if (fighterCondition.isDead) return;
         if (!attackable) return;
 
         Weapon bullet = normalWeapons[GetNormalBulletIndex()];

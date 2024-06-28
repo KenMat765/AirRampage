@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -11,17 +12,32 @@ public class Receiver : NetworkBehaviour
     public FighterCondition fighterCondition { get; set; }
     public bool acceptDamage { get; set; }
 
+    // Collider needs to be disabled, in order not to be detected by other fighter as homing target.
+    Collider col;
+
+    // Causes of death.
+    public const string DEATH_NORMAL_BLAST = "NormalBlast";
+    public const string SPECIFIC_DEATH_CRYSTAL = "Crystal Kill";        // Specific death (Death other than enemy attacks)
+    public const string SPECIFIC_DEATH_COLLISION = "Collision Crash";   // Specific death (Death other than enemy attacks)
+    static string[] specificDeath = { SPECIFIC_DEATH_CRYSTAL, SPECIFIC_DEATH_COLLISION };
+    public static bool IsSpecificDeath(string causeOfDeath) { return specificDeath.Contains(causeOfDeath); }
+
 
     void Awake()
     {
         fighterCondition = GetComponentInParent<FighterCondition>();
+        col = GetComponent<Collider>();
     }
 
 
-    public virtual void OnDeath(int destroyerNo, string destroyerSkillName)
+
+    // Death & Revival /////////////////////////////////////////////////////////////////////////////////////////////
+    public virtual void OnDeath(int destroyerNo, string causeOfDeath)
     {
-        // If killed by crystal (Crystal Hunter)
-        if (destroyerSkillName == "Crystal")
+        col.enabled = false;
+
+        // If specific cause of death. (Not killed by enemy)
+        if (IsSpecificDeath(causeOfDeath))
         {
             return;
         }
@@ -31,11 +47,39 @@ public class Receiver : NetworkBehaviour
         destroyer_condition.Combo(fighterCondition.my_cp);
     }
 
-    public virtual void OnRevival() { }
+    public virtual void OnRevival()
+    {
+        col.enabled = true;
+    }
+
+    // Tell uGUIManager to report death of this fighter. (Called from Player and AI fighters)
+    protected void ReportDeath(int destroyerNo, string causeOfDeath)
+    {
+        string my_name = fighterCondition.fighterName.Value.ToString();
+        Team my_team = fighterCondition.fighterTeam.Value;
+
+        // Specific cause of death.
+        if (IsSpecificDeath(causeOfDeath))
+        {
+            uGUIMannager.I.BookRepo(causeOfDeath, my_name, my_team, causeOfDeath);
+            return;
+        }
+
+        // Death by enemy attacks.
+        string destroyer_name = ParticipantManager.I.fighterInfos[destroyerNo].fighterCondition.fighterName.Value.ToString();
+        if (causeOfDeath == DEATH_NORMAL_BLAST)
+        {
+            uGUIMannager.I.BookRepo(destroyer_name, my_name, my_team, causeOfDeath);
+        }
+        else
+        {
+            uGUIMannager.I.BookRepo(destroyer_name, my_name, my_team, causeOfDeath);
+        }
+    }
 
 
 
-    // Damage ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Shooter Detection /////////////////////////////////////////////////////////////////////////////////////////////
     public int lastShooterNo { get; private set; }
     public string lastSkillName { get; private set; }
 
@@ -63,16 +107,19 @@ public class Receiver : NetworkBehaviour
 
 
 
+    // Damages & Debuffs ////////////////////////////////////////////////////////////////////////////////////////////
     Sequence hitSeq;
 
-    // Other things to do when weapon hit. (Call : Owner)
+    // Other things to do when weapon hit. (Called only at Owner)
     public virtual void OnWeaponHit(int fighterNo)
     {
+        if (!IsOwner) return;
+
         if (!hitSeq.IsActive())
         {
-            hitSeq = DOTween.Sequence();
             Vector3 rot_strength = new Vector3(0, 0, 60);
             int rot_vibrato = 10;
+            hitSeq = DOTween.Sequence();
             hitSeq.Join(transform.DOShakeRotation(0.5f, rot_strength, rot_vibrato));
             hitSeq.Play();
         }
@@ -160,7 +207,8 @@ public class Receiver : NetworkBehaviour
     public void DefenceDownClientRpc(int defenceGrade, float defenceDuration, float defenceProbability) { if (IsOwner) DefenceDown(defenceGrade, defenceDuration, defenceProbability); }
 
 
-    // Shield.
+
+    // Shield ///////////////////////////////////////////////////////////////////////////////////////////////////////
     // Set hitDetector from Shield class.
     // As ShieldHitDetector cannot call RPCs, declear RPC here.
     public ShieldHitDetector hitDetector { get; set; }

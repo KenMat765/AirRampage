@@ -32,42 +32,6 @@ public class PlayerMovement : Movement
 
         Rotate();
         FourActionExe();
-
-#if UNITY_EDITOR
-        float maxRotSpeed = 40;
-        float maxTiltX = 55;  //縦
-        float maxTiltZ = 60;  //左右
-        float targetRotX = 0, relativeRotY = 0, targetRotZ = 0;
-        Quaternion targetRot = default(Quaternion);
-
-        if (Input.anyKey)
-        {
-            if (Input.GetKey(KeyCode.UpArrow))
-            {
-                targetRotX += maxTiltX;
-            }
-            if (Input.GetKey(KeyCode.DownArrow))
-            {
-                targetRotX -= maxTiltX;
-            }
-            if (Input.GetKey(KeyCode.RightArrow))
-            {
-                relativeRotY = maxRotSpeed;
-                targetRotZ = maxTiltZ;
-            }
-            if (Input.GetKey(KeyCode.LeftArrow))
-            {
-                relativeRotY = maxRotSpeed * -1;
-                targetRotZ = maxTiltZ * -1;
-            }
-            targetRot = Quaternion.Euler(targetRotX * -1, transform.rotation.eulerAngles.y + relativeRotY, targetRotZ * -1);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, 0.05f);
-        }
-        else
-        {
-            FixTilt();
-        }
-#endif
     }
 
 
@@ -102,12 +66,40 @@ public class PlayerMovement : Movement
             return;
         }
 
+        float targetRotX = 0;
+        float relativeRotY = 0;
+        float targetRotZ = 0;
+
+        // Set target rotation (Branch by platform)
+#if UNITY_EDITOR
+        if (Input.anyKey)
+        {
+            if (Input.GetKey(KeyCode.W))
+            {
+                targetRotX += maxTiltX;
+            }
+            if (Input.GetKey(KeyCode.S))
+            {
+                targetRotX -= maxTiltX;
+            }
+            if (Input.GetKey(KeyCode.D))
+            {
+                relativeRotY = maxRotSpeed;
+                targetRotZ = maxTiltZ;
+            }
+            if (Input.GetKey(KeyCode.A))
+            {
+                relativeRotY = -maxRotSpeed;
+                targetRotZ = -maxTiltZ;
+            }
+#else
         if (uGUIMannager.onStick)
         {
-            const int k = 100;
-            float targetRotX = Utilities.R2R(uGUIMannager.norm_diffPos.y, 0, maxTiltX, Utilities.FunctionType.convex_down, k);
-            float relativeRotY = Utilities.R2R(uGUIMannager.norm_diffPos.x, 0, maxRotSpeed, Utilities.FunctionType.convex_down, k);
-            float targetRotZ = Utilities.R2R(uGUIMannager.norm_diffPos.x, 0, maxTiltZ, Utilities.FunctionType.convex_down, k);
+            const int insensitivity = 100;
+            targetRotX = Utilities.R2R(uGUIMannager.norm_diffPos.y, 0, maxTiltX, Utilities.FunctionType.convex_down, insensitivity);
+            relativeRotY = Utilities.R2R(uGUIMannager.norm_diffPos.x, 0, maxRotSpeed, Utilities.FunctionType.convex_down, insensitivity);
+            targetRotZ = Utilities.R2R(uGUIMannager.norm_diffPos.x, 0, maxTiltZ, Utilities.FunctionType.convex_down, insensitivity);
+#endif
             Quaternion targetRot = Quaternion.Euler(targetRotX * stickReverse * uTurndirection, transform.rotation.eulerAngles.y + relativeRotY, targetRotZ * -1 * uTurndirection);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, 0.05f);
         }
@@ -277,10 +269,10 @@ public class PlayerMovement : Movement
         else if (CSManager.swipeRight) { RightRoll(0.2f); }
 
 #if UNITY_EDITOR
-        if (Input.GetKeyDown(KeyCode.S)) { Uturn(); }
-        else if (Input.GetKeyDown(KeyCode.W)) { Flip(); }
-        else if (Input.GetKeyDown(KeyCode.A)) { LeftRoll(0.2f); }
-        else if (Input.GetKeyDown(KeyCode.D)) { RightRoll(0.2f); }
+        if (Input.GetKeyDown(KeyCode.DownArrow)) { Uturn(); }
+        else if (Input.GetKeyDown(KeyCode.UpArrow)) { Flip(); }
+        else if (Input.GetKeyDown(KeyCode.LeftArrow)) { LeftRoll(0.2f); }
+        else if (Input.GetKeyDown(KeyCode.RightArrow)) { RightRoll(0.2f); }
 #endif
     }
 }

@@ -139,7 +139,7 @@ public class SkillFactoryManager : MonoBehaviour
         circleFill.fillAmount = unlock_count / (float)all_count;
 
         int coins_have = PlayerInfo.I.coins;
-        int coins_need = GameInfo.s_generate_coin;
+        int coins_need = GameInfo.S_GENERATE_COIN;
         coinHaveText.text = coins_have.ToString();
         coinNeedText.text = coins_need.ToString();
 
@@ -213,7 +213,7 @@ public class SkillFactoryManager : MonoBehaviour
 
         // Update PlayerInfo
         PlayerInfo.I.skl_unlock[skillId] = true;
-        PlayerInfo.I.coins -= GameInfo.s_generate_coin;
+        PlayerInfo.I.coins -= GameInfo.S_GENERATE_COIN;
         SaveManager.SaveData<PlayerInfo>(PlayerInfo.I);
 
         // Animation

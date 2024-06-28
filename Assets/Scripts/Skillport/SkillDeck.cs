@@ -9,18 +9,18 @@ public class SkillDeck : Utilities
 {
     [SerializeField] Image[] numberImgs = new Image[4];
 
-    [SerializeField] Image[] icon_imgs = new Image[GameInfo.max_skill_count];
-    Image[] skill_imgs = new Image[GameInfo.max_skill_count];
+    [SerializeField] Image[] icon_imgs = new Image[GameInfo.MAX_SKILL_COUNT];
+    Image[] skill_imgs = new Image[GameInfo.MAX_SKILL_COUNT];
 
-    Image[] lines = new Image[GameInfo.max_skill_count];
-    Image[] line2s = new Image[GameInfo.max_skill_count];
-    TextMeshProUGUI[] skill_names = new TextMeshProUGUI[GameInfo.max_skill_count];
-    TextMeshProUGUI[] change_texts = new TextMeshProUGUI[GameInfo.max_skill_count];
-    Image[] change_btn_imgs = new Image[GameInfo.max_skill_count];
-    TextMeshProUGUI[] remove_texts = new TextMeshProUGUI[GameInfo.max_skill_count];
-    Image[] remove_btn_imgs = new Image[GameInfo.max_skill_count];
-    TextMeshProUGUI[] set_texts = new TextMeshProUGUI[GameInfo.max_skill_count];
-    Image[] set_btn_imgs = new Image[GameInfo.max_skill_count];
+    Image[] lines = new Image[GameInfo.MAX_SKILL_COUNT];
+    Image[] line2s = new Image[GameInfo.MAX_SKILL_COUNT];
+    TextMeshProUGUI[] skill_names = new TextMeshProUGUI[GameInfo.MAX_SKILL_COUNT];
+    TextMeshProUGUI[] change_texts = new TextMeshProUGUI[GameInfo.MAX_SKILL_COUNT];
+    Image[] change_btn_imgs = new Image[GameInfo.MAX_SKILL_COUNT];
+    TextMeshProUGUI[] remove_texts = new TextMeshProUGUI[GameInfo.MAX_SKILL_COUNT];
+    Image[] remove_btn_imgs = new Image[GameInfo.MAX_SKILL_COUNT];
+    TextMeshProUGUI[] set_texts = new TextMeshProUGUI[GameInfo.MAX_SKILL_COUNT];
+    Image[] set_btn_imgs = new Image[GameInfo.MAX_SKILL_COUNT];
 
     public int current_deck_num { get; private set; } = 0;
     int? current_icon_index = null;
@@ -60,7 +60,7 @@ public class SkillDeck : Utilities
 
     public void OnSelectIcon(int icon_index)
     {
-        int?[] skillIds = new int?[GameInfo.max_skill_count];
+        int?[] skillIds = new int?[GameInfo.MAX_SKILL_COUNT];
         PlayerInfo.I.SkillIdsGetter(current_deck_num, out skillIds);
         if (current_icon_index != icon_index)
         {
@@ -93,7 +93,7 @@ public class SkillDeck : Utilities
     {
         float number_duration = 0.1f;
 
-        int next_deck_num = ((current_deck_num + direction) % GameInfo.deck_count + GameInfo.deck_count) % GameInfo.deck_count;
+        int next_deck_num = ((current_deck_num + direction) % GameInfo.DECK_COUNT + GameInfo.DECK_COUNT) % GameInfo.DECK_COUNT;
 
         numberImgs[current_deck_num].fillAmount = 0;
         numberImgs[next_deck_num].DOFillAmount(1, number_duration);
@@ -218,7 +218,7 @@ public class SkillDeck : Utilities
 
     public void RefreshIcons(int deck_num)
     {
-        int?[] skillIds = new int?[GameInfo.max_skill_count];
+        int?[] skillIds = new int?[GameInfo.MAX_SKILL_COUNT];
         PlayerInfo.I.SkillIdsGetter(deck_num, out skillIds);
         for (int k = 0; k < icon_imgs.Length; k++)
         {

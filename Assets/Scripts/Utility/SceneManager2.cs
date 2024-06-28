@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Linq;
 
 public class SceneManager2 : Singleton<SceneManager2>
 {
@@ -17,19 +18,11 @@ public class SceneManager2 : Singleton<SceneManager2>
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
+    string[] battleScenes = { "Space", "SunsetCity" };
+
     private void OnSceneLoaded(Scene loadedScene, LoadSceneMode sceneMode)
     {
-        // If entered sortie lobby scene, frame of info canvas might be open.
-        if (loadedScene.name == "SortieLobby")
-        {
-            if (InfoCanvas.I.isFrameOpen)
-            {
-                InfoCanvas.I.CloseFrame();
-                InfoCanvas.I.CloseButtonInteract(false);
-            }
-        }
-
-        if (loadedScene.name != "Space")
+        if (!battleScenes.Contains(loadedScene.name))
         {
             // In battle scenes, camera setup is called in ParticipantManager.
             CameraManager.SetupCameraInScene();
@@ -61,8 +54,8 @@ public class SceneManager2 : Singleton<SceneManager2>
                 SceneManager.LoadScene("SortieLobby");
                 break;
 
-            case GameScenes.CANYON:
-                SceneManager.LoadScene("Canyon");
+            case GameScenes.SUNSETCITY:
+                SceneManager.LoadScene("SunsetCity");
                 break;
 
             case GameScenes.SPACE:
@@ -80,30 +73,7 @@ public class SceneManager2 : Singleton<SceneManager2>
         if (beforeSceneUnload != null) { beforeSceneUnload(); }
         StartCoroutine(SceneLoader(gameScene, fadeOutType));
     }
-    public void LoadSceneAsync2(Stage stage, FadeType fadeOutType)
-    {
-        if (beforeSceneUnload != null) { beforeSceneUnload(); }
-        GameScenes gameScene;
-        switch (stage)
-        {
-            case Stage.CANYON:
-                gameScene = GameScenes.CANYON;
-                break;
 
-            case Stage.SNOWPEAK:
-                gameScene = GameScenes.SNOWPEAK;
-                break;
-
-            case Stage.SPACE:
-                gameScene = GameScenes.SPACE;
-                break;
-
-            default:
-                Debug.LogError("Could not associate stage with game scene!!", gameObject);
-                return;
-        }
-        StartCoroutine(SceneLoader(gameScene, fadeOutType));
-    }
     IEnumerator SceneLoader(GameScenes gameScene, FadeType fadeOutType)
     {
         float fadeout_duration = FadeCanvas.I.FadeOut(fadeOutType);
@@ -142,8 +112,8 @@ public class SceneManager2 : Singleton<SceneManager2>
                 async = SceneManager.LoadSceneAsync("SortieLobby");
                 break;
 
-            case GameScenes.CANYON:
-                async = SceneManager.LoadSceneAsync("Canyon");
+            case GameScenes.SUNSETCITY:
+                async = SceneManager.LoadSceneAsync("SunsetCity");
                 break;
 
             case GameScenes.SPACE:
@@ -185,7 +155,7 @@ public enum GameScenes
     ABILITYFACTORY,
     ONLINELOBBY,
     SORTIELOBBY,
-    CANYON,
+    SUNSETCITY,
     SPACE,
     SNOWPEAK
 }

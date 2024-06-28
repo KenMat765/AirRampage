@@ -47,7 +47,7 @@ public static class BattleInfo
             this.abilities = abilities;
         }
     }
-    public static ParticipantBattleData[] battleDatas { get; set; } = new ParticipantBattleData[GameInfo.max_player_count];
+    public static ParticipantBattleData[] battleDatas { get; set; } = new ParticipantBattleData[GameInfo.MAX_PLAYER_COUNT];
     public static ParticipantBattleData? GetBattleDataByFighterNo(int fighterNo)
     {
         foreach (ParticipantBattleData battleData in battleDatas)

@@ -6947,7 +6947,7 @@ Rigidbody:
   m_GameObject: {fileID: 1291436285644049}
   serializedVersion: 2
   m_Mass: 1
-  m_Drag: Infinity
+  m_Drag: 0
   m_AngularDrag: Infinity
   m_UseGravity: 0
   m_IsKinematic: 0
@@ -6964,8 +6964,8 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 10
-  m_Height: 25
+  m_Radius: 8
+  m_Height: 18
   m_Direction: 2
   m_Center: {x: 0, y: 0, z: 3.5}
 --- !u!114 &1553418874549700788
@@ -6980,7 +6980,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3015566342
+  GlobalObjectIdHash: 1454742248
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -7098,8 +7098,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a97f27b5fab3c4550b504020babd0aed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  finalDestination: {x: 0, y: 0, z: 0}
-  nextDestination: {x: 0, y: 0, z: 0}
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 4194368
 --- !u!1 &1311751778213161
 GameObject:
   m_ObjectHideFlags: 0
@@ -7183,6 +7184,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49d9ca40b3cf346e8b027d643194b665, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  homingTargetNos: 
   homingAngle: 60
   homingDist: 250
   originalNormalBullet: {fileID: 1428546918312979}

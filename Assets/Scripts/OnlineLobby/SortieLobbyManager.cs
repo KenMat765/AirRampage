@@ -36,6 +36,7 @@ public class SortieLobbyManager : NetworkSingleton<SortieLobbyManager>
 
 
     // Participant Determined /////////////////////////////////////////////////////////////////////////////////////////
+    public bool determinationInProgress { get; private set; } = false;
     public async void OnParticipantDetermined()
     {
         // Only the host can determine the participants.
@@ -44,6 +45,8 @@ public class SortieLobbyManager : NetworkSingleton<SortieLobbyManager>
             Debug.LogError("Only the host can determine participants.");
             return;
         }
+
+        determinationInProgress = true;
 
         // Kill Lobby.
         LobbyLinkedData.I.acceptDataChange = false;
@@ -79,7 +82,7 @@ public class SortieLobbyManager : NetworkSingleton<SortieLobbyManager>
 
         // Prepare all fighters.
         Team myTeam = myData.team;
-        for (int m_num = 0; m_num < GameInfo.team_member_count; m_num++)
+        for (int m_num = 0; m_num < GameInfo.TEAM_MEMBER_COUNT; m_num++)
         {
             int number = -1;
             if (LobbyLinkedData.I.TryGetNumber(myTeam, m_num, ref number))
@@ -89,6 +92,8 @@ public class SortieLobbyManager : NetworkSingleton<SortieLobbyManager>
             }
         }
         LobbyFighter.I.PrepareAllFighters(myTeam);
+
+        determinationInProgress = false;
     }
 
 
@@ -166,9 +171,9 @@ public class SortieLobbyManager : NetworkSingleton<SortieLobbyManager>
             string stage_str;
             switch (BattleInfo.stage)
             {
-                case global::Stage.CANYON: stage_str = "Canyon"; break;
-                case global::Stage.SPACE: stage_str = "Space"; break;
-                case global::Stage.SNOWPEAK: stage_str = "SnowPeak"; break;
+                case global::Stage.SUNSET_CITY: stage_str = "SunsetCity"; break;
+                case global::Stage.NULL_SPACE: stage_str = "Space"; break;
+                // case global::Stage.SNOWPEAK: stage_str = "SnowPeak"; break;
                 default: stage_str = "Space"; break;    // Fallback : Space
             }
             NetworkManager.SceneManager.LoadScene(stage_str, UnityEngine.SceneManagement.LoadSceneMode.Single);

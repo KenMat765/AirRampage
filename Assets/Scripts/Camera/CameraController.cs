@@ -22,7 +22,7 @@ public class CameraController : Singleton<CameraController>
     public bool yAxis;
     public bool zAxis;
 
-    public Transform fighterTrans { get; set; }
+    Transform fighterTrans;
 
     Vector3 currentRelativePos = Vector3.zero;
     Vector3 targetRelativePos = Vector3.zero;
@@ -38,7 +38,6 @@ public class CameraController : Singleton<CameraController>
         // Wait until fighterTrans is set from ParticipantManager.
         await UniTask.WaitUntil(() => fighterTrans != null);
 
-        ChangeViewType(viewType);
         default_view = cam.fieldOfView;
     }
 
@@ -63,6 +62,12 @@ public class CameraController : Singleton<CameraController>
             Quaternion slerp_rot = Quaternion.Slerp(transform.rotation, target_rot, rotationSpeed * Time.deltaTime);
             transform.rotation = slerp_rot;
         }
+    }
+
+    public void SetupPlayerCamera(Transform fighter_trans, ViewType view_type)
+    {
+        fighterTrans = fighter_trans;
+        ChangeViewType(view_type);
     }
 
     void ChangeViewType(ViewType new_viewType)

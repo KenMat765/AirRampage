@@ -5,21 +5,35 @@ using UnityEngine;
 // ゲーム内で不変の値を保持
 public class GameInfo : MonoBehaviour
 {
-    public static int max_skill_count { get; } = 5;
-    public static int deck_count { get; } = 4;
-    public static int max_player_count { get; } = 8;
-    public static int team_member_count { get; } = max_player_count / 2;
-    public static int max_weight { get; } = 100;
-    public static int s_generate_coin { get; } = 300;
-    public static int a_generate_coin { get; } = 100;
+    // Number of players.
+    public const int MAX_PLAYER_COUNT = 8;
+    public const int TEAM_MEMBER_COUNT = MAX_PLAYER_COUNT / 2;
+
+    // Skills.
+    public const int MAX_SKILL_COUNT = 5;
+    public const int DECK_COUNT = 4;
+
+    // Ability.
+    public const int MAX_WEIGHT = 100;
+
+    // Coins.
+    public const int S_GENERATE_COIN = 300;
+    public const int A_GENERATE_COIN = 100;
     public static int[] upgrade_coin { get; } = { 100, 200, 300, 400 };
-    public static int max_time_sec { get; } = 600;  // seconds
-    public static int min_time_sec { get; } = 10;  // seconds
+
+    // Game Time.
+    public const int MAX_TIME_SEC = 600;  // seconds
+    public const int MIN_TIME_SEC = 180;  // seconds
+
+    // LayerMask.
+    public static LayerMask redFighterMask { get; } = 1 << 17;
+    public static LayerMask blueFighterMask { get; } = 1 << 18;
     public static LayerMask terrainMask { get; } = 1 << 6;
+    public static LayerMask structureMask { get; } = 1 << 22;
 }
 
 public enum Team { RED, BLUE, NONE }
 
-public enum Rule { CRYSTALHUNTER, BATTLEROYAL, TERMINALCONQUEST, }
+public enum Rule { CRYSTAL_HUNTER, BATTLE_ROYAL, TERMINAL_CONQUEST, }
 
-public enum Stage { SPACE, CANYON, SNOWPEAK }
+public enum Stage { NULL_SPACE, SUNSET_CITY /*SNOWPEAK*/ }
