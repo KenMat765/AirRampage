@@ -76,14 +76,14 @@ class NitroBoost : SkillAssist
         if (BattleInfo.isMulti) attack.SkillEndProccessServerRpc(NetworkManager.Singleton.LocalClientId, skillNo);
     }
 
-    public override void ForceTermination()
+    public override void ForceTermination(bool maintain_charge)
     {
         burner.StopSpark();
         wind.ResetWind();
 
         if (BattleInfo.isMulti && !attack.IsOwner) return;
 
-        base.ForceTermination();
+        base.ForceTermination(maintain_charge);
         attack.fighterCondition.ResumeGradingSpeed();
 
         if (attack.IsLocalPlayer)

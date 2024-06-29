@@ -112,9 +112,9 @@ public class StarGazer : SkillAttack
         gazer_root.transform.localPosition = Vector3.zero;
     }
 
-    public override void ForceTermination()
+    public override void ForceTermination(bool maintain_charge)
     {
-        base.ForceTermination();
+        base.ForceTermination(maintain_charge);
         EndProccess();
         if (root_tweener.IsActive()) root_tweener.Kill();
     }

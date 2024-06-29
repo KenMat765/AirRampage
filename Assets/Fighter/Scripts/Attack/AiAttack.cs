@@ -12,6 +12,7 @@ public class AiAttack : Attack
     // Must be called on every clients.
     public override void OnDeath()
     {
+        base.OnDeath();
         TerminateAllSkills();
     }
 

@@ -94,6 +94,7 @@ public class PlayerAttack : Attack
 
     public override void OnDeath()
     {
+        base.OnDeath();
         TerminateAllSkills();
     }
 

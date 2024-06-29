@@ -36,7 +36,7 @@ public abstract class Attack : NetworkBehaviour
             {
                 if (skill.isUsing)
                 {
-                    skill.ForceTermination();
+                    skill.ForceTermination(true);
                 }
                 skill.isLocked = lock_skill;
             }
@@ -48,14 +48,8 @@ public abstract class Attack : NetworkBehaviour
         {
             if (skill != null)
             {
-                if (fighterCondition.has_skillKeep)
-                {
-                    skill.ForceTermination(true);
-                }
-                else
-                {
-                    skill.ForceTermination();
-                }
+                bool maintain_charge = fighterCondition.has_skillKeep;
+                skill.ForceTermination(maintain_charge);
             }
         }
     }

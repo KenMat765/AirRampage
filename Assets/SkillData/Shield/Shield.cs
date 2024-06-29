@@ -52,11 +52,12 @@ public class Shield : SkillAssist
         // Destroy shield.
         hit_detector.DestroyShield();
 
-        if (BattleInfo.isMulti && attack.IsOwner) attack.SkillEndProccessServerRpc(NetworkManager.Singleton.LocalClientId, skillNo);
+        if (attack.IsOwner) attack.SkillEndProccessServerRpc(NetworkManager.Singleton.LocalClientId, skillNo);
     }
 
-    public override void ForceTermination()
+    public override void ForceTermination(bool maintain_charge)
     {
+        base.ForceTermination(maintain_charge);
         EndProccess();
         hit_detector.TerminateShield();
     }
