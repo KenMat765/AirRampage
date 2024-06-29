@@ -384,17 +384,17 @@ public class AbilityPortManager : Singleton<AbilityPortManager>
         switch (ability.Name)
         {
             case "HP Boost": hp += 20 * sign; break;
-            case "HP Boost - II": hp += 30 * sign; break;
-            case "HP Boost - III": hp += 50 * sign; break;
+            case "HP Boost II": hp += 30 * sign; break;
+            case "HP Boost III": hp += 50 * sign; break;
             case "Berserker": atk += 20 * sign; break;
-            case "Berserker - II": atk += 30 * sign; break;
-            case "Berserker - III": atk += 50 * sign; break;
+            case "Berserker II": atk += 30 * sign; break;
+            case "Berserker III": atk += 50 * sign; break;
             case "Guardian": def += 20 * sign; break;
-            case "Guardian - II": def += 30 * sign; break;
-            case "Guardian - III": def += 50 * sign; break;
+            case "Guardian II": def += 30 * sign; break;
+            case "Guardian III": def += 50 * sign; break;
             case "Lightning": spd += 20 * sign; break;
-            case "Lightning - II": spd += 30 * sign; break;
-            case "Lightning - III": spd += 50 * sign; break;
+            case "Lightning II": spd += 30 * sign; break;
+            case "Lightning III": spd += 50 * sign; break;
         }
     }
 
