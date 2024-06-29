@@ -16,9 +16,9 @@ public abstract class SkillDisturb : Skill
         weapons = new List<Weapon>();
     }
 
-    public override void ForceTermination()
+    public override void ForceTermination(bool maintain_charge)
     {
-        base.ForceTermination();
+        base.ForceTermination(maintain_charge);
         foreach (Weapon weapon in weapons) weapon.TerminateWeapon();
     }
 

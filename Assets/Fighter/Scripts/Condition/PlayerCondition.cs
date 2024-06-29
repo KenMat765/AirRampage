@@ -41,27 +41,11 @@ public class PlayerCondition : FighterCondition
         base.CPUpdate();
     }
 
-    public override void Combo(float inc_cp)
+    public override float Combo(float inc_cp)
     {
-        // Increase combo. (combo is independent of Zone.)
-        combo++;
-        const int combo_thresh = 3;
-        combo_timer = default_combo_timer;
-
-        // Do not increase cp when Zone.
-        if (isZone) return;
-
-        // Increase cp.
-        if (combo >= combo_thresh)
-        {
-            // 3:x1.1, 4:x1.2, ... , 12:x2.0, 13:x2.0
-            float cp_magnif = 1 + 0.1f * (combo - combo_thresh + 1);
-            cp_magnif = Mathf.Clamp(cp_magnif, 1.0f, 2.0f);
-            inc_cp *= cp_magnif;
-            // Book combo repo.
-            uGUIMannager.I.BookCombo(combo, cp_magnif);
-        }
-        cp += inc_cp;
+        float cp_magnif = base.Combo(inc_cp);
+        uGUIMannager.I.BookCombo(combo, cp_magnif);
+        return cp_magnif;
     }
 
     protected override void StartZone()

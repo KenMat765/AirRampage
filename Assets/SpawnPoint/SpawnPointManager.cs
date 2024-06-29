@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using NaughtyAttributes;
 
+// Can not be a Singleton, because SpawnPointManager exists for each game rule
+// Althogh, you can access to SpawnPointManager of current game rule from BattleConductor.spawnPointManager
 public class SpawnPointManager : MonoBehaviour
 {
     public int zakoCountAll;

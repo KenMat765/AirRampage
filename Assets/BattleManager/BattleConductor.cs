@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
-using System.Data;
 
 // Should be called at the very first in scene.
 [DefaultExecutionOrder(-1)]
@@ -80,7 +79,7 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
     }
 
     // Scores of each fighers & zakos of each team.
-    public static int[] individualScores;
+    public NetworkList<int> individualScores;
     public const int score_fighter = 500;   // Score obtained when killed other player.
     public const int score_zako = 50;       // Score obtained when killed zako.
 
@@ -98,15 +97,16 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
     protected override void Awake()
     {
         base.Awake();
+
+        // Init individual scores.
+        individualScores = new NetworkList<int>();
+
         StartCoroutine(GameSetup());
     }
 
 
     IEnumerator GameSetup()
     {
-        // Init individual scores. [Player count (= 8) + Zako (red & blue)]
-        individualScores = new int[GameInfo.MAX_PLAYER_COUNT + 2];
-
         // Push UI to sides before fading in to the scene.
         uGUIMannager.I.EnterExitUI(false, true);
 
@@ -171,6 +171,13 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
 
         // Start Call.
         float call_duration = uGUIMannager.I.CallStart();
+
+        // Only the host can modify NetworkList. [Player count (= 8) + Zako (red & blue)]
+        if (NetworkManager.Singleton.IsHost)
+        {
+            for (int k = 0; k < GameInfo.MAX_PLAYER_COUNT + 2; k++)
+                individualScores.Add(0);
+        }
 
         // Wait for few seconds before starting game.
         yield return new WaitForSeconds(call_duration + 0.2f);

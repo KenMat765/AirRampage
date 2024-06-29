@@ -46,12 +46,12 @@ public class DefenceTuner : SkillAssist
         }
     }
 
-    public override void ForceTermination()
+    public override void ForceTermination(bool maintain_charge)
     {
         effect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 
         if (BattleInfo.isMulti && !attack.IsOwner) return;
 
-        base.ForceTermination();
+        base.ForceTermination(maintain_charge);
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public class PlayerAttack : Attack
@@ -11,7 +12,7 @@ public class PlayerAttack : Attack
     // Blast direction control.
     [SerializeField] float blastRange = 30;
     [SerializeField] float sensitivity = 0.2f;
-    Quaternion muzzleRot;
+    NetworkVariable<Quaternion> muzzleRot = new NetworkVariable<Quaternion>(writePerm: NetworkVariableWritePermission.Owner);
     bool isBlasting = false;
 
     void FixedUpdate()
@@ -34,7 +35,7 @@ public class PlayerAttack : Attack
             {
                 isBlasting = true;
                 blastTimer = setInterval;       // Reset blast timer.
-                muzzleRot = transform.rotation; // Reset muzzle rotation.
+                muzzleRot.Value = transform.rotation; // Reset muzzle rotation.
             }
 
             // Determine blast direction.
@@ -43,7 +44,7 @@ public class PlayerAttack : Attack
             float target_xAngle = Utilities.R2R(-diff_pos.y, 0, blastRange, Utilities.FunctionType.linear, k);
             float target_yAngle = Utilities.R2R(diff_pos.x, 0, blastRange, Utilities.FunctionType.linear, k);
             Quaternion targetRot = Quaternion.Euler(target_xAngle, target_yAngle, 0);
-            muzzleRot = Quaternion.Slerp(muzzleRot, targetRot, sensitivity);
+            muzzleRot.Value = Quaternion.Slerp(muzzleRot.Value, targetRot, sensitivity);
 
             // Count down blast timer.
             blastTimer -= Time.deltaTime;
@@ -84,7 +85,7 @@ public class PlayerAttack : Attack
         // Change rotation of bullet
         if (target == null)
         {
-            bullet.transform.localRotation = muzzleRot;
+            bullet.transform.localRotation = muzzleRot.Value;
         }
 
         blastImpact.Play();
@@ -94,6 +95,7 @@ public class PlayerAttack : Attack
 
     public override void OnDeath()
     {
+        base.OnDeath();
         TerminateAllSkills();
     }
 

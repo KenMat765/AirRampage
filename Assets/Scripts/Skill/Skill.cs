@@ -118,38 +118,17 @@ public abstract class Skill : NetworkBehaviour
     /// <Summary>
     /// 起動中に死亡した時に呼ばれる。基本的にはEndProcessと同様の処理(一部例外のスキルあり)。
     /// </Summary>
-    public virtual void ForceTermination()
-    {
-        if (meter_tweener.IsActive())
-        {
-            meter_tweener.Kill();
-        }
-        elapsed_time = 0;
-        isCharged = false;
-        isUsing = false;
-        ready2Charge = true;
-    }
-
     public virtual void ForceTermination(bool maintain_charge)
     {
         if (meter_tweener.IsActive())
         {
             meter_tweener.Kill();
         }
-        // Reset charge of ALL skills.
-        if (!maintain_charge)
+        // Reset charge of skills.
+        if (!maintain_charge || isUsing)
         {
             elapsed_time = 0;
             isCharged = false;
-        }
-        else
-        {
-            // If the skill was used, reset charge.
-            if (isUsing)
-            {
-                elapsed_time = 0;
-                isCharged = false;
-            }
         }
         isUsing = false;
         ready2Charge = true;

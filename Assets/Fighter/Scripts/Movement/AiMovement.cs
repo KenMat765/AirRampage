@@ -6,11 +6,6 @@ using DG.Tweening;
 
 public class AiMovement : Movement
 {
-    // Emergency Avoidance
-    const float AVOID_DISTANCE = 80;    // Perform an avoidance if the distance is less than this value.
-    bool avoiding = false;
-
-
     protected override void Awake()
     {
         base.Awake();
@@ -26,7 +21,6 @@ public class AiMovement : Movement
 
         latestDestinations = new Vector3[max_cashe];
     }
-
 
     protected override void FixedUpdate()
     {
@@ -61,40 +55,14 @@ public class AiMovement : Movement
     }
 
 
-    public override void Controllable(bool controllable)
-    {
-        base.Controllable(controllable);
-        if (controllable)
-        {
-            switch (BattleInfo.rule)
-            {
-                // Start going to random position when Battle Royal.
-                case Rule.BATTLE_ROYAL: SetFinalDestination(SubTarget.GetRandomPosition()); break;
 
-                // Start going to random opponent terminal.
-                case Rule.TERMINAL_CONQUEST:
-                    targetTerminal = TerminalManager.I.GetOpponentTerminals(fighterCondition.fighterTeam.Value).RandomChoice();
-                    SetFinalDestination(targetTerminal.transform.position, true);
-                    break;
-            }
-        }
-    }
-
-
-    public override void OnRevival()
-    {
-        base.OnRevival();
-
-        // Reset u-turn.
-        if (uTurndirection == -1) uTurndirection = 1;
-
-        // Stop burner effects.
-        burnerController.StopStaticBurner();
-        burnerController.StopSpark();
-    }
-
-
+    // Movement ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     bool can_rotate = true;
+
+    // Emergency Avoidance
+    const float AVOID_DISTANCE = 80;    // Perform an avoidance if the distance is less than this value.
+    bool avoiding = false;
+
     protected override void Rotate()
     {
         if (!can_rotate)
@@ -120,9 +88,28 @@ public class AiMovement : Movement
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
     }
 
+    public override void Controllable(bool controllable)
+    {
+        base.Controllable(controllable);
+        if (controllable)
+        {
+            switch (BattleInfo.rule)
+            {
+                // Start going to random position when Battle Royal.
+                case Rule.BATTLE_ROYAL: SetFinalDestination(SubTarget.GetRandomPosition()); break;
+
+                // Start going to random opponent terminal.
+                case Rule.TERMINAL_CONQUEST:
+                    targetTerminal = TerminalManager.I.GetOpponentTerminals(fighterCondition.fighterTeam.Value).RandomChoice();
+                    SetFinalDestination(targetTerminal.transform.position, true);
+                    break;
+            }
+        }
+    }
 
 
-    // 4アクション ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // 4-Actions ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     [SerializeField] BurnerController burnerController;
     [SerializeField] ParticleSystem rollSpark;
     [SerializeField] AudioSource flipAudio, uturnAudio, rollAudio;
@@ -521,9 +508,37 @@ public class AiMovement : Movement
 
 
 
+    // Death & Revival ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    protected override IEnumerator DeathAnimation()
+    {
+        yield return StartCoroutine(base.DeathAnimation());
+
+        // Return to start position. (Only the owner should control transforms)
+        if (IsOwner)
+        {
+            int no = fighterCondition.fighterNo.Value;
+            SpawnPointFighter point = BattleConductor.spawnPointManager.GetSpawnPointFighter(no);
+            Transform point_trans = point.transform;
+            transform.position = point_trans.position;
+            transform.rotation = point_trans.rotation;
+        }
+    }
+
+    public override void OnRevival()
+    {
+        base.OnRevival();
+
+        // Reset u-turn.
+        if (uTurndirection == -1) uTurndirection = 1;
+
+        // Stop burner effects.
+        burnerController.StopStaticBurner();
+        burnerController.StopSpark();
+    }
 
 
 
+    // For Debug ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     void OnDrawGizmos()
     {
         if (!controllable) return;

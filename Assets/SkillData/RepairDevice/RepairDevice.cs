@@ -41,12 +41,12 @@ public class RepairDevice : SkillHeal
         else attack.SkillActivatorServerRpc(NetworkManager.Singleton.LocalClientId, skillNo);
     }
 
-    public override void ForceTermination()
+    public override void ForceTermination(bool maintain_charge)
     {
         effect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 
         if (!attack.IsOwner) return;
 
-        base.ForceTermination();
+        base.ForceTermination(maintain_charge);
     }
 }

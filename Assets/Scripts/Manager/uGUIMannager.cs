@@ -774,7 +774,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
                     {
                         // Just set scores to UI.
                         int zako_no = no;
-                        seq.Join(DOTween.To(() => scores_float[zako_no], (value) => scores_float[zako_no] = value, BattleConductor.individualScores[zako_no], score_update_duration)
+                        seq.Join(DOTween.To(() => scores_float[zako_no], (value) => scores_float[zako_no] = value, BattleConductor.I.individualScores[zako_no], score_update_duration)
                             .OnUpdate(() => fighter_scores[zako_no].text = Mathf.CeilToInt(scores_float[zako_no]).ToString()));
                         continue;
                     }
@@ -801,7 +801,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
 
                     // Set individual scores to UI.
                     int fighter_no = no;
-                    seq.Join(DOTween.To(() => scores_float[fighter_no], (value) => scores_float[fighter_no] = value, BattleConductor.individualScores[fighter_no], score_update_duration)
+                    seq.Join(DOTween.To(() => scores_float[fighter_no], (value) => scores_float[fighter_no] = value, BattleConductor.I.individualScores[fighter_no], score_update_duration)
                         .OnUpdate(() => fighter_scores[ui_idx].text = Mathf.CeilToInt(scores_float[fighter_no]).ToString()));
                 }
                 break;
@@ -968,14 +968,15 @@ public class uGUIMannager : Singleton<uGUIMannager>
         // Do not edit fillAmount of cp & zone meters while animating zone.
         if (animating_zone) return;
 
+        cp_meter.fillAmount = playerInfo.fighterCondition.cp / playerInfo.fighterCondition.full_cp;
+
         if (playerInfo.fighterCondition.isZone)
         {
-            cp_meter.fillAmount = playerInfo.fighterCondition.cp / playerInfo.fighterCondition.full_cp;
             zone_meter.fillAmount = playerInfo.fighterCondition.cp / playerInfo.fighterCondition.full_cp;
         }
         else
         {
-            cp_meter.fillAmount = playerInfo.fighterCondition.cp / playerInfo.fighterCondition.full_cp;
+            zone_meter.fillAmount = 0;
         }
     }
 
@@ -1017,7 +1018,18 @@ public class uGUIMannager : Singleton<uGUIMannager>
         {
             combo_displayed = true;
             combo.text = "COMBO x" + combo_count;
-            cp_bonus.text = "CP BONUS x" + cp_magnif.ToString("f1");
+
+            // Do not show CP magnification if it's 0 (ex: when zone)
+            if (cp_magnif == 0)
+            {
+                cp_bonus.text = "";
+            }
+            else
+            {
+                cp_bonus.text = "CP BONUS x" + cp_magnif.ToString("f1");
+            }
+
+            // Change color by combo count.
             if (3 <= combo_count && combo_count <= 6)
             {
                 combo.colorGradientPreset = gradv_green;

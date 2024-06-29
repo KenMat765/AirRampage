@@ -452,12 +452,12 @@ public abstract class FighterCondition : NetworkBehaviour
     public bool isZone { get; set; }
 
     // Constants
-    public float full_cp { get; set; } = 10; // CP necessary to get in the Zone.
+    public float full_cp { get; set; } = 10000; // CP necessary to get in the Zone.
     public abstract float my_cp { get; set; }   // CP to give to opponent when killed.
     protected float dec_cp_per_sec = 5; // Decreasing amount of CP over time.
     protected float cp_maintain = 0f;   // 0.0 (maintain none) ~ 1.0 (maintain all)
     protected float default_combo_timer;    // Time until the combo runs out.
-    protected float default_zone_timer = 30;    // Duration of zone.
+    protected float default_zone_timer = 15;    // Duration of zone.
 
     protected void CPStart()
     {
@@ -511,7 +511,7 @@ public abstract class FighterCondition : NetworkBehaviour
         zone_timer = default_zone_timer;
     }
 
-    public virtual void Combo(float inc_cp)
+    public virtual float Combo(float inc_cp)
     {
         // Increase combo. (combo is independent of Zone.)
         combo++;
@@ -538,16 +538,17 @@ public abstract class FighterCondition : NetworkBehaviour
         }
 
         // Do not increase cp when Zone.
-        if (isZone) return;
+        if (isZone) return 0;
 
-        // Increase cp.
+        // Magnify CP if combo is over combo_thresh.
+        float cp_magnif = 1;
         if (combo >= combo_thresh)
         {
             // 3:x1.1, 4:x1.2, ... , 12:x2.0, 13:x2.0
-            float cp_magnif = 1 + 0.1f * (combo - combo_thresh + 1);
+            cp_magnif = 1 + 0.1f * (combo - combo_thresh + 1);
             cp_magnif = Mathf.Clamp(cp_magnif, 1.0f, 2.0f);
-            inc_cp *= cp_magnif;
         }
+        inc_cp *= cp_magnif;
 
         // Bonus of ability.
         if (has_deepAbsorb)
@@ -555,7 +556,11 @@ public abstract class FighterCondition : NetworkBehaviour
             inc_cp *= 1.5f;
         }
 
+        // Increase cp.
         cp += inc_cp;
+
+        // Return magnification of CP. (Used in uGUIManager)
+        return cp_magnif;
     }
 
     protected virtual void StartZone()
@@ -640,6 +645,7 @@ public abstract class FighterCondition : NetworkBehaviour
             PowerResetter();
             DefenceResetter();
             CPResetter();
+            EndZone();
         }
     }
 

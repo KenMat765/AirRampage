@@ -141,6 +141,7 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
     {
         for (int no = 0; no < GameInfo.MAX_PLAYER_COUNT; no++)
         {
+            // Get battle data of this fighter.
             BattleInfo.ParticipantBattleData? battleData_nullable = BattleInfo.GetBattleDataByFighterNo(no);
             if (!battleData_nullable.HasValue)
             {
@@ -149,6 +150,9 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
             }
             BattleInfo.ParticipantBattleData battleData = (BattleInfo.ParticipantBattleData)battleData_nullable;
 
+            // GameObject & SpawnPoint of spawning fighter.
+            GameObject fighter;
+            SpawnPointFighter point = spawnPointManager.GetSpawnPointFighter(no);
 
             // If Player ////////////////////////////////////////////////////////////////////////
             if (battleData.isPlayer)
@@ -163,8 +167,6 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
                 ulong clientId = (ulong)clientId_nullable;
 
                 // Create fighter.
-                GameObject fighter;
-                SpawnPointFighter point = spawnPointManager.GetSpawnPointFighter(no);
                 if (battleData.team == Team.RED)
                 {
                     fighter = Instantiate(redPlayerPrefab, point.transform.position, point.transform.rotation);
@@ -177,21 +179,12 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
                 // Spawn fighter.
                 NetworkObject networkObject = fighter.GetComponent<NetworkObject>();
                 networkObject.SpawnAsPlayerObject(clientId, true);
-
-                // Set fighterNo & fighterName at fighter condition. (Initialize NetworkVariables AFTER spawning)
-                FighterCondition fighterCondition = fighter.GetComponent<FighterCondition>();
-                fighterCondition.fighterNo.Value = battleData.fighterNo;
-                fighterCondition.fighterName.Value = battleData.name;
-                fighterCondition.fighterTeam.Value = battleData.team;
             }
-
 
             // If AI ////////////////////////////////////////////////////////////////////////////
             else
             {
                 // Create fighter.
-                GameObject fighter;
-                SpawnPointFighter point = spawnPointManager.GetSpawnPointFighter(no);
                 if (battleData.team == Team.RED)
                 {
                     fighter = Instantiate(redAiPrefab, point.transform.position, point.transform.rotation);
@@ -204,13 +197,13 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
                 // Spawn fighter.
                 NetworkObject networkObject = fighter.GetComponent<NetworkObject>();
                 networkObject.Spawn(true);
-
-                // Set fighterNo at fighter & team condition.
-                FighterCondition fighterCondition = fighter.GetComponent<FighterCondition>();
-                fighterCondition.fighterNo.Value = battleData.fighterNo;
-                fighterCondition.fighterName.Value = battleData.name;
-                fighterCondition.fighterTeam.Value = battleData.team;
             }
+
+            // Set NetworkVariables in fighter condition. (Initialize NetworkVariables AFTER spawning)
+            FighterCondition fighterCondition = fighter.GetComponent<FighterCondition>();
+            fighterCondition.fighterNo.Value = battleData.fighterNo;
+            fighterCondition.fighterName.Value = battleData.name;
+            fighterCondition.fighterTeam.Value = battleData.team;
         }
     }
 

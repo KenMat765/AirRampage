@@ -50,9 +50,8 @@ public class ZakoAttack : Attack
 
                 // Blast normal bullets.
                 NormalRapid(rapidCount, target);
-
-                // If multiplayer, send to all clones to blast bullets.
-                if (BattleInfo.isMulti) NormalRapidClientRpc(OwnerClientId, targetNo, rapidCount);
+                // Send to all clones to blast bullets.
+                NormalRapidClientRpc(OwnerClientId, rapidCount, targetNo);
             }
         }
     }

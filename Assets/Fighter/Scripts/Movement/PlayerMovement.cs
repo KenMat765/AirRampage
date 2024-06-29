@@ -36,28 +36,10 @@ public class PlayerMovement : Movement
 
 
 
-    public override void OnRevival()
-    {
-        base.OnRevival();
-
-        // Reset u-turn.
-        if (uTurndirection == -1)
-        {
-            uTurndirection = 1;
-            if (!IsOwner) return;
-            CameraController.I.TurnCamera(uTurndirection);
-        }
-
-        // Stop burner effects.
-        burnerController.StopStaticBurner();
-        burnerController.StopSpark();
-    }
-
-
-
-    float maxRotSpeed = 40;
-    public int stickReverse { get; set; } = -1;    // 設定で変更可能に
+    // Movement ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     bool can_rotate = true;
+    public float maxRotSpeed { get; set; } = 40; // Might be changeable by availability.
+    public int stickReverse { get; set; } = -1; // TODO: make this changeable by settings.
 
     protected override void Rotate()
     {
@@ -109,9 +91,6 @@ public class PlayerMovement : Movement
         }
     }
 
-
-
-    // 機体の傾きを戻す ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     void FixTilt()
     {
         const float fix_time = 0.05f;
@@ -120,7 +99,7 @@ public class PlayerMovement : Movement
 
 
 
-    // 4アクション ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 4-Actions ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     [SerializeField] BurnerController burnerController;
     [SerializeField] ParticleSystem rollSpark;
     [SerializeField] AudioSource flipAudio, uturnAudio, rollAudio;
@@ -274,5 +253,40 @@ public class PlayerMovement : Movement
         else if (Input.GetKeyDown(KeyCode.LeftArrow)) { LeftRoll(0.2f); }
         else if (Input.GetKeyDown(KeyCode.RightArrow)) { RightRoll(0.2f); }
 #endif
+    }
+
+
+
+    // Death & Revival ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    protected override IEnumerator DeathAnimation()
+    {
+        yield return StartCoroutine(base.DeathAnimation());
+
+        // Return to start position. (Only the owner should control transforms)
+        if (IsOwner)
+        {
+            int no = fighterCondition.fighterNo.Value;
+            SpawnPointFighter point = BattleConductor.spawnPointManager.GetSpawnPointFighter(no);
+            Transform point_trans = point.transform;
+            transform.position = point_trans.position;
+            transform.rotation = point_trans.rotation;
+        }
+    }
+
+    public override void OnRevival()
+    {
+        base.OnRevival();
+
+        // Reset u-turn.
+        if (uTurndirection == -1)
+        {
+            uTurndirection = 1;
+            if (!IsOwner) return;
+            CameraController.I.TurnCamera(uTurndirection);
+        }
+
+        // Stop burner effects.
+        burnerController.StopStaticBurner();
+        burnerController.StopSpark();
     }
 }
