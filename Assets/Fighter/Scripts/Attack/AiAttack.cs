@@ -42,17 +42,16 @@ public class AiAttack : Attack
         // Only the owner (= host) executes the following processes.
         if (!IsHost) return;
 
-        SetHomingTargetNos();
-
-        // Search for Attackable Terminals. /////////////////////////////////////////////////////////////////////
-        if (BattleInfo.rule == Rule.TERMINAL_CONQUEST) SearchAttackableTerminals();
-
-
         // Normal Blast. ////////////////////////////////////////////////////////////////////////////////////////
-        if (homingCount > 0 || (BattleInfo.rule == Rule.TERMINAL_CONQUEST && attackableTerminals.Count > 0))
+        if (blastTimer > 0) blastTimer -= Time.deltaTime;
+
+        else
         {
-            blastTimer -= Time.deltaTime;
-            if (blastTimer < 0)
+            // Search targets. (Fighters or Terminals)
+            SetHomingTargetNos();
+            if (BattleInfo.rule == Rule.TERMINAL_CONQUEST) SearchAttackableTerminals();
+
+            if (homingCount > 0 || (BattleInfo.rule == Rule.TERMINAL_CONQUEST && attackableTerminals.Count > 0))
             {
                 // Reset timer.
                 blastTimer = setInterval;
@@ -71,14 +70,9 @@ public class AiAttack : Attack
                 // Blast normal bullets for yourself.
                 NormalRapid(rapidCount, target);
                 // Send to all clones to blast bullets.
-                NormalRapidClientRpc(OwnerClientId, targetNo, rapidCount);
+                NormalRapidClientRpc(OwnerClientId, rapidCount, targetNo);
             }
         }
-        else
-        {
-            blastTimer = setInterval;
-        }
-
 
         // Activate Skills. /////////////////////////////////////////////////////////////////////////////////////
         for (int skill_num = 0; skill_num < skills.Length; skill_num++)
