@@ -640,6 +640,7 @@ public abstract class FighterCondition : NetworkBehaviour
             PowerResetter();
             DefenceResetter();
             CPResetter();
+            EndZone();
         }
     }
 

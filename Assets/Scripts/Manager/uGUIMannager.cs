@@ -968,14 +968,15 @@ public class uGUIMannager : Singleton<uGUIMannager>
         // Do not edit fillAmount of cp & zone meters while animating zone.
         if (animating_zone) return;
 
+        cp_meter.fillAmount = playerInfo.fighterCondition.cp / playerInfo.fighterCondition.full_cp;
+
         if (playerInfo.fighterCondition.isZone)
         {
-            cp_meter.fillAmount = playerInfo.fighterCondition.cp / playerInfo.fighterCondition.full_cp;
             zone_meter.fillAmount = playerInfo.fighterCondition.cp / playerInfo.fighterCondition.full_cp;
         }
         else
         {
-            cp_meter.fillAmount = playerInfo.fighterCondition.cp / playerInfo.fighterCondition.full_cp;
+            zone_meter.fillAmount = 0;
         }
     }
 
