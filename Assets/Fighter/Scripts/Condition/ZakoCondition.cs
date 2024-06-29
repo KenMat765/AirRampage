@@ -6,10 +6,10 @@ using Unity.Netcode;
 public class ZakoCondition : FighterCondition
 {
     public override float my_cp { get; set; } = 200;
-
     public override float revivalTime { get; set; } = 3;
     public FighterArray fighterArray { get; set; }
     [SerializeField] GameObject red_body, blue_body;
+    public NetworkVariable<int> spawnPointNo { get; set; } = new NetworkVariable<int>();
 
     public void ChangeTeam(Team new_team)
     {

@@ -204,7 +204,6 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
             fighterCondition.fighterNo.Value = battleData.fighterNo;
             fighterCondition.fighterName.Value = battleData.name;
             fighterCondition.fighterTeam.Value = battleData.team;
-            fighterCondition.spawnPointNo.Value = point.pointNo;
         }
     }
 

@@ -265,8 +265,8 @@ public class PlayerMovement : Movement
         // Return to start position. (Only the owner should control transforms)
         if (IsOwner)
         {
-            int spawnPoint_no = fighterCondition.spawnPointNo.Value;
-            SpawnPointFighter point = BattleConductor.spawnPointManager.GetSpawnPointFighter(spawnPoint_no);
+            int no = fighterCondition.fighterNo.Value;
+            SpawnPointFighter point = BattleConductor.spawnPointManager.GetSpawnPointFighter(no);
             Transform point_trans = point.transform;
             transform.position = point_trans.position;
             transform.rotation = point_trans.rotation;

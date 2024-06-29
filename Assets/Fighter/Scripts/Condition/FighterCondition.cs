@@ -88,7 +88,7 @@ public abstract class FighterCondition : NetworkBehaviour
     public NetworkVariable<int> fighterNo = new NetworkVariable<int>();   // How many participant is this fighter.
     public NetworkVariable<FixedString32Bytes> fighterName = new NetworkVariable<FixedString32Bytes>();
     public NetworkVariable<Team> fighterTeam = new NetworkVariable<Team>();
-    public NetworkVariable<int> spawnPointNo { get; set; } = new NetworkVariable<int>();
+
 
 
     // HP ///////////////////////////////////////////////////////////////////////////////////////////////////////////
