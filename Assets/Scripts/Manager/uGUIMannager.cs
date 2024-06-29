@@ -1018,7 +1018,18 @@ public class uGUIMannager : Singleton<uGUIMannager>
         {
             combo_displayed = true;
             combo.text = "COMBO x" + combo_count;
-            cp_bonus.text = "CP BONUS x" + cp_magnif.ToString("f1");
+
+            // Do not show CP magnification if it's 0 (ex: when zone)
+            if (cp_magnif == 0)
+            {
+                cp_bonus.text = "";
+            }
+            else
+            {
+                cp_bonus.text = "CP BONUS x" + cp_magnif.ToString("f1");
+            }
+
+            // Change color by combo count.
             if (3 <= combo_count && combo_count <= 6)
             {
                 combo.colorGradientPreset = gradv_green;

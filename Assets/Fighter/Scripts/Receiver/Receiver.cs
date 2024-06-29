@@ -42,9 +42,12 @@ public class Receiver : NetworkBehaviour
             return;
         }
 
-        // Give combo to destroyer.
+        // Give combo to destroyer. (Only the owner of the destroyer needs to count combos)
         FighterCondition destroyer_condition = ParticipantManager.I.fighterInfos[destroyerNo].fighterCondition;
-        destroyer_condition.Combo(fighterCondition.my_cp);
+        if (destroyer_condition.IsOwner)
+        {
+            destroyer_condition.Combo(fighterCondition.my_cp);
+        }
     }
 
     public virtual void OnRevival()
