@@ -5,93 +5,15 @@ using UnityEngine;
 using Unity.Netcode;
 using Cysharp.Threading.Tasks;
 using System;
-using DG.Tweening;
 
 // 機体を動かすクラス
 public abstract class Movement : NetworkBehaviour
 {
     public FighterCondition fighterCondition { get; set; }
 
-    // Used for death animation.
-    Rigidbody rigidBody;
-    Transform explosion2Trans;
-    AudioSource explosionSound1, explosionSound2;
-    ParticleSystem explosion1, explosion2, explosionTrail;
-
-    // Is called at every clients.
-    public virtual void OnDeath()
-    {
-        ready4action = false;
-        StartCoroutine(DeathAnimation());
-    }
-
-    IEnumerator DeathAnimation()
-    {
-        // Start falling, and play first explision effect.
-        rigidBody.useGravity = true;
-        explosion1.Play();
-        explosionSound1.Play();
-        explosionTrail.Play();
-
-        // 1.6f : effect play time of explosion dead.
-        yield return new WaitForSeconds(2.0f);
-
-        // Stop falling, and play second explision effect.
-        rigidBody.useGravity = false;
-        rigidBody.velocity = Vector3.zero;
-        // Put out explosion2 from fighterbody before deactivating fighterbody.
-        explosion2Trans.parent = transform;
-        explosion2.Play();
-        explosionSound2.Play();
-        explosionTrail.Stop();
-        fighterCondition.body.SetActive(false);
-
-        // 1.6f : effect play time of explosion dead.
-        yield return new WaitForSeconds(1.8f);
-
-        // Return to start position.
-        transform.position = start_pos;
-        transform.rotation = start_rot;
-        // Put back explosion2.
-        explosion2Trans.parent = fighterCondition.body.transform;
-        explosion2Trans.localPosition = Vector3.zero;
-    }
-
-    // Must be called on every clients.
-    public virtual async void OnRevival()
-    {
-        GameObject body = fighterCondition.body;
-        body.transform.localPosition = Vector3.zero;
-        body.SetActive(true);
-        await UniTask.Delay(TimeSpan.FromSeconds(3));
-        ready4action = true;
-    }
-
-
-    Vector3 start_pos;
-    Quaternion start_rot;
-
-    protected const float maxTiltX = 55;  //縦
-    protected const float maxTiltZ = 60;  //左右
-
-    Collider col;
-
-    // Enables rotation & 4actions when true.
-    protected bool controllable { get; private set; } = false;
-    public virtual void Controllable(bool controllable)
-    {
-        this.controllable = controllable;
-        // If controllable, enable collider to detect collision to obstacles.
-        col.enabled = controllable;
-    }
-
-
-
     protected virtual void Awake()
     {
         fighterCondition = GetComponent<FighterCondition>();
-        start_pos = transform.position;
-        start_rot = transform.rotation;
         col = GetComponent<Collider>();
         col.enabled = false;
 
@@ -120,6 +42,13 @@ public abstract class Movement : NetworkBehaviour
         FourActionExe();
     }
 
+
+
+    // Movement ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    protected const float maxTiltX = 55;  //縦
+    protected const float maxTiltZ = 60;  //左右
+    Collider col;
+
     protected void MoveForward()
     {
         float speed = fighterCondition.speed;
@@ -136,9 +65,18 @@ public abstract class Movement : NetworkBehaviour
 
     protected abstract void Rotate();
 
+    // Enables rotation & 4actions when true.
+    protected bool controllable { get; private set; } = false;
+    public virtual void Controllable(bool controllable)
+    {
+        this.controllable = controllable;
+        // If controllable, enable collider to detect collision to obstacles.
+        col.enabled = controllable;
+    }
 
 
-    // 4アクション ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // 4-Actions ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     protected Animator anim;
     protected float uturnTime, flipTime, rollTime;
 
@@ -236,6 +174,61 @@ public abstract class Movement : NetworkBehaviour
             }
             fighterCondition.Death(-1, Receiver.SPECIFIC_DEATH_COLLISION);
         }
+    }
+
+
+
+    // Death & Revival ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Used for death animation.
+    Rigidbody rigidBody;
+    Transform explosion2Trans;
+    AudioSource explosionSound1, explosionSound2;
+    ParticleSystem explosion1, explosion2, explosionTrail;
+
+    // Is called at every clients.
+    public virtual void OnDeath()
+    {
+        ready4action = false;
+        StartCoroutine(DeathAnimation());
+    }
+
+    protected virtual IEnumerator DeathAnimation()
+    {
+        // Start falling, and play first explision effect.
+        rigidBody.useGravity = true;
+        explosion1.Play();
+        explosionSound1.Play();
+        explosionTrail.Play();
+
+        // 1.6f : effect play time of explosion dead.
+        yield return new WaitForSeconds(2.0f);
+
+        // Stop falling, and play second explision effect.
+        rigidBody.useGravity = false;
+        rigidBody.velocity = Vector3.zero;
+        // Put out explosion2 from fighterbody before deactivating fighterbody.
+        explosion2Trans.parent = transform;
+        explosion2.Play();
+        explosionSound2.Play();
+        explosionTrail.Stop();
+        fighterCondition.body.SetActive(false);
+
+        // 1.6f : effect play time of explosion dead.
+        yield return new WaitForSeconds(1.8f);
+
+        // Put back explosion2.
+        explosion2Trans.parent = fighterCondition.body.transform;
+        explosion2Trans.localPosition = Vector3.zero;
+    }
+
+    // Must be called on every clients.
+    public virtual async void OnRevival()
+    {
+        GameObject body = fighterCondition.body;
+        body.transform.localPosition = Vector3.zero;
+        body.SetActive(true);
+        await UniTask.Delay(TimeSpan.FromSeconds(3));
+        ready4action = true;
     }
 
 
