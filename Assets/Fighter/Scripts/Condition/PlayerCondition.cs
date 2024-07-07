@@ -60,6 +60,11 @@ public class PlayerCondition : FighterCondition
         uGUIMannager.I.EndZoneAnim();
     }
 
+    protected override void OnDeath(int destroyerNo, string causeOfDeath)
+    {
+        base.OnDeath(destroyerNo, causeOfDeath);
+        ReportDeath(destroyerNo, causeOfDeath);
+    }
 
     public override float revivalTime { get; set; } = 7;
     protected override void OnRevival()

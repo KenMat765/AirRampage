@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using DG.Tweening;
@@ -14,13 +13,6 @@ public class Receiver : NetworkBehaviour
 
     // Collider needs to be disabled, in order not to be detected by other fighter as homing target.
     Collider col;
-
-    // Causes of death.
-    public const string DEATH_NORMAL_BLAST = "NormalBlast";
-    public const string SPECIFIC_DEATH_CRYSTAL = "Crystal Kill";        // Specific death (Death other than enemy attacks)
-    public const string SPECIFIC_DEATH_COLLISION = "Collision Crash";   // Specific death (Death other than enemy attacks)
-    static string[] specificDeath = { SPECIFIC_DEATH_CRYSTAL, SPECIFIC_DEATH_COLLISION };
-    public static bool IsSpecificDeath(string causeOfDeath) { return specificDeath.Contains(causeOfDeath); }
 
 
     void Awake()
@@ -35,49 +27,11 @@ public class Receiver : NetworkBehaviour
     public virtual void OnDeath(int destroyerNo, string causeOfDeath)
     {
         col.enabled = false;
-
-        // If specific cause of death. (Not killed by enemy)
-        if (IsSpecificDeath(causeOfDeath))
-        {
-            return;
-        }
-
-        // Give combo to destroyer. (Only the owner of the destroyer needs to count combos)
-        FighterCondition destroyer_condition = ParticipantManager.I.fighterInfos[destroyerNo].fighterCondition;
-        if (destroyer_condition.IsOwner)
-        {
-            destroyer_condition.Combo(fighterCondition.my_cp);
-        }
     }
 
     public virtual void OnRevival()
     {
         col.enabled = true;
-    }
-
-    // Tell uGUIManager to report death of this fighter. (Called from Player and AI fighters)
-    protected void ReportDeath(int destroyerNo, string causeOfDeath)
-    {
-        string my_name = fighterCondition.fighterName.Value.ToString();
-        Team my_team = fighterCondition.fighterTeam.Value;
-
-        // Specific cause of death.
-        if (IsSpecificDeath(causeOfDeath))
-        {
-            uGUIMannager.I.BookRepo(causeOfDeath, my_name, my_team, causeOfDeath);
-            return;
-        }
-
-        // Death by enemy attacks.
-        string destroyer_name = ParticipantManager.I.fighterInfos[destroyerNo].fighterCondition.fighterName.Value.ToString();
-        if (causeOfDeath == DEATH_NORMAL_BLAST)
-        {
-            uGUIMannager.I.BookRepo(destroyer_name, my_name, my_team, causeOfDeath);
-        }
-        else
-        {
-            uGUIMannager.I.BookRepo(destroyer_name, my_name, my_team, causeOfDeath);
-        }
     }
 
 
@@ -87,25 +41,25 @@ public class Receiver : NetworkBehaviour
     public string lastSkillName { get; private set; }
 
     // Call : Server + Owner.
-    public void LastShooterDetector(int fighterNo, string skillName)
+    public void LastShooterDetector(int fighterNo, string causeOfDeath)
     {
         lastShooterNo = fighterNo;
-        lastSkillName = skillName;
+        lastSkillName = causeOfDeath;
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void LastShooterDetectorServerRpc(int fighterNo, string skillName)
+    public void LastShooterDetectorServerRpc(int fighterNo, string causeOfDeath)
     {
         // Call in server too.
-        LastShooterDetector(fighterNo, skillName);
-        if (!IsOwner) LastShooterDetectorClientRpc(fighterNo, skillName);
+        LastShooterDetector(fighterNo, causeOfDeath);
+        if (!IsOwner) LastShooterDetectorClientRpc(fighterNo, causeOfDeath);
     }
 
     [ClientRpc]
-    public void LastShooterDetectorClientRpc(int fighterNo, string skillName)
+    public void LastShooterDetectorClientRpc(int fighterNo, string causeOfDeath)
     {
         // Call in owner.
-        if (IsOwner) LastShooterDetector(fighterNo, skillName);
+        if (IsOwner) LastShooterDetector(fighterNo, causeOfDeath);
     }
 
 
@@ -118,6 +72,7 @@ public class Receiver : NetworkBehaviour
     {
         if (!IsOwner) return;
 
+        // Shake fighter body.
         if (!hitSeq.IsActive())
         {
             Vector3 rot_strength = new Vector3(0, 0, 60);

@@ -565,13 +565,13 @@ public class uGUIMannager : Singleton<uGUIMannager>
                 }
 
                 // Specific cause of death.
-                if (Receiver.IsSpecificDeath(causeOfDeath))
+                if (FighterCondition.IsSpecificDeath(causeOfDeath))
                 {
                     destroyerTex.colorGradientPreset = gradv_gray;
                     skill_icon.enabled = false;
                 }
                 // Killed by normal blast.
-                else if (causeOfDeath == Receiver.DEATH_NORMAL_BLAST)
+                else if (causeOfDeath == FighterCondition.DEATH_NORMAL_BLAST)
                 {
                     skill_icon.enabled = false;
                 }

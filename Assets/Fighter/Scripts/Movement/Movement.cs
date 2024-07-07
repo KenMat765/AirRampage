@@ -172,7 +172,7 @@ public abstract class Movement : NetworkBehaviour
                 Debug.Log("<color=red>Hit object</color>", col.gameObject);
                 // Time.timeScale = 0;
             }
-            fighterCondition.Death(-1, Receiver.SPECIFIC_DEATH_COLLISION);
+            fighterCondition.Death(-1, FighterCondition.SPECIFIC_DEATH_COLLISION);
         }
     }
 

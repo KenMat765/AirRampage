@@ -7,9 +7,9 @@ TerrainLayer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: CanyonLayer3
-  m_DiffuseTexture: {fileID: 2800000, guid: 30a69dad1642b4c21adbabaeae724fea, type: 3}
-  m_NormalMapTexture: {fileID: 2800000, guid: 15b8cf0f2c0944b8cb800b31f159eaf8, type: 3}
-  m_MaskMapTexture: {fileID: 2800000, guid: e86321d5e526849e6a64ddcfad994aa3, type: 3}
+  m_DiffuseTexture: {fileID: 2800000, guid: 09bf5c6b49f0740a28d30edab2405938, type: 3}
+  m_NormalMapTexture: {fileID: 2800000, guid: 1fd4e3e1b907d422da743e9d690f3dff, type: 3}
+  m_MaskMapTexture: {fileID: 2800000, guid: 864d841f0497f472b8be0b4c8e1c5337, type: 3}
   m_TileSize: {x: 30, y: 30}
   m_TileOffset: {x: 0, y: 0}
   m_Specular: {r: 0, g: 0, b: 0, a: 0}

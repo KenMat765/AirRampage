@@ -142,7 +142,7 @@ public abstract class Attack : NetworkBehaviour
     [SerializeField] protected GameObject originalNormalBullet;
     [SerializeField] protected ParticleSystem blastImpact;
     [SerializeField] protected AudioSource blastSound;
-    protected List<Weapon> normalWeapons;
+    protected List<Weapon> normalWeapons = new List<Weapon>();
     protected abstract int rapidCount { get; set; }
     protected float blastTimer { get; set; }
     HomingType homingType = HomingType.PreHoming;
@@ -151,27 +151,25 @@ public abstract class Attack : NetworkBehaviour
     public abstract float setInterval { get; set; }
     public float power = 1, speed = 150, lifespan = 1;
 
+    // This if DEATH_NORMAL_BLAST for fighters, but change this to SPECIFIC_DEATH_CANNON for cannons.
+    protected virtual string causeOfDeath { get; set; } = FighterCondition.DEATH_NORMAL_BLAST;
+
     protected void PoolNormalBullets(int quantity)
     {
-        Vector3 bullet_position = originalNormalBullet.transform.position;
-        Quaternion bullet_rotation = originalNormalBullet.transform.rotation;
-
-        normalWeapons = new List<Weapon>();
-
+        Transform orig_trans = originalNormalBullet.transform;
         for (int k = 0; k < quantity; k++)
         {
-            GameObject bullet = Instantiate(originalNormalBullet, bullet_position, bullet_rotation, transform);
+            GameObject bullet = Instantiate(originalNormalBullet, orig_trans.position, orig_trans.rotation, transform);
             Weapon weapon = bullet.GetComponent<Weapon>();
             normalWeapons.Add(weapon);
-            weapon.WeaponSetter(gameObject, this, false, "NormalBlast");
+            weapon.WeaponSetter(gameObject, this, false, causeOfDeath);
             weapon.WeaponParameterSetter(power, speed, lifespan, homingType);
         }
     }
 
     protected int GetNormalBulletIndex()
     {
-        Vector3 bullet_position = originalNormalBullet.transform.position;
-        Quaternion bullet_rotation = originalNormalBullet.transform.rotation;
+        // Get ready weapon.
         foreach (Weapon normalWeapon in normalWeapons)
         {
             if (normalWeapon.weapon_ready)
@@ -179,12 +177,10 @@ public abstract class Attack : NetworkBehaviour
                 return normalWeapons.IndexOf(normalWeapon);
             }
         }
-        GameObject newBullet = Instantiate(originalNormalBullet, bullet_position, bullet_rotation, transform);   //全て使用中だったら新たに作成
-        Weapon newWeapon = newBullet.GetComponent<Weapon>();
-        normalWeapons.Add(newWeapon);
-        newWeapon.WeaponSetter(gameObject, this, false, "NormalBlast");
-        newWeapon.WeaponParameterSetter(power, speed, lifespan, homingType);
-        return normalWeapons.IndexOf(newWeapon);
+
+        // Create new weapon if all weapons were not ready.
+        PoolNormalBullets(1);
+        return normalWeapons.Count - 1;
     }
 
     ///<param name="target"> Put null when there are no targets. </param>

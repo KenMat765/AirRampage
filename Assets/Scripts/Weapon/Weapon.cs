@@ -82,6 +82,7 @@ public abstract class Weapon : Utilities
 
 
     // Receiverに受け渡す要素 /////////////////////////////////////////////////////////////////////////////////////////////
+    string causeOfDeath;
     protected float power_temp { get; private set; }
 
     protected bool speedDown { get; private set; }
@@ -103,10 +104,14 @@ public abstract class Weapon : Utilities
     // Skillからセット //////////////////////////////////////////////////////////////////////////////////////////////////
     GameObject owner;    // owner is figherbody, not Fighter
     bool isSkill;
-    string skill_name;
     System.Func<float> StayMotion = null;
     Attack attack;
     GameObject targetObject = null;
+
+
+    // Fighter properties //////////////////////////////////////////////////////////////////////////////////////////////////
+    Team team => attack.fighterCondition.fighterTeam.Value;
+    int fighterNo => attack.fighterCondition.fighterNo.Value;
 
 
     int enemy_body_layer, enemy_shield_layer, enemy_terminal_layer;
@@ -127,10 +132,6 @@ public abstract class Weapon : Utilities
 
     // Referenced from zako attack when changing team.
     public ParticleSystem parent_particle;
-
-    Team team => attack.fighterCondition.fighterTeam.Value;
-    int fighterNo => attack.fighterCondition.fighterNo.Value;
-
 
 
     // Awake() is called whether the gameObject is active or not.
@@ -257,7 +258,7 @@ public abstract class Weapon : Utilities
                     if (attack.IsOwner)
                     {
                         receiver.HPDownServerRpc(power_temp);
-                        receiver.LastShooterDetectorServerRpc(fighterNo, skill_name);
+                        receiver.LastShooterDetectorServerRpc(fighterNo, causeOfDeath);
                         receiver.OnWeaponHitServerRpc(fighterNo);
                         if (speedDown) receiver.SpeedDownServerRpc(speedGrade, speedDuration, speedProbability);
                         if (powerDown) receiver.PowerDownServerRpc(powerGrade, powerDuration, powerProbability);
@@ -267,7 +268,7 @@ public abstract class Weapon : Utilities
                 else
                 {
                     receiver.HPDown(power_temp);
-                    receiver.LastShooterDetector(fighterNo, skill_name);
+                    receiver.LastShooterDetector(fighterNo, causeOfDeath);
                     receiver.OnWeaponHit(fighterNo);
                     if (speedDown) receiver.SpeedDown(speedGrade, speedDuration, speedProbability);
                     if (powerDown) receiver.PowerDown(powerGrade, powerDuration, powerProbability);
@@ -527,7 +528,7 @@ public abstract class Weapon : Utilities
                             if (attack.IsOwner)
                             {
                                 receiver.HPDownServerRpc(power_temp);
-                                receiver.LastShooterDetectorServerRpc(fighterNo, skill_name);
+                                receiver.LastShooterDetectorServerRpc(fighterNo, causeOfDeath);
                                 receiver.OnWeaponHitServerRpc(fighterNo);
                                 if (speedDown) receiver.SpeedDownServerRpc(speedGrade, speedDuration, speedProbability);
                                 if (powerDown) receiver.PowerDownServerRpc(powerGrade, powerDuration, powerProbability);
@@ -537,7 +538,7 @@ public abstract class Weapon : Utilities
                         else
                         {
                             receiver.HPDown(power_temp);
-                            receiver.LastShooterDetector(fighterNo, skill_name);
+                            receiver.LastShooterDetector(fighterNo, causeOfDeath);
                             receiver.OnWeaponHit(fighterNo);
                             if (speedDown) receiver.SpeedDown(speedGrade, speedDuration, speedProbability);
                             if (powerDown) receiver.PowerDown(powerGrade, powerDuration, powerProbability);
@@ -657,14 +658,14 @@ public abstract class Weapon : Utilities
     }
 
 
-    // Skillから呼ばれる ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Weapon setting methods ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void WeaponSetter
-    (GameObject owner, Attack attack, bool isSkill, string skill_name, System.Func<float> StayMotion = null)
+    (GameObject owner, Attack attack, bool isSkill, string causeOfDeath, System.Func<float> StayMotion = null)
     {
         this.owner = owner;
         this.attack = attack;
         this.isSkill = isSkill;
-        this.skill_name = skill_name;
+        this.causeOfDeath = causeOfDeath;
         this.StayMotion = StayMotion;
     }
 
@@ -701,7 +702,7 @@ public abstract class Weapon : Utilities
     }
 
 
-
+    // For Debug ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(hitEffect.transform.position, rangeRadius);

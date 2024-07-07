@@ -4,6 +4,7 @@ using UnityEngine;
 using DG.Tweening;
 using Unity.Netcode;
 using Unity.Collections;
+using System.Linq;
 
 // Fighterの状態を保持するクラス
 // このクラスのプロパティをもとに、Movement、Attack、Receiverを動かす
@@ -85,9 +86,9 @@ public abstract class FighterCondition : NetworkBehaviour
 
 
     // ParticipantManagerからセット ///////////////////////////////////////////////////////////////////////////////////
-    public NetworkVariable<int> fighterNo = new NetworkVariable<int>();   // How many participant is this fighter.
-    public NetworkVariable<FixedString32Bytes> fighterName = new NetworkVariable<FixedString32Bytes>();
-    public NetworkVariable<Team> fighterTeam = new NetworkVariable<Team>();
+    public NetworkVariable<int> fighterNo { get; set; } = new NetworkVariable<int>();   // How many participant is this fighter.
+    public NetworkVariable<FixedString32Bytes> fighterName { get; set; } = new NetworkVariable<FixedString32Bytes>();
+    public NetworkVariable<Team> fighterTeam { get; set; } = new NetworkVariable<Team>();
 
 
 
@@ -583,6 +584,14 @@ public abstract class FighterCondition : NetworkBehaviour
     public abstract float revivalTime { get; set; }
     public float reviveTimer { get; private set; }
 
+    // Causes of death.
+    public const string DEATH_NORMAL_BLAST = "Normal Blast";
+    public const string SPECIFIC_DEATH_CANNON = "Cannon";               // Specific death (Death other than enemy attacks)
+    public const string SPECIFIC_DEATH_CRYSTAL = "Crystal Kill";        // Specific death (Death other than enemy attacks)
+    public const string SPECIFIC_DEATH_COLLISION = "Collision Crash";   // Specific death (Death other than enemy attacks)
+    static string[] specificDeath = { SPECIFIC_DEATH_CANNON, SPECIFIC_DEATH_CRYSTAL, SPECIFIC_DEATH_COLLISION };
+    public static bool IsSpecificDeath(string causeOfDeath) { return specificDeath.Contains(causeOfDeath); }
+
     // Processes run at the time of death. (Should be called on every clients)
     protected virtual void OnDeath(int destroyerNo, string causeOfDeath)
     {
@@ -596,6 +605,19 @@ public abstract class FighterCondition : NetworkBehaviour
         attack.OnDeath();
         receiver.OnDeath(destroyerNo, causeOfDeath);
         radarIcon.Visualize(false);
+
+        // If specific cause of death. (Not killed by enemy)
+        if (IsSpecificDeath(causeOfDeath))
+        {
+            return;
+        }
+
+        // Give combo to destroyer. (Only the owner of the destroyer needs to count combos)
+        FighterCondition destroyer_condition = ParticipantManager.I.fighterInfos[destroyerNo].fighterCondition;
+        if (destroyer_condition.IsOwner)
+        {
+            destroyer_condition.Combo(my_cp);
+        }
 
         if (IsHost)
         {
@@ -673,6 +695,24 @@ public abstract class FighterCondition : NetworkBehaviour
     {
         if (NetworkManager.Singleton.LocalClientId == senderId) return;
         OnRevival();
+    }
+
+    // Tell uGUIManager to report death of this fighter. (Called from Player and AI fighters)
+    protected void ReportDeath(int destroyerNo, string causeOfDeath)
+    {
+        string my_name = fighterName.Value.ToString();
+        Team my_team = fighterTeam.Value;
+
+        // Specific cause of death.
+        if (IsSpecificDeath(causeOfDeath))
+        {
+            uGUIMannager.I.BookRepo(causeOfDeath, my_name, my_team, causeOfDeath);
+            return;
+        }
+
+        // Death by enemy attacks.
+        string destroyer_name = ParticipantManager.I.fighterInfos[destroyerNo].fighterCondition.fighterName.Value.ToString();
+        uGUIMannager.I.BookRepo(destroyer_name, my_name, my_team, causeOfDeath);
     }
 
 

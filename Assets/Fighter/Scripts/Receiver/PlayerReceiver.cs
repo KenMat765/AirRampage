@@ -8,7 +8,6 @@ public class PlayerReceiver : Receiver
     public override void OnDeath(int destroyerNo, string causeOfDeath)
     {
         base.OnDeath(destroyerNo, causeOfDeath);
-        ReportDeath(destroyerNo, causeOfDeath);
     }
 
     public override void OnWeaponHit(int fighterNo)

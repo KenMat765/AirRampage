@@ -37,7 +37,6 @@ public class AiReceiver : Receiver
     public override void OnDeath(int destroyerNo, string causeOfDeath)
     {
         base.OnDeath(destroyerNo, causeOfDeath);
-        ReportDeath(destroyerNo, causeOfDeath);
         underAttack = false;
     }
 
@@ -46,6 +45,14 @@ public class AiReceiver : Receiver
     public override void OnWeaponHit(int fighterNo)
     {
         base.OnWeaponHit(fighterNo);
+
+        // Do nothing when shooter is not opponent fighter.
+        if (fighterNo < 0)
+        {
+            return;
+        }
+
+        // Current shooter detection.
         if (!underAttack)
         {
             hitTimer = 5;
