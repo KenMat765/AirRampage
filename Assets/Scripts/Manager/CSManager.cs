@@ -23,9 +23,10 @@ public class CSManager : Singleton<CSManager>
         swipeRight = false;
         swipeDown = false;
 
-        if (Input.touchCount > 0 && currentTouches.Count < detectableNum)
+        int touch_count = Input.touchCount;
+        if (touch_count > 0 && currentTouches.Count <= detectableNum)
         {
-            for (int i = 0; i < Mathf.Min(Input.touchCount, detectableNum); i++)
+            for (int i = 0; i < Mathf.Min(touch_count, detectableNum); i++)
             {
                 Touch touch = Input.GetTouch(i);
                 int Id = touch.fingerId;
@@ -35,7 +36,7 @@ public class CSManager : Singleton<CSManager>
                     case TouchPhase.Began:
                         if (!currentTouches.ContainsKey(Id))
                         {
-                            TouchExtension touch_began = new TouchExtension(touch, touch.position, 0);
+                            TouchExtension touch_began = new TouchExtension(touch, touch.position, 3);
                             currentTouches.Add(Id, touch_began);
                         }
                         break;
@@ -55,35 +56,45 @@ public class CSManager : Singleton<CSManager>
                         // Update touch.
                         if (currentTouches.ContainsKey(Id))
                         {
-                            Vector2 start_pos = currentTouches[Id].start_pos;
-                            float prev_drag_speed = currentTouches[Id].drag_speed;
-                            TouchExtension touch_exist = new TouchExtension(touch, start_pos, prev_drag_speed);
+                            TouchExtension touch_exist = currentTouches[Id];
+                            touch_exist.UpdateTouch(touch);
                             currentTouches[Id] = touch_exist;
                         }
                         break;
                 }
             }
         }
+        else
+        {
+            currentTouches.Clear();
+        }
     }
 
-    bool SwipeCheck(TouchExtension swipe)
+    bool SwipeCheck(TouchExtension touch)
     {
-        if (!swipe_condition(swipe))
+        if (!swipe_condition(touch))
         {
             return false;
         }
 
-        if (swipe.prev_drag_speed > swipeThresh)
+        if (touch.prev_drag_speed.Count == 0)
         {
-            if (Vector2.SignedAngle(Vector2.up, swipe.delta_pos) >= -45 && Vector2.SignedAngle(Vector2.up, swipe.delta_pos) < 45)
+            return false;
+        }
+
+        float max_drag_speed = touch.prev_drag_speed.Max();
+        if (max_drag_speed > swipeThresh)
+        {
+            float swipe_angle = Vector2.SignedAngle(Vector2.up, touch.delta_pos);
+            if (swipe_angle >= -45 && swipe_angle < 45)
             {
                 swipeUp = true;
             }
-            else if (Vector2.SignedAngle(Vector2.up, swipe.delta_pos) >= 45 && Vector2.SignedAngle(Vector2.up, swipe.delta_pos) < 135)
+            else if (swipe_angle >= 45 && swipe_angle < 135)
             {
                 swipeLeft = true;
             }
-            else if (Vector2.SignedAngle(Vector2.up, swipe.delta_pos) >= -135 && Vector2.SignedAngle(Vector2.up, swipe.delta_pos) < -45)
+            else if (swipe_angle >= -135 && swipe_angle < -45)
             {
                 swipeRight = true;
             }
@@ -104,7 +115,7 @@ public struct TouchExtension
 {
     public Touch touch { get; set; }
     public Vector2 start_pos { get; set; }
-    public float prev_drag_speed { get; set; }
+    public FixedSizeQueue<float> prev_drag_speed { get; set; }
     public Vector2 current_pos
     {
         get { return touch.position; }
@@ -115,13 +126,17 @@ public struct TouchExtension
     }
     public float drag_speed
     {
-        // get { return touch.phase == TouchPhase.Moved ? delta_pos.magnitude / touch.deltaTime : 0; }
         get { return delta_pos.magnitude / touch.deltaTime; }
     }
-    public TouchExtension(Touch touch, Vector2 start_pos, float prev_drag_speed)
+    public TouchExtension(Touch touch, Vector2 start_pos, int record_frames)
     {
         this.touch = touch;
         this.start_pos = start_pos;
-        this.prev_drag_speed = prev_drag_speed;
+        this.prev_drag_speed = new FixedSizeQueue<float>(record_frames);
+    }
+    public void UpdateTouch(Touch new_touch)
+    {
+        touch = new_touch;
+        prev_drag_speed.Enqueue(drag_speed);
     }
 }

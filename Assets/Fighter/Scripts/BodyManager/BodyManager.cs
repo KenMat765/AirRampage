@@ -33,11 +33,7 @@ public class BodyManager : MonoBehaviour
 
         // Get direction to main camera.
         Camera main_camera = Camera.main;
-        if (main_camera == null)
-        {
-            Debug.Log("Camera null");
-            return;
-        }
+        if (main_camera == null) return;
         Vector3 camera_direction = main_camera.transform.position - trans.position;
 
         // Check distance between this fighter and camera.
