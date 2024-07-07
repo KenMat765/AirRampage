@@ -13,6 +13,9 @@ public class PlayerReceiver : Receiver
     public override void OnWeaponHit(int fighterNo)
     {
         base.OnWeaponHit(fighterNo);
+
+        if (!IsOwner) return;
+
         uGUIMannager.I.ScreenColorSetter(new Color(1, 0, 0, 0.2f));
     }
 }

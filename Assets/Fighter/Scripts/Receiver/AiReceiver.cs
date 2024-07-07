@@ -46,6 +46,8 @@ public class AiReceiver : Receiver
     {
         base.OnWeaponHit(fighterNo);
 
+        if (!IsOwner) return;
+
         // Do nothing when shooter is not opponent fighter.
         if (fighterNo < 0)
         {
