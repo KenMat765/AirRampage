@@ -34,15 +34,14 @@ public class PlayerAttack : Attack
             if (!isBlasting)
             {
                 isBlasting = true;
-                blastTimer = setInterval;       // Reset blast timer.
-                muzzleRot.Value = transform.rotation; // Reset muzzle rotation.
+                blastTimer = setInterval;               // Reset blast timer.
+                muzzleRot.Value = transform.rotation;   // Reset muzzle rotation.
             }
 
             // Determine blast direction.
-            int k = 30;
             Vector2 diff_pos = uGUIMannager.normBlastDiffPos;
-            float target_xAngle = Utilities.R2R(-diff_pos.y, 0, blastRange, Utilities.FunctionType.linear, k);
-            float target_yAngle = Utilities.R2R(diff_pos.x, 0, blastRange, Utilities.FunctionType.linear, k);
+            float target_xAngle = Utilities.R2R(-diff_pos.y, 0, blastRange, Utilities.FunctionType.linear);
+            float target_yAngle = Utilities.R2R(diff_pos.x, 0, blastRange, Utilities.FunctionType.linear);
             Quaternion targetRot = Quaternion.Euler(target_xAngle, target_yAngle, 0);
             muzzleRot.Value = Quaternion.Slerp(muzzleRot.Value, targetRot, sensitivity);
 

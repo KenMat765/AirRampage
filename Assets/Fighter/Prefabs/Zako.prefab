@@ -7035,50 +7035,8 @@ MonoBehaviour:
   body: {fileID: 1311751778213161}
   movement: {fileID: 4290537579717849159}
   attack: {fileID: 4261731771400978922}
-  receiver: {fileID: 710287870623200186}
+  receiver: {fileID: 3543031913966478976}
   radarIcon: {fileID: 7226467974988038721}
-  fighters_mask:
-    serializedVersion: 2
-    m_Bits: 0
-  fighterNo:
-    m_InternalValue: 0
-  fighterName:
-    m_InternalValue:
-      utf8LengthInBytes: 0
-      bytes:
-        offset0000:
-          byte0000: 0
-          byte0001: 0
-          byte0002: 0
-          byte0003: 0
-          byte0004: 0
-          byte0005: 0
-          byte0006: 0
-          byte0007: 0
-          byte0008: 0
-          byte0009: 0
-          byte0010: 0
-          byte0011: 0
-          byte0012: 0
-          byte0013: 0
-          byte0014: 0
-          byte0015: 0
-        byte0016: 0
-        byte0017: 0
-        byte0018: 0
-        byte0019: 0
-        byte0020: 0
-        byte0021: 0
-        byte0022: 0
-        byte0023: 0
-        byte0024: 0
-        byte0025: 0
-        byte0026: 0
-        byte0027: 0
-        byte0028: 0
-        byte0029: 0
-  fighterTeam:
-    m_InternalValue: 0
   HP: 0
   speed: 0
   power: 0
@@ -7116,8 +7074,7 @@ GameObject:
   - component: {fileID: 54163363052103401}
   - component: {fileID: 65118879918359656}
   - component: {fileID: 4261731771400978922}
-  - component: {fileID: 710287870623200186}
-  - component: {fileID: 489249531106770361}
+  - component: {fileID: 3543031913966478976}
   m_Layer: 9
   m_Name: fighterbody
   m_TagString: Untagged
@@ -7187,8 +7144,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49d9ca40b3cf346e8b027d643194b665, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackable: 0
-  homingTargetNos: 
   homingAngle: 60
   homingDist: 250
   originalNormalBullet: {fileID: 1428546918312979}
@@ -7256,7 +7211,7 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 2
     m_NumAlphaKeys: 3
---- !u!114 &710287870623200186
+--- !u!114 &3543031913966478976
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -7265,19 +7220,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1311751778213161}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d9e46130ff4e946ac9aafd6845694b85, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &489249531106770361
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1311751778213161}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b0dbb4d099a2944b0815e14028e5e2a8, type: 3}
+  m_Script: {fileID: 11500000, guid: 1111cc8af148e4efcbf943a08d3edff2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1360027754317512

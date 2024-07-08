@@ -6,7 +6,7 @@ using UnityEngine;
 using DG.Tweening;
 
 // FighterConditionの各変数と、外部との橋渡しをするクラス
-public class Receiver : NetworkBehaviour
+public abstract class Receiver : NetworkBehaviour
 {
     public FighterCondition fighterCondition { get; set; }
     public bool acceptDamage { get; set; }
@@ -64,24 +64,10 @@ public class Receiver : NetworkBehaviour
 
 
 
-    // Damages & Debuffs ////////////////////////////////////////////////////////////////////////////////////////////
-    Sequence hitSeq;
+    // On weapon hit callback ////////////////////////////////////////////////////////////////////////////////////////////
 
-    // Other things to do when weapon hit. (Called only at Owner)
-    public virtual void OnWeaponHit(int fighterNo)
-    {
-        if (!IsOwner) return;
-
-        // Shake fighter body.
-        if (!hitSeq.IsActive())
-        {
-            Vector3 rot_strength = new Vector3(0, 0, 60);
-            int rot_vibrato = 10;
-            hitSeq = DOTween.Sequence();
-            hitSeq.Join(transform.DOShakeRotation(0.5f, rot_strength, rot_vibrato));
-            hitSeq.Play();
-        }
-    }
+    // Should be called only at Owner
+    public virtual void OnWeaponHit(int fighterNo) { }
 
     [ServerRpc(RequireOwnership = false)]
     public void OnWeaponHitServerRpc(int fighterNo)
@@ -96,6 +82,23 @@ public class Receiver : NetworkBehaviour
         if (IsOwner) OnWeaponHit(fighterNo);
     }
 
+    Sequence hitSeq;
+    protected void ShakeBody()
+    {
+        if (hitSeq.IsActive())
+        {
+            return;
+        }
+        Vector3 rot_strength = new Vector3(0, 0, 60);
+        int rot_vibrato = 10;
+        hitSeq = DOTween.Sequence();
+        hitSeq.Join(transform.DOShakeRotation(0.5f, rot_strength, rot_vibrato));
+        hitSeq.Play();
+    }
+
+
+
+    // Damages & Debuffs ////////////////////////////////////////////////////////////////////////////////////////////
 
     // HPDown is always called from weapon.
     public void HPDown(float power)
