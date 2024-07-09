@@ -78,7 +78,7 @@ public abstract class Movement : NetworkBehaviour
 
     // 4-Actions ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     protected Animator anim;
-    protected float uturnTime, flipTime, rollTime;
+    protected float uturnTime, somersaultTime, rollTime;
 
     // KariCameraで使うためにpublic(後でprotectedに直す)
     public int uTurndirection { get; set; } = 1;
@@ -92,12 +92,12 @@ public abstract class Movement : NetworkBehaviour
     }
     protected virtual IEnumerator uTurn() { return null; }
 
-    protected void Flip()
+    protected void Somersault()
     {
-        if (ready4action) StartCoroutine(flip());
-        if (IsOwner) FlipServerRpc(OwnerClientId);
+        if (ready4action) StartCoroutine(somersault());
+        if (IsOwner) SomersaultServerRpc(OwnerClientId);
     }
-    protected virtual IEnumerator flip() { return null; }
+    protected virtual IEnumerator somersault() { return null; }
 
     protected float rollDistance = 15;
 
@@ -118,7 +118,7 @@ public abstract class Movement : NetworkBehaviour
     protected virtual void FourActionExe() { }
 
     [ServerRpc]
-    void FlipServerRpc(ulong senderId) => FlipClientRpc(senderId);
+    void SomersaultServerRpc(ulong senderId) => SomersaultClientRpc(senderId);
     [ServerRpc]
     void UturnServerRpc(ulong senderId) => UturnClientRpc(senderId);
     [ServerRpc]
@@ -126,10 +126,10 @@ public abstract class Movement : NetworkBehaviour
     [ServerRpc]
     void RightRollServerRpc(ulong senderId, float delay) => RightRoleClientRpc(senderId, delay);
     [ClientRpc]
-    void FlipClientRpc(ulong senderId)
+    void SomersaultClientRpc(ulong senderId)
     {
         if (NetworkManager.Singleton.LocalClientId == senderId) return;
-        Flip();
+        Somersault();
     }
     [ClientRpc]
     void UturnClientRpc(ulong senderId)
@@ -165,6 +165,7 @@ public abstract class Movement : NetworkBehaviour
         // Crash when collided to obstacle.
         if ((obstacleMask & col_layer) != 0)
         {
+#if UNITY_EDITOR
             // For Debug.
             if (fighterCondition.fighterNo.Value < 8)
             {
@@ -172,6 +173,7 @@ public abstract class Movement : NetworkBehaviour
                 Debug.Log("<color=red>Hit object</color>", col.gameObject);
                 // Time.timeScale = 0;
             }
+#endif
             fighterCondition.Death(-1, FighterCondition.SPECIFIC_DEATH_COLLISION);
         }
     }

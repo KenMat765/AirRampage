@@ -13,7 +13,7 @@ public class PlayerMovement : Movement
         anim = GetComponentInChildren<Animator>();
         var rac = anim.runtimeAnimatorController;
         uturnTime = rac.animationClips.Where(a => a.name == "U-Turn").Select(b => b.length).ToArray()[0];
-        flipTime = rac.animationClips.Where(a => a.name == "Flip").Select(b => b.length).ToArray()[0];
+        somersaultTime = rac.animationClips.Where(a => a.name == "Flip").Select(b => b.length).ToArray()[0];
         rollTime = rac.animationClips.Where(a => a.name == "RightRoll").Select(b => b.length).ToArray()[0];
     }
 
@@ -130,7 +130,7 @@ public class PlayerMovement : Movement
         burnerController.StopSpark();
     }
 
-    protected override IEnumerator flip()
+    protected override IEnumerator somersault()
     {
         // Disable rotation & 4actions.
         ready4action = false;
@@ -150,12 +150,12 @@ public class PlayerMovement : Movement
         // Look up camera (Owner only)
         if (IsOwner)
         {
-            CameraController.I.LookUp(-90 * uTurndirection, flipTime / 2);
+            CameraController.I.LookUp(-90 * uTurndirection, somersaultTime / 2);
         }
 
         // Restart moving a bit faster than flip time.
         float resume_offset = 0.3f;
-        yield return new WaitForSeconds(flipTime - resume_offset);
+        yield return new WaitForSeconds(somersaultTime - resume_offset);
         fighterCondition.ResumeGradingSpeed();
         burnerController.StopStaticBurner();
 
@@ -243,13 +243,13 @@ public class PlayerMovement : Movement
     protected override void FourActionExe()
     {
         if (CSManager.swipeDown) { Uturn(); }
-        else if (CSManager.swipeUp) { Flip(); }
+        else if (CSManager.swipeUp) { Somersault(); }
         else if (CSManager.swipeLeft) { LeftRoll(0.2f); }
         else if (CSManager.swipeRight) { RightRoll(0.2f); }
 
 #if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.DownArrow)) { Uturn(); }
-        else if (Input.GetKeyDown(KeyCode.UpArrow)) { Flip(); }
+        else if (Input.GetKeyDown(KeyCode.UpArrow)) { Somersault(); }
         else if (Input.GetKeyDown(KeyCode.LeftArrow)) { LeftRoll(0.2f); }
         else if (Input.GetKeyDown(KeyCode.RightArrow)) { RightRoll(0.2f); }
 #endif

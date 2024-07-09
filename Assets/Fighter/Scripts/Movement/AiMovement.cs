@@ -13,7 +13,7 @@ public class AiMovement : Movement
         anim = GetComponentInChildren<Animator>();
         var rac = anim.runtimeAnimatorController;
         uturnTime = rac.animationClips.Where(a => a.name == "U-Turn").Select(b => b.length).ToArray()[0];
-        flipTime = rac.animationClips.Where(a => a.name == "Flip").Select(b => b.length).ToArray()[0];
+        somersaultTime = rac.animationClips.Where(a => a.name == "Flip").Select(b => b.length).ToArray()[0];
         rollTime = rac.animationClips.Where(a => a.name == "RightRoll").Select(b => b.length).ToArray()[0];
 
         aiReceiver = (AiReceiver)fighterCondition.receiver;
@@ -164,7 +164,7 @@ public class AiMovement : Movement
         burnerController.StopSpark();
     }
 
-    protected override IEnumerator flip()
+    protected override IEnumerator somersault()
     {
         // Disable rotation & 4actions.
         ready4action = false;
@@ -183,7 +183,7 @@ public class AiMovement : Movement
 
         // Restart moving a bit faster than flip time.
         float resume_offset = 0.3f;
-        yield return new WaitForSeconds(flipTime - resume_offset);
+        yield return new WaitForSeconds(somersaultTime - resume_offset);
         fighterCondition.ResumeGradingSpeed();
         burnerController.StopStaticBurner();
         burnerController.StopSpark();
@@ -456,7 +456,7 @@ public class AiMovement : Movement
                 break;
 
             case Conditions.FLIP:
-                Flip();
+                Somersault();
                 break;
 
             case Conditions.COUNTER:
