@@ -63,7 +63,7 @@ public abstract class Attack : NetworkBehaviour
         }
         else
         {
-            // Clean up list.
+            // Clean up list when there are no enemy fighters around.
             lockonTargetNos.Clear();
         }
     }
@@ -107,19 +107,19 @@ public abstract class Attack : NetworkBehaviour
 
     // Normal Blast /////////////////////////////////////////////////////////////////////////////////////////////////
     [Header("Normal Blast")]
-    [SerializeField] protected GameObject originalNormalBullet; // original prefab of the normal bullet
-    [SerializeField] protected ParticleSystem blastImpact;      // bullet firing effect
-    [SerializeField] protected AudioSource blastSound;          // bullet firing sound
+    [SerializeField] protected GameObject originalNormalBullet;
+    [SerializeField] protected ParticleSystem blastImpact;
+    [SerializeField] protected AudioSource blastSound;
 
     // Properties of normal bullet.
-    public float bulletPower = 1;                               // power of normal bullet (≠ FighterCondition.power)
-    public float bulletSpeed = 150;                             // speed of normal bullet (≠ FighterCondition.speed)
-    public float bulletLifespan = 1;                            // lifespan of normal bullet
-    public abstract float blastInterval { get; set; }           // interval until the next blast (changes by Ability)
-    HomingType homingType = HomingType.PreHoming;               // homing type of normal bullet (PreHoming: face towards the enemy upon firing)
+    public float bulletPower = 1;   // power of normal bullet (≠ FighterCondition.power: power of fighter itself)
+    public float bulletSpeed = 150;
+    public float bulletLifespan = 1;
+    public abstract float blastInterval { get; set; }
+    HomingType homingType = HomingType.PreHoming;
 
-    protected List<Weapon> normalWeapons = new List<Weapon>();  // list of Weapon components attached to each bullets
-    protected float blastTimer { get; set; }                    // timer used for firing at specific interval.
+    protected List<Weapon> normalWeapons = new List<Weapon>();
+    protected float blastTimer { get; set; }
 
     // This if DEATH_NORMAL_BLAST for fighters, but change this to SPECIFIC_DEATH_CANNON for cannons.
     protected abstract string causeOfDeath { get; set; }
