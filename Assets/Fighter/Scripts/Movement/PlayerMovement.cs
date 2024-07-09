@@ -58,21 +58,21 @@ public class PlayerMovement : Movement
         {
             if (Input.GetKey(KeyCode.W))
             {
-                targetRotX += maxTiltX;
+                targetRotX += MAX_TILT_X;
             }
             if (Input.GetKey(KeyCode.S))
             {
-                targetRotX -= maxTiltX;
+                targetRotX -= MAX_TILT_X;
             }
             if (Input.GetKey(KeyCode.D))
             {
                 relativeRotY = maxRotSpeed;
-                targetRotZ = maxTiltZ;
+                targetRotZ = MAX_TILT_Z;
             }
             if (Input.GetKey(KeyCode.A))
             {
                 relativeRotY = -maxRotSpeed;
-                targetRotZ = -maxTiltZ;
+                targetRotZ = -MAX_TILT_Z;
             }
 #else
         if (uGUIMannager.onStick)
@@ -183,7 +183,7 @@ public class PlayerMovement : Movement
         rollSpark.Play();
         rollAudio.Play();
 
-        // Move transform & camera. (Owner only)
+        // Move fighter transform & camera. (Owner only)
         if (IsOwner)
         {
             transform.DOBlendableMoveBy(-transform.right * rollDistance * uTurndirection, rollTime)
@@ -218,7 +218,7 @@ public class PlayerMovement : Movement
         rollSpark.Play();
         rollAudio.Play();
 
-        // Move transform & camera. (Owner only)
+        // Move fighter transform & camera. (Owner only)
         if (IsOwner)
         {
             transform.DOBlendableMoveBy(transform.right * rollDistance * uTurndirection, rollTime)

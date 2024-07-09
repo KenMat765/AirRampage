@@ -27,7 +27,7 @@ public class ZakoMovement : Movement
         Vector3 diff_pos = array_point.position - trans.position;
         Vector3 relativeEulerAngle = Quaternion.LookRotation(diff_pos == Vector3.zero ? trans.forward : diff_pos).eulerAngles;
         float relativeYAngle = Vector3.SignedAngle(trans.forward, diff_pos, Vector3.up);
-        Quaternion lookRotation = Quaternion.Euler(relativeEulerAngle.x, relativeEulerAngle.y, Mathf.Clamp(-relativeYAngle * 1.5f, -maxTiltZ, maxTiltZ));
+        Quaternion lookRotation = Quaternion.Euler(relativeEulerAngle.x, relativeEulerAngle.y, Mathf.Clamp(-relativeYAngle * 1.5f, -MAX_TILT_Z, MAX_TILT_Z));
         trans.rotation = Quaternion.Slerp(trans.rotation, lookRotation, rotationSpeed * Time.deltaTime);
     }
 

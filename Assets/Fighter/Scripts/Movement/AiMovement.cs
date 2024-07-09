@@ -36,15 +36,14 @@ public class AiMovement : Movement
         {
             if (ObstacleIsInFront(AVOID_DISTANCE))
             {
-                // For Debug.
-                // Debug.Log("<color=green>Avoid</color>", gameObject);
-
                 // Set avoiding to true, and reset it after u-turn is finished.
                 avoiding = true;
                 DOVirtual.DelayedCall(uturnTime, () => avoiding = false).Play();
+
                 // U-Turn to avoid obstacle.
                 Uturn();
-                // Reset next destination.
+
+                // Search for a detour.
                 SetNextDestination();
             }
         }
@@ -60,7 +59,7 @@ public class AiMovement : Movement
     bool can_rotate = true;
 
     // Emergency Avoidance
-    const float AVOID_DISTANCE = 80;    // Perform an avoidance if the distance is less than this value.
+    const float AVOID_DISTANCE = 80;  // Perform an avoidance if the distance is less than this value.
     bool avoiding = false;
 
     protected override void Rotate()
@@ -73,16 +72,16 @@ public class AiMovement : Movement
         Vector3 targetAngle = Quaternion.LookRotation(((relative_to_next == Vector3.zero) ? transform.forward : relative_to_next) * uTurndirection).eulerAngles;
         if (relativeYAngle < -135)
         {
-            targetAngle.z = (-maxTiltZ / 45 * relativeYAngle - 4 * maxTiltZ) * uTurndirection * -1;
+            targetAngle.z = (-MAX_TILT_Z / 45 * relativeYAngle - 4 * MAX_TILT_Z) * uTurndirection * -1;
         }
         else if (-135 <= relativeYAngle && relativeYAngle <= 135)
         {
             float normY = relativeYAngle / 135;
-            targetAngle.z = maxTiltZ / 2 * (Mathf.Pow(normY, 3) - 3 * normY) * uTurndirection;
+            targetAngle.z = MAX_TILT_Z / 2 * (Mathf.Pow(normY, 3) - 3 * normY) * uTurndirection;
         }
         else
         {
-            targetAngle.z = (-maxTiltZ / 45 * relativeYAngle + 4 * maxTiltZ) * uTurndirection * -1;
+            targetAngle.z = (-MAX_TILT_Z / 45 * relativeYAngle + 4 * MAX_TILT_Z) * uTurndirection * -1;
         }
         Quaternion lookRotation = Quaternion.Euler(targetAngle);
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
@@ -95,13 +94,14 @@ public class AiMovement : Movement
         {
             switch (BattleInfo.rule)
             {
-                // Start going to random position when Battle Royal.
-                case Rule.BATTLE_ROYAL: SetFinalDestination(SubTarget.GetRandomPosition()); break;
+                case Rule.BATTLE_ROYAL:
+                    SetFinalDestination(SubTarget.GetRandomPosition());
+                    break;
 
-                // Start going to random opponent terminal.
                 case Rule.TERMINAL_CONQUEST:
-                    targetTerminal = TerminalManager.I.GetOpponentTerminals(fighterCondition.fighterTeam.Value).RandomChoice();
-                    SetFinalDestination(targetTerminal.transform.position, true);
+                    break;
+
+                case Rule.CRYSTAL_HUNTER:
                     break;
             }
         }
@@ -211,7 +211,7 @@ public class AiMovement : Movement
         rollSpark.Play();
         rollAudio.Play();
 
-        // Move transform & camera. (Owner only)
+        // Move fighter transform. (Owner only)
         if (IsOwner)
         {
             transform.DOBlendableMoveBy(-transform.right * rollDistance * uTurndirection, rollTime)
@@ -241,7 +241,7 @@ public class AiMovement : Movement
         rollSpark.Play();
         rollAudio.Play();
 
-        // Move transform & camera. (Owner only)
+        // Move fighter transform. (Owner only)
         if (IsOwner)
         {
             transform.DOBlendableMoveBy(transform.right * rollDistance * uTurndirection, rollTime)
@@ -467,41 +467,9 @@ public class AiMovement : Movement
 
             // Only On Terminal Conquest.
             case Conditions.ATTACK_TERMINAL:
-                rotationSpeed = QUICK_ROTATIONSPEED;
-
-                if (arrived_at_final_destination)
-                {
-                    if (destination_is_terminal) SetFinalDestination(targetTerminal.GetRandomSubTargetPositionAround());
-                    else SetFinalDestination(targetTerminal.transform.position, true);
-                }
-
-                // If previous condition was ATTACK, just set new final_destination. (No need to arrive at target_fighters position any more.)
-                else if (prev_condition == Conditions.ATTACK ||
-                        prev_condition == Conditions.GOBACK ||
-                        prev_condition == Conditions.COUNTER)
-                {
-                    SetFinalDestination(targetTerminal.transform.position, true);
-                }
-
                 break;
 
             case Conditions.DEFENCE_TERMINAL:
-                rotationSpeed = SLOW_ROTATIONSPEED;
-
-                if (arrived_at_final_destination)
-                {
-                    if (destination_is_terminal) SetFinalDestination(targetTerminal.GetRandomSubTargetPositionAround());
-                    else SetFinalDestination(targetTerminal.transform.position, true);
-                }
-
-                // If previous condition was ATTACK, just set new final_destination. (No need to arrive at target_fighters position any more.)
-                else if (prev_condition == Conditions.ATTACK ||
-                        prev_condition == Conditions.GOBACK ||
-                        prev_condition == Conditions.COUNTER)
-                {
-                    SetFinalDestination(targetTerminal.transform.position, true);
-                }
-
                 break;
         }
     }

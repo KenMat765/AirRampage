@@ -6,7 +6,6 @@ using Unity.Netcode;
 using Cysharp.Threading.Tasks;
 using System;
 
-// 機体を動かすクラス
 public abstract class Movement : NetworkBehaviour
 {
     public FighterCondition fighterCondition { get; set; }
@@ -17,7 +16,7 @@ public abstract class Movement : NetworkBehaviour
         col = GetComponent<Collider>();
         col.enabled = false;
 
-        // For death animation.
+        // Components for death animation.
         rigidBody = GetComponent<Rigidbody>();
         Transform explosion_trans = fighterCondition.body.transform.Find("Explosion");
         Transform explosion_trans1 = explosion_trans.Find("ExplosionDead1");
@@ -45,22 +44,14 @@ public abstract class Movement : NetworkBehaviour
 
 
     // Movement ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    protected const float maxTiltX = 55;  //縦
-    protected const float maxTiltZ = 60;  //左右
+    protected const float MAX_TILT_X = 55;
+    protected const float MAX_TILT_Z = 60;
     Collider col;
 
     protected void MoveForward()
     {
         float speed = fighterCondition.speed;
-
-        // Move by transform (Slip-through occurs)
-        // transform.position = Vector3.MoveTowards(
-        //     transform.position,
-        //     transform.position + (transform.forward * speed * Time.deltaTime * uTurndirection),
-        //     speed);
-
-        // Move by rigidbody (Slip-through does not occur)
-        rigidBody.velocity = transform.forward * speed * uTurndirection;
+        rigidBody.velocity = transform.forward * speed * uTurndirection; // Move by rigidbody (Slip-through does not occur)
     }
 
     protected abstract void Rotate();
@@ -70,8 +61,7 @@ public abstract class Movement : NetworkBehaviour
     public virtual void Controllable(bool controllable)
     {
         this.controllable = controllable;
-        // If controllable, enable collider to detect collision to obstacles.
-        col.enabled = controllable;
+        col.enabled = controllable; // If controllable, also enable collider to detect collision to obstacles.
     }
 
 
@@ -79,11 +69,9 @@ public abstract class Movement : NetworkBehaviour
     // 4-Actions ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     protected Animator anim;
     protected float uturnTime, somersaultTime, rollTime;
-
-    // KariCameraで使うためにpublic(後でprotectedに直す)
-    public int uTurndirection { get; set; } = 1;
-
+    public int uTurndirection { get; set; } = 1;  // Used to reverse the direction of the aircraft after U-turn. (1 or -1)
     protected bool ready4action = true;
+    protected float rollDistance = 15;  // Lateral movement distance during rolling.
 
     protected void Uturn()
     {
@@ -98,8 +86,6 @@ public abstract class Movement : NetworkBehaviour
         if (IsOwner) SomersaultServerRpc(OwnerClientId);
     }
     protected virtual IEnumerator somersault() { return null; }
-
-    protected float rollDistance = 15;
 
     protected void LeftRoll(float freeze_time)
     {
@@ -159,21 +145,11 @@ public abstract class Movement : NetworkBehaviour
         if (!IsOwner) return;
         if (fighterCondition.isDead) return;
 
-        // Get layer of collided object.
         int col_layer = 1 << col.gameObject.layer;
 
-        // Crash when collided to obstacle.
+        // Kill this fighter instantly when collided to obstacle.
         if ((obstacleMask & col_layer) != 0)
         {
-#if UNITY_EDITOR
-            // For Debug.
-            if (fighterCondition.fighterNo.Value < 8)
-            {
-                Debug.Log("<color=red>Crashed!!</color>", gameObject);
-                Debug.Log("<color=red>Hit object</color>", col.gameObject);
-                // Time.timeScale = 0;
-            }
-#endif
             fighterCondition.Death(-1, FighterCondition.SPECIFIC_DEATH_COLLISION);
         }
     }
@@ -181,13 +157,12 @@ public abstract class Movement : NetworkBehaviour
 
 
     // Death & Revival ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Used for death animation.
     Rigidbody rigidBody;
     Transform explosion2Trans;
     AudioSource explosionSound1, explosionSound2;
     ParticleSystem explosion1, explosion2, explosionTrail;
 
-    // Is called at every clients.
+    // Must be called at every clients.
     public virtual void OnDeath()
     {
         ready4action = false;
@@ -202,23 +177,23 @@ public abstract class Movement : NetworkBehaviour
         explosionSound1.Play();
         explosionTrail.Play();
 
-        // 1.6f : effect play time of explosion dead.
+        // Wait a few seconds until the explosion1 effect (=1.6sec) ends.
         yield return new WaitForSeconds(2.0f);
 
         // Stop falling, and play second explision effect.
         rigidBody.useGravity = false;
         rigidBody.velocity = Vector3.zero;
-        // Put out explosion2 from fighterbody before deactivating fighterbody.
+        // Put out explosion2 from fighterbody before deactivating fighterbody, otherwise the effect will not be visible.
         explosion2Trans.parent = transform;
         explosion2.Play();
         explosionSound2.Play();
         explosionTrail.Stop();
         fighterCondition.body.SetActive(false);
 
-        // 1.6f : effect play time of explosion dead.
+        // Wait a few seconds until the explosion1 effect (=1.6sec) ends.
         yield return new WaitForSeconds(1.8f);
 
-        // Put back explosion2.
+        // Put back explosion2 under fighterbody.
         explosion2Trans.parent = fighterCondition.body.transform;
         explosion2Trans.localPosition = Vector3.zero;
     }
@@ -250,20 +225,14 @@ public abstract class Movement : NetworkBehaviour
     protected bool arrived_at_final_destination, arrived_at_next_destination;
     protected bool bypassing;
     int index_counter = 0;
-
-    // Initialize latestDestinations only at AIMovement & ZakoMovement, because PlayerMovement dosen't use this.
     protected const short max_cashe = 10;
     protected Vector3[] latestDestinations;
 
-    // Only for Terminal Conquest.
-    protected bool destination_is_terminal;
 
-
-    protected void SetFinalDestination(Vector3 destination, bool destination_is_terminal = false)
+    protected void SetFinalDestination(Vector3 destination)
     {
         arrived_at_final_destination = false;
         finalDestination = destination;
-        this.destination_is_terminal = destination_is_terminal;
         Array.Fill(latestDestinations, Vector3.zero);
         SetNextDestination();
     }
@@ -271,28 +240,26 @@ public abstract class Movement : NetworkBehaviour
     protected void SetNextDestination()
     {
         arrived_at_next_destination = false;
-
         Vector3 my_position = transform.position;
 
-        // When there is a obstacle between current position and final destination.
         Ray ray = new Ray(my_position, relative_to_final);
         RaycastHit hit;
         float max_distance = Vector3.Magnitude(relative_to_final);
-        if (Physics.SphereCast(ray, CAST_RADIUS, out hit, max_distance, FighterCondition.obstacles_mask) && !(destination_is_terminal && hit.transform.position == finalDestination))
+        bool obstacles_in_way = Physics.SphereCast(ray, CAST_RADIUS, out hit, max_distance, FighterCondition.obstacles_mask);
+        if (obstacles_in_way)
         {
-            // Set as bypassing.
             bypassing = true;
 
-            // Search for sub targets around until trial reaches max_trial.
+            // Search for sub-targets around until trial reaches max_trial.
+            const int max_trial = 3;
             List<Vector3> subTargetsAround = new List<Vector3>();       // Check for obstacles in way.
             List<Vector3> subTargetsAround_weak = new List<Vector3>();  // Does not check for obstacles.
-            const int max_trial = 3;
             for (int trial = 1; trial <= max_trial; trial++)
             {
                 // Expand search radius on each trial.
                 float searchRadius = SEARCH_RADIUS_ORG * trial;
 
-                // Search sub targets around.
+                // Search sub-targets around.
                 subTargetsAround_weak = Physics.OverlapSphere(my_position, searchRadius, SubTarget.mask, QueryTriggerInteraction.Collide)
                     .Select(s => s.transform.position)
                     .Where(t => !latestDestinations.Contains(t))
@@ -300,26 +267,22 @@ public abstract class Movement : NetworkBehaviour
                 subTargetsAround = subTargetsAround_weak
                     .Where(t =>
                     {
-                        Ray ray2sub = new Ray(my_position, t - my_position);
-                        float max_distance2sub = Vector3.Magnitude(t - my_position);
-                        return !Physics.SphereCast(ray2sub, CAST_RADIUS, max_distance2sub, FighterCondition.obstacles_mask);
+                        Ray ray_to_sub = new Ray(my_position, t - my_position);
+                        float distance_to_sub = Vector3.Magnitude(t - my_position);
+                        return !Physics.SphereCast(ray_to_sub, CAST_RADIUS, distance_to_sub, FighterCondition.obstacles_mask);
                     })
                     .ToList();
 
-                // break when sub target was found.
+                // Break when sub-targets were found.
                 if (subTargetsAround.Count > 0)
                 {
                     break;
                 }
             }
 
-            // If there were no sub targets around, warn it.
+            // If no sub-targets were found, relax condition.
             if (subTargetsAround.Count < 1)
             {
-#if UNITY_EDITOR
-                Debug.LogWarning("周囲にサブターゲットがありません. subTargetsAround_weak: " + subTargetsAround_weak.Count, gameObject);
-#endif
-                // If no sub targets were found, relax condition.
                 subTargetsAround = subTargetsAround_weak;
             }
 
@@ -340,8 +303,6 @@ public abstract class Movement : NetworkBehaviour
             latestDestinations[index_counter] = nextDestination;
             index_counter = (index_counter + 1) % max_cashe;
         }
-
-        // When there are no obstacles between current position and final destination.
         else
         {
             bypassing = false;
@@ -351,21 +312,13 @@ public abstract class Movement : NetworkBehaviour
 
     protected void ArrivalCheck()
     {
-        // Expand distance border when destination is terminal.
-        float sqr_distanceBorder = destination_is_terminal ? this.SQR_DISTANCE_BORDER * 3 * 3 : this.SQR_DISTANCE_BORDER;
-
-        // When arrived at next destination.
-        if (Vector3.SqrMagnitude(relative_to_next) < sqr_distanceBorder && !arrived_at_next_destination)
+        if (Vector3.SqrMagnitude(relative_to_next) < SQR_DISTANCE_BORDER && !arrived_at_next_destination)
         {
             arrived_at_next_destination = true;
-
-            // When arrived at midpoint.
             if (bypassing)
             {
                 SetNextDestination();
             }
-
-            // When arrived at final destination.
             else
             {
                 arrived_at_final_destination = true;
