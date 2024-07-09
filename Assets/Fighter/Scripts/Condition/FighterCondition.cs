@@ -40,7 +40,7 @@ public abstract class FighterCondition : NetworkBehaviour
         {
             if (HP <= 0)
             {
-                Death(receiver.lastShooterNo, receiver.lastSkillName);
+                Death(receiver.lastShooterNo, receiver.lastCauseOfDeath);
                 return;
             }
             SpeedTimeUpdate();

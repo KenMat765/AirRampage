@@ -23,47 +23,6 @@ public abstract class Receiver : NetworkBehaviour
 
 
 
-    // Death & Revival /////////////////////////////////////////////////////////////////////////////////////////////
-    public virtual void OnDeath(int destroyerNo, string causeOfDeath)
-    {
-        col.enabled = false;
-    }
-
-    public virtual void OnRevival()
-    {
-        col.enabled = true;
-    }
-
-
-
-    // Shooter Detection /////////////////////////////////////////////////////////////////////////////////////////////
-    public int lastShooterNo { get; private set; }
-    public string lastSkillName { get; private set; }
-
-    // Call : Server + Owner.
-    public void LastShooterDetector(int fighterNo, string causeOfDeath)
-    {
-        lastShooterNo = fighterNo;
-        lastSkillName = causeOfDeath;
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    public void LastShooterDetectorServerRpc(int fighterNo, string causeOfDeath)
-    {
-        // Call in server too.
-        LastShooterDetector(fighterNo, causeOfDeath);
-        if (!IsOwner) LastShooterDetectorClientRpc(fighterNo, causeOfDeath);
-    }
-
-    [ClientRpc]
-    public void LastShooterDetectorClientRpc(int fighterNo, string causeOfDeath)
-    {
-        // Call in owner.
-        if (IsOwner) LastShooterDetector(fighterNo, causeOfDeath);
-    }
-
-
-
     // On weapon hit callback ////////////////////////////////////////////////////////////////////////////////////////////
 
     // Should be called only at Owner
@@ -109,22 +68,22 @@ public abstract class Receiver : NetworkBehaviour
     }
 
     // Speed, Power, Defence is NOT always called from weapon.
-    public void SpeedDown(int speedGrade, float speedDuration, float speedProbability)
+    public void SpeedDown(int grade, float duration, float probability)
     {
         float random = Random.value;
-        if (random <= speedProbability) fighterCondition.SpeedGrader(speedGrade, speedDuration);
+        if (random <= probability) fighterCondition.SpeedGrader(grade, duration);
     }
 
-    public void PowerDown(int powerGrade, float powerDuration, float powerProbability)
+    public void PowerDown(int grade, float duration, float probability)
     {
         float random = Random.value;
-        if (random <= powerProbability) fighterCondition.PowerGrader(powerGrade, powerDuration);
+        if (random <= probability) fighterCondition.PowerGrader(grade, duration);
     }
 
-    public void DefenceDown(int defenceGrade, float defenceDuration, float defenceProbability)
+    public void DefenceDown(int grade, float duration, float probability)
     {
         float random = Random.value;
-        if (random <= defenceProbability) fighterCondition.DefenceGrader(defenceGrade, defenceDuration);
+        if (random <= probability) fighterCondition.DefenceGrader(grade, duration);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -135,37 +94,78 @@ public abstract class Receiver : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void SpeedDownServerRpc(int speedGrade, float speedDuration, float speedProbability)
+    public void SpeedDownServerRpc(int grade, float duration, float probability)
     {
-        if (IsOwner) SpeedDown(speedGrade, speedDuration, speedProbability);
-        else SpeedDownClientRpc(speedGrade, speedDuration, speedProbability);
+        if (IsOwner) SpeedDown(grade, duration, probability);
+        else SpeedDownClientRpc(grade, duration, probability);
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void PowerDownServerRpc(int powerGrade, float powerDuration, float powerProbability)
+    public void PowerDownServerRpc(int grade, float duration, float probability)
     {
-        if (IsOwner) PowerDown(powerGrade, powerDuration, powerProbability);
-        else PowerDownClientRpc(powerGrade, powerDuration, powerProbability);
+        if (IsOwner) PowerDown(grade, duration, probability);
+        else PowerDownClientRpc(grade, duration, probability);
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void DefenceDownServerRpc(int defenceGrade, float defenceDuration, float defenceProbability)
+    public void DefenceDownServerRpc(int grade, float duration, float probability)
     {
-        if (IsOwner) DefenceDown(defenceGrade, defenceDuration, defenceProbability);
-        else DefenceDownClientRpc(defenceGrade, defenceDuration, defenceProbability);
+        if (IsOwner) DefenceDown(grade, duration, probability);
+        else DefenceDownClientRpc(grade, duration, probability);
     }
 
     [ClientRpc]
     public void HPDownClientRpc(float power) { if (IsOwner) HPDown(power); }
 
     [ClientRpc]
-    public void SpeedDownClientRpc(int speedGrade, float speedDuration, float speedProbability) { if (IsOwner) SpeedDown(speedGrade, speedDuration, speedProbability); }
+    public void SpeedDownClientRpc(int grade, float duration, float probability) { if (IsOwner) SpeedDown(grade, duration, probability); }
 
     [ClientRpc]
-    public void PowerDownClientRpc(int powerGrade, float powerDuration, float powerProbability) { if (IsOwner) PowerDown(powerGrade, powerDuration, powerProbability); }
+    public void PowerDownClientRpc(int grade, float duration, float probability) { if (IsOwner) PowerDown(grade, duration, probability); }
 
     [ClientRpc]
-    public void DefenceDownClientRpc(int defenceGrade, float defenceDuration, float defenceProbability) { if (IsOwner) DefenceDown(defenceGrade, defenceDuration, defenceProbability); }
+    public void DefenceDownClientRpc(int grade, float duration, float probability) { if (IsOwner) DefenceDown(grade, duration, probability); }
+
+
+
+    // Shooter Detection /////////////////////////////////////////////////////////////////////////////////////////////
+    public int lastShooterNo { get; private set; }
+    public string lastCauseOfDeath { get; private set; }
+
+    // Call : Server + Owner.
+    public void LastShooterDetector(int fighterNo, string causeOfDeath)
+    {
+        lastShooterNo = fighterNo;
+        lastCauseOfDeath = causeOfDeath;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void LastShooterDetectorServerRpc(int fighterNo, string causeOfDeath)
+    {
+        // Call in server too.
+        LastShooterDetector(fighterNo, causeOfDeath);
+        if (!IsOwner) LastShooterDetectorClientRpc(fighterNo, causeOfDeath);
+    }
+
+    [ClientRpc]
+    public void LastShooterDetectorClientRpc(int fighterNo, string causeOfDeath)
+    {
+        // Call in owner.
+        if (IsOwner) LastShooterDetector(fighterNo, causeOfDeath);
+    }
+
+
+
+    // Death & Revival /////////////////////////////////////////////////////////////////////////////////////////////
+    public virtual void OnDeath(int destroyerNo, string causeOfDeath)
+    {
+        col.enabled = false;
+    }
+
+    public virtual void OnRevival()
+    {
+        col.enabled = true;
+    }
 
 
 

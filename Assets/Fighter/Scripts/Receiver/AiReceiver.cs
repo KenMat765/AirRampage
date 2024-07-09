@@ -6,7 +6,7 @@ public class AiReceiver : Receiver
 {
     void Update()
     {
-        if (BattleInfo.isMulti && !IsHost) return;
+        if (!IsHost) return;
 
         if (!underAttack)
         {
@@ -15,11 +15,14 @@ public class AiReceiver : Receiver
         }
         else
         {
+            // Keep on updating shooter position when under attack.
             if (hitTimer > 0)
             {
                 UpdateShooterPosition();
                 hitTimer -= Time.deltaTime;
             }
+
+            // Set underAttack to false if no attacks are received for a certain period.
             else
             {
                 underAttack = false;
@@ -48,17 +51,20 @@ public class AiReceiver : Receiver
 
         if (!IsOwner) return;
 
-        // Do nothing when shooter is not opponent fighter.
+        // Do nothing when shooter is not fighter.
         if (fighterNo < 0)
         {
             return;
         }
 
-        // Current shooter detection.
+        // If not under attack.
         if (!underAttack)
         {
+            // Count up hit bullet count.
             hitTimer = 5;
             hitBulletCount++;
+
+            // If hit bullet count exceeds a certain threshhold, set underAttack to true.
             if (hitBulletCount > 10)
             {
                 underAttack = true;
@@ -66,6 +72,8 @@ public class AiReceiver : Receiver
                 hitTimer = 7;
             }
         }
+
+        // If already under attack, reset timer.
         else
         {
             hitTimer = 7;
@@ -73,12 +81,12 @@ public class AiReceiver : Receiver
     }
 
 
-    // Detect Shooter ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Shooter Detection ///////////////////////////////////////////////////////////////////////////////////////////////
     public bool underAttack { get; private set; }
     public GameObject currentShooter { get; private set; }
-    public Vector3 shooterPos { get; private set; }
-    public Vector3 relativeSPos { get; private set; }
-    public float relativeSAngle { get; private set; }
+    public Vector3 shooterPos { get; private set; }     // position of current shooter.
+    public Vector3 relativeSPos { get; private set; }   // relative posiiont to current shooter.
+    public float relativeSAngle { get; private set; }   // relative y-angle to current shooter.
 
     int hitBulletCount;
     float hitTimer;

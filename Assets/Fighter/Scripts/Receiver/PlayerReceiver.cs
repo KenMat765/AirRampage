@@ -16,6 +16,7 @@ public class PlayerReceiver : Receiver
 
         if (!IsOwner) return;
 
+        // Flash the screen red briefly when weapon hit.
         uGUIMannager.I.ScreenColorSetter(new Color(1, 0, 0, 0.2f));
     }
 }
