@@ -177,7 +177,7 @@ MonoBehaviour:
   bulletPower: 1
   bulletSpeed: 150
   bulletLifespan: 1
-  blastRange: 30
+  blastAngle: 30
   sensitivity: 0.2
 --- !u!114 &2221773611656743181
 MonoBehaviour:
@@ -331,11 +331,8 @@ MonoBehaviour:
   attack: {fileID: 7800842039064356382}
   receiver: {fileID: 5536389363294344597}
   radarIcon: {fileID: 4626117550613923900}
-  HP: 0
-  speed: 0
-  power: 0
-  defence: 0
-  defaultHP: 100
+  Hp: 0
+  defaultHp: 100
   defaultSpeed: 40
   defaultPower: 1
   defaultDefence: 1

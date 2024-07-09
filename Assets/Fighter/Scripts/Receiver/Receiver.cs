@@ -58,32 +58,29 @@ public abstract class Receiver : NetworkBehaviour
 
 
     // Damages & Debuffs ////////////////////////////////////////////////////////////////////////////////////////////
-
-    // HPDown is always called from weapon.
     public void HPDown(float power)
     {
         if (!acceptDamage) return;
-        float damage = power / fighterCondition.defence;
+        float damage = power / fighterCondition.defence.value;
         fighterCondition.HPDecreaser(damage);
     }
 
-    // Speed, Power, Defence is NOT always called from weapon.
-    public void SpeedDown(int grade, float duration, float probability)
+    public void SpeedDown(int delta_grade, float duration, float probability)
     {
         float random = Random.value;
-        if (random <= probability) fighterCondition.SpeedGrader(grade, duration);
+        if (random <= probability) fighterCondition.speed.Grade(delta_grade, duration);
     }
 
-    public void PowerDown(int grade, float duration, float probability)
+    public void PowerDown(int delta_grade, float duration, float probability)
     {
         float random = Random.value;
-        if (random <= probability) fighterCondition.PowerGrader(grade, duration);
+        if (random <= probability) fighterCondition.power.Grade(delta_grade, duration);
     }
 
-    public void DefenceDown(int grade, float duration, float probability)
+    public void DefenceDown(int delta_grade, float duration, float probability)
     {
         float random = Random.value;
-        if (random <= probability) fighterCondition.DefenceGrader(grade, duration);
+        if (random <= probability) fighterCondition.defence.Grade(delta_grade, duration);
     }
 
     [ServerRpc(RequireOwnership = false)]

@@ -178,13 +178,13 @@ public class AiMovement : Movement
         flipAudio.Play();
 
         // Stop moving.
-        float speed_temp = fighterCondition.speed;
-        fighterCondition.PauseGradingSpeed(0);
+        float tmp_speed = 0;
+        System.Guid guid = fighterCondition.speed.ApplyTempStatus(tmp_speed);
 
         // Restart moving a bit faster than flip time.
         float resume_offset = 0.3f;
         yield return new WaitForSeconds(somersaultTime - resume_offset);
-        fighterCondition.ResumeGradingSpeed();
+        fighterCondition.speed.RemoveTempStatus(guid);
         burnerController.StopStaticBurner();
         burnerController.StopSpark();
 

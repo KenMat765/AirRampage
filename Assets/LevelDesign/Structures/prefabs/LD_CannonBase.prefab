@@ -4849,11 +4849,8 @@ MonoBehaviour:
   attack: {fileID: 2387120010496438759}
   receiver: {fileID: 0}
   radarIcon: {fileID: 0}
-  HP: 0
-  speed: 0
-  power: 0
-  defence: 0
-  defaultHP: 1000
+  Hp: 0
+  defaultHp: 1000
   defaultSpeed: 0
   defaultPower: 1
   defaultDefence: 1
@@ -16734,16 +16731,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ace0acc9c234846ed8ebdbdb0075c545, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  homingAngle: 180
-  homingDist: 350
+  lockonAngle: 180
+  lockonDistance: 350
   originalNormalBullet: {fileID: 749786050208294807}
   blastImpact: {fileID: 7363698738687857408}
   blastSound: {fileID: 4203254887408812309}
-  power: 1.5
-  speed: 400
-  lifespan: 1
+  bulletPower: 1.5
+  bulletSpeed: 350
+  bulletLifespan: 1
   rotationSpeed: 10
-  blastInterval: 0.4
+  rapidInterval: 0.3
   bulletRed:
     serializedVersion: 2
     key0: {r: 0.7061162, g: 0.7075472, b: 0.5250979, a: 1}

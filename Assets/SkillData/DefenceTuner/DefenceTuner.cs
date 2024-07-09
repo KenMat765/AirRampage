@@ -38,7 +38,7 @@ public class DefenceTuner : SkillAssist
 
         base.Activator();
         MeterDecreaser(duration);
-        attack.fighterCondition.DefenceGrader(defence_grade, duration);
+        attack.fighterCondition.defence.Grade(defence_grade, duration);
         if (BattleInfo.isMulti)
         {
             if (IsHost) attack.SkillActivatorClientRpc(NetworkManager.Singleton.LocalClientId, skillNo);

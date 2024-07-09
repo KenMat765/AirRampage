@@ -48,9 +48,9 @@ public abstract class Movement : NetworkBehaviour
     protected const float MAX_TILT_Z = 60;
     Collider col;
 
-    protected void MoveForward()
+    protected virtual void MoveForward()
     {
-        float speed = fighterCondition.speed;
+        float speed = fighterCondition.speed.value;
         rigidBody.velocity = transform.forward * speed * uTurndirection; // Move by rigidbody (Slip-through does not occur)
     }
 

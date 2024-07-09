@@ -383,7 +383,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   condition: 1
   prev_condition: 1
-  speed: 30
+  speed: 40
   angular_speed: 0.8
   final_destination: {x: 0, y: 0, z: 0}
   next_destination: {x: 0, y: 0, z: 0}

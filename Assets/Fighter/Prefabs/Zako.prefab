@@ -6980,7 +6980,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3015566342
+  GlobalObjectIdHash: 1454742248
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -7037,12 +7037,9 @@ MonoBehaviour:
   attack: {fileID: 4261731771400978922}
   receiver: {fileID: 3543031913966478976}
   radarIcon: {fileID: 7226467974988038721}
-  HP: 0
-  speed: 0
-  power: 0
-  defence: 0
-  defaultHP: 15
-  defaultSpeed: 30
+  Hp: 0
+  defaultHp: 12
+  defaultSpeed: 40
   defaultPower: 1
   defaultDefence: 1
   red_body: {fileID: 1988865275300390}

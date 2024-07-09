@@ -9,6 +9,6 @@ public class Abi_HpBoost2 : Ability
     // public override string Explanation { get; protected set; } = "HP + 30";
     public override void Introducer(FighterCondition condition)
     {
-        condition.defaultHP += 30;
+        condition.defaultHp += 30;
     }
 }

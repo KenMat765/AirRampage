@@ -52,7 +52,7 @@ public class BurnerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        float cur_speed = fighterCondition.speed;
+        float cur_speed = fighterCondition.speed.value;
         if (cur_speed != prev_speed)
         {
             prev_speed = cur_speed;

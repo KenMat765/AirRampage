@@ -38,7 +38,7 @@ public class SpeedTuner : SkillAssist
 
         base.Activator();
         MeterDecreaser(duration);
-        attack.fighterCondition.SpeedGrader(speed_grade, duration);
+        attack.fighterCondition.speed.Grade(speed_grade, duration);
         if (BattleInfo.isMulti)
         {
             if (IsHost) attack.SkillActivatorClientRpc(NetworkManager.Singleton.LocalClientId, skillNo);

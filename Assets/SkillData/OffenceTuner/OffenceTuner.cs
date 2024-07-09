@@ -38,7 +38,7 @@ public class OffenceTuner : SkillAssist
 
         base.Activator();
         MeterDecreaser(duration);
-        attack.fighterCondition.PowerGrader(power_grade, duration);
+        attack.fighterCondition.power.Grade(power_grade, duration);
         if (BattleInfo.isMulti)
         {
             if (IsHost) attack.SkillActivatorClientRpc(NetworkManager.Singleton.LocalClientId, skillNo);

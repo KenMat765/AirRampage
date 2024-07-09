@@ -109,7 +109,7 @@ public class AiAttack : Attack
                         // For RepairDevice, activate when your HP is less than 50%.
                         if (skill_name == "RepairDevice")
                         {
-                            if (fighterCondition.HP < fighterCondition.defaultHP / 2)
+                            if (fighterCondition.Hp < fighterCondition.defaultHp / 2)
                             {
                                 skill.Activator();
                             }

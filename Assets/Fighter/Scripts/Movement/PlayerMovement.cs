@@ -144,8 +144,8 @@ public class PlayerMovement : Movement
         flipAudio.Play();
 
         // Stop moving.
-        float speed_temp = fighterCondition.speed;
-        fighterCondition.PauseGradingSpeed(0);
+        float tmp_speed = 0;
+        System.Guid guid = fighterCondition.speed.ApplyTempStatus(tmp_speed);
 
         // Look up camera (Owner only)
         if (IsOwner)
@@ -156,7 +156,7 @@ public class PlayerMovement : Movement
         // Restart moving a bit faster than flip time.
         float resume_offset = 0.3f;
         yield return new WaitForSeconds(somersaultTime - resume_offset);
-        fighterCondition.ResumeGradingSpeed();
+        fighterCondition.speed.RemoveTempStatus(guid);
         burnerController.StopStaticBurner();
 
         // Flip completes here.

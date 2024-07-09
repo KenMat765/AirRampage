@@ -1,27 +1,33 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using DG.Tweening;
 using Unity.Netcode;
 using Unity.Collections;
 using System.Linq;
+using System;
 
 // Fighterの状態を保持するクラス
 // このクラスのプロパティをもとに、Movement、Attack、Receiverを動かす
 public abstract class FighterCondition : NetworkBehaviour
 {
-    protected virtual void Start()
+    // Awake is called BEFORE fighterNo, fighterName, fighterTeam is assigned by ParticipantManager.
+    void Awake()
     {
-        // Only the owner refers to HP, speed, defence, and power.
-        if (!IsOwner) return;
-        SetLayerMasks(fighterTeam.Value);
-        HPResetter();
-        SpeedResetter();
-        PowerResetter();
-        DefenceResetter();
+        Hp = defaultHp;
+        speed = new FighterStatus(defaultSpeed);
+        power = new FighterStatus(defaultPower);
+        defence = new FighterStatus(defaultDefence);
     }
 
-    protected virtual void Update()
+    // Start is called AFTER fighterNo, fighterName, fighterTeam is assigned by ParticipantManager.
+    protected virtual void Start()
+    {
+        if (!IsOwner) return;
+
+        SetLayerMasks(fighterTeam.Value);
+    }
+
+    protected virtual void FixedUpdate()
     {
         // Only the owner of this fighter calls Update().
         if (!IsOwner) return;
@@ -38,14 +44,14 @@ public abstract class FighterCondition : NetworkBehaviour
 
         else
         {
-            if (HP <= 0)
+            if (Hp <= 0)
             {
                 Death(receiver.lastShooterNo, receiver.lastCauseOfDeath);
                 return;
             }
-            SpeedTimeUpdate();
-            PowerTimeUpdate();
-            DefenceTimeUpdate();
+            speed.Timer();
+            power.Timer();
+            defence.Timer();
         }
     }
 
@@ -92,27 +98,29 @@ public abstract class FighterCondition : NetworkBehaviour
 
 
 
-    // HP ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Only the owner of this fighter knows HP.
+    // Status //////////////////////////////////////////////////////////////////////////////////////////////////
     [Header("Current Status")]
-    public float HP;
-    public bool isDead { get; private set; }
+    public float Hp; // Only the owner of this fighter knows HP.
+    public FighterStatus speed;  // Only reffered by owner. (Movement)
+    public FighterStatus power;  // Reffered in every clients. (Weapon.Activate)
+    public FighterStatus defence;  // Only reffered by owner. (Receiver.Damage)
 
-    // Only the owner of this fighter initializes HP, because HP is linked among all clones.
-    void HPResetter() => HP = defaultHP;
+    [Header("Default Status")]
+    public float defaultHp;
+    public float defaultSpeed;
+    public float defaultPower;
+    public float defaultDefence;
 
-    // Decreaser is called only from the owner.
-    // Only the owner of this fighter should call this in Repair Device.
-    public virtual void HPDecreaser(float deltaHP)    // HPを増加させたい場合は、deltaHP < 0 とする
+    public virtual void HPDecreaser(float deltaHP)
     {
-        HP -= deltaHP;
-        HP = Mathf.Clamp(HP, 0, defaultHP);
+        Hp -= deltaHP;
+        Hp = Mathf.Clamp(Hp, 0, defaultHp);
     }
 
     [ServerRpc]
     public void HpDecreaser_UIServerRPC(float curHp)
     {
-        float normHp = curHp.Normalize(0, defaultHP);
+        float normHp = curHp.Normalize(0, defaultHp);
         HpDecreaser_UIClientRPC(normHp);
     }
 
@@ -120,325 +128,6 @@ public abstract class FighterCondition : NetworkBehaviour
     public void HpDecreaser_UIClientRPC(float normHp)
     {
         uGUIMannager.I.HPDecreaser_UI(fighterNo.Value, normHp);
-    }
-
-
-
-    // Speed, Power, Defence ////////////////////////////////////////////////////////////////////////////////////////
-    // Only reffered by owner. (Movement)
-    public float speed;
-    // Reffered in every clients. (Weapon.Activate)
-    public float power;
-    // Only reffered by owner. (Receiver.Damage)
-    public float defence;
-
-    // Only reffered by owner.
-    public int speed_grade { get; private set; }
-    public int power_grade { get; private set; }
-    public int defence_grade { get; private set; }
-
-    // Only reffered by owner.
-    float speed_duration;
-    float power_duration;
-    float defence_duration;
-
-    // Only reffered by owner.
-    float speed_timer;
-    float power_timer;
-    float defence_timer;
-
-    // Only reffered by owner.
-    bool pausing_speed;
-    bool pausing_power;
-    bool pausing_defence;
-
-    [Header("Default Status")]
-    public float defaultHP;
-    public float defaultSpeed = 5f;
-    public float defaultPower = 1f;
-    public float defaultDefence = 1f;
-
-    const float speed_change_duration = 0.35f;
-
-
-    // Only the owner of this fighter needs to updates timers.
-    void SpeedTimeUpdate()
-    {
-        if (speed_grade != 0)
-        {
-            speed_timer += Time.deltaTime;
-            if (speed_timer > speed_duration)
-            {
-                SpeedResetter();
-            }
-        }
-    }
-    void PowerTimeUpdate()
-    {
-        if (power_grade != 0)
-        {
-            power_timer += Time.deltaTime;
-            if (power_timer > power_duration)
-            {
-                PowerResetter();
-            }
-        }
-    }
-    void DefenceTimeUpdate()
-    {
-        if (defence_grade != 0)
-        {
-            defence_timer += Time.deltaTime;
-            if (defence_timer > defence_duration)
-            {
-                DefenceResetter();
-            }
-        }
-    }
-
-    // Only the owner of this fighter needs to initializes variables.
-    void SpeedResetter()
-    {
-        speed = defaultSpeed;
-        pausing_speed = false;
-        speed_grade = 0;
-        speed_duration = 0;
-        speed_timer = 0;
-    }
-    void PowerResetter()
-    {
-        power = defaultPower;
-        pausing_power = false;
-        power_grade = 0;
-        power_duration = 0;
-        power_timer = 0;
-    }
-    void DefenceResetter()
-    {
-        defence = defaultDefence;
-        pausing_defence = false;
-        defence_grade = 0;
-        defence_duration = 0;
-        defence_timer = 0;
-    }
-
-
-    // These methods are just for convenience.
-    void SpeedUpdater()
-    {
-        // pausing_speed の時は速度変更を行わない
-        if (pausing_speed) return;
-
-        switch (speed_grade)
-        {
-            case -3: SpeedMultiplier(1 / 3f, speed_change_duration); break;
-            case -2: SpeedMultiplier(1 / 2f, speed_change_duration); break;
-            case -1: SpeedMultiplier(1 / 1.5f, speed_change_duration); break;
-            case 0: SpeedMultiplier(1, speed_change_duration); break;
-            case 1: SpeedMultiplier(1.2f, speed_change_duration); break;
-            case 2: SpeedMultiplier(1.5f, speed_change_duration); break;
-            case 3: SpeedMultiplier(2, speed_change_duration); break;
-        }
-    }
-    void PowerUpdater()
-    {
-        // pausing_power の時は速度変更を行わない
-        if (pausing_power) return;
-
-        switch (power_grade)
-        {
-            case -3: PowerMultiplier(1 / 2f); break;
-            case -2: PowerMultiplier(1 / 1.5f); break;
-            case -1: PowerMultiplier(1 / 1.2f); break;
-            case 0: PowerMultiplier(1); break;
-            case 1: PowerMultiplier(1.2f); break;
-            case 2: PowerMultiplier(1.5f); break;
-            case 3: PowerMultiplier(2); break;
-        }
-    }
-    void DefenceUpdater()
-    {
-        // pausing_defence の時は速度変更を行わない
-        if (pausing_defence) return;
-
-        switch (defence_grade)
-        {
-            case -3: DefenceMultiplier(1 / 2f); break;
-            case -2: DefenceMultiplier(1 / 1.5f); break;
-            case -1: DefenceMultiplier(1 / 1.2f); break;
-            case 0: DefenceMultiplier(1); break;
-            case 1: DefenceMultiplier(1.2f); break;
-            case 2: DefenceMultiplier(1.5f); break;
-            case 3: DefenceMultiplier(2); break;
-        }
-    }
-    void SpeedMultiplier(float magnif, float duration = 0)
-    {
-        float end_speed = defaultSpeed * magnif;
-        DOTween.To(() => speed, (x) => speed = x, end_speed, duration);
-    }
-    void PowerMultiplier(float magnif) => power = defaultPower * magnif;
-    void DefenceMultiplier(float magnif) => defence = defaultDefence * magnif;
-
-
-    // Only the owner of this fighter needs to call Graders.
-    public void SpeedGrader(int delta_grade, float new_duration)
-    {
-        // Cache previous grade.
-        int pre_grade = speed_grade;
-
-        // Update grade.
-        speed_grade += delta_grade;
-        speed_grade = Mathf.Clamp(speed_grade, -3, 3);
-
-        // Update duration.
-        if (speed_grade == 0)
-        {
-            speed_timer = 0;
-            speed_duration = 0;
-        }
-        else
-        {
-            if (pre_grade == 0)
-            {
-                speed_timer = 0;
-                speed_duration = new_duration;
-            }
-            else
-            {
-                bool sign_flipped = pre_grade * speed_grade < 0;
-                if (sign_flipped)
-                {
-                    speed_timer = 0;
-                    speed_duration = new_duration;
-                }
-                else
-                {
-                    speed_duration += new_duration;
-                }
-            }
-        }
-
-        // Update status.
-        SpeedUpdater();
-    }
-    public void PowerGrader(int delta_grade, float new_duration)
-    {
-        // Cache previous grade.
-        int pre_grade = power_grade;
-
-        // Update grade.
-        power_grade += delta_grade;
-        power_grade = Mathf.Clamp(power_grade, -3, 3);
-
-        // Update duration.
-        if (power_grade == 0)
-        {
-            power_timer = 0;
-            power_duration = 0;
-        }
-        else
-        {
-            if (pre_grade == 0)
-            {
-                power_timer = 0;
-                power_duration = new_duration;
-            }
-            else
-            {
-                bool sign_flipped = pre_grade * power_grade < 0;
-                if (sign_flipped)
-                {
-                    power_timer = 0;
-                    power_duration = new_duration;
-                }
-                else
-                {
-                    power_duration += new_duration;
-                }
-            }
-        }
-
-        // Update status.
-        PowerUpdater();
-    }
-    public void DefenceGrader(int delta_grade, float new_duration)
-    {
-        // Cache previous grade.
-        int pre_grade = defence_grade;
-
-        // Update grade.
-        defence_grade += delta_grade;
-        defence_grade = Mathf.Clamp(defence_grade, -3, 3);
-
-        // Update duration.
-        if (defence_grade == 0)
-        {
-            defence_timer = 0;
-            defence_duration = 0;
-        }
-        else
-        {
-            if (pre_grade == 0)
-            {
-                defence_timer = 0;
-                defence_duration = new_duration;
-            }
-            else
-            {
-                bool sign_flipped = pre_grade * defence_grade < 0;
-                if (sign_flipped)
-                {
-                    defence_timer = 0;
-                    defence_duration = new_duration;
-                }
-                else
-                {
-                    defence_duration += new_duration;
-                }
-            }
-        }
-
-        // Update status.
-        DefenceUpdater();
-    }
-
-    // Only the owner of the fighter needs to pause/resume grading.
-    public void PauseGradingSpeed(float speed_temp, float duration = 0)
-    {
-        if (!IsOwner) return;
-        pausing_speed = true;
-        DOTween.To(() => speed, (x) => speed = x, speed_temp, duration);
-    }
-    public void ResumeGradingSpeed()
-    {
-        if (!IsOwner) return;
-        pausing_speed = false;
-        SpeedUpdater();
-    }
-    public void PauseGradingPower(float power_temp)
-    {
-        if (!IsOwner) return;
-        pausing_power = true;
-        power = power_temp;
-    }
-    public void ResumeGradingPower()
-    {
-        if (!IsOwner) return;
-        pausing_power = false;
-        PowerUpdater();
-    }
-    public void PauseGradingDefence(float defence_temp)
-    {
-        if (!IsOwner) return;
-        pausing_defence = true;
-        defence = defence_temp;
-    }
-    public void ResumeGradingDefence()
-    {
-        if (!IsOwner) return;
-        pausing_defence = false;
-        DefenceUpdater();
     }
 
 
@@ -526,15 +215,15 @@ public abstract class FighterCondition : NetworkBehaviour
             const float boost_duration = 10;
             if (has_comboBoostA)
             {
-                PowerGrader(boost_grade, boost_duration);
+                power.Grade(boost_grade, boost_duration);
             }
             if (has_comboBoostD)
             {
-                DefenceGrader(boost_grade, boost_duration);
+                defence.Grade(boost_grade, boost_duration);
             }
             if (has_comboBoostS)
             {
-                SpeedGrader(boost_grade, boost_duration);
+                speed.Grade(boost_grade, boost_duration);
             }
         }
 
@@ -581,6 +270,7 @@ public abstract class FighterCondition : NetworkBehaviour
 
 
     // Death & Revival //////////////////////////////////////////////////////////////////////////////////////////////
+    public bool isDead { get; private set; }
     public abstract float revivalTime { get; set; }
     public float reviveTimer { get; private set; }
 
@@ -662,10 +352,10 @@ public abstract class FighterCondition : NetworkBehaviour
 
         if (IsOwner)
         {
-            HPResetter();
-            SpeedResetter();
-            PowerResetter();
-            DefenceResetter();
+            Hp = defaultHp;
+            speed.Reset();
+            power.Reset();
+            defence.Reset();
             CPResetter();
             EndZone();
         }
@@ -730,4 +420,138 @@ public abstract class FighterCondition : NetworkBehaviour
     public bool has_comboBoostA { get; set; } = false;
     public bool has_comboBoostD { get; set; } = false;
     public bool has_comboBoostS { get; set; } = false;
+}
+
+
+
+public class FighterStatus
+{
+    public float value { get; private set; }
+    public float defaultValue { get; private set; }
+
+    // (Debuff) -3 << 0 >> 3 : (Buff)
+    public int grade { get; private set; }
+    public float gradeDuration { get; private set; }
+    float gradeTimer;
+
+    // Use this when you want to temporarily assign a different value to the status, suspending updates based on grade.
+    Dictionary<Guid, float> tmpStatusStack;
+
+    public FighterStatus(float defaultValue)
+    {
+        this.defaultValue = defaultValue;
+        tmpStatusStack = new Dictionary<Guid, float>();
+        Reset();
+    }
+
+    public void Reset()
+    {
+        value = defaultValue;
+        grade = 0;
+        gradeDuration = 0;
+        gradeTimer = 0;
+        tmpStatusStack.Clear();
+    }
+
+    public void Timer()
+    {
+        if (grade != 0)
+        {
+            gradeTimer += Time.deltaTime;
+            if (gradeTimer > gradeDuration)
+            {
+                Reset();
+            }
+        }
+    }
+
+    public void Grade(int delta_grade, float duration)
+    {
+        // Update grade.
+        int pre_grade = grade;
+        grade += delta_grade;
+        grade = Mathf.Clamp(grade, -3, 3);
+
+        // Update grade duration.
+        if (grade == 0)
+        {
+            gradeTimer = 0;
+            gradeDuration = 0;
+        }
+        else
+        {
+            if (pre_grade == 0)
+            {
+                gradeTimer = 0;
+                gradeDuration = duration;
+            }
+            else
+            {
+                // When buffs and debuffs are swapped.
+                bool sign_flipped = pre_grade * grade < 0;
+                if (sign_flipped)
+                {
+                    gradeTimer = 0;
+                    gradeDuration = duration;
+                }
+                else
+                {
+                    gradeDuration += duration;
+                }
+            }
+        }
+
+        // Update status value only if temporary status is none.
+        if (tmpStatusStack.Count == 0)
+        {
+            UpdateStatusByGrade();
+        }
+    }
+
+    /// <returns>Guid used to remove added temp value.</returns>
+    public Guid ApplyTempStatus(float tmp_value)
+    {
+        Guid guid = Guid.NewGuid();
+        tmpStatusStack[guid] = tmp_value;
+        value = tmp_value;
+        return guid;
+    }
+
+    /// <param name="guid">Use the same guid published from ApplyTempStatus.</param>
+    public void RemoveTempStatus(Guid guid)
+    {
+        if (!tmpStatusStack.ContainsKey(guid))
+        {
+            return;
+        }
+        tmpStatusStack.Remove(guid);
+
+        // If all temporary status were removed, resume updating status by grade.
+        if (tmpStatusStack.Count == 0)
+        {
+            UpdateStatusByGrade();
+        }
+
+        // If temporary status still remains, apply the last value to current status.
+        else
+        {
+            float tmp_value = tmpStatusStack.Last().Value;
+            value = tmp_value;
+        }
+    }
+
+    void UpdateStatusByGrade()
+    {
+        float multiplier = 1.0f;
+        switch (grade)
+        {
+            case -3: multiplier = 1.0f / 2.0f; break;
+            case -2: multiplier = 1.0f / 1.5f; break;
+            case -1: multiplier = 1.0f / 1.2f; break;
+            case 1: multiplier = 1.2f; break;
+            case 2: multiplier = 1.5f; break;
+            case 3: multiplier = 2.0f; break;
+        }
+        value = defaultValue * multiplier;
+    }
 }

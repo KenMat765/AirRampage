@@ -19,9 +19,9 @@ public class AiCondition : FighterCondition
         }
     }
 
-    protected override void Update()
+    protected override void FixedUpdate()
     {
-        base.Update();
+        base.FixedUpdate();
         CPUpdate();
     }
 
@@ -30,7 +30,7 @@ public class AiCondition : FighterCondition
     {
         if (!IsOwner) return;
         base.HPDecreaser(deltaHP);
-        HpDecreaser_UIServerRPC(HP);
+        HpDecreaser_UIServerRPC(Hp);
     }
 
     protected override void OnDeath(int destroyerNo, string causeOfDeath)

@@ -328,11 +328,8 @@ MonoBehaviour:
   attack: {fileID: 1058749907071328082}
   receiver: {fileID: 3430642439028620820}
   radarIcon: {fileID: 3627874878998011375}
-  HP: 0
-  speed: 0
-  power: 0
-  defence: 0
-  defaultHP: 100
+  Hp: 0
+  defaultHp: 100
   defaultSpeed: 40
   defaultPower: 1
   defaultDefence: 1

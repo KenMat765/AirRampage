@@ -15,6 +15,7 @@ class NitroBoost : SkillAssist
         boost_duration = levelData.FreeFloat2;
     }
 
+    System.Guid guid;
     BurnerController burner;
     WindController wind;
 
@@ -31,41 +32,46 @@ class NitroBoost : SkillAssist
 
     public override void Activator(int[] transfer = null)
     {
-        // Play effect.
-        const float accel_duration = 0.2f;
+        // Play effects.
         burner.PlaySpark();
         wind.WindGenerator(2, 15);
 
-        if (BattleInfo.isMulti && !attack.IsOwner) return;
+        if (!attack.IsOwner) return;
 
         base.Activator();
         MeterDecreaser(boost_duration, EndProccess);
-        attack.fighterCondition.PauseGradingSpeed(attack.fighterCondition.defaultSpeed * speed_magnif, accel_duration);
+        float tmp_speed = attack.fighterCondition.defaultSpeed * speed_magnif;
+        guid = attack.fighterCondition.speed.ApplyTempStatus(tmp_speed);
 
         if (attack.IsLocalPlayer)
         {
-            CameraController.I.ChangeView(100, accel_duration);
+            const float ACCEL_DURATION = 0.2f;
+            const float FIELD_OF_VIEW = 100;
+            CameraController.I.ChangeView(FIELD_OF_VIEW, ACCEL_DURATION);
         }
 
-        if (BattleInfo.isMulti)
+        if (IsHost)
         {
-            if (IsHost) attack.SkillActivatorClientRpc(NetworkManager.Singleton.LocalClientId, skillNo);
-            else attack.SkillActivatorServerRpc(NetworkManager.Singleton.LocalClientId, skillNo);
+            attack.SkillActivatorClientRpc(NetworkManager.Singleton.LocalClientId, skillNo);
+        }
+        else
+        {
+            attack.SkillActivatorServerRpc(NetworkManager.Singleton.LocalClientId, skillNo);
         }
     }
 
     public override void EndProccess()
     {
-        // Stop effect.
+        // Stop effects.
         const float decelerate_duration = 1.5f;
         burner.StopSpark();
         wind.ResetWind();
 
-        if (BattleInfo.isMulti && !attack.IsOwner) return;
+        if (!attack.IsOwner) return;
 
         // Reset fighter condition.
         base.EndProccess();
-        attack.fighterCondition.ResumeGradingSpeed();
+        attack.fighterCondition.speed.RemoveTempStatus(guid);
 
         if (attack.IsLocalPlayer)
         {
@@ -73,7 +79,7 @@ class NitroBoost : SkillAssist
         }
 
         // Send RPC to all clones to end this skill.
-        if (BattleInfo.isMulti) attack.SkillEndProccessServerRpc(NetworkManager.Singleton.LocalClientId, skillNo);
+        attack.SkillEndProccessServerRpc(NetworkManager.Singleton.LocalClientId, skillNo);
     }
 
     public override void ForceTermination(bool maintain_charge)
@@ -84,7 +90,7 @@ class NitroBoost : SkillAssist
         if (BattleInfo.isMulti && !attack.IsOwner) return;
 
         base.ForceTermination(maintain_charge);
-        attack.fighterCondition.ResumeGradingSpeed();
+        attack.fighterCondition.speed.RemoveTempStatus(guid);
 
         if (attack.IsLocalPlayer)
         {

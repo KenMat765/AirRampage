@@ -20,9 +20,9 @@ public class PlayerCondition : FighterCondition
         }
     }
 
-    protected override void Update()
+    protected override void FixedUpdate()
     {
-        base.Update();
+        base.FixedUpdate();
         CPUpdate();
     }
 
@@ -31,7 +31,7 @@ public class PlayerCondition : FighterCondition
     {
         if (!IsOwner) return;
         base.HPDecreaser(deltaHP);
-        HpDecreaser_UIServerRPC(HP);
+        HpDecreaser_UIServerRPC(Hp);
     }
 
 

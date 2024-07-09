@@ -694,9 +694,9 @@ public class uGUIMannager : Singleton<uGUIMannager>
         Color dot_blue = new Color(0.318f, 0.425f, 1, 1);
         Color dot_orange = new Color(1, 0.356f, 0.175f, 1);
 
-        int speed_grade = playerInfo.fighterCondition.speed_grade;
-        int power_grade = playerInfo.fighterCondition.power_grade;
-        int defence_grade = playerInfo.fighterCondition.defence_grade;
+        int speed_grade = playerInfo.fighterCondition.speed.grade;
+        int power_grade = playerInfo.fighterCondition.power.grade;
+        int defence_grade = playerInfo.fighterCondition.defence.grade;
 
         // gradeが変化した時だけDotsの色を変更
         if (speed_grade != speed_grade_cashe)

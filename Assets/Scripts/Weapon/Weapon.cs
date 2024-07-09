@@ -339,7 +339,8 @@ public abstract class Weapon : Utilities
 
     public void Activate(GameObject target)
     {
-        power_temp = power * attack.fighterCondition.power;
+        float fighter_power = attack.fighterCondition.power.value;
+        power_temp = power * fighter_power;
         targetObject = target;
         gameObject.SetActive(true);
     }
