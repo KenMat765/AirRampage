@@ -8,6 +8,6 @@ public class Abi_RapidShot2 : Ability
     // public override string Explanation { get; protected set; } = "Somewhat increases the fire rate of normal bullet.";
     public override void Introducer(FighterCondition condition)
     {
-        condition.attack.setInterval /= 1.4f;
+        condition.attack.blastInterval /= 1.4f;
     }
 }

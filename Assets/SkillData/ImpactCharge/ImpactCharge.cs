@@ -30,9 +30,9 @@ public class ImpactCharge : SkillAttack
                 target_no[0] = -1;
 
                 // Activate your own skill.
-                if (attack.homingCount > 0)
+                if (attack.lockonCount > 0)
                 {
-                    int targetNo = attack.homingTargetNos[0];
+                    int targetNo = attack.lockonTargetNos[0];
                     target = ParticipantManager.I.fighterInfos[targetNo].body;
                     target_no[0] = targetNo;
                 }
@@ -63,9 +63,9 @@ public class ImpactCharge : SkillAttack
         else
         {
             // Activate your own skill.
-            if (attack.homingCount > 0)
+            if (attack.lockonCount > 0)
             {
-                int targetNo = attack.homingTargetNos[0];
+                int targetNo = attack.lockonTargetNos[0];
                 target = ParticipantManager.I.fighterInfos[targetNo].body;
             }
             weapons[GetPrefabIndex()].Activate(target);

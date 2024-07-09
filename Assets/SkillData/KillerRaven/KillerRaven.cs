@@ -52,12 +52,12 @@ public class KillerRaven : SkillAttack
                 for (int k = 0; k < target_nos.Length; k++) target_nos[k] = -1;
 
                 // Activate your own skill.
-                if (attack.homingCount > 0)
+                if (attack.lockonCount > 0)
                 {
                     for (int k = 0; k < raven_count; k++)
                     {
                         // int target_no = attack.homingTargetNos.RandomChoice();
-                        int target_no = attack.homingTargetNos[k % attack.homingCount];
+                        int target_no = attack.lockonTargetNos[k % attack.lockonCount];
 
                         // Pack target fighters to array to activate your skill.
                         targets[k] = ParticipantManager.I.fighterInfos[target_no].body;
@@ -105,12 +105,12 @@ public class KillerRaven : SkillAttack
         else
         {
             // Activate your own skill.
-            if (attack.homingCount > 0)
+            if (attack.lockonCount > 0)
             {
                 for (int k = 0; k < raven_count; k++)
                 {
                     // int target_no = attack.homingTargetNos.RandomChoice();
-                    int target_no = attack.homingTargetNos[k % attack.homingCount];
+                    int target_no = attack.lockonTargetNos[k % attack.lockonCount];
                     targets[k] = ParticipantManager.I.fighterInfos[target_no].body;
                 }
             }

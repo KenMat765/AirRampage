@@ -6,12 +6,9 @@ using Unity.Netcode;
 
 public abstract class Attack : NetworkBehaviour
 {
-    // If able to attack or not.
-    public bool attackable { get; set; } = false;
+    public FighterCondition fighterCondition { get; set; }
+    public bool attackable { get; set; } = false;   // If able to attack or not.
 
-
-    // 各武器の生成時に値を追加していく
-    // ゲーム中に動的に生成される武器も存在するので、Attackからまとめて取得することはしない
     protected virtual void Awake()
     {
         fighterCondition = GetComponentInParent<FighterCondition>();
@@ -19,69 +16,41 @@ public abstract class Attack : NetworkBehaviour
     }
 
 
-    public FighterCondition fighterCondition { get; set; }
+
+    // Death & Revival ///////////////////////////////////////////////////////////////
     public virtual void OnDeath() { }
     public virtual void OnRevival() { }
 
 
 
-    // Skills ////////////////////////////////////////////////////////////////////////
-    // These are set in Awake() of ParticipantManager
-    public Skill[] skills { get; set; } = new Skill[GameInfo.MAX_SKILL_COUNT];
-    public void LockAllSkills(bool lock_skill)
-    {
-        foreach (Skill skill in skills)
-        {
-            if (skill != null)
-            {
-                if (skill.isUsing)
-                {
-                    skill.ForceTermination(true);
-                }
-                skill.isLocked = lock_skill;
-            }
-        }
-    }
-    public void TerminateAllSkills()
-    {
-        foreach (Skill skill in skills)
-        {
-            if (skill != null)
-            {
-                bool maintain_charge = fighterCondition.has_skillKeep;
-                skill.ForceTermination(maintain_charge);
-            }
-        }
-    }
-
-
-
     // Lock On ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    public List<int> homingTargetNos { get; private set; } = new List<int>();    // homingTargets = body or shield
-    public int homingCount { get { return homingTargetNos.Count; } }
+    public List<int> lockonTargetNos { get; private set; } = new List<int>(); // targets: body or shield
+    public int lockonCount { get { return lockonTargetNos.Count; } }
 
-    [Header("Homing")]
-    public float homingAngle;    // Abilityで変化
-    public float homingDist;    // Abilityで変化
+    [Header("Lockon")]
+    public float lockonAngle;       // change by Ability
+    public float lockonDistance;    // change by Ability
 
-    protected void SetHomingTargetNos()
+    // Search for the fighter number of locked-on targets.
+    protected void SetLockonTargetNos()
     {
-        Vector3 my_position = transform.position;
+        Transform my_transform = transform;
+        Vector3 my_position = my_transform.position;
         Vector3 bullet_position = originalNormalBullet.transform.position;
 
         // Detect Fighter-Root to detect target regardless of opponents shield activation. (Collider of body is disabled when activating shield)
-        Collider[] colliders = Physics.OverlapSphere(bullet_position, homingDist, fighterCondition.fighters_mask);
+        Collider[] colliders = Physics.OverlapSphere(bullet_position, lockonDistance, fighterCondition.fighters_mask);
 
-        // Detect targets, and set them to homingTargetNos.
+        // Detect targets, and set them to lockonTargetNos.
         if (colliders.Length > 0)
         {
             var possibleTargets = colliders.Select(t => t.gameObject);
 
             // Get fighter number of targets.
-            homingTargetNos = possibleTargets.Where(p =>
+            lockonTargetNos = possibleTargets.Where(p =>
 
-                // Check if target is inside homing range.
-                Vector3.Angle(transform.forward, p.transform.position - my_position) < homingAngle &&
+                // Check if target is inside lockon range.
+                Vector3.Angle(my_transform.forward, p.transform.position - my_position) < lockonAngle &&
 
                 // Check if there are no obstacles (terrain + terminals) between self and target.
                 !Physics.Raycast(my_position, p.transform.position - my_position, Vector3.Magnitude(p.transform.position - my_position), FighterCondition.obstacles_mask))
@@ -95,7 +64,7 @@ public abstract class Attack : NetworkBehaviour
         else
         {
             // Clean up list.
-            homingTargetNos.Clear();
+            lockonTargetNos.Clear();
         }
     }
 
@@ -103,13 +72,12 @@ public abstract class Attack : NetworkBehaviour
 
     // Only For Terminal Conquest ///////////////////////////////////////////////////////////////////////////////////
     public List<int> attackableTerminals { get; private set; } = new List<int>();
-
     protected void SearchAttackableTerminals()
     {
         Vector3 my_position = transform.position;
         Vector3 bullet_position = originalNormalBullet.transform.position;
 
-        Collider[] colliders = Physics.OverlapSphere(bullet_position, homingDist, fighterCondition.terminals_mask);
+        Collider[] colliders = Physics.OverlapSphere(bullet_position, lockonDistance, fighterCondition.terminals_mask);
 
         // Detect targets, and set them to aroundTerminals.
         if (colliders.Length > 0)
@@ -119,8 +87,8 @@ public abstract class Attack : NetworkBehaviour
             // Get terminal number of targets.
             attackableTerminals = possibleTargets.Where(p =>
 
-                // Check if target is inside homing range.
-                Vector3.Angle(transform.forward, p.transform.position - my_position) < homingAngle &&
+                // Check if target is inside lockon range.
+                Vector3.Angle(transform.forward, p.transform.position - my_position) < lockonAngle &&
 
                 // Check if there are no obstacles (terrain) between self and target.
                 !Physics.Raycast(my_position, p.transform.position - my_position, Vector3.Magnitude(p.transform.position - my_position), GameInfo.terrainMask))
@@ -139,21 +107,24 @@ public abstract class Attack : NetworkBehaviour
 
     // Normal Blast /////////////////////////////////////////////////////////////////////////////////////////////////
     [Header("Normal Blast")]
-    [SerializeField] protected GameObject originalNormalBullet;
-    [SerializeField] protected ParticleSystem blastImpact;
-    [SerializeField] protected AudioSource blastSound;
-    protected List<Weapon> normalWeapons = new List<Weapon>();
-    protected abstract int rapidCount { get; set; }
-    protected float blastTimer { get; set; }
-    HomingType homingType = HomingType.PreHoming;
+    [SerializeField] protected GameObject originalNormalBullet; // original prefab of the normal bullet
+    [SerializeField] protected ParticleSystem blastImpact;      // bullet firing effect
+    [SerializeField] protected AudioSource blastSound;          // bullet firing sound
 
-    // Variables that may vary by Ability.
-    public abstract float setInterval { get; set; }
-    public float power = 1, speed = 150, lifespan = 1;
+    // Properties of normal bullet.
+    public float bulletPower = 1;                               // power of normal bullet (≠ FighterCondition.power)
+    public float bulletSpeed = 150;                             // speed of normal bullet (≠ FighterCondition.speed)
+    public float bulletLifespan = 1;                            // lifespan of normal bullet
+    public abstract float blastInterval { get; set; }           // interval until the next blast (changes by Ability)
+    HomingType homingType = HomingType.PreHoming;               // homing type of normal bullet (PreHoming: face towards the enemy upon firing)
+
+    protected List<Weapon> normalWeapons = new List<Weapon>();  // list of Weapon components attached to each bullets
+    protected float blastTimer { get; set; }                    // timer used for firing at specific interval.
 
     // This if DEATH_NORMAL_BLAST for fighters, but change this to SPECIFIC_DEATH_CANNON for cannons.
-    protected virtual string causeOfDeath { get; set; } = FighterCondition.DEATH_NORMAL_BLAST;
+    protected abstract string causeOfDeath { get; set; }
 
+    // Instantiate a specified number of bullets.
     protected void PoolNormalBullets(int quantity)
     {
         Transform orig_trans = originalNormalBullet.transform;
@@ -163,10 +134,11 @@ public abstract class Attack : NetworkBehaviour
             Weapon weapon = bullet.GetComponent<Weapon>();
             normalWeapons.Add(weapon);
             weapon.WeaponSetter(gameObject, this, false, causeOfDeath);
-            weapon.WeaponParameterSetter(power, speed, lifespan, homingType);
+            weapon.WeaponParameterSetter(bulletPower, bulletSpeed, bulletLifespan, homingType);
         }
     }
 
+    // Get the ID of bullet that are currently not in use.
     protected int GetNormalBulletIndex()
     {
         // Get ready weapon.
@@ -198,8 +170,7 @@ public abstract class Attack : NetworkBehaviour
     ///<param name="target"> Put null when there are no targets. </param>
     protected void NormalRapid(int rapidCount, GameObject target = null)
     {
-        // const float interval = 0.05f;
-        float interval = setInterval / this.rapidCount;
+        float interval = blastInterval / rapidCount;
         IEnumerator normalRapid()
         {
             NormalBlast(target);
@@ -229,7 +200,42 @@ public abstract class Attack : NetworkBehaviour
         NormalRapid(rapidCount, target);
     }
 
-    // Declared here because Skill cannnot call RPCs. (they are attached AFTER fighters are spawned)
+
+
+    // Skills ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public Skill[] skills { get; set; } = new Skill[GameInfo.MAX_SKILL_COUNT];  // Set in ParticipantManager.Awake
+
+    // Stop charging and disable the use of skills.
+    public void LockAllSkills(bool lock_skill)
+    {
+        foreach (Skill skill in skills)
+        {
+            if (skill != null)
+            {
+                if (skill.isUsing)
+                {
+                    skill.ForceTermination(true);
+                }
+                skill.isLocked = lock_skill;
+            }
+        }
+    }
+
+    // Terminate all currently active skills.
+    public void TerminateAllSkills()
+    {
+        foreach (Skill skill in skills)
+        {
+            if (skill != null)
+            {
+                bool maintain_charge = fighterCondition.has_skillKeep;
+                skill.ForceTermination(maintain_charge);
+            }
+        }
+    }
+
+    // Activation RPCs are declared here because Skill component cannnot call RPCs. (they are attached AFTER fighters are spawned)
+
     [ServerRpc]
     /// <Param name="targetNos">Used for attack & disturb skills to send target fighter numbers.</Param>
     public void SkillActivatorServerRpc(ulong senderId, int skillNo, int[] targetNos = null)

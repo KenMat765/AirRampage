@@ -7,12 +7,11 @@ public class CannonAttack : Attack
     // Set from Inspector.
     [Header("Cannon Settings")]
     [SerializeField] float rotationSpeed;
-    [SerializeField] float blastInterval;
+    [SerializeField] float rapidInterval;
     [SerializeField] Gradient bulletRed, bulletBlue;
 
     // Blasts {rapidCount} bullets in {setInterval} seconds.
-    public override float setInterval { get; set; } // rewrited in Awake.
-    protected override int rapidCount { get; set; } = 3;
+    public override float blastInterval { get; set; } // rewrited in Awake.
 
     // This if DEATH_NORMAL_BLAST for fighters, but change this to SPECIFIC_DEATH_CANNON for cannons.
     protected override string causeOfDeath { get; set; } = FighterCondition.SPECIFIC_DEATH_CANNON;
@@ -51,7 +50,7 @@ public class CannonAttack : Attack
         PoolNormalBullets(5);
 
         // Set blast interval from Inspector. (It does not change by ability)
-        setInterval = blastInterval;
+        blastInterval = rapidInterval;
 
         // Set attackable by yourself. (It is not set from ParticipantManager)
         attackable = true;
@@ -69,25 +68,26 @@ public class CannonAttack : Attack
         else
         {
             // Search targets.
-            SetHomingTargetNos();
+            SetLockonTargetNos();
 
-            if (homingCount > 0)
+            if (lockonCount > 0)
             {
                 // Reset timer.
-                blastTimer = setInterval;
+                blastTimer = blastInterval;
 
                 // Blast normal bullets for yourself.
-                NormalRapid(rapidCount);
+                int rapid_count = 3;
+                NormalRapid(rapid_count);
                 // Send to all clones to blast bullets.
-                NormalRapidClientRpc(OwnerClientId, rapidCount);
+                NormalRapidClientRpc(OwnerClientId, rapid_count);
             }
         }
 
         // Muzzle Rotation. ////////////////////////////////////////////////////////////////////////////////////////
-        if (homingCount > 0)
+        if (lockonCount > 0)
         {
             // Determine target.
-            int targetNo = homingTargetNos[0];
+            int targetNo = lockonTargetNos[0];
             GameObject target = ParticipantManager.I.fighterInfos[targetNo].body;
 
             // Rotate muzzle toward target.
@@ -105,6 +105,6 @@ public class CannonAttack : Attack
     {
         Transform trans = transform;
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(trans.position, homingDist);
+        Gizmos.DrawWireSphere(trans.position, lockonDistance);
     }
 }

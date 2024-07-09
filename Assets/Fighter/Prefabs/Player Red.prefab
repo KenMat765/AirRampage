@@ -169,14 +169,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75552e2a2fc444db193e515874f44650, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  homingAngle: 45
-  homingDist: 200
+  lockonAngle: 45
+  lockonDistance: 200
   originalNormalBullet: {fileID: 1606845707113445}
   blastImpact: {fileID: 198700518705561751}
   blastSound: {fileID: 82973143086541104}
-  power: 1
-  speed: 150
-  lifespan: 1
+  bulletPower: 1
+  bulletSpeed: 150
+  bulletLifespan: 1
   blastRange: 30
   sensitivity: 0.2
 --- !u!114 &2221773611656743181
@@ -331,45 +331,6 @@ MonoBehaviour:
   attack: {fileID: 7800842039064356382}
   receiver: {fileID: 8249018594591096013}
   radarIcon: {fileID: 3627874878998011375}
-  fighterNo:
-    m_InternalValue: 0
-  fighterName:
-    m_InternalValue:
-      utf8LengthInBytes: 0
-      bytes:
-        offset0000:
-          byte0000: 0
-          byte0001: 0
-          byte0002: 0
-          byte0003: 0
-          byte0004: 0
-          byte0005: 0
-          byte0006: 0
-          byte0007: 0
-          byte0008: 0
-          byte0009: 0
-          byte0010: 0
-          byte0011: 0
-          byte0012: 0
-          byte0013: 0
-          byte0014: 0
-          byte0015: 0
-        byte0016: 0
-        byte0017: 0
-        byte0018: 0
-        byte0019: 0
-        byte0020: 0
-        byte0021: 0
-        byte0022: 0
-        byte0023: 0
-        byte0024: 0
-        byte0025: 0
-        byte0026: 0
-        byte0027: 0
-        byte0028: 0
-        byte0029: 0
-  fighterTeam:
-    m_InternalValue: 0
   HP: 0
   speed: 0
   power: 0
@@ -393,8 +354,6 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 4194368
-  finalDestination: {x: 0, y: 0, z: 0}
-  nextDestination: {x: 0, y: 0, z: 0}
   burnerController: {fileID: 6042251533966865366}
   rollSpark: {fileID: 8606861055914180142}
   flipAudio: {fileID: 9038844553108165233}

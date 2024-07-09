@@ -9,6 +9,6 @@ public class Abi_JetBallet3 : Ability
 
     public override void Introducer(FighterCondition condition)
     {
-        condition.attack.speed += 75;
+        condition.attack.bulletSpeed += 75;
     }
 }

@@ -443,7 +443,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
 
     void LockOnManager()
     {
-        if (playerInfo.attack.homingCount == 0)
+        if (playerInfo.attack.lockonCount == 0)
         {
             Color defaultColor = new Color(0.84f, 0.84f, 0.84f, 0.0f);
             Transform player_trans = playerInfo.fighter.transform;
@@ -453,7 +453,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
         }
         else
         {
-            int currentTargetNo = playerInfo.attack.homingTargetNos[0];
+            int currentTargetNo = playerInfo.attack.lockonTargetNos[0];
             GameObject currentTarget = ParticipantManager.I.fighterInfos[currentTargetNo].body;
             lockOn.rectTransform.anchoredPosition = RectTransformUtility.WorldToScreenPoint(CameraController.I.cam, currentTarget.transform.position).Screen2Canvas();
             lockOn.color = Color.red;

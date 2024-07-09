@@ -9,6 +9,6 @@ public class Abi_JetBallet1 : Ability
     // public override string Explanation { get; protected set; } = "Slightly increases the normal bullet speed.";
     public override void Introducer(FighterCondition condition)
     {
-        condition.attack.speed += 30;
+        condition.attack.bulletSpeed += 30;
     }
 }

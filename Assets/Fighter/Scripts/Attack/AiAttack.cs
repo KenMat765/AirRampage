@@ -6,8 +6,10 @@ using UnityEngine;
 public class AiAttack : Attack
 {
     // Blasts {rapidCount} bullets in {setInterval} seconds.
-    public override float setInterval { get; set; } = 0.6f;
-    protected override int rapidCount { get; set; } = 3;
+    public override float blastInterval { get; set; } = 0.6f;
+
+    // This if DEATH_NORMAL_BLAST for fighters, but change this to SPECIFIC_DEATH_CANNON for cannons.
+    protected override string causeOfDeath { get; set; } = FighterCondition.DEATH_NORMAL_BLAST;
 
     // Must be called on every clients.
     public override void OnDeath()
@@ -49,29 +51,30 @@ public class AiAttack : Attack
         else
         {
             // Search targets. (Fighters or Terminals)
-            SetHomingTargetNos();
+            SetLockonTargetNos();
             if (BattleInfo.rule == Rule.TERMINAL_CONQUEST) SearchAttackableTerminals();
 
-            if (homingCount > 0 || (BattleInfo.rule == Rule.TERMINAL_CONQUEST && attackableTerminals.Count > 0))
+            if (lockonCount > 0 || (BattleInfo.rule == Rule.TERMINAL_CONQUEST && attackableTerminals.Count > 0))
             {
                 // Reset timer.
-                blastTimer = setInterval;
+                blastTimer = blastInterval;
 
                 // Determine target.
                 int targetNo = -1;
                 GameObject target = null;
 
                 // Do not home to terminals.
-                if (homingCount > 0)
+                if (lockonCount > 0)
                 {
-                    targetNo = homingTargetNos[0];
+                    targetNo = lockonTargetNos[0];
                     target = ParticipantManager.I.fighterInfos[targetNo].body;
                 }
 
                 // Blast normal bullets for yourself.
-                NormalRapid(rapidCount, target);
+                int rapid_count = 3;
+                NormalRapid(rapid_count, target);
                 // Send to all clones to blast bullets.
-                NormalRapidClientRpc(OwnerClientId, rapidCount, targetNo);
+                NormalRapidClientRpc(OwnerClientId, rapid_count, targetNo);
             }
         }
 
@@ -94,7 +97,7 @@ public class AiAttack : Attack
                 {
                     case SkillType.attack:
                         // Activate when fighters in front is more than thresh, or attackable terminals are in front.
-                        if (homingCount >= target_thresh || (BattleInfo.rule == Rule.TERMINAL_CONQUEST && attackableTerminals.Count > 0))
+                        if (lockonCount >= target_thresh || (BattleInfo.rule == Rule.TERMINAL_CONQUEST && attackableTerminals.Count > 0))
                         {
                             skill.Activator();
                             elapsed_times[skill_num] = 0;
@@ -132,7 +135,7 @@ public class AiAttack : Attack
 
                     case SkillType.disturb:
                         // Activate when opponents in front is more than thresh.
-                        if (homingCount >= target_thresh)
+                        if (lockonCount >= target_thresh)
                         {
                             skill.Activator();
                             elapsed_times[skill_num] = 0;

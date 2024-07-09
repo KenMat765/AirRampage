@@ -6,11 +6,14 @@ using UnityEngine;
 public class PlayerAttack : Attack
 {
     // Blasts {rapidCount} bullets in {setInterval} seconds.
-    public override float setInterval { get; set; } = 0.6f;
-    protected override int rapidCount { get; set; } = 3;
+    public override float blastInterval { get; set; } = 0.6f;
+
+    // This if DEATH_NORMAL_BLAST for fighters, but change this to SPECIFIC_DEATH_CANNON for cannons.
+    protected override string causeOfDeath { get; set; } = FighterCondition.DEATH_NORMAL_BLAST;
 
     // Blast direction control.
-    [SerializeField] float blastRange = 30;
+    [Header("Blast Direction Control")]
+    [SerializeField] float blastAngle = 30;
     [SerializeField] float sensitivity = 0.2f;
     NetworkVariable<Quaternion> muzzleRot = new NetworkVariable<Quaternion>(writePerm: NetworkVariableWritePermission.Owner);
     bool isBlasting = false;
@@ -22,7 +25,7 @@ public class PlayerAttack : Attack
         // Only the owner needs homing target nos.
         if (!IsOwner) return;
 
-        SetHomingTargetNos();
+        SetLockonTargetNos();
 
 #if UNITY_EDITOR
         if (Input.GetKey(KeyCode.Space))
@@ -34,14 +37,14 @@ public class PlayerAttack : Attack
             if (!isBlasting)
             {
                 isBlasting = true;
-                blastTimer = setInterval;               // Reset blast timer.
+                blastTimer = blastInterval;               // Reset blast timer.
                 muzzleRot.Value = transform.rotation;   // Reset muzzle rotation.
             }
 
             // Determine blast direction.
             Vector2 diff_pos = uGUIMannager.normBlastDiffPos;
-            float target_xAngle = Utilities.R2R(-diff_pos.y, 0, blastRange, Utilities.FunctionType.linear);
-            float target_yAngle = Utilities.R2R(diff_pos.x, 0, blastRange, Utilities.FunctionType.linear);
+            float target_xAngle = Utilities.R2R(-diff_pos.y, 0, blastAngle, Utilities.FunctionType.linear);
+            float target_yAngle = Utilities.R2R(diff_pos.x, 0, blastAngle, Utilities.FunctionType.linear);
             Quaternion targetRot = Quaternion.Euler(target_xAngle, target_yAngle, 0);
             muzzleRot.Value = Quaternion.Slerp(muzzleRot.Value, targetRot, sensitivity);
 
@@ -50,13 +53,13 @@ public class PlayerAttack : Attack
             if (blastTimer < 0)
             {
                 // Reset timer.
-                blastTimer = setInterval;
+                blastTimer = blastInterval;
 
                 // Blast normal bullets for yourself.
-                NormalRapid(rapidCount, null);
-
+                int rapid_count = 3;
+                NormalRapid(rapid_count, null);
                 // Send to all clones to blast bullets.
-                NormalRapidServerRpc(OwnerClientId, rapidCount, -1);
+                NormalRapidServerRpc(OwnerClientId, rapid_count, -1);
 
                 // === Pre-Homing (Automatically looks at opponent) === //
                 // Determine target.
@@ -103,6 +106,6 @@ public class PlayerAttack : Attack
     void OnDrawGizmos()
     {
         Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(transform.position, homingDist);
+        Gizmos.DrawWireSphere(transform.position, lockonDistance);
     }
 }

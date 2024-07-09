@@ -7144,14 +7144,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49d9ca40b3cf346e8b027d643194b665, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  homingAngle: 60
-  homingDist: 250
+  lockonAngle: 45
+  lockonDistance: 200
   originalNormalBullet: {fileID: 1428546918312979}
   blastImpact: {fileID: 198225710895975438}
   blastSound: {fileID: 82771324434258131}
-  power: 1
-  speed: 500
-  lifespan: 0.5
+  bulletPower: 1
+  bulletSpeed: 150
+  bulletLifespan: 1
   minMaxInterval: {x: 1, y: 1.5}
   bulletRed:
     serializedVersion: 2

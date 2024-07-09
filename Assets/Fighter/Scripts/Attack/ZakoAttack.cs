@@ -7,14 +7,17 @@ public class ZakoAttack : Attack
 {
     // setInterval is not used in ZakoAttack.
     // set setInterval to small number in order to stop WaitForSeconds in NormalRapid()
-    public override float setInterval { get; set; } = 0.05f;
-    protected override int rapidCount { get; set; } = 1;
+    public override float blastInterval { get; set; } = 0.05f;
+
+    // This if DEATH_NORMAL_BLAST for fighters, but change this to SPECIFIC_DEATH_CANNON for cannons.
+    protected override string causeOfDeath { get; set; } = FighterCondition.DEATH_NORMAL_BLAST;
 
     [SerializeField, MinMaxSlider(0, 3)]
     Vector2 minMaxInterval;
 
     [Header("Normal Bullet Color")]
-    [SerializeField] Gradient bulletRed, bulletBlue;
+    [SerializeField] Gradient bulletRed;
+    [SerializeField] Gradient bulletBlue;
 
 
     void FixedUpdate()
@@ -23,7 +26,7 @@ public class ZakoAttack : Attack
 
         if (!IsHost) return;
 
-        // Normal Blast. ////////////////////////////////////////////////////////////////////////////////////////
+        // Normal Blast. ///////////////////////////////////////////////////////////////////////////////////////
         if (blastTimer > 0) blastTimer -= Time.deltaTime;
 
         else
@@ -48,10 +51,11 @@ public class ZakoAttack : Attack
                     target = ParticipantManager.I.fighterInfos[targetNo].body;
                 }
 
-                // Blast normal bullets.
-                NormalRapid(rapidCount, target);
+                // Blast normal bullet.
+                int rapid_count = 1;
+                NormalRapid(rapid_count, target);
                 // Send to all clones to blast bullets.
-                NormalRapidClientRpc(OwnerClientId, rapidCount, targetNo);
+                NormalRapidClientRpc(OwnerClientId, rapid_count, targetNo);
             }
         }
     }

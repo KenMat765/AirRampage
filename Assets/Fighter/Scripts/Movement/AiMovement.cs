@@ -314,12 +314,12 @@ public class AiMovement : Movement
             {
                 case Rule.BATTLE_ROYAL:
                     // When there are opponents in front.
-                    if (aiAttack.homingCount > 0)
+                    if (aiAttack.lockonCount > 0)
                     {
                         // Set target fighter if null.
                         if (targetFighter == null)
                         {
-                            int target_no = aiAttack.homingTargetNos[0];
+                            int target_no = aiAttack.lockonTargetNos[0];
                             targetFighter = ParticipantManager.I.fighterInfos[target_no].body;
                         }
                         condition = Conditions.ATTACK;
@@ -375,11 +375,11 @@ public class AiMovement : Movement
                         }
 
                         // If detected opponent fighter during defencing ally terminal, chase and attack it.
-                        if (aiAttack.homingCount > 0)
+                        if (aiAttack.lockonCount > 0)
                         {
                             if (targetFighter == null)
                             {
-                                int targetNo = aiAttack.homingTargetNos[0];
+                                int targetNo = aiAttack.lockonTargetNos[0];
                                 targetFighter = ParticipantManager.I.fighterInfos[targetNo].body;
                             }
                             condition = Conditions.ATTACK;
