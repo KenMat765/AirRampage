@@ -11,12 +11,6 @@ public class AiCondition : FighterCondition
         base.Start();
         CPStart();
         uGUIMannager.I.ResetHP_UI(fighterNo.Value);
-
-        // Abilities
-        if (has_quickRepair)
-        {
-            revivalTime = 4;
-        }
     }
 
     protected override void FixedUpdate()

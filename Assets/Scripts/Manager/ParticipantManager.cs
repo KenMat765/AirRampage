@@ -91,13 +91,6 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
                 // Get battle data at fighterNo.
                 BattleInfo.ParticipantBattleData battleData = BattleInfo.battleDatas[no];
 
-                // Setup Abilities (do this before skill setup)
-                foreach (int abilityID in battleData.abilities)
-                {
-                    Ability ability = AbilityDatabase.I.GetAbilityById(abilityID);
-                    ability.Introducer(fighterCondition);
-                }
-
                 // Setup Skills
                 for (int skillNo = 0; skillNo < GameInfo.MAX_SKILL_COUNT; skillNo++)
                 {
@@ -117,6 +110,13 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
                     {
                         attack.skills[skillNo] = null;
                     }
+                }
+
+                // Setup Abilities. (Do this AFTER setting up skills, because some abilities refers to attack.skills)
+                foreach (int abilityID in battleData.abilities)
+                {
+                    Ability ability = AbilityDatabase.I.GetAbilityById(abilityID);
+                    ability.Introducer(fighterCondition);
                 }
             }
 

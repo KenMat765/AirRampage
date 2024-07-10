@@ -12,12 +12,6 @@ public class PlayerCondition : FighterCondition
         CPStart();
         uGUIMannager.I.ResetHP_UI(fighterNo.Value);
         uGUIMannager.I.default_combo_disp_timer = default_combo_timer;
-
-        // Abilities
-        if (has_quickRepair)
-        {
-            revivalTime = 4;
-        }
     }
 
     protected override void FixedUpdate()

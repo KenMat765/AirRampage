@@ -224,11 +224,11 @@ public abstract class Attack : NetworkBehaviour
     // Terminate all currently active skills.
     public void TerminateAllSkills()
     {
+        bool maintain_charge = fighterCondition.has_skillKeep;
         foreach (Skill skill in skills)
         {
             if (skill != null)
             {
-                bool maintain_charge = fighterCondition.has_skillKeep;
                 skill.ForceTermination(maintain_charge);
             }
         }

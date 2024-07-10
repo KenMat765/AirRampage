@@ -4,10 +4,16 @@ using UnityEngine;
 
 public class Abi_Technician : Ability
 {
-    // public override int Weight { get; protected set; } = 10;
-    // public override string Explanation { get; protected set; } = "Charges skills quickly.";
     public override void Introducer(FighterCondition condition)
     {
-        condition.has_technician_1 = true;
+        Skill[] skills = condition.attack.skills;
+        foreach (Skill skill in skills)
+        {
+            if (skill == null)
+            {
+                continue;
+            }
+            skill.charge_time /= 1.2f;
+        }
     }
 }

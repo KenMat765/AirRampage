@@ -20,7 +20,7 @@ public abstract class Skill : NetworkBehaviour
     }
 
     public float charge_time { get; set; }
-    public float elapsed_time { get; private set; }
+    public float elapsed_time { get; set; }
     public bool isCharged { get; private set; } = false;
     protected bool ready2Charge { get; private set; } = true;
     public bool isUsing { get; private set; } = false;
@@ -70,10 +70,6 @@ public abstract class Skill : NetworkBehaviour
         prefabs = new List<GameObject>();
         attack = GetComponent<Attack>();
         ParameterUpdater(); // charge_time is set here.
-        if (attack.fighterCondition.has_skillBoost)
-        {
-            elapsed_time = charge_time;
-        }
     }
 
     public virtual void Activator(int[] transfer = null)
@@ -96,17 +92,11 @@ public abstract class Skill : NetworkBehaviour
 
         if (!isCharged && ready2Charge)
         {
-            float dt = Time.deltaTime;
-            if (attack.fighterCondition.has_technician_1)
+            elapsed_time += Time.deltaTime;
+            if (elapsed_time >= charge_time)
             {
-                dt *= 1.2f;
+                isCharged = true;
             }
-            if (attack.fighterCondition.has_technician_2)
-            {
-                dt *= 1.5f;
-            }
-            elapsed_time += dt;
-            if (elapsed_time >= charge_time) { isCharged = true; }
         }
     }
 

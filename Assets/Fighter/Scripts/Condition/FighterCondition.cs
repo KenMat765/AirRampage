@@ -144,16 +144,15 @@ public abstract class FighterCondition : NetworkBehaviour
     // Constants
     public float full_cp { get; set; } = 10000; // CP necessary to get in the Zone.
     public abstract float my_cp { get; set; }   // CP to give to opponent when killed.
-    protected float dec_cp_per_sec = 5; // Decreasing amount of CP over time.
-    protected float cp_maintain = 0f;   // 0.0 (maintain none) ~ 1.0 (maintain all)
-    protected float default_combo_timer;    // Time until the combo runs out.
-    protected float default_zone_timer = 15;    // Duration of zone.
+    public float dec_cp_per_sec { get; set; } = 5;  // Decreasing amount of CP over time.
+    public float cp_maintain { get; set; } = 0f;    // 0.0 (maintain none) ~ 1.0 (maintain all)
+    public float default_combo_timer { get; set; } = 2.5f;  // Time until the combo runs out.
+    public float default_zone_timer { get; set; } = 15; // Duration of zone.
 
     protected void CPStart()
     {
         cp = 0;
         combo = 0;
-        default_combo_timer = has_comboKeep ? 4f : 2.5f;
         combo_timer = default_combo_timer;
         zone_timer = default_zone_timer;
     }
@@ -408,14 +407,7 @@ public abstract class FighterCondition : NetworkBehaviour
 
 
     // Special Abilities //////////////////////////////////////////////////////////////////////////////////////////////
-    public bool has_shadowStep { get; set; } = false;
-    public bool has_boostStep { get; set; } = false;
-    public bool has_skillBoost { get; set; } = false;
     public bool has_skillKeep { get; set; } = false;
-    public bool has_technician_1 { get; set; } = false;
-    public bool has_technician_2 { get; set; } = false;
-    public bool has_quickRepair { get; set; } = false;
-    public bool has_comboKeep { get; set; } = false;
     public bool has_deepAbsorb { get; set; } = false;
     public bool has_comboBoostA { get; set; } = false;
     public bool has_comboBoostD { get; set; } = false;

@@ -9,6 +9,6 @@ public class Abi_ComboKeep : Ability
     // public override string Explanation { get; protected set; } = "Extend the time until combos run out.";
     public override void Introducer(FighterCondition condition)
     {
-        condition.has_comboKeep = true;
+        condition.default_combo_timer += 1.5f;
     }
 }
