@@ -8,7 +8,7 @@ using DG.Tweening;
 // FighterConditionの各変数と、外部との橋渡しをするクラス
 public abstract class Receiver : NetworkBehaviour
 {
-    public FighterCondition fighterCondition { get; set; }
+    public FighterCondition fighterCondition { get; private set; }
 
     [Tooltip("Stops accepting any attacks when false")]
     public bool acceptAttack;
@@ -193,7 +193,7 @@ public abstract class Receiver : NetworkBehaviour
 
 
     // Death & Revival /////////////////////////////////////////////////////////////////////////////////////////////
-    public virtual void OnDeath(int destroyerNo, string causeOfDeath)
+    public virtual void OnDeath()
     {
         col.enabled = false;
     }

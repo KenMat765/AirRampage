@@ -273,6 +273,8 @@ public abstract class FighterCondition : NetworkBehaviour
     static string[] specificDeath = { SPECIFIC_DEATH_CANNON, SPECIFIC_DEATH_CRYSTAL, SPECIFIC_DEATH_COLLISION };
     public static bool IsSpecificDeath(string causeOfDeath) { return specificDeath.Contains(causeOfDeath); }
 
+    public Action<int, string> OnDeathCallback { get; set; }
+
     // Processes run at the time of death. (Should be called on every clients)
     protected virtual void OnDeath(int destroyerNo, string causeOfDeath)
     {
@@ -284,8 +286,9 @@ public abstract class FighterCondition : NetworkBehaviour
 
         movement.OnDeath();
         attack.OnDeath();
-        receiver.OnDeath(destroyerNo, causeOfDeath);
+        receiver.OnDeath();
         radarIcon.Visualize(false);
+        OnDeathCallback?.Invoke(destroyerNo, causeOfDeath);
 
         // If specific cause of death. (Not killed by enemy)
         if (IsSpecificDeath(causeOfDeath))

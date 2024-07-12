@@ -276,21 +276,17 @@ public class AiMovement : Movement
 
         if (aiReceiver.underAttack)
         {
-            // 現在の標的を削除
             targetFighter = null;
-
-            GameObject shooter = aiReceiver.currentShooter;
-            Vector3 relativePos = aiReceiver.relativeSPos;
-            float relativeAngle = aiReceiver.relativeSAngle;
-
-            if (relativeAngle >= -30 && relativeAngle <= 30)
+            Vector3 relative_pos = aiReceiver.shooterBody.transform.position - transform.position;
+            float relative_y_ang = Vector3.SignedAngle(transform.forward * uTurndirection, relative_pos, Vector3.up);
+            if (relative_y_ang >= -30 && relative_y_ang <= 30)
             {
                 action = Actions.COUNTER;
             }
-            else if (relativeAngle <= -135 || relativeAngle >= 135)
+            else if (relative_y_ang <= -135 || relative_y_ang >= 135)
             {
                 float somersault_distance = 30;
-                if (Vector3.SqrMagnitude(relativePos) < Mathf.Pow(somersault_distance, 2))
+                if (Vector3.SqrMagnitude(relative_pos) < Mathf.Pow(somersault_distance, 2))
                 {
                     action = Actions.SOMERSAULT;
                 }
@@ -310,10 +306,8 @@ public class AiMovement : Movement
             switch (BattleInfo.rule)
             {
                 case Rule.BATTLE_ROYAL:
-                    // When there are opponents in front.
                     if (fighterCondition.attack.lockonCount > 0)
                     {
-                        // Set target fighter if null.
                         if (targetFighter == null)
                         {
                             int target_no = fighterCondition.attack.lockonTargetNos[0];
@@ -321,12 +315,12 @@ public class AiMovement : Movement
                         }
                         action = Actions.ATTACK;
                     }
-
-                    // When nobody is in front.
                     else
                     {
-                        // Set target fighter to null.
-                        if (targetFighter != null) targetFighter = null;
+                        if (targetFighter != null)
+                        {
+                            targetFighter = null;
+                        }
                         action = Actions.SEARCH;
                     }
                     break;
@@ -350,52 +344,60 @@ public class AiMovement : Movement
         {
             // === Not Under Attack === //
             case Actions.ATTACK:
-                rotationSpeed = QUICK_ROTATIONSPEED;
-                if (targetFighter != null)
                 {
+                    rotationSpeed = QUICK_ROTATIONSPEED;
                     SetFinalDestination(targetFighter.transform.position);
+                    break;
                 }
-                break;
 
             case Actions.SEARCH:
-                rotationSpeed = QUICK_ROTATIONSPEED;
-
-                if (arrived_at_final_destination)
                 {
-                    SetFinalDestination(SubTarget.GetRandomPosition());
+                    rotationSpeed = QUICK_ROTATIONSPEED;
+                    if (arrived_at_final_destination)
+                    {
+                        SetFinalDestination(SubTarget.GetRandomPosition());
+                    }
+                    // If chasing other fighter, set new final_destination. (No need to arrive at target fighters position any more.)
+                    else if (prev_action == Actions.ATTACK ||
+                            prev_action == Actions.GOBACK ||
+                            prev_action == Actions.COUNTER)
+                    {
+                        SetFinalDestination(SubTarget.GetRandomPosition());
+                    }
+                    break;
                 }
-
-                // If chasing other fighter, set new final_destination. (No need to arrive at target fighters position any more.)
-                else if (prev_action == Actions.ATTACK ||
-                        prev_action == Actions.GOBACK ||
-                        prev_action == Actions.COUNTER)
-                {
-                    SetFinalDestination(SubTarget.GetRandomPosition());
-                }
-
-                break;
 
 
             // === Under Attack === //
             case Actions.GOBACK:
-                float back_offset = -30;
-                rotationSpeed = SLOW_ROTATIONSPEED;
-                SetFinalDestination(aiReceiver.shooterPos + aiReceiver.currentShooter.transform.forward * back_offset);
-                break;
+                {
+                    rotationSpeed = SLOW_ROTATIONSPEED;
+                    float back_offset = -30;
+                    Transform shooter_trans = aiReceiver.shooterBody.transform;
+                    SetFinalDestination(shooter_trans.position + shooter_trans.forward * back_offset);
+                    break;
+                }
 
             case Actions.FARESCAPE:
-                rotationSpeed = QUICK_ROTATIONSPEED;
-                if (arrived_at_final_destination) SetFinalDestination(SubTarget.GetRandomPosition());
-                break;
+                {
+                    rotationSpeed = QUICK_ROTATIONSPEED;
+                    if (arrived_at_final_destination) SetFinalDestination(SubTarget.GetRandomPosition());
+                    break;
+                }
 
             case Actions.SOMERSAULT:
-                Somersault();
-                break;
+                {
+                    Somersault();
+                    break;
+                }
 
             case Actions.COUNTER:
-                rotationSpeed = QUICK_ROTATIONSPEED;
-                SetFinalDestination(aiReceiver.shooterPos);
-                break;
+                {
+                    rotationSpeed = QUICK_ROTATIONSPEED;
+                    Transform shooter_trans = aiReceiver.shooterBody.transform;
+                    SetFinalDestination(shooter_trans.position);
+                    break;
+                }
         }
     }
 

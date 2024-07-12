@@ -4,12 +4,6 @@ using UnityEngine;
 
 public class PlayerReceiver : Receiver
 {
-    // Must be called on every clients.
-    public override void OnDeath(int destroyerNo, string causeOfDeath)
-    {
-        base.OnDeath(destroyerNo, causeOfDeath);
-    }
-
     public override void OnWeaponHit(int fighterNo)
     {
         base.OnWeaponHit(fighterNo);
