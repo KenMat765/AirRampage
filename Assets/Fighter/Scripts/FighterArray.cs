@@ -496,15 +496,15 @@ public class FighterArray : MonoBehaviour
 
 
 
-    void OnDrawGizmos()
-    {
-        Gizmos.color = Color.blue;
-        Gizmos.DrawLine(transform.position, final_destination);
+    // void OnDrawGizmos()
+    // {
+    //     Gizmos.color = Color.blue;
+    //     Gizmos.DrawLine(transform.position, final_destination);
 
-        if (bypassing)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(transform.position, next_destination);
-        }
-    }
+    //     if (bypassing)
+    //     {
+    //         Gizmos.color = Color.red;
+    //         Gizmos.DrawLine(transform.position, next_destination);
+    //     }
+    // }
 }

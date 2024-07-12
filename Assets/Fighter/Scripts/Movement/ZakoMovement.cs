@@ -17,7 +17,7 @@ public class ZakoMovement : Movement
 
     protected override void FixedUpdate()
     {
-        if (!IsHost) return;
+        if (!IsOwner) return;
         base.FixedUpdate();
     }
 

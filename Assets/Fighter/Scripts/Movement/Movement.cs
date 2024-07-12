@@ -80,7 +80,7 @@ public abstract class Movement : NetworkBehaviour
     // 4-Actions ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     protected Animator anim;
     protected float uturnTime, somersaultTime, rollTime;
-    public int uTurndirection { get; set; } = 1;  // Used to reverse the direction of the aircraft after U-turn. (1 or -1)
+    public int uTurndirection { get; protected set; } = 1;  // Used to reverse the direction of the aircraft after U-turn. (1 or -1)
     protected bool ready4action = true;
     protected float rollDistance = 15;  // Lateral movement distance during rolling.
 

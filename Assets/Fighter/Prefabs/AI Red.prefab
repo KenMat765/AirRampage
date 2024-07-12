@@ -173,13 +173,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackable: 0
-  lockonAngle: 45
+  lockonAngle: 30
   lockonDistance: 200
   originalNormalBullet: {fileID: 1606845707113445}
   blastImpact: {fileID: 198700518705561751}
   blastSound: {fileID: 82973143086541104}
   bulletPower: 1
-  bulletSpeed: 150
+  bulletSpeed: 200
   bulletLifespan: 1
   blastInterval: 0.6
 --- !u!114 &2221773611656743181

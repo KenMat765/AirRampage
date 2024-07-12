@@ -157,7 +157,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77899a645f51b4c8d87f3dd1fda1c0f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  acceptDamage: 0
+  acceptAttack: 0
 --- !u!114 &7800842039064356382
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -171,13 +171,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackable: 0
-  lockonAngle: 45
+  lockonAngle: 30
   lockonDistance: 200
   originalNormalBullet: {fileID: 4639018034981648401}
   blastImpact: {fileID: 4610140682244791181}
   blastSound: {fileID: 4331803364409258538}
   bulletPower: 1
-  bulletSpeed: 150
+  bulletSpeed: 200
   bulletLifespan: 1
   blastInterval: 0.6
   blastAngle: 30

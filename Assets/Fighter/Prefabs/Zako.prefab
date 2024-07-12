@@ -6980,7 +6980,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1454742248
+  GlobalObjectIdHash: 3015566342
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -7143,14 +7143,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49d9ca40b3cf346e8b027d643194b665, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attackable: 0
   lockonAngle: 45
   lockonDistance: 200
   originalNormalBullet: {fileID: 1428546918312979}
   blastImpact: {fileID: 198225710895975438}
   blastSound: {fileID: 82771324434258131}
   bulletPower: 1
-  bulletSpeed: 150
+  bulletSpeed: 200
   bulletLifespan: 1
+  blastInterval: 0
   minMaxInterval: {x: 1, y: 1.5}
   bulletRed:
     serializedVersion: 2
@@ -7222,6 +7224,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1111cc8af148e4efcbf943a08d3edff2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  acceptAttack: 0
 --- !u!1 &1360027754317512
 GameObject:
   m_ObjectHideFlags: 0
