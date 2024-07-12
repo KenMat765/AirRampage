@@ -5,9 +5,6 @@ using UnityEngine;
 
 public class AiAttack : Attack
 {
-    // Blasts {rapidCount} bullets in {setInterval} seconds.
-    public override float blastInterval { get; set; } = 0.6f;
-
     // This if DEATH_NORMAL_BLAST for fighters, but change this to SPECIFIC_DEATH_CANNON for cannons.
     protected override string causeOfDeath { get; set; } = FighterCondition.DEATH_NORMAL_BLAST;
 
@@ -43,38 +40,21 @@ public class AiAttack : Attack
         if (!attackable) return;
 
         // Only the owner (= host) executes the following processes.
-        if (!IsHost) return;
+        if (!IsOwner) return;
 
         // Normal Blast. ////////////////////////////////////////////////////////////////////////////////////////
         if (blastTimer > 0) blastTimer -= Time.deltaTime;
 
         else
         {
-            // Search targets. (Fighters or Terminals)
             SetLockonTargetNos();
-            if (BattleInfo.rule == Rule.TERMINAL_CONQUEST) SearchAttackableTerminals();
-
-            if (lockonCount > 0 || (BattleInfo.rule == Rule.TERMINAL_CONQUEST && attackableTerminals.Count > 0))
+            if (lockonCount > 0)
             {
-                // Reset timer.
                 blastTimer = blastInterval;
-
-                // Determine target.
-                int targetNo = -1;
-                GameObject target = null;
-
-                // Do not home to terminals.
-                if (lockonCount > 0)
-                {
-                    targetNo = lockonTargetNos[0];
-                    target = ParticipantManager.I.fighterInfos[targetNo].body;
-                }
-
-                // Blast normal bullets for yourself.
+                int targetNo = lockonTargetNos[0];
+                GameObject target = ParticipantManager.I.fighterInfos[targetNo].body;
                 int rapid_count = 3;
                 NormalRapid(rapid_count, target);
-                // Send to all clones to blast bullets.
-                NormalRapidClientRpc(OwnerClientId, rapid_count, targetNo);
             }
         }
 
@@ -97,7 +77,7 @@ public class AiAttack : Attack
                 {
                     case SkillType.attack:
                         // Activate when fighters in front is more than thresh, or attackable terminals are in front.
-                        if (lockonCount >= target_thresh || (BattleInfo.rule == Rule.TERMINAL_CONQUEST && attackableTerminals.Count > 0))
+                        if (lockonCount >= target_thresh)
                         {
                             skill.Activator();
                             elapsed_times[skill_num] = 0;
@@ -121,7 +101,8 @@ public class AiAttack : Attack
                         if (skill_name == "NitroBoost")
                         {
                             const float DISTANCE_THRESH = 800;
-                            float distance_to_destination = Vector3.Magnitude(fighterCondition.movement.relative_to_next);
+                            Vector3 relative_to_next = fighterCondition.movement.nextDestination - transform.position;
+                            float distance_to_destination = Vector3.Magnitude(relative_to_next);
                             if (distance_to_destination > DISTANCE_THRESH) skill.Activator();
                         }
                         // For other assist skills, activate as soon as it's charged.

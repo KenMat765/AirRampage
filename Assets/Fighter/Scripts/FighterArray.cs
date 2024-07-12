@@ -103,7 +103,6 @@ public class FighterArray : MonoBehaviour
         }
 
         DetectFighters();
-        if (BattleInfo.rule == Rule.TERMINAL_CONQUEST) DetectTerminals();
         ChangeCondition();
         OnEachCondition();
         MoveTowardNextDestination();
@@ -462,6 +461,7 @@ public class FighterArray : MonoBehaviour
 
     public List<int> detected_fighters_nos { get; private set; } = new List<int>();
     LayerMask fighters_mask;
+    LayerMask terminals_mask;
 
     void DetectFighters()
     {
@@ -493,45 +493,6 @@ public class FighterArray : MonoBehaviour
             detected_fighters_nos.Clear();
         }
     }
-
-
-
-    // ================================================================================================ //
-    // === Terminal Detection === //
-    // ================================================================================================ //
-    public List<int> detected_terminal_nos { get; private set; } = new List<int>();
-    LayerMask terminals_mask;
-
-    protected void DetectTerminals()
-    {
-        Vector3 my_pos = transform.position;
-
-        Collider[] colliders = Physics.OverlapSphere(my_pos, detectDistance, terminals_mask);
-
-        // Detect targets, and set them to aroundTerminals.
-        if (colliders.Length > 0)
-        {
-            var possibleTargets = colliders.Select(t => t.gameObject);
-
-            // Get terminal number of targets.
-            detected_terminal_nos = possibleTargets.Where(p =>
-
-                // Check if target is inside homing range.
-                Vector3.Angle(transform.forward, p.transform.position - my_pos) < detectAngle &&
-
-                // Check if there are no obstacles (terrain) between self and target.
-                !Physics.Raycast(my_pos, p.transform.position - my_pos, Vector3.Magnitude(p.transform.position - my_pos), GameInfo.terrainMask))
-
-                // Get terminal number of target from its name.
-                .Select(r => int.Parse(r.name)).ToList();
-        }
-        else
-        {
-            // Clean up list.
-            detected_terminal_nos.Clear();
-        }
-    }
-
 
 
 

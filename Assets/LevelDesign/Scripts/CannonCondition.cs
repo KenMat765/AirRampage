@@ -11,8 +11,4 @@ public class CannonCondition : FighterCondition
     // Set from Inspector.
     [Header("Cannon Settings")]
     public Team team;
-
-    // Necessary overrides (Cannon does not have CP and revivalTime)
-    public override float my_cp { get; set; } = 0;
-    public override float revivalTime { get; set; } = 0;
 }

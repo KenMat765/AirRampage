@@ -91,8 +91,8 @@ public abstract class FighterCondition : NetworkBehaviour
 
 
 
-    // ParticipantManagerからセット ///////////////////////////////////////////////////////////////////////////////////
-    public NetworkVariable<int> fighterNo { get; set; } = new NetworkVariable<int>();   // How many participant is this fighter.
+    // Fighter Identities //////////////////////////////////////////////////////////////////////////////////////
+    public NetworkVariable<int> fighterNo { get; set; } = new NetworkVariable<int>();
     public NetworkVariable<FixedString32Bytes> fighterName { get; set; } = new NetworkVariable<FixedString32Bytes>();
     public NetworkVariable<Team> fighterTeam { get; set; } = new NetworkVariable<Team>();
 
@@ -101,9 +101,9 @@ public abstract class FighterCondition : NetworkBehaviour
     // Status //////////////////////////////////////////////////////////////////////////////////////////////////
     [Header("Current Status")]
     public float Hp; // Only the owner of this fighter knows HP.
-    public FighterStatus speed;  // Only reffered by owner. (Movement)
-    public FighterStatus power;  // Reffered in every clients. (Weapon.Activate)
-    public FighterStatus defence;  // Only reffered by owner. (Receiver.Damage)
+    public FighterStatus speed { get; private set; }  // Only reffered by owner.
+    public FighterStatus power { get; private set; }  // Reffered by every clients.
+    public FighterStatus defence { get; private set; }  // Only reffered by owner.
 
     [Header("Default Status")]
     public float defaultHp;
@@ -125,54 +125,49 @@ public abstract class FighterCondition : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void HpDecreaser_UIClientRPC(float normHp)
+    void HpDecreaser_UIClientRPC(float normHp)
     {
         uGUIMannager.I.HPDecreaser_UI(fighterNo.Value, normHp);
     }
 
 
 
-    // Combo & CP (Concentration Point) ////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    // Variables
-    public float cp { get; set; }   // CP currently have.
+    // Combo & CP (Concentration Point) ///////////////////////////////////////////////////////////////////////////
+    [Header("CP")]
+    public float cpToGive;
+    public float cp { get; set; }
     public int combo { get; set; }
-    protected float combo_timer;
-    float zone_timer;
     public bool isZone { get; set; }
-
-    // Constants
-    public float full_cp { get; set; } = 10000; // CP necessary to get in the Zone.
-    public abstract float my_cp { get; set; }   // CP to give to opponent when killed.
-    public float dec_cp_per_sec { get; set; } = 5;  // Decreasing amount of CP over time.
-    public float cp_maintain { get; set; } = 0f;    // 0.0 (maintain none) ~ 1.0 (maintain all)
-    public float default_combo_timer { get; set; } = 2.5f;  // Time until the combo runs out.
-    public float default_zone_timer { get; set; } = 15; // Duration of zone.
+    public float cpToEnterZone { get; set; } = 10000;
+    public float cpLossPerSec { get; set; } = 5;
+    public float cpMaintain { get; set; } = 0f; // 0.0 (maintain none) ~ 1.0 (maintain all)
+    public float comboTimeout { get; set; } = 2.5f;
+    public float zoneDuration { get; set; } = 15;
+    float comboTimer;
+    float zoneTimer;
 
     protected void CPStart()
     {
         cp = 0;
         combo = 0;
-        combo_timer = default_combo_timer;
-        zone_timer = default_zone_timer;
+        comboTimer = comboTimeout;
+        zoneTimer = zoneDuration;
     }
 
     protected virtual void CPUpdate()
     {
-        // Stop combo when combo timer is over. (combo is independent of Zone.)
-        combo_timer -= Time.deltaTime;
-        if (combo_timer <= 0)
+        comboTimer -= Time.deltaTime;
+        if (comboTimer <= 0)
         {
             combo = 0;
-            combo_timer = default_combo_timer;
+            comboTimer = comboTimeout;
         }
 
         if (isZone)
         {
-            // Decrease zone_timer.
-            zone_timer -= Time.deltaTime;
-            cp = zone_timer / default_zone_timer * full_cp;
-            if (zone_timer <= 0)
+            zoneTimer -= Time.deltaTime;
+            cp = zoneTimer / zoneDuration * cpToEnterZone;
+            if (zoneTimer <= 0)
             {
                 EndZone();
             }
@@ -180,32 +175,29 @@ public abstract class FighterCondition : NetworkBehaviour
 
         else
         {
-            // Into Zone when cp is over full_cp.
-            if (cp >= full_cp)
+            if (cp >= cpToEnterZone)
             {
                 StartZone();
                 return;
             }
-            // Decrease cp by dec_cp_per_sec.
-            cp -= dec_cp_per_sec * Time.deltaTime;
+            cp -= cpLossPerSec * Time.deltaTime;
             cp = (cp < 0) ? 0 : cp;
         }
     }
 
     void CPResetter()
     {
-        cp *= cp_maintain;
+        cp *= cpMaintain;
         combo = 0;
-        combo_timer = default_combo_timer;
-        zone_timer = default_zone_timer;
+        comboTimer = comboTimeout;
+        zoneTimer = zoneDuration;
     }
 
     public virtual float Combo(float inc_cp)
     {
-        // Increase combo. (combo is independent of Zone.)
         combo++;
         const int combo_thresh = 3;
-        combo_timer = default_combo_timer;
+        comboTimer = comboTimeout;
 
         // Combo Boost Ability. (combo == 5, 10, 15, ...)
         if (combo % 5 == 0 && combo > 0)
@@ -245,7 +237,6 @@ public abstract class FighterCondition : NetworkBehaviour
             inc_cp *= 1.5f;
         }
 
-        // Increase cp.
         cp += inc_cp;
 
         // Return magnification of CP. (Used in uGUIManager)
@@ -255,23 +246,24 @@ public abstract class FighterCondition : NetworkBehaviour
     protected virtual void StartZone()
     {
         isZone = true;
-        zone_timer = default_zone_timer;
-        cp = full_cp;
+        zoneTimer = zoneDuration;
+        cp = cpToEnterZone;
     }
 
     protected virtual void EndZone()
     {
         isZone = false;
-        zone_timer = default_zone_timer;
+        zoneTimer = zoneDuration;
         cp = 0;
     }
 
 
 
     // Death & Revival //////////////////////////////////////////////////////////////////////////////////////////////
-    public bool isDead { get; private set; }
-    public abstract float revivalTime { get; set; }
+    [Header("Death and Revival")]
+    public float revivalTime;
     public float reviveTimer { get; private set; }
+    public bool isDead { get; private set; }
 
     // Causes of death.
     public const string DEATH_NORMAL_BLAST = "Normal Blast";
@@ -305,7 +297,7 @@ public abstract class FighterCondition : NetworkBehaviour
         FighterCondition destroyer_condition = ParticipantManager.I.fighterInfos[destroyerNo].fighterCondition;
         if (destroyer_condition.IsOwner)
         {
-            destroyer_condition.Combo(my_cp);
+            destroyer_condition.Combo(cpToGive);
         }
 
         if (IsHost)

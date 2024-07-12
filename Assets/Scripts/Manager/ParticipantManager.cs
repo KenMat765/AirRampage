@@ -345,7 +345,7 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
     public void FighterAcceptDamageHandler(int no, bool accept)
     {
         Receiver receiver = fighterInfos[no].receiver;
-        receiver.acceptDamage = accept;
+        receiver.acceptAttack = accept;
     }
 }
 

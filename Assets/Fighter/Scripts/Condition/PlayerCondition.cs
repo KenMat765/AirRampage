@@ -4,14 +4,12 @@ using UnityEngine;
 
 public class PlayerCondition : FighterCondition
 {
-    public override float my_cp { get; set; } = 1000;
-
     protected override void Start()
     {
         base.Start();
         CPStart();
         uGUIMannager.I.ResetHP_UI(fighterNo.Value);
-        uGUIMannager.I.default_combo_disp_timer = default_combo_timer;
+        uGUIMannager.I.default_combo_disp_timer = comboTimeout;
     }
 
     protected override void FixedUpdate()
@@ -60,7 +58,6 @@ public class PlayerCondition : FighterCondition
         ReportDeath(destroyerNo, causeOfDeath);
     }
 
-    public override float revivalTime { get; set; } = 7;
     protected override void OnRevival()
     {
         base.OnRevival();

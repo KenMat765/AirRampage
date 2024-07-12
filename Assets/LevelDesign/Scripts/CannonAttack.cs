@@ -10,9 +10,6 @@ public class CannonAttack : Attack
     [SerializeField] float rapidInterval;
     [SerializeField] Gradient bulletRed, bulletBlue;
 
-    // Blasts {rapidCount} bullets in {setInterval} seconds.
-    public override float blastInterval { get; set; } // rewrited in Awake.
-
     // This if DEATH_NORMAL_BLAST for fighters, but change this to SPECIFIC_DEATH_CANNON for cannons.
     protected override string causeOfDeath { get; set; } = FighterCondition.SPECIFIC_DEATH_CANNON;
 
@@ -67,19 +64,12 @@ public class CannonAttack : Attack
         if (blastTimer > 0) blastTimer -= Time.deltaTime;
         else
         {
-            // Search targets.
             SetLockonTargetNos();
-
             if (lockonCount > 0)
             {
-                // Reset timer.
                 blastTimer = blastInterval;
-
-                // Blast normal bullets for yourself.
                 int rapid_count = 3;
                 NormalRapid(rapid_count);
-                // Send to all clones to blast bullets.
-                NormalRapidClientRpc(OwnerClientId, rapid_count);
             }
         }
 

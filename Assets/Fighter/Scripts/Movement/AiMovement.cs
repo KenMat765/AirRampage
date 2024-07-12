@@ -17,15 +17,11 @@ public class AiMovement : Movement
         rollTime = rac.animationClips.Where(a => a.name == "RightRoll").Select(b => b.length).ToArray()[0];
 
         aiReceiver = (AiReceiver)fighterCondition.receiver;
-        aiAttack = (AiAttack)fighterCondition.attack;
-
-        latestDestinations = new Vector3[max_cashe];
     }
 
     protected override void FixedUpdate()
     {
-        // Only the host can control AI.
-        if (!IsHost) return;
+        if (!IsOwner) return;
 
         base.FixedUpdate();
 
@@ -34,7 +30,9 @@ public class AiMovement : Movement
         // Emergency Avoidance (Check for obstacles in front to avoid crashing in to it)
         if (!avoiding)
         {
-            if (ObstacleIsInFront(AVOID_DISTANCE))
+            Ray ray = new Ray(transform.position, transform.forward * uTurndirection);
+            bool obstacle_in_front = Physics.SphereCast(ray, SPHERE_CAST_RADIUS, AVOID_DISTANCE, FighterCondition.obstacles_mask);
+            if (obstacle_in_front)
             {
                 // Set avoiding to true, and reset it after u-turn is finished.
                 avoiding = true;
@@ -48,8 +46,8 @@ public class AiMovement : Movement
             }
         }
 
-        ChangeCondition();
-        ActionOnEachCondition();
+        DecideAction();
+        MovementByAction();
         ArrivalCheck();
     }
 
@@ -69,19 +67,21 @@ public class AiMovement : Movement
             return;
         }
 
+        Vector3 relative_to_next = nextDestination - transform.position;
+        float relative_y_angle = Vector3.SignedAngle(transform.forward * uTurndirection, relative_to_next, Vector3.up);
         Vector3 targetAngle = Quaternion.LookRotation(((relative_to_next == Vector3.zero) ? transform.forward : relative_to_next) * uTurndirection).eulerAngles;
-        if (relativeYAngle < -135)
+        if (relative_y_angle < -135)
         {
-            targetAngle.z = (-MAX_TILT_Z / 45 * relativeYAngle - 4 * MAX_TILT_Z) * uTurndirection * -1;
+            targetAngle.z = (-MAX_TILT_Z / 45 * relative_y_angle - 4 * MAX_TILT_Z) * uTurndirection * -1;
         }
-        else if (-135 <= relativeYAngle && relativeYAngle <= 135)
+        else if (-135 <= relative_y_angle && relative_y_angle <= 135)
         {
-            float normY = relativeYAngle / 135;
+            float normY = relative_y_angle / 135;
             targetAngle.z = MAX_TILT_Z / 2 * (Mathf.Pow(normY, 3) - 3 * normY) * uTurndirection;
         }
         else
         {
-            targetAngle.z = (-MAX_TILT_Z / 45 * relativeYAngle + 4 * MAX_TILT_Z) * uTurndirection * -1;
+            targetAngle.z = (-MAX_TILT_Z / 45 * relative_y_angle + 4 * MAX_TILT_Z) * uTurndirection * -1;
         }
         Quaternion lookRotation = Quaternion.Euler(targetAngle);
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
@@ -116,17 +116,20 @@ public class AiMovement : Movement
 
     protected override void FourActionExe()
     {
-        if (Vector3.SqrMagnitude(relative_to_next) >= SQR_DISTANCE_BORDER)
+        float far_distance = 30;
+        Vector3 relative_to_next = nextDestination - transform.position;
+        float relative_y_angle = Vector3.SignedAngle(transform.forward * uTurndirection, relative_to_next, Vector3.up);
+        if (Vector3.SqrMagnitude(relative_to_next) >= Mathf.Pow(far_distance, 2))
         {
-            if (relativeYAngle >= -60 && relativeYAngle <= -45)
+            if (relative_y_angle >= -60 && relative_y_angle <= -45)
             {
                 LeftRoll(3);
             }
-            else if (relativeYAngle >= 45 && relativeYAngle <= 60)
+            else if (relative_y_angle >= 45 && relative_y_angle <= 60)
             {
                 RightRoll(3);
             }
-            else if (relativeYAngle <= -135 || relativeYAngle >= 135)
+            else if (relative_y_angle <= -135 || relative_y_angle >= 135)
             {
                 Uturn();
             }
@@ -134,7 +137,7 @@ public class AiMovement : Movement
         }
         else
         {
-            if (relativeYAngle <= -135 || relativeYAngle >= 135)
+            if (relative_y_angle <= -135 || relative_y_angle >= 135)
             {
                 Uturn();
             }
@@ -261,25 +264,16 @@ public class AiMovement : Movement
 
 
     // AI Controll /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    enum Conditions { ATTACK, SEARCH, GOBACK, FARESCAPE, FLIP, COUNTER, ATTACK_TERMINAL, DEFENCE_TERMINAL }
-    [SerializeField] Conditions condition = Conditions.SEARCH;
-    [SerializeField] Conditions prev_condition = Conditions.SEARCH;
-
+    enum Actions { ATTACK, SEARCH, GOBACK, FARESCAPE, SOMERSAULT, COUNTER }
+    Actions action = Actions.SEARCH;
+    Actions prev_action = Actions.SEARCH;
     GameObject targetFighter;
-    Terminal targetTerminal;    // Attacking or defencing terminal.
-
-    float relativeYAngle => Vector3.SignedAngle(transform.forward * uTurndirection, relative_to_next, Vector3.up);
-
     AiReceiver aiReceiver;
-    AiAttack aiAttack;
 
-
-    void ChangeCondition()
+    void DecideAction()
     {
-        prev_condition = condition;
+        prev_action = action;
 
-        // Under Attack.
-        // Take necessary action despite of rule.
         if (aiReceiver.underAttack)
         {
             // 現在の標的を削除
@@ -289,40 +283,43 @@ public class AiMovement : Movement
             Vector3 relativePos = aiReceiver.relativeSPos;
             float relativeAngle = aiReceiver.relativeSAngle;
 
-            // When Shooter is alive.
-            if (shooter.activeSelf == true)
+            if (relativeAngle >= -30 && relativeAngle <= 30)
             {
-                if (relativeAngle >= -30 && relativeAngle <= 30) condition = Conditions.COUNTER;
-                else if (relativeAngle <= -135 || relativeAngle >= 135)
-                {
-                    if (Vector3.SqrMagnitude(relativePos) < SQR_DISTANCE_BORDER) condition = Conditions.FLIP;
-                    // else condition = Conditions.FARESCAPE;
-                    else condition = Conditions.COUNTER;
-                }
-                else condition = Conditions.GOBACK;
+                action = Actions.COUNTER;
             }
-
-            // When Shooter is dead.
-            else condition = Conditions.SEARCH;
+            else if (relativeAngle <= -135 || relativeAngle >= 135)
+            {
+                float somersault_distance = 30;
+                if (Vector3.SqrMagnitude(relativePos) < Mathf.Pow(somersault_distance, 2))
+                {
+                    action = Actions.SOMERSAULT;
+                }
+                else
+                {
+                    action = Actions.COUNTER;
+                }
+            }
+            else
+            {
+                action = Actions.GOBACK;
+            }
         }
 
-        // Not Under Attack.
-        // Act appropriately according to the rule.
         else
         {
             switch (BattleInfo.rule)
             {
                 case Rule.BATTLE_ROYAL:
                     // When there are opponents in front.
-                    if (aiAttack.lockonCount > 0)
+                    if (fighterCondition.attack.lockonCount > 0)
                     {
                         // Set target fighter if null.
                         if (targetFighter == null)
                         {
-                            int target_no = aiAttack.lockonTargetNos[0];
+                            int target_no = fighterCondition.attack.lockonTargetNos[0];
                             targetFighter = ParticipantManager.I.fighterInfos[target_no].body;
                         }
-                        condition = Conditions.ATTACK;
+                        action = Actions.ATTACK;
                     }
 
                     // When nobody is in front.
@@ -330,79 +327,14 @@ public class AiMovement : Movement
                     {
                         // Set target fighter to null.
                         if (targetFighter != null) targetFighter = null;
-                        condition = Conditions.SEARCH;
+                        action = Actions.SEARCH;
                     }
                     break;
 
                 case Rule.TERMINAL_CONQUEST:
-                    // Set target to terminal.
-                    // Judge whether ally team is currently winning or not.
-                    float my_team_point_per_sec = 0;
-                    float opponent_team_point_per_sec = 0;
-                    switch (fighterCondition.fighterTeam.Value)
-                    {
-                        case Team.RED:
-                            my_team_point_per_sec = TerminalManager.redPoint_per_second;
-                            opponent_team_point_per_sec = TerminalManager.bluePoint_per_second;
-                            break;
+                    break;
 
-                        case Team.BLUE:
-                            my_team_point_per_sec = TerminalManager.bluePoint_per_second;
-                            opponent_team_point_per_sec = TerminalManager.redPoint_per_second;
-                            break;
-                    }
-
-                    // If winning, defence ally terminal.
-                    if (my_team_point_per_sec > opponent_team_point_per_sec)
-                    {
-                        // When current target is null or opponent, set new target terminal.
-                        if (targetTerminal == null || targetTerminal.team != fighterCondition.fighterTeam.Value)
-                        {
-                            // Prioritize owner terminals.
-                            List<Terminal> owner_terminals;
-
-                            // If owner terminals were found, choose random one to defence.
-                            if (TerminalManager.I.TryGetOwnerTerminals(fighterCondition.fighterNo.Value, out owner_terminals))
-                            {
-                                targetTerminal = owner_terminals.RandomChoice();
-                            }
-
-                            // If there were no owner terminals, defence random ally terminal.
-                            else
-                            {
-                                targetTerminal = TerminalManager.I.GetAllyTerminals(fighterCondition.fighterTeam.Value).RandomChoice();
-                            }
-                        }
-
-                        // If detected opponent fighter during defencing ally terminal, chase and attack it.
-                        if (aiAttack.lockonCount > 0)
-                        {
-                            if (targetFighter == null)
-                            {
-                                int targetNo = aiAttack.lockonTargetNos[0];
-                                targetFighter = ParticipantManager.I.fighterInfos[targetNo].body;
-                            }
-                            condition = Conditions.ATTACK;
-                        }
-
-                        // Otherwise, fly around target (= ally) terminal.
-                        else
-                        {
-                            if (targetFighter != null) targetFighter = null;
-                            condition = Conditions.DEFENCE_TERMINAL;
-                        }
-                    }
-
-                    // If losing or draw.
-                    else
-                    {
-                        // Set opponent terminal with least HP as a target when current target is null or is ally terminal.
-                        if (targetTerminal == null || targetTerminal.team == fighterCondition.fighterTeam.Value)
-                        {
-                            targetTerminal = TerminalManager.I.GetNearestOpponentTerminal(fighterCondition.fighterTeam.Value, transform.position);
-                        }
-                        condition = Conditions.ATTACK_TERMINAL;
-                    }
+                case Rule.CRYSTAL_HUNTER:
                     break;
             }
         }
@@ -412,12 +344,12 @@ public class AiMovement : Movement
     // Rotation speed differs by each condition.
     const float QUICK_ROTATIONSPEED = 2f;
     const float SLOW_ROTATIONSPEED = 0.5f;
-    void ActionOnEachCondition()
+    void MovementByAction()
     {
-        switch (condition)
+        switch (action)
         {
-            // Not Under Attack.
-            case Conditions.ATTACK:
+            // === Not Under Attack === //
+            case Actions.ATTACK:
                 rotationSpeed = QUICK_ROTATIONSPEED;
                 if (targetFighter != null)
                 {
@@ -425,7 +357,7 @@ public class AiMovement : Movement
                 }
                 break;
 
-            case Conditions.SEARCH:
+            case Actions.SEARCH:
                 rotationSpeed = QUICK_ROTATIONSPEED;
 
                 if (arrived_at_final_destination)
@@ -433,10 +365,10 @@ public class AiMovement : Movement
                     SetFinalDestination(SubTarget.GetRandomPosition());
                 }
 
-                // If previous condition was ATTACK, just set new final_destination. (No need to arrive at target_fighters position any more.)
-                else if (prev_condition == Conditions.ATTACK ||
-                        prev_condition == Conditions.GOBACK ||
-                        prev_condition == Conditions.COUNTER)
+                // If chasing other fighter, set new final_destination. (No need to arrive at target fighters position any more.)
+                else if (prev_action == Actions.ATTACK ||
+                        prev_action == Actions.GOBACK ||
+                        prev_action == Actions.COUNTER)
                 {
                     SetFinalDestination(SubTarget.GetRandomPosition());
                 }
@@ -444,32 +376,25 @@ public class AiMovement : Movement
                 break;
 
 
-            // Under Attack.
-            case Conditions.GOBACK:
+            // === Under Attack === //
+            case Actions.GOBACK:
+                float back_offset = -30;
                 rotationSpeed = SLOW_ROTATIONSPEED;
-                SetFinalDestination(aiReceiver.shooterPos + aiReceiver.currentShooter.transform.forward * -DISTANCE_BORDER);
+                SetFinalDestination(aiReceiver.shooterPos + aiReceiver.currentShooter.transform.forward * back_offset);
                 break;
 
-            case Conditions.FARESCAPE:
+            case Actions.FARESCAPE:
                 rotationSpeed = QUICK_ROTATIONSPEED;
                 if (arrived_at_final_destination) SetFinalDestination(SubTarget.GetRandomPosition());
                 break;
 
-            case Conditions.FLIP:
+            case Actions.SOMERSAULT:
                 Somersault();
                 break;
 
-            case Conditions.COUNTER:
+            case Actions.COUNTER:
                 rotationSpeed = QUICK_ROTATIONSPEED;
                 SetFinalDestination(aiReceiver.shooterPos);
-                break;
-
-
-            // Only On Terminal Conquest.
-            case Conditions.ATTACK_TERMINAL:
-                break;
-
-            case Conditions.DEFENCE_TERMINAL:
                 break;
         }
     }
@@ -511,24 +436,18 @@ public class AiMovement : Movement
     {
         if (!controllable) return;
 
-        Transform trans = transform;
+        Vector3 my_position = transform.position;
 
         Gizmos.color = Color.blue;
-        Gizmos.DrawLine(trans.position, trans.position + relative_to_final);
+        Gizmos.DrawLine(my_position, finalDestination);
 
         if (bypassing)
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawLine(trans.position, trans.position + relative_to_next);
+            Gizmos.DrawLine(my_position, nextDestination);
         }
 
-        // Gizmos.color = Color.green;
-        // Gizmos.DrawWireSphere(trans.position, searchRadius_orig);
-
-        // Gizmos.color = Color.cyan;
-        // Gizmos.DrawWireSphere(trans.position, distanceBorder);
-
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(trans.position + trans.forward * uTurndirection * AVOID_DISTANCE, CAST_RADIUS);
+        Gizmos.DrawWireSphere(my_position + transform.forward * uTurndirection * AVOID_DISTANCE, SPHERE_CAST_RADIUS);
     }
 }

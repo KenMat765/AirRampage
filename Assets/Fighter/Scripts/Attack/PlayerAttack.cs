@@ -5,9 +5,6 @@ using UnityEngine;
 
 public class PlayerAttack : Attack
 {
-    // Blasts {rapidCount} bullets in {setInterval} seconds.
-    public override float blastInterval { get; set; } = 0.6f;
-
     // This if DEATH_NORMAL_BLAST for fighters, but change this to SPECIFIC_DEATH_CANNON for cannons.
     protected override string causeOfDeath { get; set; } = FighterCondition.DEATH_NORMAL_BLAST;
 
@@ -37,8 +34,8 @@ public class PlayerAttack : Attack
             if (!isBlasting)
             {
                 isBlasting = true;
-                blastTimer = blastInterval;               // Reset blast timer.
-                muzzleRot.Value = transform.rotation;   // Reset muzzle rotation.
+                blastTimer = blastInterval;
+                muzzleRot.Value = transform.rotation;
             }
 
             // Determine blast direction.
@@ -48,27 +45,12 @@ public class PlayerAttack : Attack
             Quaternion targetRot = Quaternion.Euler(target_xAngle, target_yAngle, 0);
             muzzleRot.Value = Quaternion.Slerp(muzzleRot.Value, targetRot, sensitivity);
 
-            // Count down blast timer.
             blastTimer -= Time.deltaTime;
             if (blastTimer < 0)
             {
-                // Reset timer.
                 blastTimer = blastInterval;
-
-                // Blast normal bullets for yourself.
                 int rapid_count = 3;
                 NormalRapid(rapid_count, null);
-                // Send to all clones to blast bullets.
-                NormalRapidServerRpc(OwnerClientId, rapid_count, -1);
-
-                // === Pre-Homing (Automatically looks at opponent) === //
-                // Determine target.
-                // int targetNo = -1;
-                // if (homingCount > 0) targetNo = homingTargetNos[0];
-                // GameObject target = null;
-                // if (targetNo != -1) target = ParticipantManager.I.fighterInfos[targetNo].body;
-                // NormalRapid(rapidCount, target);
-                // NormalRapidServerRpc(OwnerClientId, rapidCount, targetNo);
             }
         }
         else if (isBlasting)
@@ -99,13 +81,5 @@ public class PlayerAttack : Attack
     {
         base.OnDeath();
         TerminateAllSkills();
-    }
-
-
-
-    void OnDrawGizmos()
-    {
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(transform.position, lockonDistance);
     }
 }

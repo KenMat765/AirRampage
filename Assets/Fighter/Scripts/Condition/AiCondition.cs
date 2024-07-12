@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class AiCondition : FighterCondition
 {
-    public override float my_cp { get; set; } = 1000;
-
     protected override void Start()
     {
         base.Start();
@@ -33,7 +31,6 @@ public class AiCondition : FighterCondition
         ReportDeath(destroyerNo, causeOfDeath);
     }
 
-    public override float revivalTime { get; set; } = 7;
     protected override void OnRevival()
     {
         base.OnRevival();

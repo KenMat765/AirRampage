@@ -13,6 +13,7 @@ public abstract class Movement : NetworkBehaviour
     protected virtual void Awake()
     {
         fighterCondition = GetComponent<FighterCondition>();
+        latestDestinations = new Vector3[MAX_CACHE];
         col = GetComponent<Collider>();
         col.enabled = false;
 
@@ -213,20 +214,18 @@ public abstract class Movement : NetworkBehaviour
     // For AI fighters & zakos //////////////////////////////////////////////////////////////////////////////////////////////////////////
     protected float rotationSpeed { get; set; }
 
-    // Judged arrived when distance to destination is smaller than this value.
-    // Also used to judge whether shooter is near or far from this fighter.
-    protected const float DISTANCE_BORDER = 30f;
-    protected float SQR_DISTANCE_BORDER { get { return DISTANCE_BORDER * DISTANCE_BORDER; } }
-    protected const float SEARCH_RADIUS_ORG = 150;  // Used for searching sub-targets around.
-    protected const float CAST_RADIUS = 5;           // Used for detecting obstacles in way.
-    protected Vector3 finalDestination, nextDestination;
-    public Vector3 relative_to_final => finalDestination - transform.position;
-    public Vector3 relative_to_next => nextDestination - transform.position;
-    protected bool arrived_at_final_destination, arrived_at_next_destination;
+    protected const float ARRIVE_DISTANCE = 30f;
+    protected const float SPHERE_CAST_RADIUS = 5;
+
+    public Vector3 finalDestination { get; private set; }
+    public Vector3 nextDestination { get; private set; }
+    protected bool arrived_at_final_destination;
+    protected bool arrived_at_next_destination;
     protected bool bypassing;
-    int index_counter = 0;
-    protected const short max_cashe = 10;
+
     protected Vector3[] latestDestinations;
+    const short MAX_CACHE = 10;
+    int cache_idx = 0;
 
 
     protected void SetFinalDestination(Vector3 destination)
@@ -240,24 +239,27 @@ public abstract class Movement : NetworkBehaviour
     protected void SetNextDestination()
     {
         arrived_at_next_destination = false;
-        Vector3 my_position = transform.position;
 
-        Ray ray = new Ray(my_position, relative_to_final);
+        Vector3 my_position = transform.position;
+        Vector3 relative_to_final = finalDestination - my_position;
+        float distance_to_final = Vector3.Magnitude(relative_to_final);
+
         RaycastHit hit;
-        float max_distance = Vector3.Magnitude(relative_to_final);
-        bool obstacles_in_way = Physics.SphereCast(ray, CAST_RADIUS, out hit, max_distance, FighterCondition.obstacles_mask);
+        Ray ray = new Ray(my_position, relative_to_final);
+        bool obstacles_in_way = Physics.SphereCast(ray, SPHERE_CAST_RADIUS, out hit, distance_to_final, FighterCondition.obstacles_mask);
         if (obstacles_in_way)
         {
             bypassing = true;
 
             // Search for sub-targets around until trial reaches max_trial.
-            const int max_trial = 3;
+            int max_trial = 3;
+            float search_radius = 150;
             List<Vector3> subTargetsAround = new List<Vector3>();       // Check for obstacles in way.
             List<Vector3> subTargetsAround_weak = new List<Vector3>();  // Does not check for obstacles.
             for (int trial = 1; trial <= max_trial; trial++)
             {
                 // Expand search radius on each trial.
-                float searchRadius = SEARCH_RADIUS_ORG * trial;
+                float searchRadius = search_radius * trial;
 
                 // Search sub-targets around.
                 subTargetsAround_weak = Physics.OverlapSphere(my_position, searchRadius, SubTarget.mask, QueryTriggerInteraction.Collide)
@@ -269,7 +271,7 @@ public abstract class Movement : NetworkBehaviour
                     {
                         Ray ray_to_sub = new Ray(my_position, t - my_position);
                         float distance_to_sub = Vector3.Magnitude(t - my_position);
-                        return !Physics.SphereCast(ray_to_sub, CAST_RADIUS, distance_to_sub, FighterCondition.obstacles_mask);
+                        return !Physics.SphereCast(ray_to_sub, SPHERE_CAST_RADIUS, distance_to_sub, FighterCondition.obstacles_mask);
                     })
                     .ToList();
 
@@ -300,8 +302,8 @@ public abstract class Movement : NetworkBehaviour
             }
 
             // Update latest destinations.
-            latestDestinations[index_counter] = nextDestination;
-            index_counter = (index_counter + 1) % max_cashe;
+            latestDestinations[cache_idx] = nextDestination;
+            cache_idx = (cache_idx + 1) % MAX_CACHE;
         }
         else
         {
@@ -312,7 +314,10 @@ public abstract class Movement : NetworkBehaviour
 
     protected void ArrivalCheck()
     {
-        if (Vector3.SqrMagnitude(relative_to_next) < SQR_DISTANCE_BORDER && !arrived_at_next_destination)
+        if (arrived_at_next_destination) return;
+
+        Vector3 relative_to_next = nextDestination - transform.position;
+        if (Vector3.SqrMagnitude(relative_to_next) < Mathf.Pow(ARRIVE_DISTANCE, 2))
         {
             arrived_at_next_destination = true;
             if (bypassing)
@@ -324,12 +329,5 @@ public abstract class Movement : NetworkBehaviour
                 arrived_at_final_destination = true;
             }
         }
-    }
-
-    protected bool ObstacleIsInFront(float max_distance)
-    {
-        Transform trans = transform;
-        Ray ray = new Ray(trans.position, trans.forward * uTurndirection);
-        return Physics.SphereCast(ray, CAST_RADIUS, max_distance, FighterCondition.obstacles_mask);
     }
 }

@@ -48,8 +48,6 @@ public class ShieldHitDetector : MonoBehaviour
         else if (gameObject.layer == LayerMask.NameToLayer("BlueShield")) enemy_bullet_layer = LayerMask.NameToLayer("RedBullet");
         else Debug.LogError("Layer is not set to Shield Prefab");
 
-        if (!BattleInfo.isMulti) return;
-
         // Set self to Receiver (Used in RPC)
         GetComponentInParent<Receiver>().hitDetector = this;
     }
@@ -60,7 +58,7 @@ public class ShieldHitDetector : MonoBehaviour
         shield_durability -= exhaust_speed * Time.deltaTime;
 
         // elapsed_timeをshield_durabilityに応じて更新
-        shield.MeterDecreaserManual((Mathf.Clamp(shield_durability, 0, shield.shield_durability) * shield.charge_time) / shield.shield_durability);
+        shield.MeterDecreaserManual(Mathf.Clamp(shield_durability, 0, shield.shield_durability) * shield.charge_time / shield.shield_durability);
 
         // 破壊処理
         if (shield_durability <= 0)

@@ -7042,6 +7042,8 @@ MonoBehaviour:
   defaultSpeed: 40
   defaultPower: 1
   defaultDefence: 1
+  cpToGive: 200
+  revivalTime: 3
   red_body: {fileID: 1988865275300390}
   blue_body: {fileID: 1360027754317512}
 --- !u!114 &4290537579717849159

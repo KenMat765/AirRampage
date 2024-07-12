@@ -157,6 +157,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7e9875122e5546a0b4bbd17ee8b33d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  acceptDamage: 0
 --- !u!114 &1058749907071328082
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -169,6 +170,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 223282543bc274178b0ad18bd30cec05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attackable: 0
   lockonAngle: 45
   lockonDistance: 200
   originalNormalBullet: {fileID: 1606845707113445}
@@ -177,6 +179,7 @@ MonoBehaviour:
   bulletPower: 1
   bulletSpeed: 150
   bulletLifespan: 1
+  blastInterval: 0.6
 --- !u!114 &2221773611656743181
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -333,6 +336,8 @@ MonoBehaviour:
   defaultSpeed: 40
   defaultPower: 1
   defaultDefence: 1
+  cpToGive: 1000
+  revivalTime: 7
 --- !u!114 &7260632517496643834
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -353,8 +358,6 @@ MonoBehaviour:
   flipAudio: {fileID: 2920741803212730164}
   uturnAudio: {fileID: 3100629185663173467}
   rollAudio: {fileID: 5421883004582474808}
-  condition: 1
-  prev_condition: 1
 --- !u!1001 &608152692306536542
 PrefabInstance:
   m_ObjectHideFlags: 0

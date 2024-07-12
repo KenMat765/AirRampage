@@ -10,7 +10,7 @@ public abstract class Weapon : Utilities
     {
         get
         {
-            return (!gameObject.activeSelf && !hitEffect.activeSelf);
+            return !gameObject.activeSelf && !hitEffect.activeSelf;
         }
     }
 
@@ -220,52 +220,25 @@ public abstract class Weapon : Utilities
 
     protected virtual void OnCollisionEnter(Collision col)
     {
-        // 攻撃：Attack Range == Single
         if (attackRange == AttackRange.Single)
         {
             GameObject hit_obj = col.gameObject;
 
-            // Shieldだった場合
-            // ヒット：シールド
+            // hit_obj == shield
             if (hit_obj.layer == enemy_shield_layer)
             {
-                if (BattleInfo.isMulti)
+                if (attack.IsOwner)
                 {
-                    // Only the owner of this weapon requests to server to change parameters.
-                    if (attack.IsOwner)
-                    {
-                        Receiver receiver = hit_obj.GetComponentInParent<Receiver>();
-                        receiver.ShieldDurabilityDecreaseServerRpc(power_temp);
-                    }
-                }
-                else
-                {
-                    ShieldHitDetector hitDetector = hit_obj.GetComponent<ShieldHitDetector>();
-                    hitDetector.DecreaseDurability(power_temp);
+                    Receiver receiver = hit_obj.GetComponentInParent<Receiver>();
+                    receiver.ShieldDurabilityDecreaseServerRpc(power_temp);
                 }
             }
 
-            // ボディだった場合
-            // ヒット：ボディ
+            // hit_obj == fighter_body
             else if (hit_obj.layer == enemy_body_layer)
             {
-                // Get fighter's Receiver.
                 Receiver receiver = hit_obj.GetComponent<Receiver>();
-
-                if (BattleInfo.isMulti)
-                {
-                    // Only the owner of this weapon requests to server to change parameters.
-                    if (attack.IsOwner)
-                    {
-                        receiver.HPDownServerRpc(power_temp);
-                        receiver.LastShooterDetectorServerRpc(fighterNo, causeOfDeath);
-                        receiver.OnWeaponHitServerRpc(fighterNo);
-                        if (speedDown) receiver.SpeedDownServerRpc(speedGrade, speedDuration, speedProbability);
-                        if (powerDown) receiver.PowerDownServerRpc(powerGrade, powerDuration, powerProbability);
-                        if (defenceDown) receiver.DefenceDownServerRpc(defenceGrade, defenceDuration, defenceProbability);
-                    }
-                }
-                else
+                if (attack.IsOwner)
                 {
                     receiver.HPDown(power_temp);
                     receiver.LastShooterDetector(fighterNo, causeOfDeath);
@@ -273,26 +246,6 @@ public abstract class Weapon : Utilities
                     if (speedDown) receiver.SpeedDown(speedGrade, speedDuration, speedProbability);
                     if (powerDown) receiver.PowerDown(powerGrade, powerDuration, powerProbability);
                     if (defenceDown) receiver.DefenceDown(defenceGrade, defenceDuration, defenceProbability);
-                }
-            }
-
-            // ターミナルだった場合
-            // ヒット：ターミナル
-            else if (hit_obj.layer == enemy_terminal_layer || hit_obj.layer == Terminal.defaultLayer)
-            {
-                // Get Terminal component.
-                Terminal terminal = hit_obj.GetComponent<Terminal>();
-
-                if (BattleInfo.isMulti)
-                {
-                    if (attack.IsOwner)
-                    {
-                        terminal.DamageServerRpc(power_temp, isSkill, fighterNo);
-                    }
-                }
-                else
-                {
-                    terminal.Damage(power_temp, isSkill, fighterNo);
                 }
             }
         }
@@ -478,65 +431,36 @@ public abstract class Weapon : Utilities
         // 攻撃：Attack Range == Range
         if (attackRange == AttackRange.Range)
         {
-            // ヒット：ボディ or シールド
+            // hits == fighter_body or shield
             Collider[] hits = Physics.OverlapSphere(transform.position, rangeRadius, enemy_mask);
 
             foreach (Collider hit in hits)
             {
                 GameObject hit_obj = hit.gameObject;
 
-                // Shieldだった場合
-                // ヒット：シールド
+                // hit_obj == shield
                 if (hit_obj.layer == enemy_shield_layer)
                 {
                     if (!alreadyBombed.Contains(hit_obj))
                     {
-                        // Call this on every clones.
                         alreadyBombed.Add(hit.gameObject);
                         alreadyBombed.Add(hit.transform.parent.gameObject);
-                        if (BattleInfo.isMulti)
+                        if (attack.IsOwner)
                         {
-                            // Only the owner of this weapon requests to server to change parameters.
-                            if (attack.IsOwner)
-                            {
-                                Receiver receiver = hit_obj.GetComponentInParent<Receiver>();
-                                receiver.ShieldDurabilityDecreaseServerRpc(power_temp);
-                            }
-                        }
-                        else
-                        {
-                            ShieldHitDetector hitDetector = hit_obj.GetComponent<ShieldHitDetector>();
-                            hitDetector.DecreaseDurability(power_temp);
+                            Receiver receiver = hit_obj.GetComponentInParent<Receiver>();
+                            receiver.ShieldDurabilityDecreaseServerRpc(power_temp);
                         }
                     }
                 }
 
-                // ボディだった場合
-                // ヒット：ボディ
+                // hit_obj == fighter_body
                 else if (hit_obj.layer == enemy_body_layer)
                 {
-                    // まだダメージを与えていない敵だった場合
                     if (!alreadyBombed.Contains(hit_obj))
                     {
                         alreadyBombed.Add(hit.gameObject);
-
-                        // Get fighter's Receiver.
                         Receiver receiver = hit_obj.GetComponent<Receiver>();
-
-                        if (BattleInfo.isMulti)
-                        {
-                            // Only the owner of this weapon requests to server to change parameters.
-                            if (attack.IsOwner)
-                            {
-                                receiver.HPDownServerRpc(power_temp);
-                                receiver.LastShooterDetectorServerRpc(fighterNo, causeOfDeath);
-                                receiver.OnWeaponHitServerRpc(fighterNo);
-                                if (speedDown) receiver.SpeedDownServerRpc(speedGrade, speedDuration, speedProbability);
-                                if (powerDown) receiver.PowerDownServerRpc(powerGrade, powerDuration, powerProbability);
-                                if (defenceDown) receiver.DefenceDownServerRpc(defenceGrade, defenceDuration, defenceProbability);
-                            }
-                        }
-                        else
+                        if (attack.IsOwner)
                         {
                             receiver.HPDown(power_temp);
                             receiver.LastShooterDetector(fighterNo, causeOfDeath);
@@ -544,33 +468,6 @@ public abstract class Weapon : Utilities
                             if (speedDown) receiver.SpeedDown(speedGrade, speedDuration, speedProbability);
                             if (powerDown) receiver.PowerDown(powerGrade, powerDuration, powerProbability);
                             if (defenceDown) receiver.DefenceDown(defenceGrade, defenceDuration, defenceProbability);
-                        }
-                    }
-                }
-
-                // ターミナルだった場合
-                // ヒット：ターミナル
-                else if (hit_obj.layer == enemy_terminal_layer || hit_obj.layer == Terminal.defaultLayer)
-                {
-                    // まだダメージを与えていない敵だった場合
-                    if (!alreadyBombed.Contains(hit_obj))
-                    {
-                        alreadyBombed.Add(hit.gameObject);
-
-                        // Get Terminal component.
-                        Terminal terminal = hit_obj.GetComponent<Terminal>();
-
-                        if (BattleInfo.isMulti)
-                        {
-                            // Only the owner of this weapon requests to server to change parameters.
-                            if (attack.IsOwner)
-                            {
-                                terminal.DamageServerRpc(power_temp, isSkill, fighterNo);
-                            }
-                        }
-                        else
-                        {
-                            terminal.Damage(power_temp, isSkill, fighterNo);
                         }
                     }
                 }

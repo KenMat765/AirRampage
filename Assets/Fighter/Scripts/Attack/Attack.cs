@@ -7,7 +7,9 @@ using Unity.Netcode;
 public abstract class Attack : NetworkBehaviour
 {
     public FighterCondition fighterCondition { get; set; }
-    public bool attackable { get; set; } = false;   // If able to attack or not.
+
+    [Tooltip("Disable attack when false")]
+    public bool attackable;
 
     protected virtual void Awake()
     {
@@ -70,41 +72,6 @@ public abstract class Attack : NetworkBehaviour
 
 
 
-    // Only For Terminal Conquest ///////////////////////////////////////////////////////////////////////////////////
-    public List<int> attackableTerminals { get; private set; } = new List<int>();
-    protected void SearchAttackableTerminals()
-    {
-        Vector3 my_position = transform.position;
-        Vector3 bullet_position = originalNormalBullet.transform.position;
-
-        Collider[] colliders = Physics.OverlapSphere(bullet_position, lockonDistance, fighterCondition.terminals_mask);
-
-        // Detect targets, and set them to aroundTerminals.
-        if (colliders.Length > 0)
-        {
-            var possibleTargets = colliders.Select(t => t.gameObject);
-
-            // Get terminal number of targets.
-            attackableTerminals = possibleTargets.Where(p =>
-
-                // Check if target is inside lockon range.
-                Vector3.Angle(transform.forward, p.transform.position - my_position) < lockonAngle &&
-
-                // Check if there are no obstacles (terrain) between self and target.
-                !Physics.Raycast(my_position, p.transform.position - my_position, Vector3.Magnitude(p.transform.position - my_position), GameInfo.terrainMask))
-
-                // Get terminal number of target from its name.
-                .Select(r => int.Parse(r.name)).ToList();
-        }
-        else
-        {
-            // Clean up list.
-            attackableTerminals.Clear();
-        }
-    }
-
-
-
     // Normal Blast /////////////////////////////////////////////////////////////////////////////////////////////////
     [Header("Normal Blast")]
     [SerializeField] protected GameObject originalNormalBullet;
@@ -115,7 +82,7 @@ public abstract class Attack : NetworkBehaviour
     public float bulletPower = 1;   // power of normal bullet (≠ FighterCondition.power: power of fighter itself)
     public float bulletSpeed = 150;
     public float bulletLifespan = 1;
-    public abstract float blastInterval { get; set; }
+    public float blastInterval;
     HomingType homingType = HomingType.PreHoming;
 
     protected List<Weapon> normalWeapons = new List<Weapon>();
@@ -168,33 +135,39 @@ public abstract class Attack : NetworkBehaviour
     }
 
     ///<param name="target"> Put null when there are no targets. </param>
-    protected void NormalRapid(int rapidCount, GameObject target = null)
+    protected void NormalRapid(int rapid_count, GameObject target = null)
     {
-        float interval = blastInterval / rapidCount;
+        float interval = blastInterval / rapid_count;
         IEnumerator normalRapid()
         {
             NormalBlast(target);
-            for (int k = 1; k < rapidCount; k++)
+            for (int k = 1; k < rapid_count; k++)
             {
                 yield return new WaitForSeconds(interval);
                 NormalBlast(target);
             }
         }
         StartCoroutine(normalRapid());
+
+        if (IsOwner)
+        {
+            if (IsHost)
+                NormalRapidClientRpc(rapid_count, -1);
+            else
+                NormalRapidServerRpc(rapid_count, -1);
+        }
     }
 
     [ServerRpc]
-    /// <Param name="targetNo">Send -1 if there are no targets.</Param>
-    protected void NormalRapidServerRpc(ulong senderId, int rapidCount, int targetNo = -1)
+    void NormalRapidServerRpc(int rapidCount, int targetNo = -1)
     {
-        NormalRapidClientRpc(senderId, rapidCount, targetNo);
+        NormalRapidClientRpc(rapidCount, targetNo);
     }
 
     [ClientRpc]
-    /// <Param name="targetNo">Send -1 if there are no targets.</Param>
-    protected void NormalRapidClientRpc(ulong senderId, int rapidCount, int targetNo = -1)
+    void NormalRapidClientRpc(int rapidCount, int targetNo = -1)
     {
-        if (NetworkManager.Singleton.LocalClientId == senderId) return;
+        if (IsOwner) return;
         GameObject target = null;
         if (targetNo != -1) target = ParticipantManager.I.fighterInfos[targetNo].body;
         NormalRapid(rapidCount, target);

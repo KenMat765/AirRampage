@@ -78,9 +78,9 @@ public class PlayerMovement : Movement
         if (uGUIMannager.onStick)
         {
             const int insensitivity = 100;
-            targetRotX = Utilities.R2R(uGUIMannager.norm_diffPos.y, 0, maxTiltX, Utilities.FunctionType.convex_down, insensitivity);
+            targetRotX = Utilities.R2R(uGUIMannager.norm_diffPos.y, 0, MAX_TILT_X, Utilities.FunctionType.convex_down, insensitivity);
             relativeRotY = Utilities.R2R(uGUIMannager.norm_diffPos.x, 0, maxRotSpeed, Utilities.FunctionType.convex_down, insensitivity);
-            targetRotZ = Utilities.R2R(uGUIMannager.norm_diffPos.x, 0, maxTiltZ, Utilities.FunctionType.convex_down, insensitivity);
+            targetRotZ = Utilities.R2R(uGUIMannager.norm_diffPos.x, 0, MAX_TILT_Z, Utilities.FunctionType.convex_down, insensitivity);
 #endif
             Quaternion targetRot = Quaternion.Euler(targetRotX * stickReverse * uTurndirection, transform.rotation.eulerAngles.y + relativeRotY, targetRotZ * -1 * uTurndirection);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, 0.05f);
@@ -99,7 +99,7 @@ public class PlayerMovement : Movement
 
 
 
-    // 4-Actions ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 4-Actions ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     [SerializeField] BurnerController burnerController;
     [SerializeField] ParticleSystem rollSpark;
     [SerializeField] AudioSource flipAudio, uturnAudio, rollAudio;

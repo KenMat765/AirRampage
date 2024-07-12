@@ -5,11 +5,7 @@ using NaughtyAttributes;
 
 public class ZakoAttack : Attack
 {
-    // setInterval is not used in ZakoAttack.
-    // set setInterval to small number in order to stop WaitForSeconds in NormalRapid()
-    public override float blastInterval { get; set; } = 0.05f;
-
-    // This if DEATH_NORMAL_BLAST for fighters, but change this to SPECIFIC_DEATH_CANNON for cannons.
+    // This is DEATH_NORMAL_BLAST for fighters, but change this to SPECIFIC_DEATH_CANNON for cannons.
     protected override string causeOfDeath { get; set; } = FighterCondition.DEATH_NORMAL_BLAST;
 
     [SerializeField, MinMaxSlider(0, 3)]
@@ -24,7 +20,7 @@ public class ZakoAttack : Attack
     {
         if (!attackable) return;
 
-        if (!IsHost) return;
+        if (!IsOwner) return;
 
         // Normal Blast. ///////////////////////////////////////////////////////////////////////////////////////
         if (blastTimer > 0) blastTimer -= Time.deltaTime;
@@ -33,29 +29,13 @@ public class ZakoAttack : Attack
         {
             ZakoCondition condition = (ZakoCondition)fighterCondition;
             List<int> fighter_nos = condition.fighterArray.detected_fighters_nos;
-            List<int> terminal_nos = condition.fighterArray.detected_terminal_nos;
-            if (fighter_nos.Count > 0 || (BattleInfo.rule == Rule.TERMINAL_CONQUEST && terminal_nos.Count > 0))
+            if (fighter_nos.Count > 0)
             {
-                // Reset timer.
-                // blastTimer = setInterval;
                 blastTimer = Random.Range(minMaxInterval[0], minMaxInterval[1]);
-
-                // Determine target.
-                int targetNo = -1;
-                GameObject target = null;
-
-                // Do not home to terminals.
-                if (fighter_nos.Count > 0)
-                {
-                    targetNo = fighter_nos.RandomChoice();
-                    target = ParticipantManager.I.fighterInfos[targetNo].body;
-                }
-
-                // Blast normal bullet.
+                int targetNo = fighter_nos.RandomChoice();
+                GameObject target = ParticipantManager.I.fighterInfos[targetNo].body;
                 int rapid_count = 1;
                 NormalRapid(rapid_count, target);
-                // Send to all clones to blast bullets.
-                NormalRapidClientRpc(OwnerClientId, rapid_count, targetNo);
             }
         }
     }

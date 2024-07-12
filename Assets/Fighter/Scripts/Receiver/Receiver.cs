@@ -9,7 +9,9 @@ using DG.Tweening;
 public abstract class Receiver : NetworkBehaviour
 {
     public FighterCondition fighterCondition { get; set; }
-    public bool acceptDamage { get; set; }
+
+    [Tooltip("Stops accepting any attacks when false")]
+    public bool acceptAttack;
 
     // Collider needs to be disabled, in order not to be detected by other fighter as homing target.
     Collider col;
@@ -26,20 +28,24 @@ public abstract class Receiver : NetworkBehaviour
     // On weapon hit callback ////////////////////////////////////////////////////////////////////////////////////////////
 
     // Should be called only at Owner
-    public virtual void OnWeaponHit(int fighterNo) { }
+    public virtual void OnWeaponHit(int fighterNo)
+    {
+        if (IsOwner) { }
+        else
+            OnWeaponHitServerRpc(fighterNo);
+    }
 
     [ServerRpc(RequireOwnership = false)]
-    public void OnWeaponHitServerRpc(int fighterNo)
+    void OnWeaponHitServerRpc(int fighterNo)
     {
-        if (IsOwner) OnWeaponHit(fighterNo);
-        else OnWeaponHitClientRpc(fighterNo);
+        if (IsOwner)
+            OnWeaponHit(fighterNo);
+        else
+            OnWeaponHitClientRpc(fighterNo);
     }
 
     [ClientRpc]
-    void OnWeaponHitClientRpc(int fighterNo)
-    {
-        if (IsOwner) OnWeaponHit(fighterNo);
-    }
+    void OnWeaponHitClientRpc(int fighterNo) { if (IsOwner) OnWeaponHit(fighterNo); }
 
     Sequence hitSeq;
     protected void ShakeBody()
@@ -60,68 +66,99 @@ public abstract class Receiver : NetworkBehaviour
     // Damages & Debuffs ////////////////////////////////////////////////////////////////////////////////////////////
     public void HPDown(float power)
     {
-        if (!acceptDamage) return;
-        float damage = power / fighterCondition.defence.value;
-        fighterCondition.HPDecreaser(damage);
+        if (IsOwner)
+        {
+            if (!acceptAttack) return;
+            float damage = power / fighterCondition.defence.value;
+            fighterCondition.HPDecreaser(damage);
+        }
+        else
+            HPDownServerRpc(power);
     }
 
     public void SpeedDown(int delta_grade, float duration, float probability)
     {
-        float random = Random.value;
-        if (random <= probability) fighterCondition.speed.Grade(delta_grade, duration);
+        if (IsOwner)
+        {
+            if (!acceptAttack) return;
+            float random = Random.value;
+            if (random <= probability) fighterCondition.speed.Grade(delta_grade, duration);
+        }
+        else
+            SpeedDownServerRpc(delta_grade, duration, probability);
     }
 
     public void PowerDown(int delta_grade, float duration, float probability)
     {
-        float random = Random.value;
-        if (random <= probability) fighterCondition.power.Grade(delta_grade, duration);
+        if (IsOwner)
+        {
+            if (!acceptAttack) return;
+            float random = Random.value;
+            if (random <= probability) fighterCondition.power.Grade(delta_grade, duration);
+        }
+        else
+            PowerDownServerRpc(delta_grade, duration, probability);
     }
 
     public void DefenceDown(int delta_grade, float duration, float probability)
     {
-        float random = Random.value;
-        if (random <= probability) fighterCondition.defence.Grade(delta_grade, duration);
+        if (IsOwner)
+        {
+            if (!acceptAttack) return;
+            float random = Random.value;
+            if (random <= probability) fighterCondition.defence.Grade(delta_grade, duration);
+        }
+        else
+            DefenceDownServerRpc(delta_grade, duration, probability);
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void HPDownServerRpc(float power)
+    void HPDownServerRpc(float power)
     {
-        if (IsOwner) HPDown(power);
-        else HPDownClientRpc(power);
+        if (IsOwner)
+            HPDown(power);
+        else
+            HPDownClientRpc(power);
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void SpeedDownServerRpc(int grade, float duration, float probability)
+    void SpeedDownServerRpc(int grade, float duration, float probability)
     {
-        if (IsOwner) SpeedDown(grade, duration, probability);
-        else SpeedDownClientRpc(grade, duration, probability);
+        if (IsOwner)
+            SpeedDown(grade, duration, probability);
+        else
+            SpeedDownClientRpc(grade, duration, probability);
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void PowerDownServerRpc(int grade, float duration, float probability)
+    void PowerDownServerRpc(int grade, float duration, float probability)
     {
-        if (IsOwner) PowerDown(grade, duration, probability);
-        else PowerDownClientRpc(grade, duration, probability);
+        if (IsOwner)
+            PowerDown(grade, duration, probability);
+        else
+            PowerDownClientRpc(grade, duration, probability);
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void DefenceDownServerRpc(int grade, float duration, float probability)
+    void DefenceDownServerRpc(int grade, float duration, float probability)
     {
-        if (IsOwner) DefenceDown(grade, duration, probability);
-        else DefenceDownClientRpc(grade, duration, probability);
+        if (IsOwner)
+            DefenceDown(grade, duration, probability);
+        else
+            DefenceDownClientRpc(grade, duration, probability);
     }
 
     [ClientRpc]
-    public void HPDownClientRpc(float power) { if (IsOwner) HPDown(power); }
+    void HPDownClientRpc(float power) { if (IsOwner) HPDown(power); }
 
     [ClientRpc]
-    public void SpeedDownClientRpc(int grade, float duration, float probability) { if (IsOwner) SpeedDown(grade, duration, probability); }
+    void SpeedDownClientRpc(int grade, float duration, float probability) { if (IsOwner) SpeedDown(grade, duration, probability); }
 
     [ClientRpc]
-    public void PowerDownClientRpc(int grade, float duration, float probability) { if (IsOwner) PowerDown(grade, duration, probability); }
+    void PowerDownClientRpc(int grade, float duration, float probability) { if (IsOwner) PowerDown(grade, duration, probability); }
 
     [ClientRpc]
-    public void DefenceDownClientRpc(int grade, float duration, float probability) { if (IsOwner) DefenceDown(grade, duration, probability); }
+    void DefenceDownClientRpc(int grade, float duration, float probability) { if (IsOwner) DefenceDown(grade, duration, probability); }
 
 
 
@@ -129,27 +166,29 @@ public abstract class Receiver : NetworkBehaviour
     public int lastShooterNo { get; private set; }
     public string lastCauseOfDeath { get; private set; }
 
-    // Call : Server + Owner.
+    // Should be called at Owner.
     public void LastShooterDetector(int fighterNo, string causeOfDeath)
     {
-        lastShooterNo = fighterNo;
-        lastCauseOfDeath = causeOfDeath;
+        if (IsOwner)
+        {
+            lastShooterNo = fighterNo;
+            lastCauseOfDeath = causeOfDeath;
+        }
+        else
+            LastShooterDetectorServerRpc(fighterNo, causeOfDeath);
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void LastShooterDetectorServerRpc(int fighterNo, string causeOfDeath)
+    void LastShooterDetectorServerRpc(int fighterNo, string causeOfDeath)
     {
-        // Call in server too.
-        LastShooterDetector(fighterNo, causeOfDeath);
-        if (!IsOwner) LastShooterDetectorClientRpc(fighterNo, causeOfDeath);
+        if (IsOwner)
+            LastShooterDetector(fighterNo, causeOfDeath);
+        else
+            LastShooterDetectorClientRpc(fighterNo, causeOfDeath);
     }
 
     [ClientRpc]
-    public void LastShooterDetectorClientRpc(int fighterNo, string causeOfDeath)
-    {
-        // Call in owner.
-        if (IsOwner) LastShooterDetector(fighterNo, causeOfDeath);
-    }
+    void LastShooterDetectorClientRpc(int fighterNo, string causeOfDeath) { if (IsOwner) LastShooterDetector(fighterNo, causeOfDeath); }
 
 
 
@@ -167,9 +206,9 @@ public abstract class Receiver : NetworkBehaviour
 
 
     // Shield ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Set hitDetector from Shield class.
-    // As ShieldHitDetector cannot call RPCs, declear RPC here.
-    public ShieldHitDetector hitDetector { get; set; }
+
+    // As ShieldHitDetector cannot call RPCs, declear here.
+    public ShieldHitDetector hitDetector { get; set; }  // Set from Shield class.
 
     [ServerRpc(RequireOwnership = false)]
     public void ShieldDurabilityDecreaseServerRpc(float power)
