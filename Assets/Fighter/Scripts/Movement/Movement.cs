@@ -13,6 +13,9 @@ public abstract class Movement : NetworkBehaviour
     protected virtual void Awake()
     {
         fighterCondition = GetComponent<FighterCondition>();
+        fighterCondition.OnDeathCallback += OnDeath;
+        fighterCondition.OnRevivalCallback += OnRevival;
+
         latestDestinations = new Vector3[MAX_CACHE];
         col = GetComponent<Collider>();
         col.enabled = false;
@@ -28,6 +31,13 @@ public abstract class Movement : NetworkBehaviour
         explosion1 = explosion_trans1.GetComponent<ParticleSystem>();
         explosion2 = explosion_trans2.GetComponent<ParticleSystem>();
         explosionTrail = explosion_trans.Find("ExplosionTrail").GetComponent<ParticleSystem>();
+    }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+        fighterCondition.OnDeathCallback -= OnDeath;
+        fighterCondition.OnRevivalCallback -= OnRevival;
     }
 
     protected virtual void FixedUpdate()
@@ -164,7 +174,7 @@ public abstract class Movement : NetworkBehaviour
     ParticleSystem explosion1, explosion2, explosionTrail;
 
     // Must be called at every clients.
-    public virtual void OnDeath()
+    protected virtual void OnDeath(int destroyerNo, string causeOfDeath)
     {
         ready4action = false;
         StartCoroutine(DeathAnimation());
@@ -200,7 +210,7 @@ public abstract class Movement : NetworkBehaviour
     }
 
     // Must be called on every clients.
-    public virtual async void OnRevival()
+    protected virtual async void OnRevival()
     {
         GameObject body = fighterCondition.body;
         body.transform.localPosition = Vector3.zero;

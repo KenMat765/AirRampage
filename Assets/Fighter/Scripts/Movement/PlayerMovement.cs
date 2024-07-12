@@ -273,7 +273,7 @@ public class PlayerMovement : Movement
         }
     }
 
-    public override void OnRevival()
+    protected override void OnRevival()
     {
         base.OnRevival();
 

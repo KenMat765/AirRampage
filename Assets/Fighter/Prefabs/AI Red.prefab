@@ -157,7 +157,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7e9875122e5546a0b4bbd17ee8b33d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  acceptDamage: 0
+  acceptAttack: 0
+  hitBulletThresh: 5
+  hitResetTime: 5
 --- !u!114 &1058749907071328082
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -77,9 +77,9 @@ public class PlayerAttack : Attack
         bullet.Activate(target);
     }
 
-    public override void OnDeath()
+    protected override void OnDeath(int destroyerNo, string causeOfDeath)
     {
-        base.OnDeath();
+        base.OnDeath(destroyerNo, causeOfDeath);
         TerminateAllSkills();
     }
 }

@@ -22,9 +22,9 @@ public class AiReceiver : Receiver
 
 
     // Must be called on every clients.
-    public override void OnDeath()
+    protected override void OnDeath(int destroyerNo, string causeOfDeath)
     {
-        base.OnDeath();
+        base.OnDeath(destroyerNo, causeOfDeath);
         underAttack = false;
         hitBulletCount = 0;
         hitTimer = 0;

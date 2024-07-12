@@ -17,10 +17,19 @@ public abstract class Receiver : NetworkBehaviour
     Collider col;
 
 
-    void Awake()
+    protected virtual void Awake()
     {
         fighterCondition = GetComponentInParent<FighterCondition>();
+        fighterCondition.OnDeathCallback += OnDeath;
+        fighterCondition.OnRevivalCallback += OnRevival;
         col = GetComponent<Collider>();
+    }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+        fighterCondition.OnDeathCallback -= OnDeath;
+        fighterCondition.OnRevivalCallback -= OnRevival;
     }
 
 
@@ -193,12 +202,12 @@ public abstract class Receiver : NetworkBehaviour
 
 
     // Death & Revival /////////////////////////////////////////////////////////////////////////////////////////////
-    public virtual void OnDeath()
+    protected virtual void OnDeath(int destroyerNo, string causeOfDeath)
     {
         col.enabled = false;
     }
 
-    public virtual void OnRevival()
+    protected virtual void OnRevival()
     {
         col.enabled = true;
     }

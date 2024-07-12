@@ -265,6 +265,9 @@ public abstract class FighterCondition : NetworkBehaviour
     public float reviveTimer { get; private set; }
     public bool isDead { get; private set; }
 
+    public Action<int, string> OnDeathCallback { get; set; }
+    public Action OnRevivalCallback { get; set; }
+
     // Causes of death.
     public const string DEATH_NORMAL_BLAST = "Normal Blast";
     public const string SPECIFIC_DEATH_CANNON = "Cannon";               // Specific death (Death other than enemy attacks)
@@ -272,8 +275,6 @@ public abstract class FighterCondition : NetworkBehaviour
     public const string SPECIFIC_DEATH_COLLISION = "Collision Crash";   // Specific death (Death other than enemy attacks)
     static string[] specificDeath = { SPECIFIC_DEATH_CANNON, SPECIFIC_DEATH_CRYSTAL, SPECIFIC_DEATH_COLLISION };
     public static bool IsSpecificDeath(string causeOfDeath) { return specificDeath.Contains(causeOfDeath); }
-
-    public Action<int, string> OnDeathCallback { get; set; }
 
     // Processes run at the time of death. (Should be called on every clients)
     protected virtual void OnDeath(int destroyerNo, string causeOfDeath)
@@ -283,12 +284,8 @@ public abstract class FighterCondition : NetworkBehaviour
             return;
         }
         isDead = true;
-
-        movement.OnDeath();
-        attack.OnDeath();
-        receiver.OnDeath();
-        radarIcon.Visualize(false);
         OnDeathCallback?.Invoke(destroyerNo, causeOfDeath);
+        radarIcon?.Visualize(false);
 
         // If specific cause of death. (Not killed by enemy)
         if (IsSpecificDeath(causeOfDeath))
@@ -339,11 +336,7 @@ public abstract class FighterCondition : NetworkBehaviour
     protected virtual void OnRevival()
     {
         isDead = false;
-
-        movement.OnRevival();
-        attack.OnRevival();
-        receiver.OnRevival();
-
+        OnRevivalCallback?.Invoke();
         if (IsOwner)
         {
             Hp = defaultHp;

@@ -9,9 +9,9 @@ public class AiAttack : Attack
     protected override string causeOfDeath { get; set; } = FighterCondition.DEATH_NORMAL_BLAST;
 
     // Must be called on every clients.
-    public override void OnDeath()
+    protected override void OnDeath(int destroyerNo, string causeOfDeath)
     {
-        base.OnDeath();
+        base.OnDeath(destroyerNo, causeOfDeath);
         TerminateAllSkills();
     }
 

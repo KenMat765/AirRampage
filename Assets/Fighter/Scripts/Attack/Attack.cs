@@ -14,14 +14,23 @@ public abstract class Attack : NetworkBehaviour
     protected virtual void Awake()
     {
         fighterCondition = GetComponentInParent<FighterCondition>();
+        fighterCondition.OnDeathCallback += OnDeath;
+        fighterCondition.OnRevivalCallback += OnRevival;
         PoolNormalBullets(2);
+    }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+        fighterCondition.OnDeathCallback -= OnDeath;
+        fighterCondition.OnRevivalCallback -= OnRevival;
     }
 
 
 
     // Death & Revival ///////////////////////////////////////////////////////////////
-    public virtual void OnDeath() { }
-    public virtual void OnRevival() { }
+    protected virtual void OnDeath(int destroyerNo, string causeOfDeath) { }
+    protected virtual void OnRevival() { }
 
 
 
