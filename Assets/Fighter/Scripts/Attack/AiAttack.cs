@@ -5,32 +5,12 @@ using UnityEngine;
 
 public class AiAttack : Attack
 {
-    // This if DEATH_NORMAL_BLAST for fighters, but change this to SPECIFIC_DEATH_CANNON for cannons.
-    protected override string causeOfDeath { get; set; } = FighterCondition.DEATH_NORMAL_BLAST;
-
-    // Must be called on every clients.
-    protected override void OnDeath(int destroyerNo, string causeOfDeath)
-    {
-        base.OnDeath(destroyerNo, causeOfDeath);
-        TerminateAllSkills();
-    }
-
-
-    // For Skills. ////////////////////////////////////////////////////////////////////////////////////////////////
-    SkillData[] skillDatas;
-    float[] elapsed_times, wait_times;
-    const float min_wait_time = 0, max_wait_time = 15;
-    const int target_thresh = 3;
-
     void Start()
     {
         int skill_length = skills.Length;
-        elapsed_times = new float[skill_length];
-        wait_times = new float[skill_length];
         skillDatas = new SkillData[skill_length];
         for (int k = 0; k < skill_length; k++)
         {
-            wait_times[k] = Random.Range(min_wait_time, max_wait_time);
             skillDatas[k] = SkillDatabase.I.SearchSkillByName(skills[k].GetType().Name);
         }
     }
@@ -38,13 +18,13 @@ public class AiAttack : Attack
     void FixedUpdate()
     {
         if (!attackable) return;
-
-        // Only the owner (= host) executes the following processes.
         if (!IsOwner) return;
 
-        // Normal Blast. ////////////////////////////////////////////////////////////////////////////////////////
-        if (blastTimer > 0) blastTimer -= Time.deltaTime;
-
+        // === Normal Blast === //
+        if (blastTimer > 0)
+        {
+            blastTimer -= Time.deltaTime;
+        }
         else
         {
             SetLockonTargetNos();
@@ -58,30 +38,50 @@ public class AiAttack : Attack
             }
         }
 
-        // Activate Skills. /////////////////////////////////////////////////////////////////////////////////////
+        // === Activate Skills === //
+        if (freezeTimer > 0)
+        {
+            freezeTimer -= Time.deltaTime;
+        }
+        else
+        {
+            bool activated_skill = TryActivateSkill();
+            if (activated_skill)
+            {
+                freezeTimer = FREEZE_TIME;
+            }
+        }
+    }
+
+
+
+    // Skills //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    [Header("Skill")]
+    [SerializeField, Tooltip("Activate attack and disturb skills when lockon target exceed this value.")]
+    int activateThresh;
+
+    SkillData[] skillDatas;
+
+    // To prevent multiple skills from being activated simultaneously, add a freeze period after a skill is activated.
+    const float FREEZE_TIME = 1;
+    float freezeTimer = FREEZE_TIME;
+
+    // This method trys to activate only one skill. Returns true if activated skill.
+    bool TryActivateSkill()
+    {
         for (int skill_num = 0; skill_num < skills.Length; skill_num++)
         {
             Skill skill = skills[skill_num];
             SkillData skillData = skillDatas[skill_num];
             if (skill.isCharged)
             {
-                // チャージが完了したら経過時間を計測
-                elapsed_times[skill_num] += Time.deltaTime;
-
-                // 待機時間を過ぎていなかったら何もしない
-                if (elapsed_times[skill_num] < wait_times[skill_num]) return;
-
-                // 待機時間を過ぎていて、かつType毎の条件を満たしていればスキルを発動
                 string skill_name = skillData.GetName();
                 switch (skillData.GetSkillType())
                 {
                     case SkillType.attack:
-                        // Activate when fighters in front is more than thresh, or attackable terminals are in front.
-                        if (lockonCount >= target_thresh)
+                        if (lockonCount >= activateThresh)
                         {
                             skill.Activator();
-                            elapsed_times[skill_num] = 0;
-                            wait_times[skill_num] = Random.Range(min_wait_time, max_wait_time);
                         }
                         break;
 
@@ -109,22 +109,33 @@ public class AiAttack : Attack
                         else
                         {
                             skill.Activator();
-                            elapsed_times[skill_num] = 0;
-                            wait_times[skill_num] = Random.Range(min_wait_time, max_wait_time);
                         }
                         break;
 
                     case SkillType.disturb:
-                        // Activate when opponents in front is more than thresh.
-                        if (lockonCount >= target_thresh)
+                        if (lockonCount >= activateThresh)
                         {
                             skill.Activator();
-                            elapsed_times[skill_num] = 0;
-                            wait_times[skill_num] = Random.Range(min_wait_time, max_wait_time);
                         }
                         break;
                 }
+                return true;
             }
         }
+        return false;
+    }
+
+
+
+    // Death & Revival ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // This if DEATH_NORMAL_BLAST for fighters, but change this to SPECIFIC_DEATH_CANNON for cannons.
+    protected override string causeOfDeath { get; set; } = FighterCondition.DEATH_NORMAL_BLAST;
+
+    // Must be called on every clients.
+    protected override void OnDeath(int destroyerNo, string causeOfDeath)
+    {
+        base.OnDeath(destroyerNo, causeOfDeath);
+        TerminateAllSkills();
     }
 }

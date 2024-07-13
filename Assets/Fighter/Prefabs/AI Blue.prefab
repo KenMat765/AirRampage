@@ -182,6 +182,7 @@ MonoBehaviour:
   bulletSpeed: 200
   bulletLifespan: 1
   blastInterval: 0.6
+  activateThresh: 3
 --- !u!114 &2221773611656743181
 MonoBehaviour:
   m_ObjectHideFlags: 0

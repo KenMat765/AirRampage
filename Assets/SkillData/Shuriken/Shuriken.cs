@@ -33,7 +33,7 @@ public class Shuriken : SkillAttack
         Weapon[] weapons_this_time = new Weapon[shuriken_count];
         int[] ready_indexes = GetPrefabIndexes(shuriken_count);
         for (int k = 0; k < shuriken_count; k++) weapons_this_time[k] = weapons[ready_indexes[k]];
-        foreach (Weapon weapon in weapons_this_time) weapon.Activate(null);
+        foreach (Weapon weapon in weapons_this_time) weapon.Activate(gameObject);
 
         if (BattleInfo.isMulti && attack.IsOwner)
         {

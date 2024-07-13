@@ -6,6 +6,8 @@ public class ZakoReceiver : Receiver
 {
     public override void OnWeaponHit(int fighterNo)
     {
+        base.OnWeaponHit(fighterNo);
+
         if (!IsOwner) return;
 
         ShakeBody();

@@ -36,11 +36,6 @@ public abstract class Weapon : Utilities
 
     [BoxGroup("AttackRange"), SerializeField, ShowIf("IsRange")]
     float rangeRadius;
-    enum LockonType { Zero, Random, Self }
-
-
-    [BoxGroup("Homing"), SerializeField]
-    LockonType lockonType;
 
 
     [BoxGroup("BlastImpact"), SerializeField, InfoBox("ParticleSystem/StopAction = Disabled (Only Parent)"), InfoBox("AudioSource(Blast Sound)/PlayOnAwake = On")]
@@ -114,8 +109,8 @@ public abstract class Weapon : Utilities
     int fighterNo => attack.fighterCondition.fighterNo.Value;
 
 
-    int enemy_body_layer, enemy_shield_layer, enemy_terminal_layer;
-    LayerMask enemy_mask;    // enemy_mask = ボディ + シールド + ターミナル
+    int enemy_body_layer, enemy_shield_layer;
+    LayerMask enemy_mask;    // enemy_mask = body + shield
 
     Transform parent;    // 帰る場所
 
@@ -147,16 +142,14 @@ public abstract class Weapon : Utilities
             gameObject.layer = LayerMask.NameToLayer("RedBullet");
             enemy_body_layer = LayerMask.NameToLayer("BlueBody");
             enemy_shield_layer = LayerMask.NameToLayer("BlueShield");
-            enemy_terminal_layer = Terminal.blueLayer;
-            enemy_mask = (1 << 12) + (1 << 14) + (1 << 19) + (1 << 21);
+            enemy_mask = (1 << 12) + (1 << 14);
         }
         else if (team == Team.BLUE)
         {
             gameObject.layer = LayerMask.NameToLayer("BlueBullet");
             enemy_body_layer = LayerMask.NameToLayer("RedBody");
             enemy_shield_layer = LayerMask.NameToLayer("RedShield");
-            enemy_terminal_layer = Terminal.redLayer;
-            enemy_mask = (1 << 9) + (1 << 11) + (1 << 19) + (1 << 20);
+            enemy_mask = (1 << 9) + (1 << 11);
         }
         else Debug.LogError("AttackにTeamが割り当てられていません。ParticipantManagerでAttackにTeamが割り当てられているか確認してください。");
 
@@ -300,7 +293,7 @@ public abstract class Weapon : Utilities
 
     public void TerminateWeapon()
     {
-        if (current_state == WeaponState.staying || (lockonType == LockonType.Self && current_state != WeaponState.inactive))
+        if (current_state == WeaponState.staying || (targetObject == owner && current_state != WeaponState.inactive))
         {
             KillWeapon();
         }
@@ -331,27 +324,6 @@ public abstract class Weapon : Utilities
     {
         elapsedTime = 0;
 
-        // 標的をセット
-        switch (lockonType)
-        {
-            // Set target from each skills.
-            case LockonType.Zero:
-                // if(attack.homingTargets.Count > 0) targetObject = attack.homingTargets[0];
-                // else targetObject = null;
-                break;
-
-            // Set target from each skills.
-            case LockonType.Random:
-                // if(attack.homingTargets.Count > 0) targetObject = attack.homingTargets.RandomChoice();
-                // else targetObject = null;
-                break;
-
-            // Set target by yourself.
-            case LockonType.Self:
-                targetObject = owner;
-                break;
-        }
-
         // 準ホーミング
         if (homingType == HomingType.PreHoming)
         {
@@ -359,8 +331,6 @@ public abstract class Weapon : Utilities
         }
 
         // 弾をリジェクト ＋ 発射音、エフェクト再生
-        // if (lockonType == LockonType.Self) transform.parent = transform.root;
-        // else transform.parent = null;
         transform.parent = null;
         if (blastImpact != null)
         {
@@ -498,14 +468,7 @@ public abstract class Weapon : Utilities
 
     void Homing()
     {
-        Vector3 targetPosition;
-        if (lockonType == LockonType.Self)
-        {
-            targetPosition = targetObject.transform.position
-                + Quaternion.Euler((Time.time - Mathf.Floor(Time.time)) * 360, Random.value * 360, 0) * targetObject.transform.forward;
-        }
-        else targetPosition = targetObject.transform.position;
-        Vector3 relativePos = targetPosition - transform.position;
+        Vector3 relativePos = targetObject.transform.position - transform.position;
 
         // Disable this for now ...
         // homingAngle圏内にいない場合、またはtargetが既に死んでいる(非アクティブ)場合は、targetを見失う
