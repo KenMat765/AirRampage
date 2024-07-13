@@ -92,6 +92,7 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
                 BattleInfo.ParticipantBattleData battleData = BattleInfo.battleDatas[no];
 
                 // Setup Skills
+                SkillExecuter skill_executer = body.GetComponent<SkillExecuter>();
                 for (int skillNo = 0; skillNo < GameInfo.MAX_SKILL_COUNT; skillNo++)
                 {
                     int? skillId_nullable = battleData.skillIds[skillNo];
@@ -99,16 +100,17 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
                     {
                         int skillId = (int)skillId_nullable;
                         int skillLevel = (int)battleData.skillLevels[skillNo];
-                        Skill skill_origin = SkillDatabase.I.SearchSkillById(skillId).GetScript();
-                        LevelData level_data = SkillLevelDatabase.I.SearchSkillById(skillId).GetLevelData(skillLevel);
-                        attack.skills[skillNo] = (Skill)body.AddComponent(skill_origin.GetType());
-                        attack.skills[skillNo].LevelDataSetter(level_data);
-                        attack.skills[skillNo].Generator();
-                        attack.skills[skillNo].skillNo = skillNo;
+                        SkillData skill_data = SkillDatabase.I.SearchSkillById(skillId);
+                        Skill skill_script = skill_data.GetScript();
+                        SkillLevelData skill_levelData = SkillLevelDatabase.I.SearchSkillById(skillId);
+                        LevelData level_data = skill_levelData.GetLevelData(skillLevel);
+                        skill_executer.skills[skillNo] = (Skill)body.AddComponent(skill_script.GetType());
+                        skill_executer.skills[skillNo].LevelDataSetter(level_data);
+                        skill_executer.skills[skillNo].Generator(skillNo, skill_data);
                     }
                     else
                     {
-                        attack.skills[skillNo] = null;
+                        skill_executer.skills[skillNo] = null;
                     }
                 }
 

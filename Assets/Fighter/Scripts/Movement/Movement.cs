@@ -7,7 +7,7 @@ using System;
 
 public abstract class Movement : NetworkBehaviour
 {
-    public FighterCondition fighterCondition { get; private set; }
+    public FighterCondition fighterCondition { get; protected set; }
 
     protected virtual void Awake()
     {

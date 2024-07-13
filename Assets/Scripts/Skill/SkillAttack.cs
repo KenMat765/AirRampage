@@ -9,11 +9,13 @@ public abstract class SkillAttack : Skill
     public override void LevelDataSetter(LevelData levelData) => this.levelData = (AttackLevelData)levelData;
     protected override void ParameterUpdater() => charge_time = levelData.ChargeTime;
     protected virtual System.Func<float> StayMotionGenerator(GameObject prefab) { return null; }
+    protected Attack attack;
 
-    public override void Generator()
+    public override void Generator(int skill_no, SkillData skill_data)
     {
-        base.Generator();
+        base.Generator(skill_no, skill_data);
         weapons = new List<Weapon>();
+        attack = GetComponent<Attack>();
     }
 
     public override void ForceTermination(bool maintain_charge)
@@ -37,7 +39,7 @@ public abstract class SkillAttack : Skill
         prefabs.Add(prefab);
 
         Weapon weapon = prefab.GetComponent<Weapon>();
-        weapon.WeaponSetter(gameObject, attack, true, this.GetType().Name, StayMotionGenerator(prefab));
+        weapon.WeaponSetter(gameObject, skillExecuter.fighterCondition, true, GetType().Name, StayMotionGenerator(prefab));
         weapon.WeaponParameterSetter(levelData);
         weapons.Add(weapon);
 
@@ -76,7 +78,7 @@ public abstract class SkillAttack : Skill
             prefabs.Add(prefab);
 
             Weapon weapon = prefab.GetComponent<Weapon>();
-            weapon.WeaponSetter(gameObject, attack, true, this.GetType().Name, StayMotionGenerator(prefab));
+            weapon.WeaponSetter(gameObject, skillExecuter.fighterCondition, true, GetType().Name, StayMotionGenerator(prefab));
             weapon.WeaponParameterSetter(levelData);
             weapons.Add(weapon);
 

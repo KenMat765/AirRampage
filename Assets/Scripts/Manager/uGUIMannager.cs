@@ -41,11 +41,14 @@ public class uGUIMannager : Singleton<uGUIMannager>
     public static Vector2 norm_diffPos { get; private set; }
     #endregion
 
-    #region Blast and Skills
+    #region Normal Blast
     public static bool onBlast { get; private set; }
     public static Vector2 normBlastDiffPos { get; private set; }
     [SerializeField] float blast_diff_pos_max_mag = 200;
+    #endregion
 
+    #region Skills
+    SkillExecuter playerSkillExe;
     Image[] skill_fills = new Image[GameInfo.MAX_SKILL_COUNT];
     Button[] skill_btns = new Button[GameInfo.MAX_SKILL_COUNT];
     Image[] skill_imgs = new Image[GameInfo.MAX_SKILL_COUNT];
@@ -158,7 +161,8 @@ public class uGUIMannager : Singleton<uGUIMannager>
         stick = controllStick.Find("Stick").GetComponent<RectTransform>();
         #endregion
 
-        #region Blast and Skills
+        #region Skills
+        playerSkillExe = playerInfo.body.GetComponent<SkillExecuter>();
         for (int k = 0; k < GameInfo.MAX_SKILL_COUNT; k++)
         {
             Transform skill_transform = blastAndSkills.Find("SkillButton" + k);
@@ -634,7 +638,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
                 skill_btns[k].onClick.AddListener(() =>
                 {
                     skill_btns[m].interactable = false;
-                    playerInfo.attack.skills[m].Activator();
+                    playerSkillExe.skills[m].Activator();
                 });
             }
         }
@@ -657,7 +661,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
 
         for (int k = 0; k < GameInfo.MAX_SKILL_COUNT; k++)
         {
-            Skill skill = playerInfo.attack.skills[k];
+            Skill skill = playerSkillExe.skills[k];
             if (skill != null)
             {
                 if (skill.isLocked)

@@ -32,12 +32,12 @@ public class StarGazer : SkillAttack
         }
     }
 
-    public override void Generator()
+    public override void Generator(int skill_no, SkillData skill_data)
     {
-        base.Generator();
+        base.Generator(skill_no, skill_data);
 
         // gazer_rootの初期設定
-        gazer_root = Instantiate(TeamPrefabGetter(), transform);
+        gazer_root = Instantiate(TeamPrefabGetter(fighterTeam), transform);
         gazer_root.transform.localPosition = Vector3.zero;
         // rotationは発射時に毎回補正する
         gazer_root.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
@@ -75,11 +75,14 @@ public class StarGazer : SkillAttack
                 StartCoroutine(StartGenerateGazer());
             });
 
-        if (BattleInfo.isMulti && attack.IsOwner)
+        // Send Rpc to your clones.
+        NetworkManager nm = NetworkManager.Singleton;
+        if (skillExecuter.IsOwner)
         {
-            // Send Rpc to your clones.
-            if (IsHost) attack.SkillActivatorClientRpc(NetworkManager.Singleton.LocalClientId, skillNo);
-            else attack.SkillActivatorServerRpc(NetworkManager.Singleton.LocalClientId, skillNo);
+            if (nm.IsHost)
+                skillExecuter.SkillActivatorClientRpc(nm.LocalClientId, skillNo);
+            else
+                skillExecuter.SkillActivatorServerRpc(nm.LocalClientId, skillNo);
         }
     }
 

@@ -2,22 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
-using Unity.Netcode;
 
-// 派生クラスの名前 ＝ SkillData.skillName
-public abstract class Skill : NetworkBehaviour
+public abstract class Skill : MonoBehaviour
 {
-    /// <Summary>
-    /// Indicates what number (0 ~ GameInfo.max_skill_count) this skill is.
-    /// </Summary>
-    // Assigned from ParticipantManager.
-    // Used to identify which skill to activate when received skill activator RPCs.
-    public int skillNo { get; set; }
-
-    protected virtual void Update()
-    {
-        Charger();
-    }
+    public int skillNo { get; private set; }  // Used to identify which skill to activate when received skill activator RPCs.
+    public string skillName { get; private set; }
+    public int skillId { get; private set; }
+    public SkillType skillType { get; private set; }
 
     public float charge_time { get; set; }
     public float elapsed_time { get; set; }
@@ -25,6 +16,7 @@ public abstract class Skill : NetworkBehaviour
     protected bool ready2Charge { get; private set; } = true;
     public bool isUsing { get; private set; } = false;
     public bool isLocked { get; set; } = false;
+    Tweener meter_tweener;
 
     protected GameObject original_prefab;
     protected List<GameObject> prefabs { get; private set; }
@@ -59,26 +51,39 @@ public abstract class Skill : NetworkBehaviour
     /// </Summary>
     protected Vector3[] local_scales { get; set; }
 
-    protected Attack attack { get; private set; }
-    Tweener meter_tweener;
+    // Fighter Properties.
+    protected SkillExecuter skillExecuter { get; private set; }
+    protected Team fighterTeam;
 
     public abstract void LevelDataSetter(LevelData levelData);
     protected abstract void ParameterUpdater();
 
-    public virtual void Generator()
+    protected virtual void Update()
     {
+        Charger();
+    }
+
+    public virtual void Generator(int skill_no, SkillData skill_data)
+    {
+        skillNo = skill_no;
+
+        // Get skill properties from input skill data.
+        skillName = skill_data.GetName();
+        skillId = skill_data.GetId();
+        skillType = skill_data.GetSkillType();
+
         prefabs = new List<GameObject>();
-        attack = GetComponent<Attack>();
+        skillExecuter = GetComponent<SkillExecuter>();
+        fighterTeam = skillExecuter.fighterCondition.fighterTeam.Value;
         ParameterUpdater(); // charge_time is set here.
     }
 
-    public virtual void Activator(int[] transfer = null)
+    public virtual void Activator(int[] data = null)
     {
-        if (!isCharged || attack.fighterCondition.isDead || isLocked)
+        if (!isCharged || skillExecuter.fighterCondition.isDead || isLocked)
         {
             return;
         }
-
         isCharged = false;
         ready2Charge = false;
     }
@@ -157,14 +162,17 @@ public abstract class Skill : NetworkBehaviour
     /// <Summary>
     /// Teamに応じてSkillData内のPrefabデータを返す。基本的にはoriginal_prefabに代入する(一部例外のスキルあり)。
     /// </Summary>
-    protected GameObject TeamPrefabGetter()
+    protected GameObject TeamPrefabGetter(Team team)
     {
-        if (attack.fighterCondition.fighterTeam.Value == Team.RED) return SkillDatabase.I.SearchSkillByName(this.GetType().Name).GetPrefabRed();
-        else if (attack.fighterCondition.fighterTeam.Value == Team.BLUE) return SkillDatabase.I.SearchSkillByName(this.GetType().Name).GetPrefabBlue();
-        else
+        switch (team)
         {
-            Debug.LogError("AttackにTeamが割り当てられていません。ParticipantManagerでAttackにTeamが割り当てられているか確認してください。");
-            return null;
+            case Team.RED:
+                return SkillDatabase.I.SearchSkillByName(this.GetType().Name).GetPrefabRed();
+            case Team.BLUE:
+                return SkillDatabase.I.SearchSkillByName(this.GetType().Name).GetPrefabBlue();
+            default:
+                Debug.LogError("Argument team was null", gameObject);
+                return null;
         }
     }
 
@@ -204,7 +212,11 @@ public abstract class Skill : NetworkBehaviour
     /// </Summary>
     protected virtual GameObject GeneratePrefab(Transform parent = null)
     {
-        if (parent == null) parent = attack.fighterCondition.body.transform;
+        if (parent == null)
+        {
+            // If parent is not specified, set parent to fighter_body (= transform)
+            parent = transform;
+        }
         GameObject prefab = Instantiate(original_prefab, parent);
         prefab.transform.localPosition = local_position;
         prefab.transform.localRotation = Quaternion.Euler(local_eulerAngle);
@@ -219,10 +231,12 @@ public abstract class Skill : NetworkBehaviour
     /// </Summary>
     protected virtual GameObject[] GeneratePrefabs(int count, Transform parent = null)
     {
-        if (parent == null) parent = attack.fighterCondition.body.transform;
-
+        if (parent == null)
+        {
+            // If parent is not specified, set parent to fighter_body (= transform)
+            parent = transform;
+        }
         GameObject[] generated_prefabs = new GameObject[count];
-
         for (int k = 0; k < count; k++)
         {
             GameObject prefab = Instantiate(original_prefab, parent);
@@ -232,7 +246,6 @@ public abstract class Skill : NetworkBehaviour
             prefabs.Add(prefab);
             generated_prefabs[k] = prefab;
         }
-
         return generated_prefabs;
     }
 }

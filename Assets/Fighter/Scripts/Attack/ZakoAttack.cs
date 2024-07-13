@@ -5,8 +5,6 @@ using NaughtyAttributes;
 
 public class ZakoAttack : Attack
 {
-    // This is DEATH_NORMAL_BLAST for fighters, but change this to SPECIFIC_DEATH_CANNON for cannons.
-    protected override string causeOfDeath { get; set; } = FighterCondition.DEATH_NORMAL_BLAST;
 
     [SerializeField, MinMaxSlider(0, 3)]
     Vector2 minMaxInterval;

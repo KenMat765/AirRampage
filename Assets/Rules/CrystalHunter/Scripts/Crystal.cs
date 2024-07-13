@@ -16,22 +16,25 @@ public class Crystal : MonoBehaviour
     [ShowNativeProperty]
     public State state { get; private set; } = State.PLACED;
 
-    public Vector3 placement_pos { get; set; }
-    public FighterCondition fighterCondition { get; set; }
+    public Vector3 placementPos { get; set; }
 
-    [SerializeField] float y_offset = 13.5f;
+    [SerializeField] float yOffset = 13.5f;
     [SerializeField] float maxReturnSpeed, maxChaseSpeed;
     [SerializeField] float hpDecreaseSpeed;
-    [SerializeField] GameObject red_crystal, blue_crystal;
-    [SerializeField] ParticleSystem red_get, blue_get;
+    [SerializeField] GameObject crystalRed, crystalBlue;
+    [SerializeField] ParticleSystem getEffectRed, getEffectBlue;
+
+    // Fighter Properties.
+    FighterCondition fighterCondition;
+    SkillExecuter skillExecuter;
 
     [Button]
     void InitCrystal()
     {
-        red_crystal = transform.Find("Red").gameObject;
-        blue_crystal = transform.Find("Blue").gameObject;
-        red_get = red_crystal.transform.Find("Crystal_Get").GetComponent<ParticleSystem>();
-        blue_get = blue_crystal.transform.Find("Crystal_Get").GetComponent<ParticleSystem>();
+        crystalRed = transform.Find("Red").gameObject;
+        crystalBlue = transform.Find("Blue").gameObject;
+        getEffectRed = crystalRed.transform.Find("Crystal_Get").GetComponent<ParticleSystem>();
+        getEffectBlue = crystalBlue.transform.Find("Crystal_Get").GetComponent<ParticleSystem>();
     }
 
 
@@ -88,15 +91,15 @@ public class Crystal : MonoBehaviour
 
             case State.CARRIED:
                 Vector3 body_pos = fighterCondition.body.transform.position;
-                Vector3 target_pos = body_pos + Vector3.up * y_offset;
+                Vector3 target_pos = body_pos + Vector3.up * yOffset;
                 GoToTarget(target_pos, maxChaseSpeed);
                 fighterCondition.HPDecreaser(hpDecreaseSpeed * Time.deltaTime);
                 fighterCondition.receiver.LastShooterDetector(-1, FighterCondition.SPECIFIC_DEATH_CRYSTAL);
                 break;
 
             case State.RETURNING:
-                GoToTarget(placement_pos, maxReturnSpeed);
-                if (transform.position == placement_pos)
+                GoToTarget(placementPos, maxReturnSpeed);
+                if (transform.position == placementPos)
                 {
                     state = State.PLACED;
                 }
@@ -120,24 +123,27 @@ public class Crystal : MonoBehaviour
     {
         state = State.CARRIED;
         this.fighterCondition = fighterCondition;
-        fighterCondition.attack.LockAllSkills(true);
+        skillExecuter = fighterCondition.GetComponentInChildren<SkillExecuter>();
+        skillExecuter.LockAllSkills(true);
         CrystalManager.I.carrierNos[id] = fighterCondition.fighterNo.Value;
         switch (team)
         {
             case Team.RED:
-                red_get.Play();
+                getEffectRed.Play();
                 break;
 
             case Team.BLUE:
-                blue_get.Play();
+                getEffectBlue.Play();
                 break;
         }
     }
+
     public void ReleaseCrystal()
     {
         state = State.RETURNING;
-        fighterCondition.attack.LockAllSkills(false);
+        skillExecuter.LockAllSkills(false);
         fighterCondition = null;
+        skillExecuter = null;
         CrystalManager.I.carrierNos[id] = -1;
     }
 
@@ -149,15 +155,15 @@ public class Crystal : MonoBehaviour
         switch (new_team)
         {
             case Team.RED:
-                red_crystal.SetActive(true);
-                blue_crystal.SetActive(false);
-                red_get.Play();
+                crystalRed.SetActive(true);
+                crystalBlue.SetActive(false);
+                getEffectRed.Play();
                 break;
 
             case Team.BLUE:
-                red_crystal.SetActive(false);
-                blue_crystal.SetActive(true);
-                blue_get.Play();
+                crystalRed.SetActive(false);
+                crystalBlue.SetActive(true);
+                getEffectBlue.Play();
                 break;
 
             default:

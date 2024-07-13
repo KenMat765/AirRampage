@@ -6,7 +6,7 @@ using Unity.Netcode;
 
 public abstract class Attack : NetworkBehaviour
 {
-    public FighterCondition fighterCondition { get; set; }
+    public FighterCondition fighterCondition { get; protected set; }
 
     [Tooltip("Disable attack when false")]
     public bool attackable;
@@ -98,7 +98,7 @@ public abstract class Attack : NetworkBehaviour
     protected float blastTimer { get; set; }
 
     // This if DEATH_NORMAL_BLAST for fighters, but change this to SPECIFIC_DEATH_CANNON for cannons.
-    protected abstract string causeOfDeath { get; set; }
+    protected virtual string causeOfDeath { get; set; } = FighterCondition.DEATH_NORMAL_BLAST;
 
     // Instantiate a specified number of bullets.
     protected void PoolNormalBullets(int quantity)
@@ -109,7 +109,7 @@ public abstract class Attack : NetworkBehaviour
             GameObject bullet = Instantiate(originalNormalBullet, orig_trans.position, orig_trans.rotation, transform);
             Weapon weapon = bullet.GetComponent<Weapon>();
             normalWeapons.Add(weapon);
-            weapon.WeaponSetter(gameObject, this, false, causeOfDeath);
+            weapon.WeaponSetter(gameObject, fighterCondition, false, causeOfDeath);
             weapon.WeaponParameterSetter(bulletPower, bulletSpeed, bulletLifespan, homingType);
         }
     }
@@ -180,68 +180,5 @@ public abstract class Attack : NetworkBehaviour
         GameObject target = null;
         if (targetNo != -1) target = ParticipantManager.I.fighterInfos[targetNo].body;
         NormalRapid(rapidCount, target);
-    }
-
-
-
-    // Skills ////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public Skill[] skills { get; set; } = new Skill[GameInfo.MAX_SKILL_COUNT];  // Set in ParticipantManager.Awake
-
-    // Stop charging and disable the use of skills.
-    public void LockAllSkills(bool lock_skill)
-    {
-        foreach (Skill skill in skills)
-        {
-            if (skill != null)
-            {
-                if (skill.isUsing)
-                {
-                    skill.ForceTermination(true);
-                }
-                skill.isLocked = lock_skill;
-            }
-        }
-    }
-
-    // Terminate all currently active skills.
-    public void TerminateAllSkills()
-    {
-        bool maintain_charge = fighterCondition.has_skillKeep;
-        foreach (Skill skill in skills)
-        {
-            if (skill != null)
-            {
-                skill.ForceTermination(maintain_charge);
-            }
-        }
-    }
-
-    // Activation RPCs are declared here because Skill component cannnot call RPCs. (they are attached AFTER fighters are spawned)
-
-    [ServerRpc]
-    /// <Param name="targetNos">Used for attack & disturb skills to send target fighter numbers.</Param>
-    public void SkillActivatorServerRpc(ulong senderId, int skillNo, int[] targetNos = null)
-    {
-        SkillActivatorClientRpc(senderId, skillNo, targetNos);
-    }
-
-    [ClientRpc]
-    public void SkillActivatorClientRpc(ulong senderId, int skillNo, int[] targetNos = null)
-    {
-        if (NetworkManager.Singleton.LocalClientId == senderId) return;
-        skills[skillNo].Activator(targetNos);
-    }
-
-    [ServerRpc]
-    public void SkillEndProccessServerRpc(ulong senderId, int skillNo)
-    {
-        SkillEndProccessClientRpc(senderId, skillNo);
-    }
-
-    [ClientRpc]
-    public void SkillEndProccessClientRpc(ulong senderId, int skillNo)
-    {
-        if (NetworkManager.Singleton.LocalClientId == senderId) return;
-        skills[skillNo].EndProccess();
     }
 }

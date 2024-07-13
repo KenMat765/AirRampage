@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 3430642439028620820}
   - component: {fileID: 1058749907071328082}
   - component: {fileID: 2221773611656743181}
+  - component: {fileID: 7073665644116110381}
   m_Layer: 9
   m_Name: fighterbody
   m_TagString: Untagged
@@ -182,7 +183,6 @@ MonoBehaviour:
   bulletSpeed: 200
   bulletLifespan: 1
   blastInterval: 0.6
-  activateThresh: 3
 --- !u!114 &2221773611656743181
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -195,6 +195,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0dbb4d099a2944b0815e14028e5e2a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &7073665644116110381
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1634502660656484}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0660c91d8084e4a5c9dc3ff9f760a7db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  activateThresh: 3
 --- !u!1 &1670119433932643
 GameObject:
   m_ObjectHideFlags: 0

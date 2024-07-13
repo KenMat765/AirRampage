@@ -45,7 +45,7 @@ public class CrystalManager : Singleton<CrystalManager>
             {
                 crystal.ChangeTeam(Team.RED);
                 red_crystalArea.SetNewPlacementPos(crystal);
-                crystal.transform.position = crystal.placement_pos;
+                crystal.transform.position = crystal.placementPos;
                 red_score++;
             }
             // Blue
@@ -53,7 +53,7 @@ public class CrystalManager : Singleton<CrystalManager>
             {
                 crystal.ChangeTeam(Team.BLUE);
                 blue_crystalArea.SetNewPlacementPos(crystal);
-                crystal.transform.position = crystal.placement_pos;
+                crystal.transform.position = crystal.placementPos;
                 blue_score++;
             }
 

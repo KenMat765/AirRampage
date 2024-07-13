@@ -97,16 +97,16 @@ public abstract class Weapon : Utilities
 
 
     // Skillからセット //////////////////////////////////////////////////////////////////////////////////////////////////
-    GameObject owner;    // owner is figherbody, not Fighter
+    GameObject owner;   // owner is figherbody, not Fighter
     bool isSkill;
     System.Func<float> StayMotion = null;
-    Attack attack;
     GameObject targetObject = null;
 
 
     // Fighter properties //////////////////////////////////////////////////////////////////////////////////////////////////
-    Team team => attack.fighterCondition.fighterTeam.Value;
-    int fighterNo => attack.fighterCondition.fighterNo.Value;
+    FighterCondition fighterCondition;
+    Team team => fighterCondition.fighterTeam.Value;
+    int fighterNo => fighterCondition.fighterNo.Value;
 
 
     int enemy_body_layer, enemy_shield_layer;
@@ -220,7 +220,7 @@ public abstract class Weapon : Utilities
             // hit_obj == shield
             if (hit_obj.layer == enemy_shield_layer)
             {
-                if (attack.IsOwner)
+                if (fighterCondition.IsOwner)
                 {
                     Receiver receiver = hit_obj.GetComponentInParent<Receiver>();
                     receiver.ShieldDurabilityDecreaseServerRpc(power_temp);
@@ -231,7 +231,7 @@ public abstract class Weapon : Utilities
             else if (hit_obj.layer == enemy_body_layer)
             {
                 Receiver receiver = hit_obj.GetComponent<Receiver>();
-                if (attack.IsOwner)
+                if (fighterCondition.IsOwner)
                 {
                     receiver.HPDown(power_temp);
                     receiver.LastShooterDetector(fighterNo, causeOfDeath);
@@ -285,7 +285,7 @@ public abstract class Weapon : Utilities
 
     public void Activate(GameObject target)
     {
-        float fighter_power = attack.fighterCondition.power.value;
+        float fighter_power = fighterCondition.power.value;
         power_temp = power * fighter_power;
         targetObject = target;
         gameObject.SetActive(true);
@@ -415,7 +415,7 @@ public abstract class Weapon : Utilities
                     {
                         alreadyBombed.Add(hit.gameObject);
                         alreadyBombed.Add(hit.transform.parent.gameObject);
-                        if (attack.IsOwner)
+                        if (fighterCondition.IsOwner)
                         {
                             Receiver receiver = hit_obj.GetComponentInParent<Receiver>();
                             receiver.ShieldDurabilityDecreaseServerRpc(power_temp);
@@ -430,7 +430,7 @@ public abstract class Weapon : Utilities
                     {
                         alreadyBombed.Add(hit.gameObject);
                         Receiver receiver = hit_obj.GetComponent<Receiver>();
-                        if (attack.IsOwner)
+                        if (fighterCondition.IsOwner)
                         {
                             receiver.HPDown(power_temp);
                             receiver.LastShooterDetector(fighterNo, causeOfDeath);
@@ -479,7 +479,11 @@ public abstract class Weapon : Utilities
         //     return;
         // }
 
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(relativePos), homingAccuracy);
+        if (relativePos != Vector3.zero)
+        {
+            Quaternion look_rotation = Quaternion.LookRotation(relativePos);
+            transform.rotation = Quaternion.Slerp(transform.rotation, look_rotation, homingAccuracy);
+        }
     }
 
     void HomeToDefault()
@@ -521,10 +525,10 @@ public abstract class Weapon : Utilities
 
     // Weapon setting methods ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void WeaponSetter
-    (GameObject owner, Attack attack, bool isSkill, string causeOfDeath, System.Func<float> StayMotion = null)
+    (GameObject owner, FighterCondition fighterCondition, bool isSkill, string causeOfDeath, System.Func<float> StayMotion = null)
     {
         this.owner = owner;
-        this.attack = attack;
+        this.fighterCondition = fighterCondition;
         this.isSkill = isSkill;
         this.causeOfDeath = causeOfDeath;
         this.StayMotion = StayMotion;

@@ -15,10 +15,10 @@ public class Shuriken : SkillAttack
         lifespan = levelData.Lifespan;
     }
 
-    public override void Generator()
+    public override void Generator(int skill_no, SkillData skill_data)
     {
-        base.Generator();
-        original_prefab = TeamPrefabGetter();
+        base.Generator(skill_no, skill_data);
+        original_prefab = TeamPrefabGetter(fighterTeam);
         InitTransformsLists(shuriken_count);
         for (int k = 0; k < shuriken_count; k++) SetPrefabLocalTransforms(k, Vector3.zero, new Vector3(Random.value * 360, Random.value * 360, Random.value * 360), new Vector3(4, 4, 4));
         GeneratePrefabs(shuriken_count);
@@ -35,11 +35,14 @@ public class Shuriken : SkillAttack
         for (int k = 0; k < shuriken_count; k++) weapons_this_time[k] = weapons[ready_indexes[k]];
         foreach (Weapon weapon in weapons_this_time) weapon.Activate(gameObject);
 
-        if (BattleInfo.isMulti && attack.IsOwner)
+        // Send Rpc to your clones.
+        if (skillExecuter.IsOwner)
         {
-            // Send Rpc to your clones.
-            if (IsHost) attack.SkillActivatorClientRpc(NetworkManager.Singleton.LocalClientId, skillNo);
-            else attack.SkillActivatorServerRpc(NetworkManager.Singleton.LocalClientId, skillNo);
+            NetworkManager nm = NetworkManager.Singleton;
+            if (nm.IsHost)
+                skillExecuter.SkillActivatorClientRpc(nm.LocalClientId, skillNo);
+            else
+                skillExecuter.SkillActivatorServerRpc(nm.LocalClientId, skillNo);
         }
     }
 }

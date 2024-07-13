@@ -13,10 +13,10 @@ public class KillerRaven : SkillAttack
         raven_count = levelData.WeaponCount;
     }
 
-    public override void Generator()
+    public override void Generator(int skill_no, SkillData skill_data)
     {
-        base.Generator();
-        original_prefab = TeamPrefabGetter();
+        base.Generator(skill_no, skill_data);
+        original_prefab = TeamPrefabGetter(fighterTeam);
         InitTransformsLists(raven_count);
         const float r = 0.15f;
         for (int k = 0; k < raven_count; k++)
@@ -40,9 +40,8 @@ public class KillerRaven : SkillAttack
         for (int k = 0; k < raven_count; k++) weapons_this_time[k] = weapons[ready_indexes[k]];
 
         GameObject[] targets = new GameObject[raven_count];
-        if (attack.IsOwner)
+        if (skillExecuter.IsOwner)
         {
-            // Owner of this skill pack target fighter's number to this array.
             int[] target_nos = new int[raven_count];
             for (int k = 0; k < target_nos.Length; k++) target_nos[k] = -1;
 
@@ -59,10 +58,11 @@ public class KillerRaven : SkillAttack
             StartCoroutine(activator(weapons_this_time, targets));
 
             // Send Rpc to your clones.
-            if (IsHost)
-                attack.SkillActivatorClientRpc(NetworkManager.Singleton.LocalClientId, skillNo, target_nos);
+            NetworkManager nm = NetworkManager.Singleton;
+            if (nm.IsHost)
+                skillExecuter.SkillActivatorClientRpc(nm.LocalClientId, skillNo, target_nos);
             else
-                attack.SkillActivatorServerRpc(NetworkManager.Singleton.LocalClientId, skillNo, target_nos);
+                skillExecuter.SkillActivatorServerRpc(nm.LocalClientId, skillNo, target_nos);
         }
         else
         {

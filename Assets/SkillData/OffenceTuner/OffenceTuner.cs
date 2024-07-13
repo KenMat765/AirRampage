@@ -18,10 +18,10 @@ public class OffenceTuner : SkillAssist
     ParticleSystem effect;
     AudioSource audioSource;
 
-    public override void Generator()
+    public override void Generator(int skill_no, SkillData skill_data)
     {
-        base.Generator();
-        original_prefab = TeamPrefabGetter();
+        base.Generator(skill_no, skill_data);
+        original_prefab = TeamPrefabGetter(fighterTeam);
         SetPrefabLocalTransform(Vector3.zero, new Vector3(-90, 0, 0), new Vector3(0.035f, 0.035f, 0.035f));
         GeneratePrefab();
         effect = prefabs[0].GetComponent<ParticleSystem>();
@@ -34,23 +34,24 @@ public class OffenceTuner : SkillAssist
         audioSource.Play();
 
         // Grader must be called from the owner of this fighter only.
-        if (BattleInfo.isMulti && !attack.IsOwner) return;
+        if (!skillExecuter.IsOwner) return;
 
         base.Activator();
         MeterDecreaser(duration);
-        attack.fighterCondition.power.Grade(power_grade, duration);
-        if (BattleInfo.isMulti)
-        {
-            if (IsHost) attack.SkillActivatorClientRpc(NetworkManager.Singleton.LocalClientId, skillNo);
-            else attack.SkillActivatorServerRpc(NetworkManager.Singleton.LocalClientId, skillNo);
-        }
+        skillExecuter.fighterCondition.power.Grade(power_grade, duration);
+
+        NetworkManager nm = NetworkManager.Singleton;
+        if (nm.IsHost)
+            skillExecuter.SkillActivatorClientRpc(nm.LocalClientId, skillNo);
+        else
+            skillExecuter.SkillActivatorServerRpc(nm.LocalClientId, skillNo);
     }
 
     public override void ForceTermination(bool maintain_charge)
     {
         effect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 
-        if (BattleInfo.isMulti && !attack.IsOwner) return;
+        if (BattleInfo.isMulti && !skillExecuter.IsOwner) return;
 
         base.ForceTermination(maintain_charge);
     }

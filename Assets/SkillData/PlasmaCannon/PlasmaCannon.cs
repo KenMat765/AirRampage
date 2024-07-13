@@ -14,10 +14,10 @@ public class PlasmaCannon : SkillAttack
         grow_duration = levelData.FreeFloat1;
     }
 
-    public override void Generator()
+    public override void Generator(int skill_no, SkillData skill_data)
     {
-        base.Generator();
-        original_prefab = TeamPrefabGetter();
+        base.Generator(skill_no, skill_data);
+        original_prefab = TeamPrefabGetter(fighterTeam);
         SetPrefabLocalTransform(new Vector3(0, 0, 0.12f), Vector3.zero, new Vector3(0.05f, 0.05f, 0.05f));
         GeneratePrefab();
     }
@@ -27,35 +27,21 @@ public class PlasmaCannon : SkillAttack
         base.Activator();
         MeterDecreaser();
 
-        // Multi Players.
-        if (BattleInfo.isMulti)
+        if (skillExecuter.IsOwner)
         {
-            if (attack.IsOwner)
-            {
-                // Activate your own skill. (target is null for this skill)
-                weapons[GetPrefabIndex()].Activate(null);
+            // Activate your own skill. (target is null for this skill)
+            weapons[GetPrefabIndex()].Activate(null);
 
-                // Send Rpc to your clones.
-                if (IsHost)
-                {
-                    attack.SkillActivatorClientRpc(NetworkManager.Singleton.LocalClientId, skillNo);
-                }
-                else
-                {
-                    attack.SkillActivatorServerRpc(NetworkManager.Singleton.LocalClientId, skillNo);
-                }
-            }
+            // Send Rpc to your clones.
+            NetworkManager nm = NetworkManager.Singleton;
+            if (nm.IsHost)
+                skillExecuter.SkillActivatorClientRpc(nm.LocalClientId, skillNo);
             else
-            {
-                // Receive Rpc from the owner.
-                weapons[GetPrefabIndex()].Activate(null);
-            }
+                skillExecuter.SkillActivatorServerRpc(nm.LocalClientId, skillNo);
         }
-
-        // Solo Player.
         else
         {
-            // Activate your own skill.
+            // Receive Rpc from the owner.
             weapons[GetPrefabIndex()].Activate(null);
         }
     }

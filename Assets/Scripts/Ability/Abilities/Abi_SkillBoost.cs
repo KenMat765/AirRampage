@@ -6,7 +6,8 @@ public class Abi_SkillBoost : Ability
 {
     public override void Introducer(FighterCondition condition)
     {
-        Skill[] skills = condition.attack.skills;
+        SkillExecuter skillExecuter = condition.GetComponentInChildren<SkillExecuter>();
+        Skill[] skills = skillExecuter.skills;
         foreach (Skill skill in skills)
         {
             if (skill == null)

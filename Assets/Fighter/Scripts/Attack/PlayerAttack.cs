@@ -5,9 +5,6 @@ using UnityEngine;
 
 public class PlayerAttack : Attack
 {
-    // This if DEATH_NORMAL_BLAST for fighters, but change this to SPECIFIC_DEATH_CANNON for cannons.
-    protected override string causeOfDeath { get; set; } = FighterCondition.DEATH_NORMAL_BLAST;
-
     // Blast direction control.
     [Header("Blast Direction Control")]
     [SerializeField] float blastAngle = 30;
@@ -75,11 +72,5 @@ public class PlayerAttack : Attack
         blastImpact.Play();
         blastSound.Play();
         bullet.Activate(target);
-    }
-
-    protected override void OnDeath(int destroyerNo, string causeOfDeath)
-    {
-        base.OnDeath(destroyerNo, causeOfDeath);
-        TerminateAllSkills();
     }
 }

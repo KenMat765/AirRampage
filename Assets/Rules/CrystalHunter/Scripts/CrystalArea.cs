@@ -80,7 +80,7 @@ public class CrystalArea : MonoBehaviour
         {
             placed[id] = true;
             Vector3 placement_pos = placements[id].position;
-            crystal.placement_pos = placement_pos;
+            crystal.placementPos = placement_pos;
         }
     }
 }

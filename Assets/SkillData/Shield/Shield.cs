@@ -18,10 +18,10 @@ public class Shield : SkillAssist
     Collider col;
     ShieldHitDetector hit_detector;
 
-    public override void Generator()
+    public override void Generator(int skill_no, SkillData skill_data)
     {
-        base.Generator();
-        original_prefab = TeamPrefabGetter();
+        base.Generator(skill_no, skill_data);
+        original_prefab = TeamPrefabGetter(fighterTeam);
         SetPrefabLocalTransform(new Vector3(0, 0, 0.025f), Vector3.zero, new Vector3(10, 10, 10));
         GeneratePrefab();
         col = GetComponent<Collider>();
@@ -35,14 +35,15 @@ public class Shield : SkillAssist
         // Activate shield.
         hit_detector.ShieldActivator(shield_durability, exhaust_speed);
 
-        if (BattleInfo.isMulti && !attack.IsOwner) return;
+        if (!skillExecuter.IsOwner) return;
 
         base.Activator();
-        if (BattleInfo.isMulti)
-        {
-            if (IsHost) attack.SkillActivatorClientRpc(NetworkManager.Singleton.LocalClientId, skillNo);
-            else attack.SkillActivatorServerRpc(NetworkManager.Singleton.LocalClientId, skillNo);
-        }
+
+        NetworkManager nm = NetworkManager.Singleton;
+        if (nm.IsHost)
+            skillExecuter.SkillActivatorClientRpc(nm.LocalClientId, skillNo);
+        else
+            skillExecuter.SkillActivatorServerRpc(nm.LocalClientId, skillNo);
     }
 
     public override void EndProccess()
@@ -52,7 +53,7 @@ public class Shield : SkillAssist
         // Destroy shield.
         hit_detector.DestroyShield();
 
-        if (attack.IsOwner) attack.SkillEndProccessServerRpc(NetworkManager.Singleton.LocalClientId, skillNo);
+        if (skillExecuter.IsOwner) skillExecuter.SkillEndProccessServerRpc(NetworkManager.Singleton.LocalClientId, skillNo);
     }
 
     public override void ForceTermination(bool maintain_charge)
