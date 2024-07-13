@@ -13,6 +13,7 @@ public class AiAttack : Attack
         {
             skillDatas[k] = SkillDatabase.I.SearchSkillByName(skills[k].GetType().Name);
         }
+        aiMovement = (AiMovement)fighterCondition.movement;
     }
 
     void FixedUpdate()
@@ -66,6 +67,8 @@ public class AiAttack : Attack
     const float FREEZE_TIME = 1;
     float freezeTimer = FREEZE_TIME;
 
+    AiMovement aiMovement;
+
     // This method trys to activate only one skill. Returns true if activated skill.
     bool TryActivateSkill()
     {
@@ -101,7 +104,7 @@ public class AiAttack : Attack
                         if (skill_name == "NitroBoost")
                         {
                             const float DISTANCE_THRESH = 800;
-                            Vector3 relative_to_next = fighterCondition.movement.nextDestination - transform.position;
+                            Vector3 relative_to_next = aiMovement.nextDestination - transform.position;
                             float distance_to_destination = Vector3.Magnitude(relative_to_next);
                             if (distance_to_destination > DISTANCE_THRESH) skill.Activator();
                         }

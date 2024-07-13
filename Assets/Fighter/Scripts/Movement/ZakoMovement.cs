@@ -6,12 +6,14 @@ using UnityEngine;
 public class ZakoMovement : Movement
 {
     Transform trans;
+    float rotationSpeed = 1.5f;
     public Transform array_point { get; set; }
 
     protected override void Awake()
     {
         base.Awake();
-        rotationSpeed = 1.5f;
+
+        // Cache the Transform of zakos since there are bunch of them. (GetComponent is called inside transform)
         trans = transform;
     }
 
