@@ -16,6 +16,11 @@ public class SkillController : NetworkBehaviour
         fighterCondition.OnDeathCallback += OnDeath;
     }
 
+    protected virtual void OnDeath(int killer_no, string cause_of_death)
+    {
+        TerminateAllSkills();
+    }
+
     // Stop charging and disable the use of skills.
     public void LockAllSkills(bool lock_skill)
     {
@@ -73,10 +78,4 @@ public class SkillController : NetworkBehaviour
         if (NetworkManager.Singleton.LocalClientId == senderId) return;
         skills[skillNo].EndProccess();
     }
-
-    protected virtual void OnDeath(int killer_no, string cause_of_death)
-    {
-        TerminateAllSkills();
-    }
-
 }
