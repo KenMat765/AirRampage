@@ -34,24 +34,24 @@ public class SpeedTuner : SkillAssist
         audioSource.Play();
 
         // Grader must be called from the owner of this fighter only.
-        if (!skillExecuter.IsOwner) return;
+        if (!skillController.IsOwner) return;
 
         base.Activator();
         MeterDecreaser(duration);
-        skillExecuter.fighterCondition.speed.Grade(speed_grade, duration);
+        skillController.fighterCondition.speed.Grade(speed_grade, duration);
 
         NetworkManager nm = NetworkManager.Singleton;
         if (nm.IsHost)
-            skillExecuter.SkillActivatorClientRpc(nm.LocalClientId, skillNo);
+            skillController.SkillActivatorClientRpc(nm.LocalClientId, skillNo);
         else
-            skillExecuter.SkillActivatorServerRpc(nm.LocalClientId, skillNo);
+            skillController.SkillActivatorServerRpc(nm.LocalClientId, skillNo);
     }
 
     public override void ForceTermination(bool maintain_charge)
     {
         effect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 
-        if (BattleInfo.isMulti && !skillExecuter.IsOwner) return;
+        if (BattleInfo.isMulti && !skillController.IsOwner) return;
 
         base.ForceTermination(maintain_charge);
     }

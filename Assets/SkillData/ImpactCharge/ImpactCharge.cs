@@ -19,7 +19,7 @@ public class ImpactCharge : SkillAttack
         MeterDecreaser();
 
         GameObject target = null;
-        if (skillExecuter.IsOwner)
+        if (skillController.IsOwner)
         {
             int[] target_no = new int[1];
             target_no[0] = -1;
@@ -36,9 +36,9 @@ public class ImpactCharge : SkillAttack
             // Send Rpc to your clones.
             NetworkManager nm = NetworkManager.Singleton;
             if (nm.IsHost)
-                skillExecuter.SkillActivatorClientRpc(nm.LocalClientId, skillNo, target_no);
+                skillController.SkillActivatorClientRpc(nm.LocalClientId, skillNo, target_no);
             else
-                skillExecuter.SkillActivatorServerRpc(nm.LocalClientId, skillNo, target_no);
+                skillController.SkillActivatorServerRpc(nm.LocalClientId, skillNo, target_no);
         }
         else
         {

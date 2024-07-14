@@ -36,13 +36,13 @@ public class Shuriken : SkillAttack
         foreach (Weapon weapon in weapons_this_time) weapon.Activate(gameObject);
 
         // Send Rpc to your clones.
-        if (skillExecuter.IsOwner)
+        if (skillController.IsOwner)
         {
             NetworkManager nm = NetworkManager.Singleton;
             if (nm.IsHost)
-                skillExecuter.SkillActivatorClientRpc(nm.LocalClientId, skillNo);
+                skillController.SkillActivatorClientRpc(nm.LocalClientId, skillNo);
             else
-                skillExecuter.SkillActivatorServerRpc(nm.LocalClientId, skillNo);
+                skillController.SkillActivatorServerRpc(nm.LocalClientId, skillNo);
         }
     }
 }

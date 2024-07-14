@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
-public class SkillExecuter : NetworkBehaviour
+public class SkillController : NetworkBehaviour
 {
     // Set in ParticipantManager.Awake
     public Skill[] skills { get; set; } = new Skill[GameInfo.MAX_SKILL_COUNT];
@@ -78,4 +78,5 @@ public class SkillExecuter : NetworkBehaviour
     {
         TerminateAllSkills();
     }
+
 }

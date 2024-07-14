@@ -27,7 +27,7 @@ public class PlasmaCannon : SkillAttack
         base.Activator();
         MeterDecreaser();
 
-        if (skillExecuter.IsOwner)
+        if (skillController.IsOwner)
         {
             // Activate your own skill. (target is null for this skill)
             weapons[GetPrefabIndex()].Activate(null);
@@ -35,9 +35,9 @@ public class PlasmaCannon : SkillAttack
             // Send Rpc to your clones.
             NetworkManager nm = NetworkManager.Singleton;
             if (nm.IsHost)
-                skillExecuter.SkillActivatorClientRpc(nm.LocalClientId, skillNo);
+                skillController.SkillActivatorClientRpc(nm.LocalClientId, skillNo);
             else
-                skillExecuter.SkillActivatorServerRpc(nm.LocalClientId, skillNo);
+                skillController.SkillActivatorServerRpc(nm.LocalClientId, skillNo);
         }
         else
         {

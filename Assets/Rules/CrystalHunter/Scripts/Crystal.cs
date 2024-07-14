@@ -27,7 +27,7 @@ public class Crystal : MonoBehaviour
     // Fighter Properties.
     FighterCondition fighterCondition;
     Receiver receiver;
-    SkillExecuter skillExecuter;
+    SkillController skillController;
 
     [Button]
     void InitCrystal()
@@ -125,8 +125,8 @@ public class Crystal : MonoBehaviour
         state = State.CARRIED;
         fighterCondition = fighter_condition;
         receiver = fighter_condition.GetComponentInChildren<Receiver>();
-        skillExecuter = fighter_condition.GetComponentInChildren<SkillExecuter>();
-        skillExecuter.LockAllSkills(true);
+        skillController = fighter_condition.GetComponentInChildren<SkillController>();
+        skillController.LockAllSkills(true);
         CrystalManager.I.carrierNos[id] = fighter_condition.fighterNo.Value;
         switch (team)
         {
@@ -143,9 +143,9 @@ public class Crystal : MonoBehaviour
     public void ReleaseCrystal()
     {
         state = State.RETURNING;
-        skillExecuter.LockAllSkills(false);
+        skillController.LockAllSkills(false);
         fighterCondition = null;
-        skillExecuter = null;
+        skillController = null;
         CrystalManager.I.carrierNos[id] = -1;
     }
 

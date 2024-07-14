@@ -40,7 +40,7 @@ public class KillerRaven : SkillAttack
         for (int k = 0; k < raven_count; k++) weapons_this_time[k] = weapons[ready_indexes[k]];
 
         GameObject[] targets = new GameObject[raven_count];
-        if (skillExecuter.IsOwner)
+        if (skillController.IsOwner)
         {
             int[] target_nos = new int[raven_count];
             for (int k = 0; k < target_nos.Length; k++) target_nos[k] = -1;
@@ -60,9 +60,9 @@ public class KillerRaven : SkillAttack
             // Send Rpc to your clones.
             NetworkManager nm = NetworkManager.Singleton;
             if (nm.IsHost)
-                skillExecuter.SkillActivatorClientRpc(nm.LocalClientId, skillNo, target_nos);
+                skillController.SkillActivatorClientRpc(nm.LocalClientId, skillNo, target_nos);
             else
-                skillExecuter.SkillActivatorServerRpc(nm.LocalClientId, skillNo, target_nos);
+                skillController.SkillActivatorServerRpc(nm.LocalClientId, skillNo, target_nos);
         }
         else
         {

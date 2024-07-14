@@ -92,7 +92,7 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
                 BattleInfo.ParticipantBattleData battleData = BattleInfo.battleDatas[no];
 
                 // Setup Skills
-                SkillExecuter skill_executer = body.GetComponent<SkillExecuter>();
+                SkillController skill_executer = body.GetComponent<SkillController>();
                 for (int skillNo = 0; skillNo < GameInfo.MAX_SKILL_COUNT; skillNo++)
                 {
                     int? skillId_nullable = battleData.skillIds[skillNo];

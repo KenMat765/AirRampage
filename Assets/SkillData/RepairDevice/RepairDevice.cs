@@ -32,24 +32,24 @@ public class RepairDevice : SkillHeal
         audioSource.Play();
 
         // Decreaser must be called from the owner of this fighter only, because HP is linked among all clients.
-        if (!skillExecuter.IsOwner) return;
+        if (!skillController.IsOwner) return;
 
         base.Activator();
         MeterDecreaser();
-        skillExecuter.fighterCondition.HPDecreaser(-repair_amount);
+        skillController.fighterCondition.HPDecreaser(-repair_amount);
 
         NetworkManager nm = NetworkManager.Singleton;
         if (nm.IsHost)
-            skillExecuter.SkillActivatorClientRpc(nm.LocalClientId, skillNo);
+            skillController.SkillActivatorClientRpc(nm.LocalClientId, skillNo);
         else
-            skillExecuter.SkillActivatorServerRpc(nm.LocalClientId, skillNo);
+            skillController.SkillActivatorServerRpc(nm.LocalClientId, skillNo);
     }
 
     public override void ForceTermination(bool maintain_charge)
     {
         effect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 
-        if (!skillExecuter.IsOwner) return;
+        if (!skillController.IsOwner) return;
 
         base.ForceTermination(maintain_charge);
     }

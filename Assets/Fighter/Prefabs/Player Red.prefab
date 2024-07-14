@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 8249018594591096013}
   - component: {fileID: 7800842039064356382}
   - component: {fileID: 2221773611656743181}
-  - component: {fileID: 7177903995886848401}
+  - component: {fileID: 6022362891645089186}
   m_Layer: 9
   m_Name: fighterbody
   m_TagString: Untagged
@@ -195,7 +195,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0dbb4d099a2944b0815e14028e5e2a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &7177903995886848401
+--- !u!114 &6022362891645089186
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -204,7 +204,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1634502660656484}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8637cb49d9cf64d21b9dc9d4fc53b2d7, type: 3}
+  m_Script: {fileID: 11500000, guid: 7b2fdd3824508491b9d89ef57c8601db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1670119433932643

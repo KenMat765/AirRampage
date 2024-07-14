@@ -40,7 +40,7 @@ public abstract class SkillDisturb : Skill
         prefabs.Add(prefab);
 
         Weapon weapon = prefab.GetComponent<Weapon>();
-        weapon.WeaponSetter(gameObject, skillExecuter.fighterCondition, true, GetType().Name, StayMotionGenerator(prefab));
+        weapon.WeaponSetter(gameObject, skillController.fighterCondition, true, GetType().Name, StayMotionGenerator(prefab));
         weapon.WeaponParameterSetter(levelData);
         weapons.Add(weapon);
 
@@ -79,7 +79,7 @@ public abstract class SkillDisturb : Skill
             prefabs.Add(prefab);
 
             Weapon weapon = prefab.GetComponent<Weapon>();
-            weapon.WeaponSetter(gameObject, skillExecuter.fighterCondition, true, GetType().Name, StayMotionGenerator(prefab));
+            weapon.WeaponSetter(gameObject, skillController.fighterCondition, true, GetType().Name, StayMotionGenerator(prefab));
             weapon.WeaponParameterSetter(levelData);
             weapons.Add(weapon);
 

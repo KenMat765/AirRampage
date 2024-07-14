@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AiSkillExecuter : SkillExecuter
+public class AiSkillController : SkillController
 {
     [SerializeField, Tooltip("Activate attack and disturb skills when lockon target exceed this value.")]
     int activateThresh;
@@ -96,4 +96,5 @@ public class AiSkillExecuter : SkillExecuter
         }
         return false;
     }
+
 }

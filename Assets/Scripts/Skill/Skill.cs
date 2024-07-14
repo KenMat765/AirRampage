@@ -52,7 +52,7 @@ public abstract class Skill : MonoBehaviour
     protected Vector3[] local_scales { get; set; }
 
     // Fighter Properties.
-    protected SkillExecuter skillExecuter { get; private set; }
+    protected SkillController skillController { get; private set; }
     protected Team fighterTeam;
 
     public abstract void LevelDataSetter(LevelData levelData);
@@ -73,14 +73,14 @@ public abstract class Skill : MonoBehaviour
         skillType = skill_data.GetSkillType();
 
         prefabs = new List<GameObject>();
-        skillExecuter = GetComponent<SkillExecuter>();
-        fighterTeam = skillExecuter.fighterCondition.fighterTeam.Value;
+        skillController = GetComponent<SkillController>();
+        fighterTeam = skillController.fighterCondition.fighterTeam.Value;
         ParameterUpdater(); // charge_time is set here.
     }
 
     public virtual void Activator(int[] data = null)
     {
-        if (!isCharged || skillExecuter.fighterCondition.isDead || isLocked)
+        if (!isCharged || skillController.fighterCondition.isDead || isLocked)
         {
             return;
         }

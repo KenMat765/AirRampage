@@ -49,7 +49,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
     #endregion
 
     #region Skills
-    SkillExecuter playerSkillExe;
+    SkillController playerSkillCtrl;
     Image[] skill_fills = new Image[GameInfo.MAX_SKILL_COUNT];
     Button[] skill_btns = new Button[GameInfo.MAX_SKILL_COUNT];
     Image[] skill_imgs = new Image[GameInfo.MAX_SKILL_COUNT];
@@ -164,7 +164,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
         #endregion
 
         #region Skills
-        playerSkillExe = playerInfo.body.GetComponent<SkillExecuter>();
+        playerSkillCtrl = playerInfo.body.GetComponent<SkillController>();
         for (int k = 0; k < GameInfo.MAX_SKILL_COUNT; k++)
         {
             Transform skill_transform = blastAndSkills.Find("SkillButton" + k);
@@ -640,7 +640,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
                 skill_btns[k].onClick.AddListener(() =>
                 {
                     skill_btns[m].interactable = false;
-                    playerSkillExe.skills[m].Activator();
+                    playerSkillCtrl.skills[m].Activator();
                 });
             }
         }
@@ -663,7 +663,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
 
         for (int k = 0; k < GameInfo.MAX_SKILL_COUNT; k++)
         {
-            Skill skill = playerSkillExe.skills[k];
+            Skill skill = playerSkillCtrl.skills[k];
             if (skill != null)
             {
                 if (skill.isLocked)

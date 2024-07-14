@@ -35,15 +35,15 @@ public class Shield : SkillAssist
         // Activate shield.
         hit_detector.ShieldActivator(shield_durability, exhaust_speed);
 
-        if (!skillExecuter.IsOwner) return;
+        if (!skillController.IsOwner) return;
 
         base.Activator();
 
         NetworkManager nm = NetworkManager.Singleton;
         if (nm.IsHost)
-            skillExecuter.SkillActivatorClientRpc(nm.LocalClientId, skillNo);
+            skillController.SkillActivatorClientRpc(nm.LocalClientId, skillNo);
         else
-            skillExecuter.SkillActivatorServerRpc(nm.LocalClientId, skillNo);
+            skillController.SkillActivatorServerRpc(nm.LocalClientId, skillNo);
     }
 
     public override void EndProccess()
@@ -53,7 +53,7 @@ public class Shield : SkillAssist
         // Destroy shield.
         hit_detector.DestroyShield();
 
-        if (skillExecuter.IsOwner) skillExecuter.SkillEndProccessServerRpc(NetworkManager.Singleton.LocalClientId, skillNo);
+        if (skillController.IsOwner) skillController.SkillEndProccessServerRpc(NetworkManager.Singleton.LocalClientId, skillNo);
     }
 
     public override void ForceTermination(bool maintain_charge)

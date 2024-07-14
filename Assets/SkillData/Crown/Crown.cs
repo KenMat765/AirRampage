@@ -39,7 +39,7 @@ class Crown : SkillAttack
         MeterDecreaser(interval * crown_count * 2);
 
         GameObject[] targets = new GameObject[crown_count];
-        if (skillExecuter.IsOwner)
+        if (skillController.IsOwner)
         {
             int[] target_nos = new int[crown_count];
             for (int k = 0; k < target_nos.Length; k++) target_nos[k] = -1;
@@ -59,9 +59,9 @@ class Crown : SkillAttack
             // Send Rpc to your clones.
             NetworkManager nm = NetworkManager.Singleton;
             if (nm.IsHost)
-                skillExecuter.SkillActivatorClientRpc(nm.LocalClientId, skillNo, target_nos);
+                skillController.SkillActivatorClientRpc(nm.LocalClientId, skillNo, target_nos);
             else
-                skillExecuter.SkillActivatorServerRpc(nm.LocalClientId, skillNo, target_nos);
+                skillController.SkillActivatorServerRpc(nm.LocalClientId, skillNo, target_nos);
         }
         else
         {

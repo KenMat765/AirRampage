@@ -77,12 +77,12 @@ public class StarGazer : SkillAttack
 
         // Send Rpc to your clones.
         NetworkManager nm = NetworkManager.Singleton;
-        if (skillExecuter.IsOwner)
+        if (skillController.IsOwner)
         {
             if (nm.IsHost)
-                skillExecuter.SkillActivatorClientRpc(nm.LocalClientId, skillNo);
+                skillController.SkillActivatorClientRpc(nm.LocalClientId, skillNo);
             else
-                skillExecuter.SkillActivatorServerRpc(nm.LocalClientId, skillNo);
+                skillController.SkillActivatorServerRpc(nm.LocalClientId, skillNo);
         }
     }
 
