@@ -16,6 +16,10 @@ public class GameInfo : MonoBehaviour
     // Ability.
     public const int MAX_WEIGHT = 100;
 
+    // CP.
+    public const float CP_FIGHTER = 1000;
+    public const float CP_ZAKO = 200;
+
     // Coins.
     public const int S_GENERATE_COIN = 300;
     public const int A_GENERATE_COIN = 100;

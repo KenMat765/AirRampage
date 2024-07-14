@@ -26,6 +26,7 @@ public class Crystal : MonoBehaviour
 
     // Fighter Properties.
     FighterCondition fighterCondition;
+    Receiver receiver;
     SkillExecuter skillExecuter;
 
     [Button]
@@ -94,7 +95,7 @@ public class Crystal : MonoBehaviour
                 Vector3 target_pos = body_pos + Vector3.up * yOffset;
                 GoToTarget(target_pos, maxChaseSpeed);
                 fighterCondition.HPDecreaser(hpDecreaseSpeed * Time.deltaTime);
-                fighterCondition.receiver.LastShooterDetector(-1, FighterCondition.SPECIFIC_DEATH_CRYSTAL);
+                receiver.AttackerDetector(-1, FighterCondition.SPECIFIC_DEATH_CRYSTAL);
                 break;
 
             case State.RETURNING:
@@ -119,13 +120,14 @@ public class Crystal : MonoBehaviour
 
 
     // Set state of crystal via these methods.
-    public void CarryCrystal(FighterCondition fighterCondition)
+    public void CarryCrystal(FighterCondition fighter_condition)
     {
         state = State.CARRIED;
-        this.fighterCondition = fighterCondition;
-        skillExecuter = fighterCondition.GetComponentInChildren<SkillExecuter>();
+        fighterCondition = fighter_condition;
+        receiver = fighter_condition.GetComponentInChildren<Receiver>();
+        skillExecuter = fighter_condition.GetComponentInChildren<SkillExecuter>();
         skillExecuter.LockAllSkills(true);
-        CrystalManager.I.carrierNos[id] = fighterCondition.fighterNo.Value;
+        CrystalManager.I.carrierNos[id] = fighter_condition.fighterNo.Value;
         switch (team)
         {
             case Team.RED:

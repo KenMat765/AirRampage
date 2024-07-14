@@ -7,6 +7,7 @@ public class AiSkillExecuter : SkillExecuter
     [SerializeField, Tooltip("Activate attack and disturb skills when lockon target exceed this value.")]
     int activateThresh;
     AiMovement aiMovement;
+    Attack attack;
 
     // To prevent multiple skills from being activated simultaneously, add a freeze period after a skill is activated.
     const float FREEZE_TIME = 1;
@@ -15,11 +16,15 @@ public class AiSkillExecuter : SkillExecuter
     protected override void Awake()
     {
         base.Awake();
-        aiMovement = (AiMovement)fighterCondition.movement;
+        aiMovement = fighterCondition.GetComponent<AiMovement>();
+        attack = fighterCondition.GetComponentInChildren<Attack>();
     }
 
     void FixedUpdate()
     {
+        if (!fighterCondition.IsOwner) return;
+        if (fighterCondition.isDead) return;
+
         if (freezeTimer > 0)
         {
             freezeTimer -= Time.deltaTime;
@@ -37,7 +42,7 @@ public class AiSkillExecuter : SkillExecuter
     // This method trys to activate only one skill. Returns true if activated skill.
     bool TryActivateSkill()
     {
-        int lockon_count = fighterCondition.attack.lockonCount;
+        int lockon_count = attack.lockonCount;
         for (int skill_num = 0; skill_num < skills.Length; skill_num++)
         {
             Skill skill = skills[skill_num];

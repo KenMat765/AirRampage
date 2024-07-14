@@ -20,6 +20,7 @@ public class ZakoMovement : Movement
     protected override void FixedUpdate()
     {
         if (!IsOwner) return;
+        if (fighterCondition.isDead) return;
         base.FixedUpdate();
     }
 
@@ -34,9 +35,9 @@ public class ZakoMovement : Movement
     }
 
 
-    protected override void OnDeath(int destroyerNo, string causeOfDeath)
+    protected override void OnDeath(int killer_no, string cause_of_death)
     {
-        base.OnDeath(destroyerNo, causeOfDeath);
+        base.OnDeath(killer_no, cause_of_death);
         Controllable(false);
     }
 }

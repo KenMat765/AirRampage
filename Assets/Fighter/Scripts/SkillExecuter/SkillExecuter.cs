@@ -7,13 +7,13 @@ public class SkillExecuter : NetworkBehaviour
 {
     // Set in ParticipantManager.Awake
     public Skill[] skills { get; set; } = new Skill[GameInfo.MAX_SKILL_COUNT];
-
-    public FighterCondition fighterCondition { get; private set; }
+    public FighterCondition fighterCondition { get; protected set; }
+    public bool has_skillKeep { get; set; } = false;
 
     protected virtual void Awake()
     {
         fighterCondition = GetComponentInParent<FighterCondition>();
-        fighterCondition.OnDeathCallback += (int destroyerNo, string causeOfDeath) => TerminateAllSkills();
+        fighterCondition.OnDeathCallback += OnDeath;
     }
 
     // Stop charging and disable the use of skills.
@@ -35,7 +35,7 @@ public class SkillExecuter : NetworkBehaviour
     // Terminate all currently active skills.
     public void TerminateAllSkills()
     {
-        bool maintain_charge = fighterCondition.has_skillKeep;
+        bool maintain_charge = has_skillKeep;
         foreach (Skill skill in skills)
         {
             if (skill != null)
@@ -72,5 +72,10 @@ public class SkillExecuter : NetworkBehaviour
     {
         if (NetworkManager.Singleton.LocalClientId == senderId) return;
         skills[skillNo].EndProccess();
+    }
+
+    protected virtual void OnDeath(int killer_no, string cause_of_death)
+    {
+        TerminateAllSkills();
     }
 }

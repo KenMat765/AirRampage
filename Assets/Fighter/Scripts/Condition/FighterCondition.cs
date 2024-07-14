@@ -29,7 +29,6 @@ public abstract class FighterCondition : NetworkBehaviour
 
     protected virtual void FixedUpdate()
     {
-        // Only the owner of this fighter calls Update().
         if (!IsOwner) return;
 
         if (isDead)
@@ -46,7 +45,7 @@ public abstract class FighterCondition : NetworkBehaviour
         {
             if (Hp <= 0)
             {
-                Death(receiver.lastShooterNo, receiver.lastCauseOfDeath);
+                Death(killerNo, causeOfDeath);
                 return;
             }
             speed.Timer();
@@ -59,9 +58,6 @@ public abstract class FighterCondition : NetworkBehaviour
 
     [Header("Components")]
     public GameObject body;
-    public Movement movement;
-    public Attack attack;
-    public Receiver receiver;
     public RadarIconController radarIcon;
 
 
@@ -92,18 +88,19 @@ public abstract class FighterCondition : NetworkBehaviour
 
 
     // Fighter Identities //////////////////////////////////////////////////////////////////////////////////////
-    public NetworkVariable<int> fighterNo { get; set; } = new NetworkVariable<int>();
+    public NetworkVariable<int> fighterNo { get; set; } = new NetworkVariable<int>(-1);
     public NetworkVariable<FixedString32Bytes> fighterName { get; set; } = new NetworkVariable<FixedString32Bytes>();
     public NetworkVariable<Team> fighterTeam { get; set; } = new NetworkVariable<Team>();
 
 
 
     // Status //////////////////////////////////////////////////////////////////////////////////////////////////
+    // Current status is only reffered by owner.
     [Header("Current Status")]
-    public float Hp; // Only the owner of this fighter knows HP.
-    public FighterStatus speed { get; private set; }  // Only reffered by owner.
-    public FighterStatus power { get; private set; }  // Reffered by every clients.
-    public FighterStatus defence { get; private set; }  // Only reffered by owner.
+    public float Hp;
+    public FighterStatus speed { get; private set; }
+    public FighterStatus power { get; private set; }
+    public FighterStatus defence { get; private set; }
 
     [Header("Default Status")]
     public float defaultHp;
@@ -115,146 +112,6 @@ public abstract class FighterCondition : NetworkBehaviour
     {
         Hp -= deltaHP;
         Hp = Mathf.Clamp(Hp, 0, defaultHp);
-    }
-
-    [ServerRpc]
-    public void HpDecreaser_UIServerRPC(float curHp)
-    {
-        float normHp = curHp.Normalize(0, defaultHp);
-        HpDecreaser_UIClientRPC(normHp);
-    }
-
-    [ClientRpc]
-    void HpDecreaser_UIClientRPC(float normHp)
-    {
-        uGUIMannager.I.HPDecreaser_UI(fighterNo.Value, normHp);
-    }
-
-
-
-    // Combo & CP (Concentration Point) ///////////////////////////////////////////////////////////////////////////
-    [Header("CP")]
-    public float cpToGive;
-    public float cp { get; set; }
-    public int combo { get; set; }
-    public bool isZone { get; set; }
-    public float cpToEnterZone { get; set; } = 10000;
-    public float cpLossPerSec { get; set; } = 5;
-    public float cpMaintain { get; set; } = 0f; // 0.0 (maintain none) ~ 1.0 (maintain all)
-    public float comboTimeout { get; set; } = 2.5f;
-    public float zoneDuration { get; set; } = 15;
-    float comboTimer;
-    float zoneTimer;
-
-    protected void CPStart()
-    {
-        cp = 0;
-        combo = 0;
-        comboTimer = comboTimeout;
-        zoneTimer = zoneDuration;
-    }
-
-    protected virtual void CPUpdate()
-    {
-        comboTimer -= Time.deltaTime;
-        if (comboTimer <= 0)
-        {
-            combo = 0;
-            comboTimer = comboTimeout;
-        }
-
-        if (isZone)
-        {
-            zoneTimer -= Time.deltaTime;
-            cp = zoneTimer / zoneDuration * cpToEnterZone;
-            if (zoneTimer <= 0)
-            {
-                EndZone();
-            }
-        }
-
-        else
-        {
-            if (cp >= cpToEnterZone)
-            {
-                StartZone();
-                return;
-            }
-            cp -= cpLossPerSec * Time.deltaTime;
-            cp = (cp < 0) ? 0 : cp;
-        }
-    }
-
-    void CPResetter()
-    {
-        cp *= cpMaintain;
-        combo = 0;
-        comboTimer = comboTimeout;
-        zoneTimer = zoneDuration;
-    }
-
-    public virtual float Combo(float inc_cp)
-    {
-        combo++;
-        const int combo_thresh = 3;
-        comboTimer = comboTimeout;
-
-        // Combo Boost Ability. (combo == 5, 10, 15, ...)
-        if (combo % 5 == 0 && combo > 0)
-        {
-            const int boost_grade = 1;
-            const float boost_duration = 10;
-            if (has_comboBoostA)
-            {
-                power.Grade(boost_grade, boost_duration);
-            }
-            if (has_comboBoostD)
-            {
-                defence.Grade(boost_grade, boost_duration);
-            }
-            if (has_comboBoostS)
-            {
-                speed.Grade(boost_grade, boost_duration);
-            }
-        }
-
-        // Do not increase cp when Zone.
-        if (isZone) return 0;
-
-        // Magnify CP if combo is over combo_thresh.
-        float cp_magnif = 1;
-        if (combo >= combo_thresh)
-        {
-            // 3:x1.1, 4:x1.2, ... , 12:x2.0, 13:x2.0
-            cp_magnif = 1 + 0.1f * (combo - combo_thresh + 1);
-            cp_magnif = Mathf.Clamp(cp_magnif, 1.0f, 2.0f);
-        }
-        inc_cp *= cp_magnif;
-
-        // Bonus of ability.
-        if (has_deepAbsorb)
-        {
-            inc_cp *= 1.5f;
-        }
-
-        cp += inc_cp;
-
-        // Return magnification of CP. (Used in uGUIManager)
-        return cp_magnif;
-    }
-
-    protected virtual void StartZone()
-    {
-        isZone = true;
-        zoneTimer = zoneDuration;
-        cp = cpToEnterZone;
-    }
-
-    protected virtual void EndZone()
-    {
-        isZone = false;
-        zoneTimer = zoneDuration;
-        cp = 0;
     }
 
 
@@ -270,66 +127,56 @@ public abstract class FighterCondition : NetworkBehaviour
 
     // Causes of death.
     public const string DEATH_NORMAL_BLAST = "Normal Blast";
-    public const string SPECIFIC_DEATH_CANNON = "Cannon";               // Specific death (Death other than enemy attacks)
+    public const string SPECIFIC_DEATH_CANNON = "Cannon Blast";         // Specific death (Death other than enemy attacks)
     public const string SPECIFIC_DEATH_CRYSTAL = "Crystal Kill";        // Specific death (Death other than enemy attacks)
     public const string SPECIFIC_DEATH_COLLISION = "Collision Crash";   // Specific death (Death other than enemy attacks)
     static string[] specificDeath = { SPECIFIC_DEATH_CANNON, SPECIFIC_DEATH_CRYSTAL, SPECIFIC_DEATH_COLLISION };
     public static bool IsSpecificDeath(string causeOfDeath) { return specificDeath.Contains(causeOfDeath); }
 
-    // Processes run at the time of death. (Should be called on every clients)
-    protected virtual void OnDeath(int destroyerNo, string causeOfDeath)
+    // These should only be referenced as arguments of OnDeath, since the values are not determined until death.
+    int killerNo = -1;
+    string causeOfDeath = "";
+    public void SetKiller(int killer_no, string cause_of_death)
     {
-        if (isDead)
-        {
-            return;
-        }
+        killerNo = killer_no;
+        causeOfDeath = cause_of_death;
+    }
+
+    // Processes run at the time of death. (Should be called on every clients)
+    protected virtual void OnDeath(int killer_no, string cause_of_death)
+    {
+        if (isDead) return;
+
         isDead = true;
-        OnDeathCallback?.Invoke(destroyerNo, causeOfDeath);
+        OnDeathCallback?.Invoke(killer_no, cause_of_death);
         radarIcon?.Visualize(false);
-
-        // If specific cause of death. (Not killed by enemy)
-        if (IsSpecificDeath(causeOfDeath))
-        {
-            return;
-        }
-
-        // Give combo to destroyer. (Only the owner of the destroyer needs to count combos)
-        FighterCondition destroyer_condition = ParticipantManager.I.fighterInfos[destroyerNo].fighterCondition;
-        if (destroyer_condition.IsOwner)
-        {
-            destroyer_condition.Combo(cpToGive);
-        }
-
-        if (IsHost)
-        {
-            BattleConductor.I.OnFighterDestroyed(this, destroyerNo, causeOfDeath);
-        }
     }
 
     // Method to call OnDeath() at all clients.
-    public void Death(int destroyerNo, string causeOfDeath)
+    /// <param name="killer_no">Put minus if killer is not fighter.</param>
+    public void Death(int killer_no, string cause_of_death)
     {
         // Call for yourself.
-        OnDeath(destroyerNo, causeOfDeath);
+        OnDeath(killer_no, cause_of_death);
 
         // Call for clones at other clients.
         if (IsHost)
-            DeathClientRpc(OwnerClientId, destroyerNo, causeOfDeath);
+            DeathClientRpc(OwnerClientId, killer_no, cause_of_death);
         else
-            DeathServerRpc(OwnerClientId, destroyerNo, causeOfDeath);
+            DeathServerRpc(OwnerClientId, killer_no, cause_of_death);
     }
 
     [ServerRpc]
-    void DeathServerRpc(ulong senderId, int destroyerNo, string causeOfDeath)
+    void DeathServerRpc(ulong senderId, int killer_no, string cause_of_death)
     {
-        DeathClientRpc(senderId, destroyerNo, causeOfDeath);
+        DeathClientRpc(senderId, killer_no, cause_of_death);
     }
 
     [ClientRpc]
-    void DeathClientRpc(ulong senderId, int destroyerNo, string causeOfDeath)
+    void DeathClientRpc(ulong senderId, int killer_no, string cause_of_death)
     {
         if (NetworkManager.Singleton.LocalClientId == senderId) return;
-        OnDeath(destroyerNo, causeOfDeath);
+        OnDeath(killer_no, cause_of_death);
     }
 
     // Processes run at the time of revival. (Should be called on every clients)
@@ -343,8 +190,8 @@ public abstract class FighterCondition : NetworkBehaviour
             speed.Reset();
             power.Reset();
             defence.Reset();
-            CPResetter();
-            EndZone();
+            killerNo = -1;
+            causeOfDeath = "";
         }
     }
 
@@ -373,33 +220,6 @@ public abstract class FighterCondition : NetworkBehaviour
         if (NetworkManager.Singleton.LocalClientId == senderId) return;
         OnRevival();
     }
-
-    // Tell uGUIManager to report death of this fighter. (Called from Player and AI fighters)
-    protected void ReportDeath(int destroyerNo, string causeOfDeath)
-    {
-        string my_name = fighterName.Value.ToString();
-        Team my_team = fighterTeam.Value;
-
-        // Specific cause of death.
-        if (IsSpecificDeath(causeOfDeath))
-        {
-            uGUIMannager.I.BookRepo(causeOfDeath, my_name, my_team, causeOfDeath);
-            return;
-        }
-
-        // Death by enemy attacks.
-        string destroyer_name = ParticipantManager.I.fighterInfos[destroyerNo].fighterCondition.fighterName.Value.ToString();
-        uGUIMannager.I.BookRepo(destroyer_name, my_name, my_team, causeOfDeath);
-    }
-
-
-
-    // Special Abilities //////////////////////////////////////////////////////////////////////////////////////////////
-    public bool has_skillKeep { get; set; } = false;
-    public bool has_deepAbsorb { get; set; } = false;
-    public bool has_comboBoostA { get; set; } = false;
-    public bool has_comboBoostD { get; set; } = false;
-    public bool has_comboBoostS { get; set; } = false;
 }
 
 

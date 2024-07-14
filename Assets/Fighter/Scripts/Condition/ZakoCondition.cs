@@ -21,12 +21,10 @@ public class ZakoCondition : FighterCondition
             return;
         }
 
-        // fighterTeam is synced among clients. Therefore, only the host needs to change this.
+        // fighterTeam is synced among clients, so only the host needs to change this.
         if (IsHost) fighterTeam.Value = new_team;
         SetLayerMasks(new_team);
         radarIcon.ChangeRadarIconColor(new_team);
-        ZakoAttack zako_attack = (ZakoAttack)attack;
-        zako_attack.ChangeBulletTeam(new_team);
 
         if (new_team == Team.RED)
         {
@@ -46,9 +44,9 @@ public class ZakoCondition : FighterCondition
 
     [ClientRpc] public void ChangeTeamClientRpc(Team new_team) => ChangeTeam(new_team);
 
-    protected override void OnDeath(int destroyerNo, string causeOfDeath)
+    protected override void OnDeath(int killer_no, string cause_of_death)
     {
-        base.OnDeath(destroyerNo, causeOfDeath);
+        base.OnDeath(killer_no, cause_of_death);
         if (IsHost)
         {
             // Subtract self from zako_left in FighterArray.

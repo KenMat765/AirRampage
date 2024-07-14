@@ -1,20 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 public class AiCondition : FighterCondition
 {
     protected override void Start()
     {
         base.Start();
-        CPStart();
         uGUIMannager.I.ResetHP_UI(fighterNo.Value);
-    }
-
-    protected override void FixedUpdate()
-    {
-        base.FixedUpdate();
-        CPUpdate();
     }
 
 
@@ -25,11 +19,19 @@ public class AiCondition : FighterCondition
         HpDecreaser_UIServerRPC(Hp);
     }
 
-    protected override void OnDeath(int destroyerNo, string causeOfDeath)
+    [ServerRpc]
+    public void HpDecreaser_UIServerRPC(float curHp)
     {
-        base.OnDeath(destroyerNo, causeOfDeath);
-        ReportDeath(destroyerNo, causeOfDeath);
+        float normHp = curHp.Normalize(0, defaultHp);
+        HpDecreaser_UIClientRPC(normHp);
     }
+
+    [ClientRpc]
+    void HpDecreaser_UIClientRPC(float normHp)
+    {
+        uGUIMannager.I.HPDecreaser_UI(fighterNo.Value, normHp);
+    }
+
 
     protected override void OnRevival()
     {

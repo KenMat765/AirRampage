@@ -7,8 +7,9 @@ public class AiAttack : Attack
 {
     void FixedUpdate()
     {
-        if (!attackable) return;
         if (!IsOwner) return;
+        if (fighterCondition.isDead) return;
+        if (!attackable) return;
 
         // === Normal Blast === //
         if (blastTimer > 0)

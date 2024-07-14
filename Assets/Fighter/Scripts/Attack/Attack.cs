@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 using UnityEngine;
 using Unity.Netcode;
 
@@ -28,9 +29,20 @@ public abstract class Attack : NetworkBehaviour
 
 
 
-    // Death & Revival ///////////////////////////////////////////////////////////////
-    protected virtual void OnDeath(int destroyerNo, string causeOfDeath) { }
+    // Death & Revival ///////////////////////////////////////////////////////////////////////////////////////////////
+    protected virtual void OnDeath(int killer_no, string cause_of_death) { }
     protected virtual void OnRevival() { }
+
+
+
+    // Kill //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public Action<int> OnKillCallback { get; set; }
+
+    // Called when killed opponent fighter. (Called only at Owner)
+    public virtual void OnKill(int killed_no)
+    {
+        OnKillCallback?.Invoke(killed_no);
+    }
 
 
 
@@ -98,7 +110,7 @@ public abstract class Attack : NetworkBehaviour
     protected float blastTimer { get; set; }
 
     // This if DEATH_NORMAL_BLAST for fighters, but change this to SPECIFIC_DEATH_CANNON for cannons.
-    protected virtual string causeOfDeath { get; set; } = FighterCondition.DEATH_NORMAL_BLAST;
+    protected string causeOfDeath = FighterCondition.DEATH_NORMAL_BLAST;
 
     // Instantiate a specified number of bullets.
     protected void PoolNormalBullets(int quantity)
@@ -134,9 +146,6 @@ public abstract class Attack : NetworkBehaviour
     ///<param name="target"> Put null when there are no targets. </param>
     protected virtual void NormalBlast(GameObject target = null)
     {
-        if (fighterCondition.isDead) return;
-        if (!attackable) return;
-
         Weapon bullet = normalWeapons[GetNormalBulletIndex()];
         blastImpact.Play();
         blastSound.Play();

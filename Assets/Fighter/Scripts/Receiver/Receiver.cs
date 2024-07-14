@@ -13,16 +13,12 @@ public abstract class Receiver : NetworkBehaviour
     [Tooltip("Stops accepting any attacks when false")]
     public bool acceptAttack;
 
-    // Collider needs to be disabled, in order not to be detected by other fighter as homing target.
-    Collider col;
-
 
     protected virtual void Awake()
     {
         fighterCondition = GetComponentInParent<FighterCondition>();
         fighterCondition.OnDeathCallback += OnDeath;
         fighterCondition.OnRevivalCallback += OnRevival;
-        col = GetComponent<Collider>();
     }
 
     public override void OnDestroy()
@@ -171,45 +167,53 @@ public abstract class Receiver : NetworkBehaviour
 
 
 
-    // Shooter Detection /////////////////////////////////////////////////////////////////////////////////////////////
-    public int lastShooterNo { get; private set; }
-    public string lastCauseOfDeath { get; private set; }
+    // Attacker Detection /////////////////////////////////////////////////////////////////////////////////////////////
+    public int attackerNo { get; private set; } = -1;
+    public string attackDetail { get; private set; } = "";
 
     // Should be called at Owner.
-    public void LastShooterDetector(int fighterNo, string causeOfDeath)
+    public void AttackerDetector(int attacker_no, string attack_detail)
     {
         if (IsOwner)
         {
-            lastShooterNo = fighterNo;
-            lastCauseOfDeath = causeOfDeath;
+            attackerNo = attacker_no;
+            attackDetail = attack_detail;
+            // Set the killer of FighterCondition for when this attack results in death.
+            fighterCondition.SetKiller(attacker_no, attack_detail);
         }
         else
-            LastShooterDetectorServerRpc(fighterNo, causeOfDeath);
+            AttackerDetectorServerRpc(attacker_no, attack_detail);
     }
 
     [ServerRpc(RequireOwnership = false)]
-    void LastShooterDetectorServerRpc(int fighterNo, string causeOfDeath)
+    void AttackerDetectorServerRpc(int fighter_no, string cause_of_death)
     {
         if (IsOwner)
-            LastShooterDetector(fighterNo, causeOfDeath);
+            AttackerDetector(fighter_no, cause_of_death);
         else
-            LastShooterDetectorClientRpc(fighterNo, causeOfDeath);
+            AttackerDetectorClientRpc(fighter_no, cause_of_death);
     }
 
     [ClientRpc]
-    void LastShooterDetectorClientRpc(int fighterNo, string causeOfDeath) { if (IsOwner) LastShooterDetector(fighterNo, causeOfDeath); }
+    void AttackerDetectorClientRpc(int fighter_no, string cause_of_death) { if (IsOwner) AttackerDetector(fighter_no, cause_of_death); }
 
 
 
     // Death & Revival /////////////////////////////////////////////////////////////////////////////////////////////
-    protected virtual void OnDeath(int destroyerNo, string causeOfDeath)
+    protected virtual void OnDeath(int killer_no, string cause_of_death)
     {
-        col.enabled = false;
+        if (0 <= killer_no) // This means killer is other fighter.
+        {
+            Attack killer_attack = ParticipantManager.I.fighterInfos[killer_no].attack;
+            killer_attack.OnKill(fighterCondition.fighterNo.Value);
+        }
     }
 
     protected virtual void OnRevival()
     {
-        col.enabled = true;
+        // Set attackerNo to minus value, because 0 indicates the first player.
+        attackerNo = -1;
+        attackDetail = "";
     }
 
 

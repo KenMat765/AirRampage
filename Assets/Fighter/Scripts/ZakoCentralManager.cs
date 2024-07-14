@@ -60,8 +60,10 @@ public class ZakoCentralManager : Singleton<ZakoCentralManager>
         foreach (int zako_no in sortie_zako_nos)
         {
             GameObject fighter = ParticipantManager.I.fighterInfos[zako_no].fighter;
-            ZakoCondition condition = (ZakoCondition)ParticipantManager.I.fighterInfos[zako_no].fighterCondition;
-            ZakoMovement movement = (ZakoMovement)condition.movement;
+            FighterInfo zako_info = ParticipantManager.I.fighterInfos[zako_no];
+            ZakoCondition condition = (ZakoCondition)zako_info.fighterCondition;
+            ZakoMovement movement = (ZakoMovement)zako_info.movement;
+            ZakoAttack attack = (ZakoAttack)zako_info.attack;
 
             // Tell zako where you were spawned.
             condition.spawnPointNo.Value = spawnPoint.pointNo;
@@ -83,6 +85,7 @@ public class ZakoCentralManager : Singleton<ZakoCentralManager>
             if (condition.fighterTeam.Value != team)
             {
                 condition.ChangeTeamClientRpc(team);
+                attack.ChangeBulletTeam(team);
             }
 
             // Send FighterArray and point_index to ZakoCondition.

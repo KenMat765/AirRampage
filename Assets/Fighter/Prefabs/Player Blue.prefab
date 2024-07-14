@@ -223,6 +223,7 @@ GameObject:
   - component: {fileID: 8166196062884194038}
   - component: {fileID: 635501563249559513}
   - component: {fileID: 4534842343098920796}
+  - component: {fileID: 3962706411531264072}
   m_Layer: 18
   m_Name: Player Blue
   m_TagString: Player
@@ -343,16 +344,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   body: {fileID: 1634502660656484}
-  movement: {fileID: 635501563249559513}
-  attack: {fileID: 7800842039064356382}
-  receiver: {fileID: 5536389363294344597}
   radarIcon: {fileID: 4626117550613923900}
   Hp: 0
   defaultHp: 100
   defaultSpeed: 40
   defaultPower: 1
   defaultDefence: 1
-  cpToGive: 1000
   revivalTime: 7
 --- !u!114 &635501563249559513
 MonoBehaviour:
@@ -397,6 +394,26 @@ MonoBehaviour:
     volume: 0.6
   - audio: {fileID: 7636721941109108008}
     volume: 1
+--- !u!114 &3962706411531264072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1670119433932643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb146747cbc534b99be8303afaf0f420, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cp: 0
+  cpToEnterZone: 10000
+  cpLossPerSec: 5
+  cpMaintain: 0
+  cpBonus: 1
+  combo: 0
+  comboTimeout: 2.5
+  isZone: 0
 --- !u!1001 &727765669369497037
 PrefabInstance:
   m_ObjectHideFlags: 0

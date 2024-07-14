@@ -4,10 +4,16 @@ using UnityEngine;
 
 public class Abi_SkillKeep : Ability
 {
-    // public override int Weight { get; protected set; } = 15;
-    // public override string Explanation { get; protected set; } = "Maintains skill charge even if destroyed.";
     public override void Introducer(FighterCondition condition)
     {
-        condition.has_skillKeep = true;
+        SkillExecuter skill_executer = condition.GetComponentInChildren<SkillExecuter>();
+        if (skill_executer)
+        {
+            skill_executer.has_skillKeep = true;
+        }
+        else
+        {
+            Debug.LogWarning("Could not get SkillExecuter", condition.gameObject);
+        }
     }
 }

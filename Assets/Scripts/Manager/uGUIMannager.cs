@@ -22,6 +22,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
     FighterInfo playerInfo;
 
     #region Zone
+    ZoneController playerZoneCtrl;
     Image zone_back;
     TextMeshProUGUI zone_text;
     public bool animating_zone { get; private set; } = false;
@@ -127,6 +128,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
         #endregion
 
         #region Zone
+        playerZoneCtrl = playerInfo.fighter.GetComponent<ZoneController>();
         zone_back = zone.Find("Zone_Back").GetComponent<Image>();
         zone_text = zone.Find("Zone_Text").GetComponent<TextMeshProUGUI>();
         zone_back.FadeColor(0);
@@ -153,7 +155,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
 
         cp_meter = status.Find("CP_Meter").GetComponent<Image>();
         zone_meter = status.Find("Zone_Meter").GetComponent<Image>();
-        cp_meter.fillAmount = playerInfo.fighterCondition.cp / playerInfo.fighterCondition.cpToEnterZone;
+        cp_meter.fillAmount = playerZoneCtrl.Cp / playerZoneCtrl.CpToEnterZone;
         zone_meter.fillAmount = 0;
         #endregion
 
@@ -972,11 +974,12 @@ public class uGUIMannager : Singleton<uGUIMannager>
         // Do not edit fillAmount of cp & zone meters while animating zone.
         if (animating_zone) return;
 
-        cp_meter.fillAmount = playerInfo.fighterCondition.cp / playerInfo.fighterCondition.cpToEnterZone;
-
-        if (playerInfo.fighterCondition.isZone)
+        float cp = playerZoneCtrl.Cp;
+        float cp_to_enter_zone = playerZoneCtrl.CpToEnterZone;
+        cp_meter.fillAmount = cp / cp_to_enter_zone;
+        if (playerZoneCtrl.isZone)
         {
-            zone_meter.fillAmount = playerInfo.fighterCondition.cp / playerInfo.fighterCondition.cpToEnterZone;
+            zone_meter.fillAmount = cp / cp_to_enter_zone;
         }
         else
         {

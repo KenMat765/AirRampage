@@ -40,6 +40,7 @@ public abstract class Movement : NetworkBehaviour
 
     protected virtual void FixedUpdate()
     {
+        if (!IsOwner) return;
         if (fighterCondition.isDead) return;
 
         MoveForward();
@@ -172,7 +173,7 @@ public abstract class Movement : NetworkBehaviour
     ParticleSystem explosion1, explosion2, explosionTrail;
 
     // Must be called at every clients.
-    protected virtual void OnDeath(int destroyerNo, string causeOfDeath)
+    protected virtual void OnDeath(int killer_no, string cause_of_death)
     {
         ready4action = false;
         StartCoroutine(DeathAnimation());

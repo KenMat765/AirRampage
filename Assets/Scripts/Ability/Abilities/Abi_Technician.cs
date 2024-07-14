@@ -6,15 +6,22 @@ public class Abi_Technician : Ability
 {
     public override void Introducer(FighterCondition condition)
     {
-        SkillExecuter skillExecuter = condition.GetComponentInChildren<SkillExecuter>();
-        Skill[] skills = skillExecuter.skills;
-        foreach (Skill skill in skills)
+        SkillExecuter skill_executer = condition.GetComponentInChildren<SkillExecuter>();
+        if (skill_executer)
         {
-            if (skill == null)
+            Skill[] skills = skill_executer.skills;
+            foreach (Skill skill in skills)
             {
-                continue;
+                if (skill == null)
+                {
+                    continue;
+                }
+                skill.charge_time /= 1.2f;
             }
-            skill.charge_time /= 1.2f;
+        }
+        else
+        {
+            Debug.LogWarning("Could not get SkillExecuter", condition.gameObject);
         }
     }
 }

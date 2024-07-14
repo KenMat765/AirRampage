@@ -16,11 +16,11 @@ public class ZakoAttack : Attack
 
     void FixedUpdate()
     {
+        if (!IsOwner) return;
+        if (fighterCondition.isDead) return;
         if (!attackable) return;
 
-        if (!IsOwner) return;
-
-        // Normal Blast. ///////////////////////////////////////////////////////////////////////////////////////
+        // === Normal Blast === //
         if (blastTimer > 0) blastTimer -= Time.deltaTime;
 
         else

@@ -14,13 +14,13 @@ public class PlayerAttack : Attack
 
     void FixedUpdate()
     {
-        if (!attackable) return;
-
-        // Only the owner needs homing target nos.
         if (!IsOwner) return;
+        if (fighterCondition.isDead) return;
+        if (!attackable) return;
 
         SetLockonTargetNos();
 
+        // === Normal Blast === //
 #if UNITY_EDITOR
         if (Input.GetKey(KeyCode.Space))
 #else
@@ -58,9 +58,6 @@ public class PlayerAttack : Attack
 
     protected override void NormalBlast(GameObject target = null)
     {
-        if (fighterCondition.isDead) return;
-        if (!attackable) return;
-
         Weapon bullet = normalWeapons[GetNormalBulletIndex()];
 
         // Change rotation of bullet

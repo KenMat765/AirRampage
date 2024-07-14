@@ -10,9 +10,6 @@ public class CannonAttack : Attack
     [SerializeField] float rapidInterval;
     [SerializeField] Gradient bulletRed, bulletBlue;
 
-    // This if DEATH_NORMAL_BLAST for fighters, but change this to SPECIFIC_DEATH_CANNON for cannons.
-    protected override string causeOfDeath { get; set; } = FighterCondition.SPECIFIC_DEATH_CANNON;
-
     // DO NOT call base.Awake (You need to change bullet properties between getting condition and pooling bullets)
     protected override void Awake()
     {
@@ -51,16 +48,18 @@ public class CannonAttack : Attack
 
         // Set attackable by yourself. (It is not set from ParticipantManager)
         attackable = true;
+
+        // Set cause of death to specific death.
+        causeOfDeath = FighterCondition.SPECIFIC_DEATH_CANNON;
     }
 
     void FixedUpdate()
     {
+        if (!IsOwner) return;
+        if (fighterCondition.isDead) return;
         if (!attackable) return;
 
-        // Only the owner (= host) executes the following processes.
-        if (!IsHost) return;
-
-        // Normal Blast. ////////////////////////////////////////////////////////////////////////////////////////
+        // === Normal Blast === //
         if (blastTimer > 0) blastTimer -= Time.deltaTime;
         else
         {
@@ -73,7 +72,7 @@ public class CannonAttack : Attack
             }
         }
 
-        // Muzzle Rotation. ////////////////////////////////////////////////////////////////////////////////////////
+        // === Muzzle Rotation === //
         if (lockonCount > 0)
         {
             // Determine target.

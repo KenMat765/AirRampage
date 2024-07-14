@@ -18,16 +18,18 @@ public class AiMovement : Movement
         somersaultTime = rac.animationClips.Where(a => a.name == "Flip").Select(b => b.length).ToArray()[0];
         rollTime = rac.animationClips.Where(a => a.name == "RightRoll").Select(b => b.length).ToArray()[0];
 
-        aiReceiver = (AiReceiver)fighterCondition.receiver;
+        attack = fighterCondition.GetComponentInChildren<Attack>();
+        aiReceiver = fighterCondition.GetComponentInChildren<AiReceiver>();
     }
 
     protected override void FixedUpdate()
     {
         if (!IsOwner) return;
+        if (fighterCondition.isDead) return;
 
         base.FixedUpdate();
 
-        if (fighterCondition.isDead || !controllable) return;
+        if (!controllable) return;
 
         // Emergency Avoidance (Check for obstacles in front to avoid crashing in to it)
         if (!avoiding)
@@ -270,6 +272,7 @@ public class AiMovement : Movement
     Actions action = Actions.SEARCH;
     Actions prev_action = Actions.SEARCH;
     GameObject targetFighter;
+    Attack attack;
     AiReceiver aiReceiver;
 
     void DecideAction()
@@ -308,11 +311,11 @@ public class AiMovement : Movement
             switch (BattleInfo.rule)
             {
                 case Rule.BATTLE_ROYAL:
-                    if (fighterCondition.attack.lockonCount > 0)
+                    if (attack.lockonCount > 0)
                     {
                         if (targetFighter == null)
                         {
-                            int target_no = fighterCondition.attack.lockonTargetNos[0];
+                            int target_no = attack.lockonTargetNos[0];
                             targetFighter = ParticipantManager.I.fighterInfos[target_no].body;
                         }
                         action = Actions.ATTACK;

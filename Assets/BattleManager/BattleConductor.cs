@@ -239,7 +239,7 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
     }
 
 
-    public void OnFighterDestroyed(FighterCondition fighterCondition, int destroyerNo, string causeOfDeath)
+    public void OnFighterDestroyed(FighterCondition fighterCondition, int killer_no, string cause_of_death)
     {
         Team my_team = fighterCondition.fighterTeam.Value;
         int my_no = fighterCondition.fighterNo.Value;
@@ -253,21 +253,21 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
                 GiveScoreToOpponentTeam(my_team, my_score);
 
                 // If specific cause of death.
-                if (destroyerNo < 0)
+                if (killer_no < 0)
                 {
                     // Do nothing.
                 }
 
                 // If killer is Fighter.
-                else if (0 <= destroyerNo && destroyerNo < GameInfo.MAX_PLAYER_COUNT)
+                else if (0 <= killer_no && killer_no < GameInfo.MAX_PLAYER_COUNT)
                 {
-                    individualScores[destroyerNo] += my_score;
+                    individualScores[killer_no] += my_score;
                 }
 
                 // If killer is Zako.
                 else
                 {
-                    FighterCondition zako_condition = ParticipantManager.I.fighterInfos[destroyerNo].fighterCondition;
+                    FighterCondition zako_condition = ParticipantManager.I.fighterInfos[killer_no].fighterCondition;
                     Team destroyer_team = zako_condition.fighterTeam.Value;
                     switch (destroyer_team)
                     {
@@ -280,7 +280,7 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
                             break;
 
                         default:
-                            Debug.LogError("Destroyer's team is NONE!!", zako_condition.gameObject);
+                            Debug.LogError("Killer's team is NONE!!", zako_condition.gameObject);
                             return;
                     }
                 }

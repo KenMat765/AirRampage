@@ -1,21 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 public class PlayerCondition : FighterCondition
 {
     protected override void Start()
     {
         base.Start();
-        CPStart();
         uGUIMannager.I.ResetHP_UI(fighterNo.Value);
-        uGUIMannager.I.default_combo_disp_timer = comboTimeout;
-    }
-
-    protected override void FixedUpdate()
-    {
-        base.FixedUpdate();
-        CPUpdate();
     }
 
 
@@ -26,37 +19,19 @@ public class PlayerCondition : FighterCondition
         HpDecreaser_UIServerRPC(Hp);
     }
 
-
-    protected override void CPUpdate()
+    [ServerRpc]
+    public void HpDecreaser_UIServerRPC(float curHp)
     {
-        if (uGUIMannager.I.animating_zone) return;
-        base.CPUpdate();
+        float normHp = curHp.Normalize(0, defaultHp);
+        HpDecreaser_UIClientRPC(normHp);
     }
 
-    public override float Combo(float inc_cp)
+    [ClientRpc]
+    void HpDecreaser_UIClientRPC(float normHp)
     {
-        float cp_magnif = base.Combo(inc_cp);
-        uGUIMannager.I.BookCombo(combo, cp_magnif);
-        return cp_magnif;
+        uGUIMannager.I.HPDecreaser_UI(fighterNo.Value, normHp);
     }
 
-    protected override void StartZone()
-    {
-        base.StartZone();
-        uGUIMannager.I.StartZoneAnim();
-    }
-
-    protected override void EndZone()
-    {
-        base.EndZone();
-        uGUIMannager.I.EndZoneAnim();
-    }
-
-    protected override void OnDeath(int destroyerNo, string causeOfDeath)
-    {
-        base.OnDeath(destroyerNo, causeOfDeath);
-        ReportDeath(destroyerNo, causeOfDeath);
-    }
 
     protected override void OnRevival()
     {

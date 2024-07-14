@@ -234,7 +234,7 @@ public abstract class Weapon : Utilities
                 if (fighterCondition.IsOwner)
                 {
                     receiver.HPDown(power_temp);
-                    receiver.LastShooterDetector(fighterNo, causeOfDeath);
+                    receiver.AttackerDetector(fighterNo, causeOfDeath);
                     receiver.OnWeaponHit(fighterNo);
                     if (speedDown) receiver.SpeedDown(speedGrade, speedDuration, speedProbability);
                     if (powerDown) receiver.PowerDown(powerGrade, powerDuration, powerProbability);
@@ -433,7 +433,7 @@ public abstract class Weapon : Utilities
                         if (fighterCondition.IsOwner)
                         {
                             receiver.HPDown(power_temp);
-                            receiver.LastShooterDetector(fighterNo, causeOfDeath);
+                            receiver.AttackerDetector(fighterNo, causeOfDeath);
                             receiver.OnWeaponHit(fighterNo);
                             if (speedDown) receiver.SpeedDown(speedGrade, speedDuration, speedProbability);
                             if (powerDown) receiver.PowerDown(powerGrade, powerDuration, powerProbability);
