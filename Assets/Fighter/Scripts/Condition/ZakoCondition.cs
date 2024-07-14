@@ -7,6 +7,9 @@ public class ZakoCondition : FighterCondition
 {
     public FighterArray fighterArray { get; set; }
 
+    [Header("Rader Icon")]
+    [SerializeField] RadarIconController radarIcon;
+
     [Header("Body for each Team")]
     [SerializeField] GameObject red_body;
     [SerializeField] GameObject blue_body;

@@ -268,7 +268,6 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
         info.movement.enabled = activate;
         info.attack.enabled = activate;
         info.receiver.enabled = activate;
-        info.fighterCondition.radarIcon.Visualize(activate);
     }
 
     [ClientRpc] public void FighterActivationHandlerClientRpc(int no, bool activate) => FighterActivationHandler(no, activate);

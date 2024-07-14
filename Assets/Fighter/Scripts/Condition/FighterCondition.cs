@@ -58,7 +58,6 @@ public abstract class FighterCondition : NetworkBehaviour
 
     [Header("Components")]
     public GameObject body;
-    public RadarIconController radarIcon;
 
 
 
@@ -133,7 +132,7 @@ public abstract class FighterCondition : NetworkBehaviour
     static string[] specificDeath = { SPECIFIC_DEATH_CANNON, SPECIFIC_DEATH_CRYSTAL, SPECIFIC_DEATH_COLLISION };
     public static bool IsSpecificDeath(string causeOfDeath) { return specificDeath.Contains(causeOfDeath); }
 
-    // These should only be referenced as arguments of OnDeath, since the values are not determined until death.
+    // These should only be referenced via arguments of OnDeath, since the values are not determined until death.
     int killerNo = -1;
     string causeOfDeath = "";
     public void SetKiller(int killer_no, string cause_of_death)
@@ -149,7 +148,6 @@ public abstract class FighterCondition : NetworkBehaviour
 
         isDead = true;
         OnDeathCallback?.Invoke(killer_no, cause_of_death);
-        radarIcon?.Visualize(false);
     }
 
     // Method to call OnDeath() at all clients.

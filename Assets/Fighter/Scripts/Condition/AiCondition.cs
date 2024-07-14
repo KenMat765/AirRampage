@@ -37,6 +37,5 @@ public class AiCondition : FighterCondition
     {
         base.OnRevival();
         uGUIMannager.I.ResetHP_UI(fighterNo.Value);
-        radarIcon.Visualize(true);
     }
 }
