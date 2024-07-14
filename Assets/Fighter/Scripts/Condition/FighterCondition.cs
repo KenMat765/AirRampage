@@ -11,7 +11,7 @@ using System;
 public abstract class FighterCondition : NetworkBehaviour
 {
     // Awake is called BEFORE fighterNo, fighterName, fighterTeam is assigned by ParticipantManager.
-    void Awake()
+    protected virtual void Awake()
     {
         Hp = defaultHp;
         speed = new FighterStatus(defaultSpeed);
@@ -53,11 +53,6 @@ public abstract class FighterCondition : NetworkBehaviour
             defence.Timer();
         }
     }
-
-
-
-    [Header("Components")]
-    public GameObject body;
 
 
 

@@ -26,6 +26,7 @@ public class Crystal : MonoBehaviour
 
     // Fighter Properties.
     FighterCondition fighterCondition;
+    Transform bodyTrans;
     Receiver receiver;
     SkillController skillController;
 
@@ -91,7 +92,7 @@ public class Crystal : MonoBehaviour
                 break;
 
             case State.CARRIED:
-                Vector3 body_pos = fighterCondition.body.transform.position;
+                Vector3 body_pos = bodyTrans.position;
                 Vector3 target_pos = body_pos + Vector3.up * yOffset;
                 GoToTarget(target_pos, maxChaseSpeed);
                 fighterCondition.HPDecreaser(hpDecreaseSpeed * Time.deltaTime);
@@ -124,6 +125,7 @@ public class Crystal : MonoBehaviour
     {
         state = State.CARRIED;
         fighterCondition = fighter_condition;
+        bodyTrans = fighter_condition.transform.Find("fighterbody");
         receiver = fighter_condition.GetComponentInChildren<Receiver>();
         skillController = fighter_condition.GetComponentInChildren<SkillController>();
         skillController.LockAllSkills(true);
@@ -145,6 +147,8 @@ public class Crystal : MonoBehaviour
         state = State.RETURNING;
         skillController.LockAllSkills(false);
         fighterCondition = null;
+        bodyTrans = null;
+        receiver = null;
         skillController = null;
         CrystalManager.I.carrierNos[id] = -1;
     }

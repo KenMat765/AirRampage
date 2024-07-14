@@ -14,7 +14,15 @@ public class ZakoCondition : FighterCondition
     [SerializeField] GameObject red_body;
     [SerializeField] GameObject blue_body;
 
+    GameObject body;
+
     public NetworkVariable<int> spawnPointNo { get; set; } = new NetworkVariable<int>();
+
+    protected override void Awake()
+    {
+        base.Awake();
+        body = transform.Find("fighterbody").gameObject;
+    }
 
     public void ChangeTeam(Team new_team)
     {

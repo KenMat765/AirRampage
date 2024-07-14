@@ -8,19 +8,20 @@ using System;
 public abstract class Movement : NetworkBehaviour
 {
     public FighterCondition fighterCondition { get; protected set; }
+    Transform bodyTrans;
 
     protected virtual void Awake()
     {
         fighterCondition = GetComponent<FighterCondition>();
         fighterCondition.OnDeathCallback += OnDeath;
         fighterCondition.OnRevivalCallback += OnRevival;
-
+        bodyTrans = fighterCondition.transform.Find("fighterbody");
         col = GetComponent<Collider>();
         col.enabled = false;
 
         // Components for death animation.
         rigidBody = GetComponent<Rigidbody>();
-        Transform explosion_trans = fighterCondition.body.transform.Find("Explosion");
+        Transform explosion_trans = bodyTrans.Find("Explosion");
         Transform explosion_trans1 = explosion_trans.Find("ExplosionDead1");
         Transform explosion_trans2 = explosion_trans.Find("ExplosionDead2");
         explosion2Trans = explosion_trans2;
@@ -198,22 +199,21 @@ public abstract class Movement : NetworkBehaviour
         explosion2.Play();
         explosionSound2.Play();
         explosionTrail.Stop();
-        fighterCondition.body.SetActive(false);
+        bodyTrans.gameObject.SetActive(false);
 
         // Wait a few seconds until the explosion1 effect (=1.6sec) ends.
         yield return new WaitForSeconds(1.8f);
 
         // Put back explosion2 under fighterbody.
-        explosion2Trans.parent = fighterCondition.body.transform;
+        explosion2Trans.parent = bodyTrans;
         explosion2Trans.localPosition = Vector3.zero;
     }
 
     // Must be called on every clients.
     protected virtual async void OnRevival()
     {
-        GameObject body = fighterCondition.body;
-        body.transform.localPosition = Vector3.zero;
-        body.SetActive(true);
+        bodyTrans.localPosition = Vector3.zero;
+        bodyTrans.gameObject.SetActive(true);
         await UniTask.Delay(TimeSpan.FromSeconds(3));
         ready4action = true;
     }

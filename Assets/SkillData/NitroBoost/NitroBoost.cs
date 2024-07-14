@@ -26,7 +26,7 @@ class NitroBoost : SkillAssist
         SetPrefabLocalTransform(Vector3.zero, Vector3.zero, new Vector3(1, 1, 1));
         GeneratePrefab();
 
-        burner = skillController.fighterCondition.body.GetComponentInChildren<BurnerController>();
+        burner = skillController.fighterCondition.GetComponentInChildren<BurnerController>();
         wind = prefabs[0].GetComponent<WindController>();
     }
 
