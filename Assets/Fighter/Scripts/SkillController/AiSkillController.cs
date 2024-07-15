@@ -24,6 +24,7 @@ public class AiSkillController : SkillController
     {
         if (!fighterCondition.IsOwner) return;
         if (fighterCondition.isDead) return;
+        if (!BattleConductor.gameInProgress) return;
 
         if (freezeTimer > 0)
         {

@@ -51,12 +51,6 @@ public class ZakoCondition : FighterCondition
             red_body.SetActive(false);
             blue_body.SetActive(true);
         }
-
-        // Tell all clients to change team. (Only owner == host)
-        if (IsHost)
-        {
-            ChangeTeamClientRpc(new_team);
-        }
     }
 
     [ClientRpc]
