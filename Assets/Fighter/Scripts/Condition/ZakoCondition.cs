@@ -24,7 +24,7 @@ public class ZakoCondition : FighterCondition
         body = transform.Find("fighterbody").gameObject;
     }
 
-    public void ChangeTeam(Team new_team)
+    void ChangeTeam(Team new_team)
     {
         if (new_team == Team.NONE)
         {
@@ -59,7 +59,8 @@ public class ZakoCondition : FighterCondition
         }
     }
 
-    [ClientRpc] void ChangeTeamClientRpc(Team new_team) => ChangeTeam(new_team);
+    [ClientRpc]
+    public void ChangeTeamClientRpc(Team new_team) => ChangeTeam(new_team);
 
     protected override void OnDeath(int killer_no, string cause_of_death)
     {

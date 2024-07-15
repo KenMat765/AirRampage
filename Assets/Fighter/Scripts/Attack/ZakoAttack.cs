@@ -40,7 +40,7 @@ public class ZakoAttack : Attack
     }
 
 
-    public void ChangeBulletTeam(Team new_team)
+    void ChangeBulletTeam(Team new_team)
     {
         if (new_team == Team.NONE)
         {
@@ -72,13 +72,9 @@ public class ZakoAttack : Attack
             ParticleSystem.MainModule main = weapon.parent_particle.main;
             main.startColor = bullet_color;
         }
-
-        // Tell all clients to change bullet team. (Only owner == host)
-        if (IsHost)
-        {
-            ChangeBulletTeamClientRpc(new_team);
-        }
     }
 
-    [ClientRpc] void ChangeBulletTeamClientRpc(Team new_team) => ChangeBulletTeam(new_team);
+    [ClientRpc]
+    public void ChangeBulletTeamClientRpc(Team new_team) => ChangeBulletTeam(new_team);
+
 }

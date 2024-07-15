@@ -33,7 +33,7 @@ public class PlayerReceiver : Receiver
         }
         else
         {
-            string destroyer_name = ParticipantManager.I.fighterInfos[attackerNo].fighterCondition.fighterName.Value.ToString();
+            string destroyer_name = ParticipantManager.I.fighterInfos[killer_no].fighterCondition.fighterName.Value.ToString();
             uGUIMannager.I.BookRepo(destroyer_name, my_name, my_team, cause_of_death);
         }
     }
