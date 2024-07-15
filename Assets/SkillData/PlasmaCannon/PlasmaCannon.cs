@@ -22,28 +22,12 @@ public class PlasmaCannon : SkillAttack
         GeneratePrefab();
     }
 
-    public override void Activator(int[] received_targetNos = null)
+    public override int[] Activator(int[] received_data = null)
     {
         base.Activator();
         MeterDecreaser();
-
-        if (skillController.IsOwner)
-        {
-            // Activate your own skill. (target is null for this skill)
-            weapons[GetPrefabIndex()].Activate(null);
-
-            // Send Rpc to your clones.
-            NetworkManager nm = NetworkManager.Singleton;
-            if (nm.IsHost)
-                skillController.SkillActivatorClientRpc(nm.LocalClientId, skillNo);
-            else
-                skillController.SkillActivatorServerRpc(nm.LocalClientId, skillNo);
-        }
-        else
-        {
-            // Receive Rpc from the owner.
-            weapons[GetPrefabIndex()].Activate(null);
-        }
+        weapons[GetPrefabIndex()].Activate(null);
+        return null;
     }
 
     protected override System.Func<float> StayMotionGenerator(GameObject prefab)

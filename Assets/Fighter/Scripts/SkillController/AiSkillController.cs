@@ -43,9 +43,9 @@ public class AiSkillController : SkillController
     bool TryActivateSkill()
     {
         int lockon_count = attack.lockonCount;
-        for (int skill_num = 0; skill_num < skills.Length; skill_num++)
+        for (int skill_no = 0; skill_no < skills.Length; skill_no++)
         {
-            Skill skill = skills[skill_num];
+            Skill skill = skills[skill_no];
             if (skill.isCharged)
             {
                 switch (skill.skillType)
@@ -53,7 +53,7 @@ public class AiSkillController : SkillController
                     case SkillType.attack:
                         if (lockon_count >= activateThresh)
                         {
-                            skill.Activator();
+                            SkillActivator(skill_no);
                         }
                         break;
 
@@ -63,7 +63,7 @@ public class AiSkillController : SkillController
                         {
                             if (fighterCondition.Hp < fighterCondition.defaultHp / 2)
                             {
-                                skill.Activator();
+                                SkillActivator(skill_no);
                             }
                         }
                         break;
@@ -80,14 +80,14 @@ public class AiSkillController : SkillController
                         // For other assist skills, activate as soon as it's charged.
                         else
                         {
-                            skill.Activator();
+                            SkillActivator(skill_no);
                         }
                         break;
 
                     case SkillType.disturb:
                         if (lockon_count >= activateThresh)
                         {
-                            skill.Activator();
+                            SkillActivator(skill_no);
                         }
                         break;
                 }

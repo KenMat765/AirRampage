@@ -33,7 +33,7 @@ class Crown : SkillAttack
         GeneratePrefabs(crown_count);
     }
 
-    public override void Activator(int[] received_targetNos = null)
+    public override int[] Activator(int[] received_data = null)
     {
         base.Activator();
         MeterDecreaser(interval * crown_count * 2);
@@ -55,13 +55,7 @@ class Crown : SkillAttack
                 }
             }
             StartCoroutine(activator(targets));
-
-            // Send Rpc to your clones.
-            NetworkManager nm = NetworkManager.Singleton;
-            if (nm.IsHost)
-                skillController.SkillActivatorClientRpc(nm.LocalClientId, skillNo, target_nos);
-            else
-                skillController.SkillActivatorServerRpc(nm.LocalClientId, skillNo, target_nos);
+            return target_nos;
         }
         else
         {
@@ -69,12 +63,13 @@ class Crown : SkillAttack
             for (int k = 0; k < crown_count; k++)
             {
                 // Convert received target numbers to fighter-body.
-                if (received_targetNos[k] != -1)
+                if (received_data[k] != -1)
                 {
-                    targets[k] = ParticipantManager.I.fighterInfos[(int)received_targetNos[k]].body;
+                    targets[k] = ParticipantManager.I.fighterInfos[(int)received_data[k]].body;
                 }
             }
             StartCoroutine(activator(targets));
+            return null;
         }
     }
 

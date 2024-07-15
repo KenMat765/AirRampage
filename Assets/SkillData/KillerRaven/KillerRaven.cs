@@ -29,7 +29,7 @@ public class KillerRaven : SkillAttack
         GeneratePrefabs(raven_count);
     }
 
-    public override void Activator(int[] received_targetNos = null)
+    public override int[] Activator(int[] received_targetNos = null)
     {
         base.Activator();
         MeterDecreaser();
@@ -56,13 +56,7 @@ public class KillerRaven : SkillAttack
                 }
             }
             StartCoroutine(activator(weapons_this_time, targets));
-
-            // Send Rpc to your clones.
-            NetworkManager nm = NetworkManager.Singleton;
-            if (nm.IsHost)
-                skillController.SkillActivatorClientRpc(nm.LocalClientId, skillNo, target_nos);
-            else
-                skillController.SkillActivatorServerRpc(nm.LocalClientId, skillNo, target_nos);
+            return target_nos;
         }
         else
         {
@@ -72,10 +66,11 @@ public class KillerRaven : SkillAttack
                 // Convert received target numbers to fighter-body.
                 if (received_targetNos[k] != -1)
                 {
-                    targets[k] = ParticipantManager.I.fighterInfos[(int)received_targetNos[k]].body;
+                    targets[k] = ParticipantManager.I.fighterInfos[received_targetNos[k]].body;
                 }
             }
             StartCoroutine(activator(weapons_this_time, targets));
+            return null;
         }
     }
 

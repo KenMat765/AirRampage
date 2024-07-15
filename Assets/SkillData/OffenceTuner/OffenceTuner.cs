@@ -28,30 +28,27 @@ public class OffenceTuner : SkillAssist
         audioSource = prefabs[0].GetComponent<AudioSource>();
     }
 
-    public override void Activator(int[] transfer = null)
+    public override int[] Activator(int[] received_data = null)
     {
         effect.Play();
         audioSource.Play();
 
         // Grader must be called from the owner of this fighter only.
-        if (!skillController.IsOwner) return;
+        if (skillController.IsOwner)
+        {
+            base.Activator();
+            MeterDecreaser(duration);
+            skillController.fighterCondition.power.Grade(power_grade, duration);
+        }
 
-        base.Activator();
-        MeterDecreaser(duration);
-        skillController.fighterCondition.power.Grade(power_grade, duration);
-
-        NetworkManager nm = NetworkManager.Singleton;
-        if (nm.IsHost)
-            skillController.SkillActivatorClientRpc(nm.LocalClientId, skillNo);
-        else
-            skillController.SkillActivatorServerRpc(nm.LocalClientId, skillNo);
+        return null;
     }
 
     public override void ForceTermination(bool maintain_charge)
     {
         effect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 
-        if (BattleInfo.isMulti && !skillController.IsOwner) return;
+        if (!skillController.IsOwner) return;
 
         base.ForceTermination(maintain_charge);
     }

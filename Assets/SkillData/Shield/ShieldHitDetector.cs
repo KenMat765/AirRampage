@@ -54,20 +54,15 @@ public class ShieldHitDetector : MonoBehaviour
 
     void Update()
     {
-        // shield_durabilityを時間経過によって減らす
         shield_durability -= exhaust_speed * Time.deltaTime;
 
-        // elapsed_timeをshield_durabilityに応じて更新
+        // Skillのelapsed_timeをshield_durabilityに応じて更新
         shield.MeterDecreaserManual(Mathf.Clamp(shield_durability, 0, shield.shield_durability) * shield.charge_time / shield.shield_durability);
 
-        // 破壊処理
-        if (shield_durability <= 0)
+        if (shield_durability < 0)
         {
-            // Shieldから起動する際に毎回初期化されるので、0< のfloatなら何でも良い(if文を抜けるため)
-            shield_durability = 1;
-
-            // 破壊処理
-            shield.EndProccess();
+            shield_durability = 0;
+            shield.EndProcess();
         }
     }
 
@@ -117,23 +112,22 @@ public class ShieldHitDetector : MonoBehaviour
     }
 
     // Called from Shield.EndProccess().
-    public void DestroyShield()
-    {
-        // Disable collider.
-        spr_collider.enabled = false;
-
-        // Play effect.
-        if (activate_tweener.IsActive()) activate_tweener.Kill(true);
-        // Throws Null Reference Error of mat when called before activating shield.
-        if (mat != null) mat.DOFloat(-1, property_Id, activate_duration).OnComplete(() => { gameObject.SetActive(false); });
-    }
-
-    public void TerminateShield()
+    public void DestroyShield(bool immediate = false)
     {
         spr_collider.enabled = false;
-        shield_durability = 1;
+        shield_durability = 0;
+        if (activate_tweener.IsActive())
+        {
+            activate_tweener.Kill(true);
+        }
         // Throws Null Reference Error of mat when called before activating shield.
-        if (mat != null) mat.SetFloat(property_Id, -1);
-        gameObject.SetActive(false);
+        if (mat != null)
+        {
+            if (immediate)
+                mat.SetFloat(property_Id, -1);
+            else
+                mat.DOFloat(-1, property_Id, activate_duration)
+                    .OnComplete(() => gameObject.SetActive(false));
+        }
     }
 }

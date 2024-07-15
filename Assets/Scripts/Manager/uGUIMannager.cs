@@ -620,7 +620,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
     {
         for (int k = 0; k < GameInfo.MAX_SKILL_COUNT; k++)
         {
-            int m = k;
+            int skill_no = k;
 
             skill_fills[k].fillAmount = 0;
             skill_fills[k].color = Color.red;
@@ -639,8 +639,8 @@ public class uGUIMannager : Singleton<uGUIMannager>
                 skill_imgs[k].color = new Color(1, 1, 1, 0.75f);
                 skill_btns[k].onClick.AddListener(() =>
                 {
-                    skill_btns[m].interactable = false;
-                    playerSkillCtrl.skills[m].Activator();
+                    skill_btns[skill_no].interactable = false;
+                    playerSkillCtrl.SkillActivator(skill_no);
                 });
             }
         }

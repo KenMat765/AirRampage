@@ -28,38 +28,40 @@ public class Shield : SkillAssist
         hit_detector = prefabs[0].GetComponent<ShieldHitDetector>();
     }
 
-    public override void Activator(int[] transfer = null)
+    public override int[] Activator(int[] received_data = null)
     {
         col.enabled = false;
 
         // Activate shield.
         hit_detector.ShieldActivator(shield_durability, exhaust_speed);
 
-        if (!skillController.IsOwner) return;
+        if (skillController.IsOwner)
+        {
+            base.Activator();
+        }
 
-        base.Activator();
-
-        NetworkManager nm = NetworkManager.Singleton;
-        if (nm.IsHost)
-            skillController.SkillActivatorClientRpc(nm.LocalClientId, skillNo);
-        else
-            skillController.SkillActivatorServerRpc(nm.LocalClientId, skillNo);
+        return null;
     }
 
-    public override void EndProccess()
+    public override void EndProcess()
     {
         col.enabled = true;
-
-        // Destroy shield.
         hit_detector.DestroyShield();
-
-        if (skillController.IsOwner) skillController.SkillEndProccessServerRpc(NetworkManager.Singleton.LocalClientId, skillNo);
+        if (skillController.IsOwner)
+        {
+            ulong owner_id = NetworkManager.Singleton.LocalClientId;
+            if (skillController.IsHost)
+                skillController.SkillEndProcessClientRpc(owner_id, skillNo);
+            else
+                skillController.SkillEndProcessServerRpc(owner_id, skillNo);
+        }
     }
 
+    // Do not call EndProcess in ForceTermination, because ForceTermination is called in all clients, thus EndProcess might be called twice.
     public override void ForceTermination(bool maintain_charge)
     {
         base.ForceTermination(maintain_charge);
-        EndProccess();
-        hit_detector.TerminateShield();
+        col.enabled = true;
+        hit_detector.DestroyShield(immediate: true);
     }
 }

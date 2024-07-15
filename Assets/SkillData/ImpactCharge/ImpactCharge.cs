@@ -13,7 +13,7 @@ public class ImpactCharge : SkillAttack
         GeneratePrefab();
     }
 
-    public override void Activator(int[] received_targetNos = null)
+    public override int[] Activator(int[] received_data = null)
     {
         base.Activator();
         MeterDecreaser();
@@ -32,22 +32,17 @@ public class ImpactCharge : SkillAttack
                 target_no[0] = targetNo;
             }
             weapons[GetPrefabIndex()].Activate(target);
-
-            // Send Rpc to your clones.
-            NetworkManager nm = NetworkManager.Singleton;
-            if (nm.IsHost)
-                skillController.SkillActivatorClientRpc(nm.LocalClientId, skillNo, target_no);
-            else
-                skillController.SkillActivatorServerRpc(nm.LocalClientId, skillNo, target_no);
+            return target_no;
         }
         else
         {
             // Receive Rpc from the owner.
-            if (received_targetNos[0] != -1)
+            if (received_data[0] != -1)
             {
-                target = ParticipantManager.I.fighterInfos[(int)received_targetNos[0]].body;
+                target = ParticipantManager.I.fighterInfos[received_data[0]].body;
             }
             weapons[GetPrefabIndex()].Activate(target);
+            return null;
         }
     }
 }

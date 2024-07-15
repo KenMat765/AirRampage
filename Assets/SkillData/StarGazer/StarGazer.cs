@@ -28,7 +28,7 @@ public class StarGazer : SkillAttack
         if (generating)
         {
             timer += Time.deltaTime;
-            if (timer > generate_time) EndProccess();
+            if (timer > generate_time) EndProcess();
         }
     }
 
@@ -49,7 +49,7 @@ public class StarGazer : SkillAttack
         for (int k = 0; k < gazer_default_count; k++) GeneratePrefab(gazer_root.transform);
     }
 
-    public override void Activator(int[] transfer = null)
+    public override int[] Activator(int[] received_data = null)
     {
         base.Activator();
         MeterDecreaser(startup_time + generate_time);
@@ -75,15 +75,7 @@ public class StarGazer : SkillAttack
                 StartCoroutine(StartGenerateGazer());
             });
 
-        // Send Rpc to your clones.
-        NetworkManager nm = NetworkManager.Singleton;
-        if (skillController.IsOwner)
-        {
-            if (nm.IsHost)
-                skillController.SkillActivatorClientRpc(nm.LocalClientId, skillNo);
-            else
-                skillController.SkillActivatorServerRpc(nm.LocalClientId, skillNo);
-        }
+        return null;
     }
 
     IEnumerator StartGenerateGazer()
@@ -101,7 +93,7 @@ public class StarGazer : SkillAttack
         }
     }
 
-    public override void EndProccess()
+    public override void EndProcess()
     {
         // 弾丸の生成終了
         generating = false;
@@ -118,7 +110,7 @@ public class StarGazer : SkillAttack
     public override void ForceTermination(bool maintain_charge)
     {
         base.ForceTermination(maintain_charge);
-        EndProccess();
+        EndProcess();
         if (root_tweener.IsActive()) root_tweener.Kill();
     }
 }

@@ -30,53 +30,55 @@ class NitroBoost : SkillAssist
         wind = prefabs[0].GetComponent<WindController>();
     }
 
-    public override void Activator(int[] transfer = null)
+    public override int[] Activator(int[] received_data = null)
     {
         // Play effects.
         burner.PlaySpark();
         wind.WindGenerator(2, 15);
 
-        if (!skillController.IsOwner) return;
-
-        base.Activator();
-        MeterDecreaser(boost_duration, EndProccess);
-        float tmp_speed = skillController.fighterCondition.defaultSpeed * speed_magnif;
-        guid = skillController.fighterCondition.speed.ApplyTempStatus(tmp_speed);
-
-        if (skillController.IsLocalPlayer)
+        if (skillController.IsOwner)
         {
-            const float ACCEL_DURATION = 0.2f;
-            const float FIELD_OF_VIEW = 100;
-            CameraController.I.ChangeView(FIELD_OF_VIEW, ACCEL_DURATION);
+            base.Activator();
+            MeterDecreaser(boost_duration, EndProcess);
+            float tmp_speed = skillController.fighterCondition.defaultSpeed * speed_magnif;
+            guid = skillController.fighterCondition.speed.ApplyTempStatus(tmp_speed);
+
+            if (skillController.IsLocalPlayer)
+            {
+                const float ACCEL_DURATION = 0.2f;
+                const float FIELD_OF_VIEW = 100;
+                CameraController.I.ChangeView(FIELD_OF_VIEW, ACCEL_DURATION);
+            }
         }
 
-        NetworkManager nm = NetworkManager.Singleton;
-        if (nm.IsHost)
-            skillController.SkillActivatorClientRpc(nm.LocalClientId, skillNo);
-        else
-            skillController.SkillActivatorServerRpc(nm.LocalClientId, skillNo);
+        return null;
     }
 
-    public override void EndProccess()
+    public override void EndProcess()
     {
         // Stop effects.
         const float decelerate_duration = 1.5f;
         burner.StopSpark();
         wind.ResetWind();
 
-        if (!skillController.IsOwner) return;
-
-        // Reset fighter condition.
-        base.EndProccess();
-        skillController.fighterCondition.speed.RemoveTempStatus(guid);
-
-        if (skillController.IsLocalPlayer)
+        if (skillController.IsOwner)
         {
-            CameraController.I.ResetView(decelerate_duration);
-        }
+            // Reset fighter condition.
+            base.EndProcess();
+            skillController.fighterCondition.speed.RemoveTempStatus(guid);
 
-        // Send RPC to all clones to end this skill.
-        skillController.SkillEndProccessServerRpc(NetworkManager.Singleton.LocalClientId, skillNo);
+            if (skillController.IsLocalPlayer)
+            {
+                CameraController.I.ResetView(decelerate_duration);
+            }
+
+            // Send RPC to all clones to end this skill.
+            ulong owner_id = NetworkManager.Singleton.LocalClientId;
+            if (skillController.IsHost)
+                skillController.SkillEndProcessClientRpc(owner_id, skillNo);
+            else
+                skillController.SkillEndProcessServerRpc(owner_id, skillNo);
+        }
     }
 
     public override void ForceTermination(bool maintain_charge)
@@ -84,14 +86,14 @@ class NitroBoost : SkillAssist
         burner.StopSpark();
         wind.ResetWind();
 
-        if (BattleInfo.isMulti && !skillController.IsOwner) return;
-
-        base.ForceTermination(maintain_charge);
-        skillController.fighterCondition.speed.RemoveTempStatus(guid);
-
-        if (skillController.IsLocalPlayer)
+        if (skillController.IsOwner)
         {
-            CameraController.I.ResetView();
+            base.ForceTermination(maintain_charge);
+            skillController.fighterCondition.speed.RemoveTempStatus(guid);
+            if (skillController.IsLocalPlayer)
+            {
+                CameraController.I.ResetView();
+            }
         }
     }
 }

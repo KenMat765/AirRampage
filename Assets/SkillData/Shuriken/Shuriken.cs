@@ -24,7 +24,7 @@ public class Shuriken : SkillAttack
         GeneratePrefabs(shuriken_count);
     }
 
-    public override void Activator(int[] transfer = null)
+    public override int[] Activator(int[] received_data = null)
     {
         base.Activator();
         MeterDecreaser(lifespan);
@@ -34,15 +34,6 @@ public class Shuriken : SkillAttack
         int[] ready_indexes = GetPrefabIndexes(shuriken_count);
         for (int k = 0; k < shuriken_count; k++) weapons_this_time[k] = weapons[ready_indexes[k]];
         foreach (Weapon weapon in weapons_this_time) weapon.Activate(gameObject);
-
-        // Send Rpc to your clones.
-        if (skillController.IsOwner)
-        {
-            NetworkManager nm = NetworkManager.Singleton;
-            if (nm.IsHost)
-                skillController.SkillActivatorClientRpc(nm.LocalClientId, skillNo);
-            else
-                skillController.SkillActivatorServerRpc(nm.LocalClientId, skillNo);
-        }
+        return null;
     }
 }

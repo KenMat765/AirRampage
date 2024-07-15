@@ -78,14 +78,15 @@ public abstract class Skill : MonoBehaviour
         ParameterUpdater(); // charge_time is set here.
     }
 
-    public virtual void Activator(int[] data = null)
+    public virtual int[] Activator(int[] data = null)
     {
         if (!isCharged || skillController.fighterCondition.isDead || isLocked)
         {
-            return;
+            return null;
         }
         isCharged = false;
         ready2Charge = false;
+        return null;
     }
 
     void Charger()
@@ -108,7 +109,7 @@ public abstract class Skill : MonoBehaviour
     /// <Summary>
     /// 終了時の後片付け。
     /// </Summary>
-    public virtual void EndProccess() { }
+    public virtual void EndProcess() { }
 
     /// <Summary>
     /// 起動中に死亡した時に呼ばれる。基本的にはEndProcessと同様の処理(一部例外のスキルあり)。

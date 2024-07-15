@@ -26,23 +26,20 @@ public class RepairDevice : SkillHeal
         audioSource = prefabs[0].GetComponent<AudioSource>();
     }
 
-    public override void Activator(int[] transfer = null)
+    public override int[] Activator(int[] received_data = null)
     {
         effect.Play();
         audioSource.Play();
 
         // Decreaser must be called from the owner of this fighter only, because HP is linked among all clients.
-        if (!skillController.IsOwner) return;
+        if (skillController.IsOwner)
+        {
+            base.Activator();
+            MeterDecreaser();
+            skillController.fighterCondition.HPDecreaser(-repair_amount);
+        }
 
-        base.Activator();
-        MeterDecreaser();
-        skillController.fighterCondition.HPDecreaser(-repair_amount);
-
-        NetworkManager nm = NetworkManager.Singleton;
-        if (nm.IsHost)
-            skillController.SkillActivatorClientRpc(nm.LocalClientId, skillNo);
-        else
-            skillController.SkillActivatorServerRpc(nm.LocalClientId, skillNo);
+        return null;
     }
 
     public override void ForceTermination(bool maintain_charge)
