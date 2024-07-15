@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 using NaughtyAttributes;
 
 public class ZakoAttack : Attack
@@ -71,5 +72,13 @@ public class ZakoAttack : Attack
             ParticleSystem.MainModule main = weapon.parent_particle.main;
             main.startColor = bullet_color;
         }
+
+        // Tell all clients to change bullet team. (Only owner == host)
+        if (IsHost)
+        {
+            ChangeBulletTeamClientRpc(new_team);
+        }
     }
+
+    [ClientRpc] void ChangeBulletTeamClientRpc(Team new_team) => ChangeBulletTeam(new_team);
 }

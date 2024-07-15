@@ -51,9 +51,15 @@ public class ZakoCondition : FighterCondition
             red_body.SetActive(false);
             blue_body.SetActive(true);
         }
+
+        // Tell all clients to change team. (Only owner == host)
+        if (IsHost)
+        {
+            ChangeTeamClientRpc(new_team);
+        }
     }
 
-    [ClientRpc] public void ChangeTeamClientRpc(Team new_team) => ChangeTeam(new_team);
+    [ClientRpc] void ChangeTeamClientRpc(Team new_team) => ChangeTeam(new_team);
 
     protected override void OnDeath(int killer_no, string cause_of_death)
     {

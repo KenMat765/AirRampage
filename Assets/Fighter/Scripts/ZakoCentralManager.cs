@@ -84,7 +84,7 @@ public class ZakoCentralManager : Singleton<ZakoCentralManager>
             // Check fighter team before sortie.
             if (condition.fighterTeam.Value != team)
             {
-                condition.ChangeTeamClientRpc(team);
+                condition.ChangeTeam(team);
                 attack.ChangeBulletTeam(team);
             }
 
