@@ -80,6 +80,7 @@ public class StarGazer : SkillAttack
 
     IEnumerator StartGenerateGazer()
     {
+        float fighter_power = skillController.fighterCondition.power.value;
         const float interval = 0.03f;
         while (generating)
         {
@@ -88,7 +89,7 @@ public class StarGazer : SkillAttack
             // 発射時にrotationをランダムにセット
             prefabs[index].transform.eulerAngles = new Vector3(Random.Range(30, 90), Random.Range(-180, 180), 0);
 
-            weapons[index].Activate(null);
+            weapons[index].Activate(null, fighter_power);
             yield return new WaitForSeconds(interval);
         }
     }

@@ -81,9 +81,10 @@ class Crown : SkillAttack
         for (int k = 0; k < crown_count; k++) weapons_this_time[k] = weapons[ready_indexes[k]];
 
         // Blast bullets.
+        float fighter_power = skillController.fighterCondition.power.value;
         for (int k = 0; k < crown_count; k++)
         {
-            weapons_this_time[k].Activate(targets[k]);
+            weapons_this_time[k].Activate(targets[k], fighter_power);
             yield return new WaitForSeconds(interval);
         }
     }

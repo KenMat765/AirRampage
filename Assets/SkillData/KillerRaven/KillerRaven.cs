@@ -76,10 +76,11 @@ public class KillerRaven : SkillAttack
 
     IEnumerator activator(Weapon[] weapons, GameObject[] targets)
     {
+        float fighter_power = skillController.fighterCondition.power.value;
         const float interval = 0.05f;
         for (int k = 0; k < raven_count; k++)
         {
-            weapons[k].Activate(targets[k]);
+            weapons[k].Activate(targets[k], fighter_power);
             yield return new WaitForSeconds(interval);
         }
     }

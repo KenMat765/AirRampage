@@ -26,7 +26,8 @@ public class PlasmaCannon : SkillAttack
     {
         base.Activator();
         MeterDecreaser();
-        weapons[GetPrefabIndex()].Activate(null);
+        float fighter_power = skillController.fighterCondition.power.value;
+        weapons[GetPrefabIndex()].Activate(null, fighter_power);
         return null;
     }
 

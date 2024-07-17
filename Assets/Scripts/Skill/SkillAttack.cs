@@ -39,7 +39,11 @@ public abstract class SkillAttack : Skill
         prefabs.Add(prefab);
 
         Weapon weapon = prefab.GetComponent<Weapon>();
-        weapon.WeaponSetter(gameObject, skillController.fighterCondition, true, GetType().Name, StayMotionGenerator(prefab));
+        FighterCondition fighter_condition = skillController.fighterCondition;
+        int fighter_no = fighter_condition.fighterNo.Value;
+        Team fighter_team = fighter_condition.fighterTeam.Value;
+        bool is_owner = fighter_condition.IsOwner;
+        weapon.WeaponSetter(gameObject, fighter_no, fighter_team, is_owner, true, GetType().Name, StayMotionGenerator(prefab));
         weapon.WeaponParameterSetter(levelData);
         weapons.Add(weapon);
 
@@ -78,7 +82,11 @@ public abstract class SkillAttack : Skill
             prefabs.Add(prefab);
 
             Weapon weapon = prefab.GetComponent<Weapon>();
-            weapon.WeaponSetter(gameObject, skillController.fighterCondition, true, GetType().Name, StayMotionGenerator(prefab));
+            FighterCondition fighter_condition = skillController.fighterCondition;
+            int fighter_no = fighter_condition.fighterNo.Value;
+            Team fighter_team = fighter_condition.fighterTeam.Value;
+            bool is_owner = fighter_condition.IsOwner;
+            weapon.WeaponSetter(gameObject, fighter_no, fighter_team, is_owner, true, GetType().Name, StayMotionGenerator(prefab));
             weapon.WeaponParameterSetter(levelData);
             weapons.Add(weapon);
 

@@ -32,8 +32,13 @@ public class Shuriken : SkillAttack
         // 今回の発射で使用するweapons
         Weapon[] weapons_this_time = new Weapon[shuriken_count];
         int[] ready_indexes = GetPrefabIndexes(shuriken_count);
-        for (int k = 0; k < shuriken_count; k++) weapons_this_time[k] = weapons[ready_indexes[k]];
-        foreach (Weapon weapon in weapons_this_time) weapon.Activate(gameObject);
+        for (int k = 0; k < shuriken_count; k++)
+            weapons_this_time[k] = weapons[ready_indexes[k]];
+
+        float fighter_power = skillController.fighterCondition.power.value;
+        foreach (Weapon weapon in weapons_this_time)
+            weapon.Activate(gameObject, fighter_power);
+
         return null;
     }
 }

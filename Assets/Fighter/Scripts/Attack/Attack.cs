@@ -121,7 +121,10 @@ public abstract class Attack : NetworkBehaviour
             GameObject bullet = Instantiate(originalNormalBullet, orig_trans.position, orig_trans.rotation, transform);
             Weapon weapon = bullet.GetComponent<Weapon>();
             normalWeapons.Add(weapon);
-            weapon.WeaponSetter(gameObject, fighterCondition, false, causeOfDeath);
+            int fighter_no = fighterCondition.fighterNo.Value;
+            Team fighter_team = fighterCondition.fighterTeam.Value;
+            bool is_owner = fighterCondition.IsOwner;
+            weapon.WeaponSetter(gameObject, fighter_no, fighter_team, is_owner, false, causeOfDeath);
             weapon.WeaponParameterSetter(bulletPower, bulletSpeed, bulletLifespan, homingType);
         }
     }
@@ -149,7 +152,8 @@ public abstract class Attack : NetworkBehaviour
         Weapon bullet = normalWeapons[GetNormalBulletIndex()];
         blastImpact.Play();
         blastSound.Play();
-        bullet.Activate(target);
+        float fighter_power = fighterCondition.power.value;
+        bullet.Activate(target, fighter_power);
     }
 
     ///<param name="target"> Put null when there are no targets. </param>

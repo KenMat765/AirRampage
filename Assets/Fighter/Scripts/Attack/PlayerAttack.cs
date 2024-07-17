@@ -68,6 +68,7 @@ public class PlayerAttack : Attack
 
         blastImpact.Play();
         blastSound.Play();
-        bullet.Activate(target);
+        float fighter_power = fighterCondition.power.value;
+        bullet.Activate(target, fighter_power);
     }
 }

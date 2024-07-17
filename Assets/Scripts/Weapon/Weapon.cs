@@ -66,7 +66,7 @@ public abstract class Weapon : Utilities
     Vector3 default_target;
 
 
-    // スキルレベルによって変化する要素 /////////////////////////////////////////////////////////////////////////////////////
+    // Parameters change by skill level //////////////////////////////////////////////////////////////////////////////////
     protected float power { get; set; }
     protected float lifespan { get; set; }
     protected float speed { get; set; }
@@ -76,8 +76,8 @@ public abstract class Weapon : Utilities
     protected float homingAngle { get; set; }
 
 
-    // Receiverに受け渡す要素 /////////////////////////////////////////////////////////////////////////////////////////////
-    string causeOfDeath;
+    // Parameters given to Receiver /////////////////////////////////////////////////////////////////////////////////////
+    string weaponDetail;
     protected float power_temp { get; private set; }
 
     protected bool speedDown { get; private set; }
@@ -96,18 +96,16 @@ public abstract class Weapon : Utilities
     protected float defenceDuration { get; private set; }
 
 
-    // Skillからセット //////////////////////////////////////////////////////////////////////////////////////////////////
+    // Weapon Properties /////////////////////////////////////////////////////////////////////////////////////////////
     GameObject owner;   // owner is figherbody, not Fighter
+    int fighterNo;
+    Team team;
+    bool isOwner;
     bool isSkill;
     System.Func<float> StayMotion = null;
+
+
     GameObject targetObject = null;
-
-
-    // Fighter properties //////////////////////////////////////////////////////////////////////////////////////////////////
-    FighterCondition fighterCondition;
-    Team team => fighterCondition.fighterTeam.Value;
-    int fighterNo => fighterCondition.fighterNo.Value;
-
 
     int enemy_body_layer, enemy_shield_layer;
     LayerMask enemy_mask;    // enemy_mask = body + shield
@@ -167,7 +165,7 @@ public abstract class Weapon : Utilities
             hit_startPos = hitEffect.transform.localPosition;
             hit_startRot = hitEffect.transform.localRotation;
             // Set playOnAwake here, in order not to play hitSound as soon as the game starts.
-            if (hitEffect.TryGetComponent<AudioSource>(out AudioSource hitSound))
+            if (hitEffect.TryGetComponent(out AudioSource hitSound))
             {
                 hitSound.playOnAwake = true;
             }
@@ -220,7 +218,7 @@ public abstract class Weapon : Utilities
             // hit_obj == shield
             if (hit_obj.layer == enemy_shield_layer)
             {
-                if (fighterCondition.IsOwner)
+                if (isOwner)
                 {
                     Receiver receiver = hit_obj.GetComponentInParent<Receiver>();
                     receiver.ShieldDurabilityDecreaseServerRpc(power_temp);
@@ -231,10 +229,10 @@ public abstract class Weapon : Utilities
             else if (hit_obj.layer == enemy_body_layer)
             {
                 Receiver receiver = hit_obj.GetComponent<Receiver>();
-                if (fighterCondition.IsOwner)
+                if (isOwner)
                 {
                     receiver.HPDown(power_temp);
-                    receiver.AttackerDetector(fighterNo, causeOfDeath);
+                    receiver.AttackerDetector(fighterNo, weaponDetail);
                     receiver.OnWeaponHit(fighterNo);
                     if (speedDown) receiver.SpeedDown(speedGrade, speedDuration, speedProbability);
                     if (powerDown) receiver.PowerDown(powerGrade, powerDuration, powerProbability);
@@ -283,9 +281,8 @@ public abstract class Weapon : Utilities
     }
 
 
-    public void Activate(GameObject target)
+    public void Activate(GameObject target, float fighter_power)
     {
-        float fighter_power = fighterCondition.power.value;
         power_temp = power * fighter_power;
         targetObject = target;
         gameObject.SetActive(true);
@@ -415,7 +412,7 @@ public abstract class Weapon : Utilities
                     {
                         alreadyBombed.Add(hit.gameObject);
                         alreadyBombed.Add(hit.transform.parent.gameObject);
-                        if (fighterCondition.IsOwner)
+                        if (isOwner)
                         {
                             Receiver receiver = hit_obj.GetComponentInParent<Receiver>();
                             receiver.ShieldDurabilityDecreaseServerRpc(power_temp);
@@ -430,10 +427,10 @@ public abstract class Weapon : Utilities
                     {
                         alreadyBombed.Add(hit.gameObject);
                         Receiver receiver = hit_obj.GetComponent<Receiver>();
-                        if (fighterCondition.IsOwner)
+                        if (isOwner)
                         {
                             receiver.HPDown(power_temp);
-                            receiver.AttackerDetector(fighterNo, causeOfDeath);
+                            receiver.AttackerDetector(fighterNo, weaponDetail);
                             receiver.OnWeaponHit(fighterNo);
                             if (speedDown) receiver.SpeedDown(speedGrade, speedDuration, speedProbability);
                             if (powerDown) receiver.PowerDown(powerGrade, powerDuration, powerProbability);
@@ -525,12 +522,14 @@ public abstract class Weapon : Utilities
 
     // Weapon setting methods ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void WeaponSetter
-    (GameObject owner, FighterCondition fighterCondition, bool isSkill, string causeOfDeath, System.Func<float> StayMotion = null)
+    (GameObject owner, int fighterNo, Team team, bool isOwner, bool isSkill, string weaponDetail, System.Func<float> StayMotion = null)
     {
         this.owner = owner;
-        this.fighterCondition = fighterCondition;
+        this.fighterNo = fighterNo;
+        this.team = team;
+        this.isOwner = isOwner;
         this.isSkill = isSkill;
-        this.causeOfDeath = causeOfDeath;
+        this.weaponDetail = weaponDetail;
         this.StayMotion = StayMotion;
     }
 

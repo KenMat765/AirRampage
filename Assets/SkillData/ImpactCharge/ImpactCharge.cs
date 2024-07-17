@@ -31,7 +31,8 @@ public class ImpactCharge : SkillAttack
                 target = ParticipantManager.I.fighterInfos[targetNo].body;
                 target_no[0] = targetNo;
             }
-            weapons[GetPrefabIndex()].Activate(target);
+            float fighter_power = skillController.fighterCondition.power.value;
+            weapons[GetPrefabIndex()].Activate(target, fighter_power);
             return target_no;
         }
         else
@@ -41,7 +42,8 @@ public class ImpactCharge : SkillAttack
             {
                 target = ParticipantManager.I.fighterInfos[received_data[0]].body;
             }
-            weapons[GetPrefabIndex()].Activate(target);
+            float fighter_power = skillController.fighterCondition.power.value;
+            weapons[GetPrefabIndex()].Activate(target, fighter_power);
             return null;
         }
     }
