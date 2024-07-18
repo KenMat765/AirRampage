@@ -16,8 +16,8 @@ MonoBehaviour:
   skillName: Shield
   skillId: 4
   skillType: 2
-  attackLevelData1:
-    <ChargeTime>k__BackingField: 0
+  attackLevelDatas:
+  - <ChargeTime>k__BackingField: 0
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
@@ -41,8 +41,7 @@ MonoBehaviour:
     SpeedDuration: 0
     PowerDuration: 0
     DefenceDuration: 0
-  attackLevelData2:
-    <ChargeTime>k__BackingField: 0
+  - <ChargeTime>k__BackingField: 0
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
@@ -66,8 +65,7 @@ MonoBehaviour:
     SpeedDuration: 0
     PowerDuration: 0
     DefenceDuration: 0
-  attackLevelData3:
-    <ChargeTime>k__BackingField: 0
+  - <ChargeTime>k__BackingField: 0
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
@@ -91,8 +89,7 @@ MonoBehaviour:
     SpeedDuration: 0
     PowerDuration: 0
     DefenceDuration: 0
-  attackLevelData4:
-    <ChargeTime>k__BackingField: 0
+  - <ChargeTime>k__BackingField: 0
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
@@ -116,8 +113,7 @@ MonoBehaviour:
     SpeedDuration: 0
     PowerDuration: 0
     DefenceDuration: 0
-  attackLevelData5:
-    <ChargeTime>k__BackingField: 0
+  - <ChargeTime>k__BackingField: 0
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
@@ -141,43 +137,39 @@ MonoBehaviour:
     SpeedDuration: 0
     PowerDuration: 0
     DefenceDuration: 0
-  healLevelData1:
-    <ChargeTime>k__BackingField: 0
+  healLevelDatas:
+  - <ChargeTime>k__BackingField: 0
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
     <EnhanceDetails>k__BackingField: []
     RepairAmount: 0
-  healLevelData2:
-    <ChargeTime>k__BackingField: 0
+  - <ChargeTime>k__BackingField: 0
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
     <EnhanceDetails>k__BackingField: []
     RepairAmount: 0
-  healLevelData3:
-    <ChargeTime>k__BackingField: 0
+  - <ChargeTime>k__BackingField: 0
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
     <EnhanceDetails>k__BackingField: []
     RepairAmount: 0
-  healLevelData4:
-    <ChargeTime>k__BackingField: 0
+  - <ChargeTime>k__BackingField: 0
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
     <EnhanceDetails>k__BackingField: []
     RepairAmount: 0
-  healLevelData5:
-    <ChargeTime>k__BackingField: 0
+  - <ChargeTime>k__BackingField: 0
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
     <EnhanceDetails>k__BackingField: []
     RepairAmount: 0
-  assistLevelData1:
-    <ChargeTime>k__BackingField: 40
+  assistLevelDatas:
+  - <ChargeTime>k__BackingField: 40
     <FreeFloat1>k__BackingField: 90
     <FreeFloat2>k__BackingField: 3
     <FreeFloat3>k__BackingField: 0
@@ -192,8 +184,7 @@ MonoBehaviour:
     SpeedDuration: 0
     PowerDuration: 0
     DefenceDuration: 0
-  assistLevelData2:
-    <ChargeTime>k__BackingField: 35
+  - <ChargeTime>k__BackingField: 35
     <FreeFloat1>k__BackingField: 90
     <FreeFloat2>k__BackingField: 3
     <FreeFloat3>k__BackingField: 0
@@ -208,8 +199,7 @@ MonoBehaviour:
     SpeedDuration: 0
     PowerDuration: 0
     DefenceDuration: 0
-  assistLevelData3:
-    <ChargeTime>k__BackingField: 35
+  - <ChargeTime>k__BackingField: 35
     <FreeFloat1>k__BackingField: 105
     <FreeFloat2>k__BackingField: 3
     <FreeFloat3>k__BackingField: 0
@@ -224,8 +214,7 @@ MonoBehaviour:
     SpeedDuration: 0
     PowerDuration: 0
     DefenceDuration: 0
-  assistLevelData4:
-    <ChargeTime>k__BackingField: 30
+  - <ChargeTime>k__BackingField: 30
     <FreeFloat1>k__BackingField: 105
     <FreeFloat2>k__BackingField: 3
     <FreeFloat3>k__BackingField: 0
@@ -240,8 +229,7 @@ MonoBehaviour:
     SpeedDuration: 0
     PowerDuration: 0
     DefenceDuration: 0
-  assistLevelData5:
-    <ChargeTime>k__BackingField: 30
+  - <ChargeTime>k__BackingField: 30
     <FreeFloat1>k__BackingField: 120
     <FreeFloat2>k__BackingField: 3
     <FreeFloat3>k__BackingField: 0
@@ -256,8 +244,8 @@ MonoBehaviour:
     SpeedDuration: 0
     PowerDuration: 0
     DefenceDuration: 0
-  disturbLevelData1:
-    <ChargeTime>k__BackingField: 0
+  disturbLevelDatas:
+  - <ChargeTime>k__BackingField: 0
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
@@ -280,8 +268,7 @@ MonoBehaviour:
     SpeedDuration: 0
     PowerDuration: 0
     DefenceDuration: 0
-  disturbLevelData2:
-    <ChargeTime>k__BackingField: 0
+  - <ChargeTime>k__BackingField: 0
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
@@ -304,8 +291,7 @@ MonoBehaviour:
     SpeedDuration: 0
     PowerDuration: 0
     DefenceDuration: 0
-  disturbLevelData3:
-    <ChargeTime>k__BackingField: 0
+  - <ChargeTime>k__BackingField: 0
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
@@ -328,8 +314,7 @@ MonoBehaviour:
     SpeedDuration: 0
     PowerDuration: 0
     DefenceDuration: 0
-  disturbLevelData4:
-    <ChargeTime>k__BackingField: 0
+  - <ChargeTime>k__BackingField: 0
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0
@@ -352,8 +337,7 @@ MonoBehaviour:
     SpeedDuration: 0
     PowerDuration: 0
     DefenceDuration: 0
-  disturbLevelData5:
-    <ChargeTime>k__BackingField: 0
+  - <ChargeTime>k__BackingField: 0
     <FreeFloat1>k__BackingField: 0
     <FreeFloat2>k__BackingField: 0
     <FreeFloat3>k__BackingField: 0

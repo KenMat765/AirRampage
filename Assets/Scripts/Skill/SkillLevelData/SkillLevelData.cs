@@ -27,53 +27,28 @@ public class SkillLevelData : ScriptableObject
 
     public LevelData GetLevelData(int level)
     {
+        if (level < 1 || 5 < level)
+        {
+            Debug.LogError("レベルが範囲を超えています");
+            return null;
+        }
         switch (skillType)
         {
             case SkillType.attack:
-                switch (level)
-                {
-                    case 1: return attackLevelData1;
-                    case 2: return attackLevelData2;
-                    case 3: return attackLevelData3;
-                    case 4: return attackLevelData4;
-                    case 5: return attackLevelData5;
-                    default: Debug.LogError("レベルが範囲を超えています"); return null;
-                }
+                return attackLevelDatas[level - 1];
 
             case SkillType.heal:
-                switch (level)
-                {
-                    case 1: return healLevelData1;
-                    case 2: return healLevelData2;
-                    case 3: return healLevelData3;
-                    case 4: return healLevelData4;
-                    case 5: return healLevelData5;
-                    default: Debug.LogError("レベルが範囲を超えています"); return null;
-                }
+                return healLevelDatas[level - 1];
 
             case SkillType.assist:
-                switch (level)
-                {
-                    case 1: return assistLevelData1;
-                    case 2: return assistLevelData2;
-                    case 3: return assistLevelData3;
-                    case 4: return assistLevelData4;
-                    case 5: return assistLevelData5;
-                    default: Debug.LogError("レベルが範囲を超えています"); return null;
-                }
+                return assistLevelDatas[level - 1];
 
             case SkillType.disturb:
-                switch (level)
-                {
-                    case 1: return disturbLevelData1;
-                    case 2: return disturbLevelData2;
-                    case 3: return disturbLevelData3;
-                    case 4: return disturbLevelData4;
-                    case 5: return disturbLevelData5;
-                    default: Debug.LogError("レベルが範囲を超えています"); return null;
-                }
+                return disturbLevelDatas[level - 1];
 
-            default: Debug.LogError("SkillTypeがNullです"); return null;
+            default:
+                Debug.LogError("SkillTypeがNullです");
+                return null;
         }
     }
 
@@ -89,68 +64,17 @@ public class SkillLevelData : ScriptableObject
     bool IsDisturb() { return skillType == SkillType.disturb; }
 
 
-    [ShowIf("IsAttack"), BoxGroup("Level 1"), SerializeField]
-    AttackLevelData attackLevelData1;
+    [ShowIf("IsAttack"), SerializeField]
+    AttackLevelData[] attackLevelDatas = new AttackLevelData[5];
 
-    [ShowIf("IsAttack"), BoxGroup("Level 2"), SerializeField]
-    AttackLevelData attackLevelData2;
+    [ShowIf("IsHeal"), SerializeField]
+    HealLevelData[] healLevelDatas = new HealLevelData[5];
 
-    [ShowIf("IsAttack"), BoxGroup("Level 3"), SerializeField]
-    AttackLevelData attackLevelData3;
+    [ShowIf("IsAssist"), SerializeField]
+    AssistLevelData[] assistLevelDatas = new AssistLevelData[5];
 
-    [ShowIf("IsAttack"), BoxGroup("Level 4"), SerializeField]
-    AttackLevelData attackLevelData4;
-
-    [ShowIf("IsAttack"), BoxGroup("Level 5"), SerializeField]
-    AttackLevelData attackLevelData5;
-
-
-    [ShowIf("IsHeal"), BoxGroup("Level 1"), SerializeField]
-    HealLevelData healLevelData1;
-
-    [ShowIf("IsHeal"), BoxGroup("Level 2"), SerializeField]
-    HealLevelData healLevelData2;
-
-    [ShowIf("IsHeal"), BoxGroup("Level 3"), SerializeField]
-    HealLevelData healLevelData3;
-
-    [ShowIf("IsHeal"), BoxGroup("Level 4"), SerializeField]
-    HealLevelData healLevelData4;
-
-    [ShowIf("IsHeal"), BoxGroup("Level 5"), SerializeField]
-    HealLevelData healLevelData5;
-
-
-    [ShowIf("IsAssist"), BoxGroup("Level 1"), SerializeField]
-    AssistLevelData assistLevelData1;
-
-    [ShowIf("IsAssist"), BoxGroup("Level 2"), SerializeField]
-    AssistLevelData assistLevelData2;
-
-    [ShowIf("IsAssist"), BoxGroup("Level 3"), SerializeField]
-    AssistLevelData assistLevelData3;
-
-    [ShowIf("IsAssist"), BoxGroup("Level 4"), SerializeField]
-    AssistLevelData assistLevelData4;
-
-    [ShowIf("IsAssist"), BoxGroup("Level 5"), SerializeField]
-    AssistLevelData assistLevelData5;
-
-
-    [ShowIf("IsDisturb"), BoxGroup("Level 1"), SerializeField]
-    DisturbLevelData disturbLevelData1;
-
-    [ShowIf("IsDisturb"), BoxGroup("Level 2"), SerializeField]
-    DisturbLevelData disturbLevelData2;
-
-    [ShowIf("IsDisturb"), BoxGroup("Level 3"), SerializeField]
-    DisturbLevelData disturbLevelData3;
-
-    [ShowIf("IsDisturb"), BoxGroup("Level 4"), SerializeField]
-    DisturbLevelData disturbLevelData4;
-
-    [ShowIf("IsDisturb"), BoxGroup("Level 5"), SerializeField]
-    DisturbLevelData disturbLevelData5;
+    [ShowIf("IsDisturb"), SerializeField]
+    DisturbLevelData[] disturbLevelDatas = new DisturbLevelData[5];
 }
 
 
