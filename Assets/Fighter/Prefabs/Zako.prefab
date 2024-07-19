@@ -7032,18 +7032,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cab8011ba83574be98e2481da3059def, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  body: {fileID: 1311751778213161}
-  movement: {fileID: 4290537579717849159}
-  attack: {fileID: 4261731771400978922}
-  receiver: {fileID: 3543031913966478976}
-  radarIcon: {fileID: 7226467974988038721}
   Hp: 0
   defaultHp: 12
   defaultSpeed: 40
   defaultPower: 1
   defaultDefence: 1
-  cpToGive: 200
   revivalTime: 3
+  radarIcon: {fileID: 7226467974988038721}
   red_body: {fileID: 1988865275300390}
   blue_body: {fileID: 1360027754317512}
 --- !u!114 &4290537579717849159
@@ -7390,7 +7385,6 @@ MonoBehaviour:
   penetrate: 0
   attackRange: 0
   rangeRadius: 0
-  lockonType: 0
   blastImpact: {fileID: 0}
   hitEffect: {fileID: 1730120202303665}
   hitDuration: 0.5
@@ -21655,7 +21649,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8508367324933416075}
   - component: {fileID: 5205698405604177900}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: JetAudio
   m_TagString: Untagged
   m_Icon: {fileID: 0}

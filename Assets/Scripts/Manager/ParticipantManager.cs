@@ -77,12 +77,12 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
             FighterCondition fighterCondition = fighter.GetComponent<FighterCondition>();
             Movement movement = fighter.GetComponent<Movement>();
             GameObject body = fighter.transform.Find("fighterbody").gameObject;
-            BodyManager bodyManager = body.GetComponent<BodyManager>();
+            Visibility visibility = body.GetComponent<Visibility>();
             Attack attack = body.GetComponent<Attack>();
             Receiver receiver = body.GetComponent<Receiver>();
 
             // Generate & Assign fighter info.
-            FighterInfo info = new FighterInfo(fighter, body, bodyManager, fighterCondition, movement, attack, receiver);
+            FighterInfo info = new FighterInfo(fighter, body, visibility, fighterCondition, movement, attack, receiver);
             fighterInfos[no] = info;
 
             // Only for Players & AIs
@@ -354,11 +354,11 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
 
 public struct FighterInfo
 {
-    public FighterInfo(GameObject fighter, GameObject body, BodyManager bodyManager, FighterCondition fighterCondition, Movement movement, Attack attack, Receiver receiver)
+    public FighterInfo(GameObject fighter, GameObject body, Visibility visibility, FighterCondition fighterCondition, Movement movement, Attack attack, Receiver receiver)
     {
         this.fighter = fighter;
         this.body = body;
-        this.bodyManager = bodyManager;
+        this.visibility = visibility;
         this.fighterCondition = fighterCondition;
         this.movement = movement;
         this.attack = attack;
@@ -367,7 +367,7 @@ public struct FighterInfo
 
     public GameObject fighter { get; private set; }
     public GameObject body { get; private set; }
-    public BodyManager bodyManager { get; private set; }
+    public Visibility visibility { get; private set; }
     public FighterCondition fighterCondition { get; private set; }
     public Movement movement { get; private set; }
     public Attack attack { get; private set; }

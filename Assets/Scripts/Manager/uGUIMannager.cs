@@ -479,7 +479,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
         {
             if (id != ParticipantManager.I.myFighterNo)
             {
-                if (ParticipantManager.I.fighterInfos[id].bodyManager.visible)
+                if (ParticipantManager.I.fighterInfos[id].visibility.isVisible)
                 {
                     Vector2 canvasPos = RectTransformUtility.WorldToScreenPoint(CameraController.I.cam, ParticipantManager.I.fighterInfos[id].body.transform.position).Screen2Canvas();
                     HP_rects[id].anchoredPosition = canvasPos + new Vector2(0, 50);

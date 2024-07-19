@@ -16,8 +16,8 @@ GameObject:
   - component: {fileID: 95634404884195193}
   - component: {fileID: 3430642439028620820}
   - component: {fileID: 1058749907071328082}
-  - component: {fileID: 2221773611656743181}
   - component: {fileID: 263453853024311411}
+  - component: {fileID: 5989410913282835213}
   m_Layer: 9
   m_Name: fighterbody
   m_TagString: Untagged
@@ -183,18 +183,6 @@ MonoBehaviour:
   bulletSpeed: 200
   bulletLifespan: 1
   blastInterval: 0.6
---- !u!114 &2221773611656743181
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1634502660656484}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b0dbb4d099a2944b0815e14028e5e2a8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &263453853024311411
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -208,6 +196,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   activateThresh: 3
+--- !u!114 &5989410913282835213
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1634502660656484}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8af462b5e464c484dad1302e70bdfe08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  visibleDistance: 500
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 7864384
 --- !u!1 &1670119433932643
 GameObject:
   m_ObjectHideFlags: 0
@@ -343,8 +347,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fcdf116e6097f495a8abc4654d226802, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  body: {fileID: 1634502660656484}
-  radarIcon: {fileID: 3627874878998011375}
   Hp: 0
   defaultHp: 100
   defaultSpeed: 40
@@ -453,17 +455,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 612249818040722905, guid: 7b00c3341e5e4434f80675a6d2e0e2f1, type: 3}
   m_PrefabInstance: {fileID: 608152692306536542}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &3627874878998011375 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4190699912119039409, guid: 7b00c3341e5e4434f80675a6d2e0e2f1, type: 3}
-  m_PrefabInstance: {fileID: 608152692306536542}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4efdf62605e58438f863f394df69bdd4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &901788124173734841
 PrefabInstance:
   m_ObjectHideFlags: 0

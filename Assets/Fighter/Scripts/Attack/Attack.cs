@@ -67,16 +67,16 @@ public abstract class Attack : NetworkBehaviour
         // Detect targets, and set them to lockonTargetNos.
         if (colliders.Length > 0)
         {
-            var possibleTargets = colliders.Select(t => t.gameObject);
+            var possibleTargets = colliders.Select(t => t.transform);
 
             // Get fighter number of targets.
             lockonTargetNos = possibleTargets.Where(p =>
 
                 // Check if target is inside lockon range.
-                Vector3.Angle(my_transform.forward, p.transform.position - my_position) < lockonAngle &&
+                Vector3.Angle(my_transform.forward, p.position - my_position) < lockonAngle &&
 
                 // Check if there are no obstacles (terrain + terminals) between self and target.
-                !Physics.Raycast(my_position, p.transform.position - my_position, Vector3.Magnitude(p.transform.position - my_position), FighterCondition.obstacles_mask))
+                !Physics.Raycast(my_position, p.position - my_position, Vector3.Magnitude(p.position - my_position), FighterCondition.obstacles_mask))
 
                 // Get fighter number of target from its name.
                 .Select(r => int.Parse(r.name))

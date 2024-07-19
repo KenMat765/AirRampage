@@ -473,19 +473,22 @@ public class FighterArray : MonoBehaviour
         // Detect targets, and set them to detected_fighter_nos.
         if (colliders.Length > 0)
         {
-            var possibleTargets = colliders.Select(t => t.gameObject);
+            var possibleTargets = colliders.Select(t => t.transform);
 
             // Get fighter number of targets.
             detected_fighters_nos = possibleTargets.Where(p =>
 
                 // Check if target is inside homing range.
-                Vector3.Angle(transform.forward, p.transform.position - my_pos) < detectAngle &&
+                Vector3.Angle(transform.forward, p.position - my_pos) < detectAngle &&
 
                 // Check if there are no obstacles (terrain + terminals) between self and target.
-                !Physics.Raycast(my_pos, p.transform.position - my_pos, Vector3.Magnitude(p.transform.position - my_pos), FighterCondition.obstacles_mask))
+                !Physics.Raycast(my_pos, p.position - my_pos, Vector3.Magnitude(p.position - my_pos), FighterCondition.obstacles_mask))
 
                 // Get fighter number of target from its name.
-                .Select(r => int.Parse(r.name)).ToList();
+                .Select(r => int.Parse(r.name))
+
+                // Filter dead fighters.
+                .Where(no => !ParticipantManager.I.fighterInfos[no].fighterCondition.isDead).ToList();
         }
         else
         {

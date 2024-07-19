@@ -265,7 +265,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7921888011989233342}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: ActionAudios
   m_TagString: Untagged
   m_Icon: {fileID: 0}
