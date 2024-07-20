@@ -23,7 +23,7 @@ public class PlayerAttack : Attack
         SetLockonTargetNos();
 
         // === Normal Blast === //
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
         if (Input.GetKey(KeyCode.Space))
 #else
         if (uGUIMannager.onBlast)

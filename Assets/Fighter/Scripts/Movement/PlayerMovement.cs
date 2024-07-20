@@ -36,7 +36,7 @@ public class PlayerMovement : Movement
         float targetRotZ = 0;
 
         // Set target rotation (Branch by platform)
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
         if (Input.anyKey)
         {
             if (Input.GetKey(KeyCode.W))
@@ -230,7 +230,7 @@ public class PlayerMovement : Movement
         else if (CSManager.swipeLeft) { LeftRoll(0.2f); }
         else if (CSManager.swipeRight) { RightRoll(0.2f); }
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
         if (Input.GetKeyDown(KeyCode.DownArrow)) { Uturn(); }
         else if (Input.GetKeyDown(KeyCode.UpArrow)) { Somersault(); }
         else if (Input.GetKeyDown(KeyCode.LeftArrow)) { LeftRoll(0.2f); }
