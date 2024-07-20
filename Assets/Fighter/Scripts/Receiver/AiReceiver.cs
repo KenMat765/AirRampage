@@ -30,25 +30,6 @@ public class AiReceiver : Receiver
         underAttack = false;
         hitBulletCount = 0;
         hitTimer = 0;
-
-        // Report BattleConductor that you are killed. (Only Host)
-        if (IsHost)
-        {
-            BattleConductor.I.OnFighterDestroyed(fighterCondition, killer_no, cause_of_death);
-        }
-
-        // Send uGUIManger to report death of this fighter.
-        string my_name = fighterCondition.fighterName.Value.ToString();
-        Team my_team = fighterCondition.fighterTeam.Value;
-        if (FighterCondition.IsSpecificDeath(cause_of_death))
-        {
-            uGUIMannager.I.BookRepo(cause_of_death, my_name, my_team, cause_of_death);
-        }
-        else
-        {
-            string destroyer_name = ParticipantManager.I.fighterInfos[killer_no].fighterCondition.fighterName.Value.ToString();
-            uGUIMannager.I.BookRepo(destroyer_name, my_name, my_team, cause_of_death);
-        }
     }
 
 

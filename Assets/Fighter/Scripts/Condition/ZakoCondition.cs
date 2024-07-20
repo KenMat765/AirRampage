@@ -56,11 +56,16 @@ public class ZakoCondition : FighterCondition
     [ClientRpc]
     public void ChangeTeamClientRpc(Team new_team) => ChangeTeam(new_team);
 
+
     protected override void OnDeath(int killer_no, string cause_of_death)
     {
         base.OnDeath(killer_no, cause_of_death);
+
         if (IsHost)
         {
+            // Report BattleConductor that you are killed. (Only Host)
+            BattleConductor.I.OnFighterDestroyed(this, killer_no, cause_of_death);
+
             // Subtract self from zako_left in FighterArray.
             fighterArray.zako_left--;
         }
@@ -69,6 +74,7 @@ public class ZakoCondition : FighterCondition
     protected override void OnRevival()
     {
         base.OnRevival();
+
         SpawnPointZako spawnPoint = BattleConductor.spawnPointManager.GetSpawnPointZako(spawnPointNo.Value);
 
         // Add self to standbys in SpawnPointZako & ZakoCentralManager.

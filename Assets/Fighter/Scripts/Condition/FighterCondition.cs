@@ -143,6 +143,13 @@ public abstract class FighterCondition : NetworkBehaviour
 
         isDead = true;
         OnDeathCallback?.Invoke(killer_no, cause_of_death);
+
+        if (!IsSpecificDeath(cause_of_death)) // Died from enemy attacks.
+        {
+            // Invoke killer's Attack.OnKill
+            Attack killer_attack = ParticipantManager.I.fighterInfos[killer_no].attack;
+            killer_attack.OnKill(fighterNo.Value);
+        }
     }
 
     // Method to call OnDeath() at all clients.

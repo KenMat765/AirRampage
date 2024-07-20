@@ -200,15 +200,7 @@ public abstract class Receiver : NetworkBehaviour
 
 
     // Death & Revival /////////////////////////////////////////////////////////////////////////////////////////////
-    protected virtual void OnDeath(int killer_no, string cause_of_death)
-    {
-        if (0 <= killer_no) // This means killer is other fighter.
-        {
-            Attack killer_attack = ParticipantManager.I.fighterInfos[killer_no].attack;
-            killer_attack.OnKill(fighterCondition.fighterNo.Value);
-        }
-    }
-
+    protected virtual void OnDeath(int killer_no, string cause_of_death) { }
     protected virtual void OnRevival()
     {
         // Set attackerNo to minus value, because 0 indicates the first player.
