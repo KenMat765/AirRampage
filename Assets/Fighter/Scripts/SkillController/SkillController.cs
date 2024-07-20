@@ -16,6 +16,12 @@ public class SkillController : NetworkBehaviour
         fighterCondition.OnDeathCallback += OnDeath;
     }
 
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+        fighterCondition.OnDeathCallback -= OnDeath;
+    }
+
     protected virtual void OnDeath(int killer_no, string cause_of_death)
     {
         TerminateAllSkills();
