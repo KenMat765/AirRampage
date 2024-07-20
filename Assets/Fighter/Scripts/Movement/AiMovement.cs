@@ -420,7 +420,7 @@ public class AiMovement : Movement
     const short MAX_CACHE = 10;
     int cache_idx = 0;
 
-    protected void SetFinalDestination(Vector3 destination)
+    void SetFinalDestination(Vector3 destination)
     {
         arrived_at_final_destination = false;
         finalDestination = destination;
@@ -428,7 +428,7 @@ public class AiMovement : Movement
         SetNextDestination();
     }
 
-    protected void SetNextDestination()
+    void SetNextDestination()
     {
         arrived_at_next_destination = false;
 
@@ -504,7 +504,7 @@ public class AiMovement : Movement
         }
     }
 
-    protected void ArrivalCheck()
+    void ArrivalCheck()
     {
         if (arrived_at_next_destination) return;
 
