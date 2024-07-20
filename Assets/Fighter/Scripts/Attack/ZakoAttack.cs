@@ -6,6 +6,7 @@ using NaughtyAttributes;
 
 public class ZakoAttack : Attack
 {
+    const int RAPID_COUNT = 1;
 
     [SerializeField, MinMaxSlider(0, 3)]
     Vector2 minMaxInterval;
@@ -14,6 +15,14 @@ public class ZakoAttack : Attack
     [SerializeField] Gradient bulletRed;
     [SerializeField] Gradient bulletBlue;
 
+    ZakoCondition zakoCondition;
+
+
+    void Start()
+    {
+        // Downcast in Start (not Awake), otherwise it throws error.
+        zakoCondition = (ZakoCondition)fighterCondition;
+    }
 
     void FixedUpdate()
     {
@@ -22,19 +31,18 @@ public class ZakoAttack : Attack
         if (!attackable) return;
 
         // === Normal Blast === //
-        if (blastTimer > 0) blastTimer -= Time.deltaTime;
-
+        if (blastTimer > 0)
+        {
+            blastTimer -= Time.deltaTime;
+        }
         else
         {
-            ZakoCondition condition = (ZakoCondition)fighterCondition;
-            List<int> fighter_nos = condition.fighterArray.detected_fighters_nos;
-            if (fighter_nos.Count > 0)
+            List<int> target_nos = zakoCondition.fighterArray.detected_fighters_nos;
+            if (target_nos.Count > 0)
             {
                 blastTimer = Random.Range(minMaxInterval[0], minMaxInterval[1]);
-                int targetNo = fighter_nos.RandomChoice();
-                GameObject target = ParticipantManager.I.fighterInfos[targetNo].body;
-                int rapid_count = 1;
-                NormalRapid(rapid_count, target);
+                int target_no = target_nos.RandomChoice();
+                NormalRapid(RAPID_COUNT, target_no);
             }
         }
     }

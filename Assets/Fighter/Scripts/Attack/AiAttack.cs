@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class AiAttack : Attack
 {
+    const int RAPID_COUNT = 3;
+
     void FixedUpdate()
     {
         if (!IsOwner) return;
@@ -22,10 +24,8 @@ public class AiAttack : Attack
             if (lockonCount > 0)
             {
                 blastTimer = blastInterval;
-                int targetNo = lockonTargetNos[0];
-                GameObject target = ParticipantManager.I.fighterInfos[targetNo].body;
-                int rapid_count = 3;
-                NormalRapid(rapid_count, target);
+                int target_no = lockonTargetNos[0];
+                NormalRapid(RAPID_COUNT, target_no);
             }
         }
     }

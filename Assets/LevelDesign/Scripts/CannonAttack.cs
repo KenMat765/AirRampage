@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class CannonAttack : Attack
 {
+    const int RAPID_COUNT = 3;
+
     // Set from Inspector.
     [Header("Cannon Settings")]
     [SerializeField] float rotationSpeed;
@@ -67,8 +69,7 @@ public class CannonAttack : Attack
             if (lockonCount > 0)
             {
                 blastTimer = blastInterval;
-                int rapid_count = 3;
-                NormalRapid(rapid_count);
+                NormalRapid(RAPID_COUNT);
             }
         }
 

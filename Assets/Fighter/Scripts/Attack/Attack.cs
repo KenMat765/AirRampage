@@ -146,27 +146,35 @@ public abstract class Attack : NetworkBehaviour
         return normalWeapons.Count - 1;
     }
 
-    ///<param name="target"> Put null when there are no targets. </param>
-    protected virtual void NormalBlast(GameObject target = null)
+    ///<param name="target"> Put minus when there are no targets. </param>
+    protected virtual void NormalBlast(int target_no = -1)
     {
         Weapon bullet = normalWeapons[GetNormalBulletIndex()];
         blastImpact.Play();
         blastSound.Play();
         float fighter_power = fighterCondition.power.value;
-        bullet.Activate(target, fighter_power);
+        if (target_no < 0)
+        {
+            bullet.Activate(null, fighter_power);
+        }
+        else
+        {
+            GameObject target = target_no < 0 ? null : ParticipantManager.I.fighterInfos[target_no].body;
+            bullet.Activate(target, fighter_power);
+        }
     }
 
-    ///<param name="target"> Put null when there are no targets. </param>
-    protected void NormalRapid(int rapid_count, GameObject target = null)
+    ///<param name="target_no"> Put minus when there are no targets. </param>
+    protected void NormalRapid(int rapid_count, int target_no = -1)
     {
         float interval = blastInterval / rapid_count;
         IEnumerator normalRapid()
         {
-            NormalBlast(target);
+            NormalBlast(target_no);
             for (int k = 1; k < rapid_count; k++)
             {
                 yield return new WaitForSeconds(interval);
-                NormalBlast(target);
+                NormalBlast(target_no);
             }
         }
         StartCoroutine(normalRapid());
@@ -174,24 +182,22 @@ public abstract class Attack : NetworkBehaviour
         if (IsOwner)
         {
             if (IsHost)
-                NormalRapidClientRpc(rapid_count, -1);
+                NormalRapidClientRpc(rapid_count, target_no);
             else
-                NormalRapidServerRpc(rapid_count, -1);
+                NormalRapidServerRpc(rapid_count, target_no);
         }
     }
 
     [ServerRpc]
-    void NormalRapidServerRpc(int rapidCount, int targetNo = -1)
+    void NormalRapidServerRpc(int rapidCount, int target_no = -1)
     {
-        NormalRapidClientRpc(rapidCount, targetNo);
+        NormalRapidClientRpc(rapidCount, target_no);
     }
 
     [ClientRpc]
-    void NormalRapidClientRpc(int rapidCount, int targetNo = -1)
+    void NormalRapidClientRpc(int rapidCount, int target_no = -1)
     {
         if (IsOwner) return;
-        GameObject target = null;
-        if (targetNo != -1) target = ParticipantManager.I.fighterInfos[targetNo].body;
-        NormalRapid(rapidCount, target);
+        NormalRapid(rapidCount, target_no);
     }
 }
