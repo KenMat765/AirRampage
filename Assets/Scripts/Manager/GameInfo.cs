@@ -40,4 +40,4 @@ public enum Team { RED, BLUE, NONE }
 
 public enum Rule { CRYSTAL_HUNTER, BATTLE_ROYAL, TERMINAL_CONQUEST, }
 
-public enum Stage { NULL_SPACE, SUNSET_CITY /*SNOWPEAK*/ }
+public enum Stage { SUNSET_CITY, NULL_SPACE, /*SNOWPEAK*/ }

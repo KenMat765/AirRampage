@@ -87,7 +87,7 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
 
     #region Game Settings
     Rule rule = Rule.BATTLE_ROYAL;
-    Stage stage = Stage.NULL_SPACE;
+    Stage stage = Stage.SUNSET_CITY;
     int time_sec = GameInfo.MIN_TIME_SEC;
     #endregion
 
