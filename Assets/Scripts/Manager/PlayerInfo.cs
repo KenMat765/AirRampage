@@ -117,8 +117,7 @@ public class PlayerInfo
     public bool[] skl_unlock =
     {
         true, true, true, true, true, true,
-        true, true, true, true, true, true,
-        true
+        false, false, false, false, false, false,
     };
 
     // skill_id と 各スキルのレベル のセット
@@ -127,7 +126,6 @@ public class PlayerInfo
     {
         1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1,
-        1
     };
 
 
@@ -149,14 +147,10 @@ public class PlayerInfo
     public bool[] abi_unlock =
     {
         true, true, true, true, true, true,
+        false, false, false, false, false, false,
         true, true, true, true, true, true,
-        true, true, true, true, true, true,
-        true, true, true, true, true, true,
-        true, true, true, true, true, true,
-        true, true, true, true, true, true,
-        true, true, true, true, true, true,
-        true, true, true, true, true, true,
-        true, true, true, true, true, true,
+        false, false, false, false, false, false,
+        true, true, true, true,
     };
 
     public bool[] abi_equip =
@@ -165,11 +159,7 @@ public class PlayerInfo
         false, false, false, false, false, false,
         false, false, false, false, false, false,
         false, false, false, false, false, false,
-        false, false, false, false, false, false,
-        false, false, false, false, false, false,
-        false, false, false, false, false, false,
-        false, false, false, false, false, false,
-        false, false, false, false, false, false,
+        false, false, false, false,
     };
 
 
