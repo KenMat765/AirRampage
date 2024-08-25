@@ -15,6 +15,8 @@ public class PlayerMovement : Movement
         uturnTime = rac.animationClips.Where(a => a.name == "U-Turn").Select(b => b.length).ToArray()[0];
         somersaultTime = rac.animationClips.Where(a => a.name == "Flip").Select(b => b.length).ToArray()[0];
         rollTime = rac.animationClips.Where(a => a.name == "RightRoll").Select(b => b.length).ToArray()[0];
+
+        stickReverse = PlayerInfo.I.invertYAxis ? 1 : -1;
     }
 
 
@@ -22,7 +24,7 @@ public class PlayerMovement : Movement
     // Movement ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     bool can_rotate = true;
     public float maxRotSpeed { get; set; } = 40; // Might be changeable by availability.
-    public int stickReverse { get; set; } = -1; // TODO: make this changeable by settings.
+    int stickReverse = -1;
 
     protected override void Rotate()
     {
