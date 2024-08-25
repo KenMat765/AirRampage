@@ -195,33 +195,33 @@ public class SettingsCapsule : MonoBehaviour
 
 
     // ===== Graphics ===== //
-    public void OnFPSToggle(int fps)
+    public void OnFPSToggle(int fps_id)
     {
-        int new_fps = 30;
-        switch (fps)
+        int fps = 30;
+        switch (fps_id)
         {
-            case 30:
+            case 0:
                 if (fps30Toggle.isOn)
                 {
-                    new_fps = 30;
+                    fps = 30;
                     fpsRadio.SwtichToggle(fps30Toggle);
                 }
                 break;
 
-            case 60:
-                if (fps30Toggle.isOn)
+            case 1:
+                if (fps60Toggle.isOn)
                 {
-                    new_fps = 60;
+                    fps = 60;
                     fpsRadio.SwtichToggle(fps60Toggle);
                 }
                 break;
 
             default:
-                Debug.LogError("FPS toggle argument out of range: Please select from 30 or 60", gameObject);
+                Debug.LogError("FPS toggle argument out of range: Please select from 0~1", gameObject);
                 return;
         }
-        PlayerInfo.I.fps = new_fps;
-        AppSetup.SetFPS(new_fps);
+        PlayerInfo.I.fps = fps;
+        AppSetup.SetFPS(fps);
     }
 
     public void OnPostprocessToggle()

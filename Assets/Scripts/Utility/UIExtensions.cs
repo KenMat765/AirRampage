@@ -28,9 +28,19 @@ namespace Originals.UIExtensions
 
         public void Interactable(bool interactable)
         {
-            foreach (Toggle toggle in toggles)
+            if (interactable)
             {
-                toggle.interactable = !toggle.isOn;
+                foreach (Toggle toggle in toggles)
+                {
+                    toggle.interactable = !toggle.isOn;
+                }
+            }
+            else
+            {
+                foreach (Toggle toggle in toggles)
+                {
+                    toggle.interactable = false;
+                }
             }
         }
 
