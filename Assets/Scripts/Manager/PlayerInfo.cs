@@ -11,8 +11,8 @@ public class PlayerInfo
     public static PlayerInfo I { get; set; }
 
 
-    // === Skill === //
 
+    // === Skill === //
     /// <Summary> returns -1 if null. </Summary>
     public string[] deck_skill_ids = new string[GameInfo.DECK_COUNT];
 
@@ -129,6 +129,7 @@ public class PlayerInfo
     };
 
 
+
     // === Ability === //
     public List<int> AbilityIdsGetter()
     {
@@ -163,12 +164,24 @@ public class PlayerInfo
     };
 
 
+
     // === Settings === //
+    // General
     public string myName = "Player";
-    public float volume = 1.0f;
+    public ViewType viewType = ViewType.TPS_FAR;
+    public bool invertYAxis = false;
+
+    // Graphics
     public int fps = 60;
-    public float bgmRatio = 1.0f;
     public bool postprocess = true;
+
+    // Audio
+    public float volume = 1.0f;
+    public float bgmRatio = 1.0f;
+
+
+
+    // === Coins === //
     public int coins
     {
         get
@@ -181,5 +194,4 @@ public class PlayerInfo
         }
     }
     [SerializeField] int Coins = 9999;
-    public ViewType viewType = ViewType.TPS_FAR;
 }
