@@ -75,7 +75,7 @@ public class ZakoCondition : FighterCondition
     {
         base.OnRevival();
 
-        SpawnPointZako spawnPoint = BattleConductor.spawnPointManager.GetSpawnPointZako(spawnPointNo.Value);
+        SpawnPointZako spawnPoint = SpawnPointManager.I.GetSpawnPointZako(spawnPointNo.Value);
 
         // Add self to standbys in SpawnPointZako & ZakoCentralManager.
         spawnPoint.standbyCount++;

@@ -90,10 +90,6 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
     [SerializeField] GameObject[] crystalOnlyObjects;
 
 
-    // As SpawnPointManager can not be Singleton, keep this in conductor for easier access.
-    public static SpawnPointManager spawnPointManager;
-
-
     protected override void Awake()
     {
         base.Awake();
@@ -114,26 +110,23 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
         switch (BattleInfo.rule)
         {
             case Rule.BATTLE_ROYAL:
-                foreach (GameObject obj in royalOnlyObjects) if (obj.TryGetComponent<SpawnPointManager>(out spawnPointManager)) break;
                 foreach (GameObject obj in terminalOnlyObjects) Destroy(obj);
                 foreach (GameObject obj in crystalOnlyObjects) Destroy(obj);
                 break;
 
             case Rule.TERMINAL_CONQUEST:
                 foreach (GameObject obj in royalOnlyObjects) Destroy(obj);
-                foreach (GameObject obj in terminalOnlyObjects) if (obj.TryGetComponent<SpawnPointManager>(out spawnPointManager)) break;
                 foreach (GameObject obj in crystalOnlyObjects) Destroy(obj);
                 break;
 
             case Rule.CRYSTAL_HUNTER:
                 foreach (GameObject obj in royalOnlyObjects) Destroy(obj);
                 foreach (GameObject obj in terminalOnlyObjects) Destroy(obj);
-                foreach (GameObject obj in crystalOnlyObjects) if (obj.TryGetComponent<SpawnPointManager>(out spawnPointManager)) break;
                 break;
         }
 
         // Start ParticipantManager setup fighter information.
-        ParticipantManager.I.FightersSetup(spawnPointManager);
+        ParticipantManager.I.FightersSetup();
 
         // Wait until ParticipantManager sets fighter information.
         yield return new WaitUntil(() => ParticipantManager.I.infoSetComplete);
@@ -143,7 +136,7 @@ public class BattleConductor : NetworkSingleton<BattleConductor>
         yield return new WaitUntil(() => everyone_ready);
 
         // After everyone is ready, setup spawnpoints.
-        spawnPointManager.SetupSpawnPoints();
+        SpawnPointManager.I.SetupSpawnPoints();
 
         // After setup spawnpoints, setup terminals.
         if (BattleInfo.rule == Rule.TERMINAL_CONQUEST) TerminalManager.I.SetupTerminals();

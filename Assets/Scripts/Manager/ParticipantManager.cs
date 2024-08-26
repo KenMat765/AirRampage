@@ -16,10 +16,10 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
     public int zakoCountAll { get; private set; }
     [SerializeField] GameObject redPlayerPrefab, bluePlayerPrefab, redAiPrefab, blueAiPrefab, zakoPrefab;
 
-    public void FightersSetup(SpawnPointManager spawnPointManager) => StartCoroutine(fightersSetup(spawnPointManager));
-    IEnumerator fightersSetup(SpawnPointManager spawnPointManager)
+    public void FightersSetup() => StartCoroutine(fightersSetup());
+    IEnumerator fightersSetup()
     {
-        zakoCountAll = spawnPointManager.zakoCountAll;
+        zakoCountAll = SpawnPointManager.I.zakoCountAll;
 
         fighterInfos = new FighterInfo[GameInfo.MAX_PLAYER_COUNT + zakoCountAll];
         GameObject[] allFighters = new GameObject[GameInfo.MAX_PLAYER_COUNT + zakoCountAll];
@@ -30,9 +30,9 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
         if (NetworkManager.Singleton.IsHost)
         {
             // Generate Players and AIs.
-            SpawnAllFighters(spawnPointManager);
+            SpawnAllFighters();
             // Generate Zakos
-            SpawnAllZakos(spawnPointManager);
+            SpawnAllZakos();
             // Tell every clients that spawning is finished.
             allSpawnComplete.Value = true;
         }
@@ -139,7 +139,7 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
 
 
     // Only the host calls this method.
-    void SpawnAllFighters(SpawnPointManager spawnPointManager)
+    void SpawnAllFighters()
     {
         for (int no = 0; no < GameInfo.MAX_PLAYER_COUNT; no++)
         {
@@ -154,7 +154,7 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
 
             // GameObject & SpawnPoint of spawning fighter.
             GameObject fighter;
-            SpawnPointFighter point = spawnPointManager.GetSpawnPointFighter(no);
+            SpawnPointFighter point = SpawnPointManager.I.GetSpawnPointFighter(no);
 
             // If Player ////////////////////////////////////////////////////////////////////////
             if (battleData.isPlayer)
@@ -211,9 +211,9 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
 
 
     // Only the host calls this method.
-    void SpawnAllZakos(SpawnPointManager spawnPointManager)
+    void SpawnAllZakos()
     {
-        for (int k = 0; k < spawnPointManager.zakoCountAll; k++)
+        for (int k = 0; k < SpawnPointManager.I.zakoCountAll; k++)
         {
             int zakoNo = GameInfo.MAX_PLAYER_COUNT + k;
 
