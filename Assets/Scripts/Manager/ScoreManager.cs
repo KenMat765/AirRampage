@@ -45,6 +45,11 @@ public class ScoreManager : NetworkSingleton<ScoreManager>
 
     public void SetScore(float score, Team team)
     {
+        if (!NetworkManager.Singleton.IsHost)
+        {
+            return;
+        }
+
         switch (team)
         {
             case Team.RED:
@@ -63,6 +68,11 @@ public class ScoreManager : NetworkSingleton<ScoreManager>
 
     public void AddScore(float delta_score, Team team)
     {
+        if (!NetworkManager.Singleton.IsHost)
+        {
+            return;
+        }
+
         switch (team)
         {
             case Team.RED:
@@ -81,6 +91,11 @@ public class ScoreManager : NetworkSingleton<ScoreManager>
 
     public void SetScoreOpponent(float score, Team ally_team)
     {
+        if (!NetworkManager.Singleton.IsHost)
+        {
+            return;
+        }
+
         switch (ally_team)
         {
             case Team.RED:
@@ -99,6 +114,11 @@ public class ScoreManager : NetworkSingleton<ScoreManager>
 
     public void AddScoreOpponent(float delta_score, Team ally_team)
     {
+        if (!NetworkManager.Singleton.IsHost)
+        {
+            return;
+        }
+
         switch (ally_team)
         {
             case Team.RED:

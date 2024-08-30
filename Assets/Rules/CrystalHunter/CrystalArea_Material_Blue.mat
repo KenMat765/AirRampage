@@ -47,6 +47,9 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _NoisePower: 1.5
+    - _NoiseScale: 15
+    - _NoiseSharpness: 0.5
     - _QueueControl: 0
     - _QueueOffset: 0
     - _Sharpness: 3
@@ -54,4 +57,5 @@ Material:
     - _SharpnessTop: 2
     m_Colors:
     - _Emission: {r: 0, g: 1.2648829, b: 7.999999, a: 1}
+    - _FlowSpeed: {r: 0, g: -0.5, b: 0, a: 0}
   m_BuildTextureStacks: []
