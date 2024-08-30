@@ -6,10 +6,13 @@ using System.Linq;
 
 public class Crystal : MonoBehaviour
 {
-    public int id;
+    // This is set in CrystalManager.InitCrystals
+    CrystalManager crystalManager;
+
+    public Team team;
 
     [ShowNativeProperty]
-    public Team team { get; private set; } = Team.NONE;
+    public int id { get; private set; }
 
     public enum State { PLACED, CARRIED, RETURNING }
 
@@ -30,9 +33,12 @@ public class Crystal : MonoBehaviour
     Receiver receiver;
     SkillController skillController;
 
-    [Button]
-    void InitCrystal()
+
+    // Called in CrystalManager.InitCrystals
+    public void Init(CrystalManager manager, int id)
     {
+        crystalManager = manager;
+        this.id = id;
         crystalRed = transform.Find("Red").gameObject;
         crystalBlue = transform.Find("Blue").gameObject;
         getEffectRed = crystalRed.transform.Find("Crystal_Get").GetComponent<ParticleSystem>();
@@ -70,7 +76,7 @@ public class Crystal : MonoBehaviour
 
             // Return if the fighter is already carring other crystal.
             int fighter_no = fighter_condition.fighterNo.Value;
-            if (CrystalManager.I.carrierNos.Contains(fighter_no))
+            if (crystalManager.carrierNos.Contains(fighter_no))
             {
                 return;
             }
@@ -129,7 +135,7 @@ public class Crystal : MonoBehaviour
         receiver = fighter_condition.GetComponentInChildren<Receiver>();
         skillController = fighter_condition.GetComponentInChildren<SkillController>();
         skillController.LockAllSkills(true);
-        CrystalManager.I.carrierNos[id] = fighter_condition.fighterNo.Value;
+        crystalManager.carrierNos[id] = fighter_condition.fighterNo.Value;
         switch (team)
         {
             case Team.RED:
@@ -150,7 +156,7 @@ public class Crystal : MonoBehaviour
         bodyTrans = null;
         receiver = null;
         skillController = null;
-        CrystalManager.I.carrierNos[id] = -1;
+        crystalManager.carrierNos[id] = -1;
     }
 
 

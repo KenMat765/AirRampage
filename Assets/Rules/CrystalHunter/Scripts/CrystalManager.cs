@@ -1,43 +1,74 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using NaughtyAttributes;
+using Unity.Netcode;
 
 // CrystalManager
 //  - Crystals
 //  - CrystalAreas
-public class CrystalManager : Singleton<CrystalManager>
+public class CrystalManager : RuleManager
 {
-    protected override bool dont_destroy_on_load { get; set; } = false;
-
-    public const int crystal_count = 6; // All crystals in scene.
-    public Crystal[] crystals = new Crystal[crystal_count];
-    public int[] carrierNos = new int[crystal_count];   // Carrier fighter's number of each crystals.
+    public const int CRYSTAL_COUNT = 6; // All crystals in scene.
+    public Crystal[] crystals;
     public CrystalArea red_crystalArea, blue_crystalArea;
+    public int[] carrierNos { get; private set; } = new int[CRYSTAL_COUNT];   // Carrier fighter's number of each crystals.
 
-    [Button]
+
     void InitCrystals()
     {
-        // Crystals
-        for (int id = 0; id < crystal_count; id++)
+        // Init Crystals
+        crystals = GetComponentsInChildren<Crystal>();
+
+        if (crystals.Length != CRYSTAL_COUNT)
         {
-            Crystal crystal = transform.GetChild(id).GetComponent<Crystal>();
-            // crystal.id = id; // id resets when the scene changes (?)
-            crystals[id] = crystal;
+            Debug.LogError($"There are more or less crystals than {CRYSTAL_COUNT}");
+            return;
         }
 
-        // Crystal Areas
-        red_crystalArea = transform.GetChild(crystal_count).GetComponent<CrystalArea>();
-        blue_crystalArea = transform.GetChild(crystal_count + 1).GetComponent<CrystalArea>();
+        for (int id = 0; id < CRYSTAL_COUNT; id++)
+        {
+            crystals[id].Init(this, id);
+        }
+
+        // Init Crystal Areas
+        CrystalArea[] crystal_areas = GetComponentsInChildren<CrystalArea>();
+
+        if (crystal_areas.Length != 2)
+        {
+            Debug.LogError($"There are more or less crystal areas than 2");
+            return;
+        }
+
+        foreach (CrystalArea area in crystal_areas)
+        {
+            area.Init(this);
+            switch (area.team)
+            {
+                case Team.RED:
+                    red_crystalArea = area;
+                    break;
+                case Team.BLUE:
+                    blue_crystalArea = area;
+                    break;
+                default:
+                    Debug.LogError($"Team of CrystalArea is invalid", area.gameObject);
+                    return;
+
+            }
+        }
     }
 
-    public void SetupCrystals()
+
+
+    public override void Setup()
     {
-        if (BattleInfo.isMulti && !BattleInfo.isHost) return;
+        InitCrystals(); // All clients must initialize crystals.
+
+        if (!NetworkManager.Singleton.IsHost) return;
 
         int red_score = 0;
         int blue_score = 0;
-        for (int id = 0; id < crystal_count; id++)
+        for (int id = 0; id < CRYSTAL_COUNT; id++)
         {
             Crystal crystal = crystals[id];
             // Red
@@ -60,23 +91,36 @@ public class CrystalManager : Singleton<CrystalManager>
             // Initialize carrier numbers.
             carrierNos[id] = -1;
         }
-        BattleConductor.I.RedScore = red_score;
-        BattleConductor.I.BlueScore = blue_score;
+
+        ScoreManager.I.SetScore(red_score, Team.RED);
+        ScoreManager.I.SetScore(blue_score, Team.BLUE);
     }
+
+    public override void OnGameStart()
+    {
+        AcceptCrystalHandler(true);
+    }
+
+    public override void OnGameEnd()
+    {
+        AcceptCrystalHandler(false);
+    }
+
+
 
     public void OnCrystalMoved(CrystalArea get_crystalArea, Crystal get_crystal)
     {
         int crystal_id = get_crystal.id;
         if (get_crystalArea == red_crystalArea)
         {
-            BattleConductor.I.RedScore++;
-            BattleConductor.I.BlueScore--;
+            ScoreManager.I.AddScore(1, Team.RED);
+            ScoreManager.I.AddScore(-1, Team.BLUE);
             blue_crystalArea.placed[crystal_id] = false;
         }
         else if (get_crystalArea == blue_crystalArea)
         {
-            BattleConductor.I.RedScore--;
-            BattleConductor.I.BlueScore++;
+            ScoreManager.I.AddScore(-1, Team.RED);
+            ScoreManager.I.AddScore(1, Team.BLUE);
             red_crystalArea.placed[crystal_id] = false;
         }
         else

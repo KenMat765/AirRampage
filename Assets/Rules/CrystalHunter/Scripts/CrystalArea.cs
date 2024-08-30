@@ -1,24 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using NaughtyAttributes;
 
 public class CrystalArea : MonoBehaviour
 {
+    // This is set in CrystalManager.InitCrystals
+    CrystalManager crystalManager;
+
     public Team team;
 
-    public Transform[] placements = new Transform[CrystalManager.crystal_count];
-    public bool[] placed = new bool[CrystalManager.crystal_count];
-    public bool acceptCrystal;
+    public Transform[] placements = new Transform[CrystalManager.CRYSTAL_COUNT];
+    public bool[] placed = new bool[CrystalManager.CRYSTAL_COUNT];
+    public bool acceptCrystal { get; set; }
 
-    [Button]
-    void InitPlacements()
+
+    // Called in CrystalManager.InitCrystals
+    public void Init(CrystalManager manager)
     {
+        crystalManager = manager;
         for (int k = 0; k < placements.Length; k++)
         {
             placements[k] = transform.GetChild(k);
         }
     }
+
 
     void OnTriggerEnter(Collider col)
     {
@@ -56,7 +61,7 @@ public class CrystalArea : MonoBehaviour
         crystal.ChangeTeam(team);
         SetNewPlacementPos(crystal);
         crystal.ReleaseCrystal();   // Call this AFTER new placement postion is set.
-        CrystalManager.I.OnCrystalMoved(this, crystal);
+        crystalManager.OnCrystalMoved(this, crystal);
     }
 
     public void SetNewPlacementPos(Crystal crystal)

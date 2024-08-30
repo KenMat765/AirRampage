@@ -63,9 +63,6 @@ public class ZakoCondition : FighterCondition
 
         if (IsHost)
         {
-            // Report BattleConductor that you are killed. (Only Host)
-            BattleConductor.I.OnFighterDestroyed(this, killer_no, cause_of_death);
-
             // Subtract self from zako_left in FighterArray.
             fighterArray.zako_left--;
         }

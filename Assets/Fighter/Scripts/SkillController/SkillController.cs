@@ -22,7 +22,7 @@ public class SkillController : NetworkBehaviour
         fighterCondition.OnDeathCallback -= OnDeath;
     }
 
-    protected virtual void OnDeath(int killer_no, string cause_of_death)
+    protected virtual void OnDeath(int killed_no, int killer_no, Team killed_team, string cause_of_death)
     {
         TerminateAllSkills();
     }

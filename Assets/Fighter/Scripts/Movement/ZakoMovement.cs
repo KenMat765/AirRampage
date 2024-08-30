@@ -35,9 +35,9 @@ public class ZakoMovement : Movement
     }
 
 
-    protected override void OnDeath(int killer_no, string cause_of_death)
+    protected override void OnDeath(int killed_no, int killer_no, Team killed_team, string cause_of_death)
     {
-        base.OnDeath(killer_no, cause_of_death);
+        base.OnDeath(killed_no, killer_no, killed_team, cause_of_death);
         Controllable(false);
     }
 }

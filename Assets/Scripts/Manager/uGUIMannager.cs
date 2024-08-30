@@ -186,8 +186,8 @@ public class uGUIMannager : Singleton<uGUIMannager>
         timer = timeAndScores.Find("Timer").GetComponent<TextMeshProUGUI>();
         redScoreText = timeAndScores.Find("ScoreRed").GetComponent<TextMeshProUGUI>();
         blueScoreText = timeAndScores.Find("ScoreBlue").GetComponent<TextMeshProUGUI>();
-        redScoreText.text = BattleConductor.I.RedScore.ToString();
-        blueScoreText.text = BattleConductor.I.BlueScore.ToString();
+        redScoreText.text = ScoreManager.I.GetScore(Team.RED).ToString();
+        blueScoreText.text = ScoreManager.I.GetScore(Team.BLUE).ToString();
         #endregion
 
         #region Result
@@ -302,7 +302,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
         LockOnManager();
         HpOnHead();
         GameTimeManager();
-        ScoreManager();
+        ScoreUIManager();
         ScreenManager();
         ReportDestroy();
         SkillButtonUpdate();
@@ -367,31 +367,46 @@ public class uGUIMannager : Singleton<uGUIMannager>
     }
 
 
-    void ScoreManager()
+    void ScoreUIManager()
     {
-        if (redScore < BattleConductor.I.RedScore)
+        float target_redScore = ScoreManager.I.GetScore(Team.RED);
+        float target_blueScore = ScoreManager.I.GetScore(Team.BLUE);
+
+        if (redScore < target_redScore)
         {
             redScore += scoreUpdateSpeed * Time.deltaTime;
-            if (redScore > BattleConductor.I.RedScore) redScore = BattleConductor.I.RedScore;
+            if (redScore > target_redScore)
+            {
+                redScore = target_redScore;
+            }
             redScoreText.text = Mathf.CeilToInt(redScore).ToString();
         }
-        else if (redScore > BattleConductor.I.RedScore)
+        else if (redScore > target_redScore)
         {
             redScore -= scoreUpdateSpeed * Time.deltaTime;
-            if (redScore < BattleConductor.I.RedScore) redScore = BattleConductor.I.RedScore;
+            if (redScore < target_redScore)
+            {
+                redScore = target_redScore;
+            }
             redScoreText.text = Mathf.CeilToInt(redScore).ToString();
         }
 
-        if (blueScore < BattleConductor.I.BlueScore)
+        if (blueScore < target_blueScore)
         {
             blueScore += scoreUpdateSpeed * Time.deltaTime;
-            if (blueScore > BattleConductor.I.BlueScore) blueScore = BattleConductor.I.BlueScore;
+            if (blueScore > target_blueScore)
+            {
+                blueScore = target_blueScore;
+            }
             blueScoreText.text = Mathf.CeilToInt(blueScore).ToString();
         }
-        else if (blueScore > BattleConductor.I.BlueScore)
+        else if (blueScore > target_blueScore)
         {
             blueScore -= scoreUpdateSpeed * Time.deltaTime;
-            if (blueScore < BattleConductor.I.BlueScore) blueScore = BattleConductor.I.BlueScore;
+            if (blueScore < target_blueScore)
+            {
+                blueScore = target_blueScore;
+            }
             blueScoreText.text = Mathf.CeilToInt(blueScore).ToString();
         }
     }
@@ -780,7 +795,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
                     {
                         // Just set scores to UI.
                         int zako_no = no;
-                        seq.Join(DOTween.To(() => scores_float[zako_no], (value) => scores_float[zako_no] = value, BattleConductor.I.individualScores[zako_no], score_update_duration)
+                        seq.Join(DOTween.To(() => scores_float[zako_no], (value) => scores_float[zako_no] = value, ScoreManager.I.individualScores[zako_no], score_update_duration)
                             .OnUpdate(() => fighter_scores[zako_no].text = Mathf.CeilToInt(scores_float[zako_no]).ToString()));
                         continue;
                     }
@@ -807,7 +822,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
 
                     // Set individual scores to UI.
                     int fighter_no = no;
-                    seq.Join(DOTween.To(() => scores_float[fighter_no], (value) => scores_float[fighter_no] = value, BattleConductor.I.individualScores[fighter_no], score_update_duration)
+                    seq.Join(DOTween.To(() => scores_float[fighter_no], (value) => scores_float[fighter_no] = value, ScoreManager.I.individualScores[fighter_no], score_update_duration)
                         .OnUpdate(() => fighter_scores[ui_idx].text = Mathf.CeilToInt(scores_float[fighter_no]).ToString()));
                 }
                 break;
@@ -820,9 +835,9 @@ public class uGUIMannager : Singleton<uGUIMannager>
         }
 
         seq.AppendInterval(interval);
-        seq.Append(DOTween.To(() => redScore, (value) => redScore = value, BattleConductor.I.RedScore, score_update_duration)
+        seq.Append(DOTween.To(() => redScore, (value) => redScore = value, ScoreManager.I.GetScore(Team.RED), score_update_duration)
             .OnUpdate(() => result_redScore.text = Mathf.CeilToInt(redScore).ToString()));
-        seq.Join(DOTween.To(() => blueScore, (value) => blueScore = value, BattleConductor.I.BlueScore, score_update_duration)
+        seq.Join(DOTween.To(() => blueScore, (value) => blueScore = value, ScoreManager.I.GetScore(Team.BLUE), score_update_duration)
             .OnUpdate(() => result_blueScore.text = Mathf.CeilToInt(blueScore).ToString()));
         seq.AppendInterval(interval);
         seq.AppendCallback(() => confirmButton.interactable = true);
