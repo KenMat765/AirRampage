@@ -39,10 +39,11 @@ public class Crystal : MonoBehaviour
         crystalManager = manager;
         this.id = id;
 
-        crystalRed = transform.Find("Red").gameObject;
-        crystalBlue = transform.Find("Blue").gameObject;
-        getEffectRed = crystalRed.transform.Find("Crystal_Get").GetComponent<ParticleSystem>();
-        getEffectBlue = crystalBlue.transform.Find("Crystal_Get").GetComponent<ParticleSystem>();
+        Transform trans = transform;
+        crystalRed = trans.Find("Red").gameObject;
+        crystalBlue = trans.Find("Blue").gameObject;
+        getEffectRed = trans.Find("Crystal_Get_Red").GetComponent<ParticleSystem>();
+        getEffectBlue = trans.Find("Crystal_Get_Blue").GetComponent<ParticleSystem>();
 
         // Call this to change appearance of crystal.
         SetTeam(team);

@@ -11484,7 +11484,7 @@ GameObject:
   - component: {fileID: 8514063386288951949}
   - component: {fileID: 8514063386288952050}
   m_Layer: 0
-  m_Name: Crystal_Get
+  m_Name: Crystal_Get_Blue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11499,13 +11499,13 @@ Transform:
   m_GameObject: {fileID: 8514063386288951948}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.8, y: 0.8000002, z: 0.8}
+  m_LocalScale: {x: 320, y: 192.00003, z: 320}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8514063386680542612}
   - {fileID: 8514063385266426867}
-  m_Father: {fileID: 8514063386759399581}
-  m_RootOrder: 2
+  m_Father: {fileID: 8514063386680247815}
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!198 &8514063386288951949
 ParticleSystem:
@@ -13782,7 +13782,7 @@ GameObject:
   - component: {fileID: 8514063386396949844}
   - component: {fileID: 8514063386396949847}
   m_Layer: 0
-  m_Name: Crystal_Get
+  m_Name: Crystal_Get_Red
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13797,12 +13797,12 @@ Transform:
   m_GameObject: {fileID: 8514063386396949841}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 400, y: 239.99998, z: 400}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8514063385270686815}
   - {fileID: 8514063385902449831}
-  m_Father: {fileID: 8514063386449151422}
+  m_Father: {fileID: 8514063386680247815}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!198 &8514063386396949844
@@ -16100,7 +16100,6 @@ Transform:
   m_Children:
   - {fileID: 8514063386856916246}
   - {fileID: 8514063386579656000}
-  - {fileID: 8514063386396949846}
   m_Father: {fileID: 8514063386680247815}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -20688,6 +20687,8 @@ Transform:
   m_Children:
   - {fileID: 8514063386449151422}
   - {fileID: 8514063386759399581}
+  - {fileID: 8514063386396949846}
+  - {fileID: 8514063386288952051}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -20732,7 +20733,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 110de5d08d7044704974d9c104b4138a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  team: 0
   yOffset: 13.5
   maxReturnSpeed: 20
   maxChaseSpeed: 100
@@ -20742,6 +20742,7 @@ MonoBehaviour:
   crystalBlue: {fileID: 8514063386759399580}
   getEffectRed: {fileID: 8514063386396949844}
   getEffectBlue: {fileID: 8514063386288951949}
+  team: 0
 --- !u!1 &8514063386680542615
 GameObject:
   m_ObjectHideFlags: 0
@@ -23070,7 +23071,6 @@ Transform:
   m_Children:
   - {fileID: 8514063385713779620}
   - {fileID: 8514063385057808501}
-  - {fileID: 8514063386288952051}
   m_Father: {fileID: 8514063386680247815}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

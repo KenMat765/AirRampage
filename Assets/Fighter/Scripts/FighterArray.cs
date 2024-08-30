@@ -52,6 +52,8 @@ public class FighterArray : MonoBehaviour
 
         gameObject.SetActive(true);
 
+        SetDestination(SubTarget.GetRandomPosition());
+        /*
         switch (BattleInfo.rule)
         {
             case Rule.BATTLE_ROYAL:
@@ -84,6 +86,7 @@ public class FighterArray : MonoBehaviour
                 // SetDestination(targetTerminal.transform.position, true);
                 break;
         }
+        */
     }
 
 
@@ -125,6 +128,28 @@ public class FighterArray : MonoBehaviour
     void ChangeCondition()
     {
         prev_condition = condition;
+
+        // When there are opponents in front.
+        if (detected_fighters_nos.Count > 0)
+        {
+            // Set target fighter if null.
+            if (targetFighter == null)
+            {
+                int target_no = detected_fighters_nos[0];
+                targetFighter = ParticipantManager.I.fighterInfos[target_no].body;
+            }
+            condition = Conditions.ATTACK;
+        }
+
+        // When nobody is in front.
+        else
+        {
+            // Set target fighter to null.
+            if (targetFighter != null) targetFighter = null;
+            condition = Conditions.SEARCH;
+        }
+
+        /*
         switch (BattleInfo.rule)
         {
             case Rule.BATTLE_ROYAL:
@@ -151,65 +176,64 @@ public class FighterArray : MonoBehaviour
                 break;
 
             case Rule.TERMINAL_CONQUEST:
-                /*
-                    // Set target to terminal.
-                    // Judge whether ally team is currently winning or not.
-                    float my_team_point_per_sec = 0;
-                    float opponent_team_point_per_sec = 0;
-                    switch (team)
-                    {
-                        case Team.RED:
-                            my_team_point_per_sec = TerminalManager.redPoint_per_second;
-                            opponent_team_point_per_sec = TerminalManager.bluePoint_per_second;
-                            break;
+                // Set target to terminal.
+                // Judge whether ally team is currently winning or not.
+                float my_team_point_per_sec = 0;
+                float opponent_team_point_per_sec = 0;
+                switch (team)
+                {
+                    case Team.RED:
+                        my_team_point_per_sec = TerminalManager.redPoint_per_second;
+                        opponent_team_point_per_sec = TerminalManager.bluePoint_per_second;
+                        break;
 
-                        case Team.BLUE:
-                            my_team_point_per_sec = TerminalManager.bluePoint_per_second;
-                            opponent_team_point_per_sec = TerminalManager.redPoint_per_second;
-                            break;
+                    case Team.BLUE:
+                        my_team_point_per_sec = TerminalManager.bluePoint_per_second;
+                        opponent_team_point_per_sec = TerminalManager.redPoint_per_second;
+                        break;
+                }
+
+                // When winning : defence ally terminal.
+                if (my_team_point_per_sec > opponent_team_point_per_sec)
+                {
+                    // When current target is null or opponent, set new target terminal.
+                    if (!targetTerminal || targetTerminal.team != team)
+                    {
+                        targetTerminal = TerminalManager.I.GetAllyTerminals(team).RandomChoice();
                     }
 
-                    // When winning : defence ally terminal.
-                    if (my_team_point_per_sec > opponent_team_point_per_sec)
+                    // If detected opponent fighter during defencing ally terminal, chase and attack it.
+                    if (detected_fighters_nos.Count > 0)
                     {
-                        // When current target is null or opponent, set new target terminal.
-                        if (!targetTerminal || targetTerminal.team != team)
+                        if (!targetFighter)
                         {
-                            targetTerminal = TerminalManager.I.GetAllyTerminals(team).RandomChoice();
+                            int targetNo = detected_fighters_nos[0];
+                            targetFighter = ParticipantManager.I.fighterInfos[targetNo].body;
                         }
-
-                        // If detected opponent fighter during defencing ally terminal, chase and attack it.
-                        if (detected_fighters_nos.Count > 0)
-                        {
-                            if (!targetFighter)
-                            {
-                                int targetNo = detected_fighters_nos[0];
-                                targetFighter = ParticipantManager.I.fighterInfos[targetNo].body;
-                            }
-                            condition = Conditions.ATTACK;
-                        }
-
-                        // Otherwise, fly around target (= ally) terminal.
-                        else
-                        {
-                            if (targetFighter != null) targetFighter = null;
-                            condition = Conditions.DEFENCE_TERMINAL;
-                        }
+                        condition = Conditions.ATTACK;
                     }
 
-                    // When losing or draw : attack opponent terminal.
+                    // Otherwise, fly around target (= ally) terminal.
                     else
                     {
-                        // Set opponent terminal with least HP as a target when current target is null or is ally terminal.
-                        if (targetTerminal == null || targetTerminal.team == team)
-                        {
-                            targetTerminal = TerminalManager.I.GetNearestOpponentTerminal(team, transform.position);
-                        }
-                        condition = Conditions.ATTACK_TERMINAL;
+                        if (targetFighter != null) targetFighter = null;
+                        condition = Conditions.DEFENCE_TERMINAL;
                     }
-                    */
+                }
+
+                // When losing or draw : attack opponent terminal.
+                else
+                {
+                    // Set opponent terminal with least HP as a target when current target is null or is ally terminal.
+                    if (targetTerminal == null || targetTerminal.team == team)
+                    {
+                        targetTerminal = TerminalManager.I.GetNearestOpponentTerminal(team, transform.position);
+                    }
+                    condition = Conditions.ATTACK_TERMINAL;
+                }
                 break;
         }
+        */
     }
 
     void OnEachCondition()

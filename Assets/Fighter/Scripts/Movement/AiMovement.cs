@@ -96,6 +96,8 @@ public class AiMovement : Movement
         base.Controllable(controllable);
         if (controllable)
         {
+            SetFinalDestination(SubTarget.GetRandomPosition());
+            /*
             switch (BattleInfo.rule)
             {
                 case Rule.BATTLE_ROYAL:
@@ -108,6 +110,7 @@ public class AiMovement : Movement
                 case Rule.CRYSTAL_HUNTER:
                     break;
             }
+            */
         }
     }
 
@@ -308,26 +311,28 @@ public class AiMovement : Movement
 
         else
         {
+            if (attack.lockonCount > 0)
+            {
+                if (targetFighter == null)
+                {
+                    int target_no = attack.lockonTargetNos[0];
+                    targetFighter = ParticipantManager.I.fighterInfos[target_no].body;
+                }
+                action = Actions.ATTACK;
+            }
+            else
+            {
+                if (targetFighter != null)
+                {
+                    targetFighter = null;
+                }
+                action = Actions.SEARCH;
+            }
+
+            /*
             switch (BattleInfo.rule)
             {
                 case Rule.BATTLE_ROYAL:
-                    if (attack.lockonCount > 0)
-                    {
-                        if (targetFighter == null)
-                        {
-                            int target_no = attack.lockonTargetNos[0];
-                            targetFighter = ParticipantManager.I.fighterInfos[target_no].body;
-                        }
-                        action = Actions.ATTACK;
-                    }
-                    else
-                    {
-                        if (targetFighter != null)
-                        {
-                            targetFighter = null;
-                        }
-                        action = Actions.SEARCH;
-                    }
                     break;
 
                 case Rule.TERMINAL_CONQUEST:
@@ -336,6 +341,7 @@ public class AiMovement : Movement
                 case Rule.CRYSTAL_HUNTER:
                     break;
             }
+            */
         }
     }
 
