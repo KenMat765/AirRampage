@@ -69,7 +69,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
     TextMeshProUGUI timer;
     TextMeshProUGUI redScoreText, blueScoreText;
     float redScore, blueScore;
-    const float scoreUpdateSpeed = 100;
+    [SerializeField] float SCORE_UPDATE_SPEED = 200;
     #endregion
 
     #region Result
@@ -374,7 +374,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
 
         if (redScore < target_redScore)
         {
-            redScore += scoreUpdateSpeed * Time.deltaTime;
+            redScore += SCORE_UPDATE_SPEED * Time.deltaTime;
             if (redScore > target_redScore)
             {
                 redScore = target_redScore;
@@ -383,7 +383,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
         }
         else if (redScore > target_redScore)
         {
-            redScore -= scoreUpdateSpeed * Time.deltaTime;
+            redScore -= SCORE_UPDATE_SPEED * Time.deltaTime;
             if (redScore < target_redScore)
             {
                 redScore = target_redScore;
@@ -393,7 +393,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
 
         if (blueScore < target_blueScore)
         {
-            blueScore += scoreUpdateSpeed * Time.deltaTime;
+            blueScore += SCORE_UPDATE_SPEED * Time.deltaTime;
             if (blueScore > target_blueScore)
             {
                 blueScore = target_blueScore;
@@ -402,7 +402,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
         }
         else if (blueScore > target_blueScore)
         {
-            blueScore -= scoreUpdateSpeed * Time.deltaTime;
+            blueScore -= SCORE_UPDATE_SPEED * Time.deltaTime;
             if (blueScore < target_blueScore)
             {
                 blueScore = target_blueScore;
