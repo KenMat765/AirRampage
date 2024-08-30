@@ -192,12 +192,12 @@ public class uGUIMannager : Singleton<uGUIMannager>
 
         #region Result
         confirmButton = result.Find("ConfirmButton").GetComponent<Button>();
+        result_redScore = result.Find("RedScore").GetComponent<TextMeshProUGUI>();
+        result_blueScore = result.Find("BlueScore").GetComponent<TextMeshProUGUI>();
         switch (BattleInfo.rule)
         {
             case Rule.BATTLE_ROYAL:
                 Transform result_royal = result.Find("Result_Royal");
-                result_redScore = result.Find("RedScore").GetComponent<TextMeshProUGUI>();
-                result_blueScore = result.Find("BlueScore").GetComponent<TextMeshProUGUI>();
                 fighter_names = result_royal.Find("Names").GetComponentsInChildren<TextMeshProUGUI>();
                 fighter_scores = result_royal.Find("Scores").GetComponentsInChildren<TextMeshProUGUI>();
                 for (int k = 0; k < GameInfo.MAX_PLAYER_COUNT; k++) fighter_names[k].text = BattleInfo.battleDatas[k].name;

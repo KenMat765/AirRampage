@@ -8,9 +8,7 @@ public class CrystalArea : MonoBehaviour
     CrystalManager crystalManager;
 
     public Team team;
-
-    public Transform[] placements = new Transform[CrystalManager.CRYSTAL_COUNT];
-    public bool[] placed = new bool[CrystalManager.CRYSTAL_COUNT];
+    public CrystalHolder[] holders { get; private set; }
     public bool acceptCrystal { get; set; }
 
 
@@ -18,10 +16,7 @@ public class CrystalArea : MonoBehaviour
     public void Init(CrystalManager manager)
     {
         crystalManager = manager;
-        for (int k = 0; k < placements.Length; k++)
-        {
-            placements[k] = transform.GetChild(k);
-        }
+        holders = GetComponentsInChildren<CrystalHolder>();
     }
 
 
@@ -44,48 +39,58 @@ public class CrystalArea : MonoBehaviour
         Crystal crystal;
         if (col.TryGetComponent<Crystal>(out crystal))
         {
-            Team crystal_team = crystal.team;
+            Team crystal_team = crystal.GetTeam();
             if (crystal_team != team)
             {
-                OnGetCrystal(crystal);
+                GetCrystal(crystal);
             }
         }
         else
         {
-            Debug.LogError("Could not get component Crystal!!", col_obj);
+            Debug.LogError("Could not get Crystal component!!", col_obj);
         }
     }
 
-    void OnGetCrystal(Crystal crystal)
+
+    void GetCrystal(Crystal crystal)
     {
-        crystal.ChangeTeam(team);
-        SetNewPlacementPos(crystal);
-        crystal.ReleaseCrystal();   // Call this AFTER new placement postion is set.
+        crystal.SetTeam(team);
+        CrystalHolder vacant_holder = GetVacantHolder();
+        if (vacant_holder)
+        {
+            vacant_holder.GetCrystal(crystal);
+            Vector3 new_homePos = vacant_holder.position;
+            crystal.SetHome(new_homePos);
+        }
+
+        // Release crystal from carrier fighter. Call this AFTER new placement postion is set.
+        crystal.ReleaseCrystal();
+
         crystalManager.OnCrystalMoved(this, crystal);
     }
 
-    public void SetNewPlacementPos(Crystal crystal)
+    public void ReleaseCrystal(Crystal crystal)
     {
-        int id = -1;
-        for (int k = 0; k < placed.Length; k++)
+        foreach (CrystalHolder holder in holders)
         {
-            if (!placed[k])
+            if (holder.crystalId == crystal.id)
             {
-                id = k;
-                break;
+                holder.ReleaseCrystal();
             }
         }
+    }
 
-        if (id == -1)
+
+    public CrystalHolder GetVacantHolder()
+    {
+        foreach (CrystalHolder holder in holders)
         {
-            Debug.LogError("All placement pos is occupied!!");
-            return;
+            if (!holder.IsOccupied())
+            {
+                return holder;
+            }
         }
-        else
-        {
-            placed[id] = true;
-            Vector3 placement_pos = placements[id].position;
-            crystal.placementPos = placement_pos;
-        }
+        Debug.LogWarning("All holders where occupied");
+        return null;
     }
 }
