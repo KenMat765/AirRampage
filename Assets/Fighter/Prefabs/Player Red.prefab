@@ -181,7 +181,7 @@ MonoBehaviour:
   bulletSpeed: 200
   bulletLifespan: 1
   blastInterval: 0.6
-  blastAngle: 30
+  blastMaxAngle: 30
   sensitivity: 0.2
 --- !u!114 &6022362891645089186
 MonoBehaviour:
@@ -389,7 +389,7 @@ MonoBehaviour:
   - audio: {fileID: 82973143086541104}
     volume: 0.2
   - audio: {fileID: 82882120188162999}
-    volume: 0.5
+    volume: 0.4
   - audio: {fileID: 9038844553108165233}
     volume: 1
   - audio: {fileID: 9151111977344826910}
