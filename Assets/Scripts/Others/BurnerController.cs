@@ -52,17 +52,20 @@ public class BurnerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        float cur_speed = fighterCondition.speed.value;
-        if (cur_speed != prev_speed)
+        if (fighterCondition.speed != null)
         {
-            prev_speed = cur_speed;
+            float cur_speed = fighterCondition.speed.value;
+            if (cur_speed != prev_speed)
+            {
+                prev_speed = cur_speed;
 
-            float particle_size = default_size * (cur_speed / fighterCondition.defaultSpeed);
-            burner_particle_left.startSizeMultiplier = particle_size;
-            burner_particle_right.startSizeMultiplier = particle_size;
+                float particle_size = default_size * (cur_speed / fighterCondition.defaultSpeed);
+                burner_particle_left.startSizeMultiplier = particle_size;
+                burner_particle_right.startSizeMultiplier = particle_size;
 
-            float pitch = default_pitch * (cur_speed / fighterCondition.defaultSpeed);
-            jetAudio.pitch = pitch;
+                float pitch = default_pitch * (cur_speed / fighterCondition.defaultSpeed);
+                jetAudio.pitch = pitch;
+            }
         }
     }
 

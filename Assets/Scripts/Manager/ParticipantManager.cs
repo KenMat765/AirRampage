@@ -122,6 +122,9 @@ public class ParticipantManager : NetworkSingleton<ParticipantManager>
                 }
             }
 
+            // Initialize fighter status AFTER initializing abilities.
+            fighterCondition.InitStatus();
+
             // Set fighter name to fighterNo for easier reference to fighterNo.
             fighter.name = no.ToString();
         }

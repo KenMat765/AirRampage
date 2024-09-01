@@ -10,8 +10,8 @@ using System;
 // このクラスのプロパティをもとに、Movement、Attack、Receiverを動かす
 public abstract class FighterCondition : NetworkBehaviour
 {
-    // Awake is called BEFORE fighterNo, fighterName, fighterTeam is assigned by ParticipantManager.
-    protected virtual void Awake()
+    // This is called from ParticipantManager, after skills and abilities are initialized.
+    public void InitStatus()
     {
         Hp = defaultHp;
         speed = new FighterStatus(defaultSpeed);

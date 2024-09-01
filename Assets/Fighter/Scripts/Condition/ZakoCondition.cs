@@ -18,9 +18,8 @@ public class ZakoCondition : FighterCondition
 
     public NetworkVariable<int> spawnPointNo { get; set; } = new NetworkVariable<int>();
 
-    protected override void Awake()
+    void Awake()
     {
-        base.Awake();
         body = transform.Find("fighterbody").gameObject;
     }
 
