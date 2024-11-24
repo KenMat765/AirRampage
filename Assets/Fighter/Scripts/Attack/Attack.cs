@@ -30,7 +30,7 @@ public abstract class Attack : NetworkBehaviour
 
 
     // Death & Revival ///////////////////////////////////////////////////////////////////////////////////////////////
-    protected virtual void OnDeath(int killer_no, string cause_of_death) { }
+    protected virtual void OnDeath(int killed_no, int killer_no, Team killed_team, string cause_of_death) { }
     protected virtual void OnRevival() { }
 
 

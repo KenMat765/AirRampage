@@ -14,7 +14,7 @@ public class RadarIconController : MonoBehaviour
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         fighterCondition = GetComponentInParent<FighterCondition>();
-        fighterCondition.OnDeathCallback += (int killer_no, string cause_of_death) => Visualize(false);
+        fighterCondition.OnDeathCallback += (int killed_no, int killer_no, Team killed_team, string cause_of_death) => Visualize(false);
         fighterCondition.OnRevivalCallback += () => Visualize(true);
     }
 

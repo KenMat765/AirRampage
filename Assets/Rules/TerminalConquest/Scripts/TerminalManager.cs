@@ -1,14 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class TerminalManager : Singleton<TerminalManager>
+public class TerminalManager : RuleManager
 {
-    protected override bool dont_destroy_on_load { get; set; } = false;
-
     Terminal[] terminals;
-    Terminal1[] terminal1s;
-    Terminal2[] terminal2s;
 
     public static int allTerminalCount { get; private set; }
     public static int redTerminalCount { get; private set; }
@@ -18,11 +15,10 @@ public class TerminalManager : Singleton<TerminalManager>
     public static float bluePoint_per_second;
 
 
-    public void SetupTerminals()
+
+    public override void Setup()
     {
         terminals = GetComponentsInChildren<Terminal>();
-        terminal1s = GetComponentsInChildren<Terminal1>();
-        terminal2s = GetComponentsInChildren<Terminal2>();
 
         allTerminalCount = terminals.Length;
         redTerminalCount = 0;
@@ -39,13 +35,27 @@ public class TerminalManager : Singleton<TerminalManager>
         }
     }
 
+    public override void OnGameStart()
+    {
+        TerminalsAcceptDamageHandler(true);
+    }
+
+    public override void OnGameEnd()
+    {
+        TerminalsAcceptDamageHandler(false);
+    }
+
+
 
     void FixedUpdate()
     {
         if (!BattleConductor.gameInProgress) return;
-        if (BattleInfo.isMulti && !BattleInfo.isHost) return;
-        BattleConductor.I.RedScore += redPoint_per_second * Time.deltaTime;
-        BattleConductor.I.BlueScore += bluePoint_per_second * Time.deltaTime;
+        if (!NetworkManager.Singleton.IsHost) return;
+
+        float delta_red_score = redPoint_per_second * Time.deltaTime;
+        float delta_blue_score = bluePoint_per_second * Time.deltaTime;
+        ScoreManager.I.AddScore(delta_red_score, Team.RED);
+        ScoreManager.I.AddScore(delta_blue_score, Team.BLUE);
     }
 
 
@@ -67,18 +77,6 @@ public class TerminalManager : Singleton<TerminalManager>
             case Team.RED: redTerminalCount++; break;
             case Team.BLUE: blueTerminalCount++; break;
         }
-
-        // Finish game if all terminal was occupated by either team.
-        // if (redTerminalCount == allTerminalCount)
-        // {
-        //     if (BattleInfo.isMulti) BattleConductor.I.FinishGameClientRpc(Team.RED);
-        //     else BattleConductor.I.FinishGame(Team.RED);
-        // }
-        // else if (blueTerminalCount == allTerminalCount)
-        // {
-        //     if (BattleInfo.isMulti) BattleConductor.I.FinishGameClientRpc(Team.BLUE);
-        //     else BattleConductor.I.FinishGame(Team.BLUE);
-        // }
     }
 
 

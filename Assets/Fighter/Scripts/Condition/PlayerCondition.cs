@@ -37,12 +37,6 @@ public class PlayerCondition : FighterCondition
     {
         base.OnDeath(killer_no, cause_of_death);
 
-        // Report BattleConductor that you are killed. (Only Host)
-        if (IsHost)
-        {
-            BattleConductor.I.OnFighterDestroyed(this, killer_no, cause_of_death);
-        }
-
         // Send uGUIManger to report death of this fighter.
         string my_name = fighterName.Value.ToString();
         Team my_team = fighterTeam.Value;

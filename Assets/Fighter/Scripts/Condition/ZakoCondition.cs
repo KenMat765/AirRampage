@@ -18,9 +18,8 @@ public class ZakoCondition : FighterCondition
 
     public NetworkVariable<int> spawnPointNo { get; set; } = new NetworkVariable<int>();
 
-    protected override void Awake()
+    void Awake()
     {
-        base.Awake();
         body = transform.Find("fighterbody").gameObject;
     }
 
@@ -63,9 +62,6 @@ public class ZakoCondition : FighterCondition
 
         if (IsHost)
         {
-            // Report BattleConductor that you are killed. (Only Host)
-            BattleConductor.I.OnFighterDestroyed(this, killer_no, cause_of_death);
-
             // Subtract self from zako_left in FighterArray.
             fighterArray.zako_left--;
         }
@@ -75,7 +71,7 @@ public class ZakoCondition : FighterCondition
     {
         base.OnRevival();
 
-        SpawnPointZako spawnPoint = BattleConductor.spawnPointManager.GetSpawnPointZako(spawnPointNo.Value);
+        SpawnPointZako spawnPoint = SpawnPointManager.I.GetSpawnPointZako(spawnPointNo.Value);
 
         // Add self to standbys in SpawnPointZako & ZakoCentralManager.
         spawnPoint.standbyCount++;

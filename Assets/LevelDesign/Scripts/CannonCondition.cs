@@ -11,4 +11,10 @@ public class CannonCondition : FighterCondition
     // Set from Inspector.
     [Header("Cannon Settings")]
     public Team team;
+
+    protected override void Start()
+    {
+        base.Start();
+        InitStatus();
+    }
 }

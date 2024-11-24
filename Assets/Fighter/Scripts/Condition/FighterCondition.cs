@@ -10,8 +10,8 @@ using System;
 // このクラスのプロパティをもとに、Movement、Attack、Receiverを動かす
 public abstract class FighterCondition : NetworkBehaviour
 {
-    // Awake is called BEFORE fighterNo, fighterName, fighterTeam is assigned by ParticipantManager.
-    protected virtual void Awake()
+    // This is called from ParticipantManager, after skills and abilities are initialized.
+    public void InitStatus()
     {
         Hp = defaultHp;
         speed = new FighterStatus(defaultSpeed);
@@ -116,7 +116,8 @@ public abstract class FighterCondition : NetworkBehaviour
     public float reviveTimer { get; private set; }
     public bool isDead { get; private set; }
 
-    public Action<int, string> OnDeathCallback { get; set; }
+    // Action<myNo, killerNo, killedTeam, causeOfDeath>
+    public Action<int, int, Team, string> OnDeathCallback { get; set; }
     public Action OnRevivalCallback { get; set; }
 
     // Causes of death.
@@ -142,7 +143,7 @@ public abstract class FighterCondition : NetworkBehaviour
         if (isDead) return;
 
         isDead = true;
-        OnDeathCallback?.Invoke(killer_no, cause_of_death);
+        OnDeathCallback?.Invoke(fighterNo.Value, killer_no, fighterTeam.Value, cause_of_death);
 
         if (!IsSpecificDeath(cause_of_death)) // Died from enemy attacks.
         {

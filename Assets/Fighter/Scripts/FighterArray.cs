@@ -52,6 +52,8 @@ public class FighterArray : MonoBehaviour
 
         gameObject.SetActive(true);
 
+        SetDestination(SubTarget.GetRandomPosition());
+        /*
         switch (BattleInfo.rule)
         {
             case Rule.BATTLE_ROYAL:
@@ -60,30 +62,31 @@ public class FighterArray : MonoBehaviour
                 break;
 
             case Rule.TERMINAL_CONQUEST:
-                float my_team_point_per_sec = 0;
-                float opponent_team_point_per_sec = 0;
-                switch (team)
-                {
-                    case Team.RED:
-                        my_team_point_per_sec = TerminalManager.redPoint_per_second;
-                        opponent_team_point_per_sec = TerminalManager.bluePoint_per_second;
-                        break;
+                // float my_team_point_per_sec = 0;
+                // float opponent_team_point_per_sec = 0;
+                // switch (team)
+                // {
+                //     case Team.RED:
+                //         my_team_point_per_sec = TerminalManager.redPoint_per_second;
+                //         opponent_team_point_per_sec = TerminalManager.bluePoint_per_second;
+                //         break;
 
-                    case Team.BLUE:
-                        my_team_point_per_sec = TerminalManager.bluePoint_per_second;
-                        opponent_team_point_per_sec = TerminalManager.redPoint_per_second;
-                        break;
-                }
+                //     case Team.BLUE:
+                //         my_team_point_per_sec = TerminalManager.bluePoint_per_second;
+                //         opponent_team_point_per_sec = TerminalManager.redPoint_per_second;
+                //         break;
+                // }
 
-                // When winning : defence ally terminal.
-                if (my_team_point_per_sec > opponent_team_point_per_sec)
-                    targetTerminal = TerminalManager.I.GetAllyTerminals(team).RandomChoice();
-                // When losing or draw : attack opponent terminal.
-                else
-                    targetTerminal = TerminalManager.I.GetOpponentTerminals(team).RandomChoice();
-                SetDestination(targetTerminal.transform.position, true);
+                // // When winning : defence ally terminal.
+                // if (my_team_point_per_sec > opponent_team_point_per_sec)
+                //     targetTerminal = TerminalManager.I.GetAllyTerminals(team).RandomChoice();
+                // // When losing or draw : attack opponent terminal.
+                // else
+                //     targetTerminal = TerminalManager.I.GetOpponentTerminals(team).RandomChoice();
+                // SetDestination(targetTerminal.transform.position, true);
                 break;
         }
+        */
     }
 
 
@@ -125,6 +128,28 @@ public class FighterArray : MonoBehaviour
     void ChangeCondition()
     {
         prev_condition = condition;
+
+        // When there are opponents in front.
+        if (detected_fighters_nos.Count > 0)
+        {
+            // Set target fighter if null.
+            if (targetFighter == null)
+            {
+                int target_no = detected_fighters_nos[0];
+                targetFighter = ParticipantManager.I.fighterInfos[target_no].body;
+            }
+            condition = Conditions.ATTACK;
+        }
+
+        // When nobody is in front.
+        else
+        {
+            // Set target fighter to null.
+            if (targetFighter != null) targetFighter = null;
+            condition = Conditions.SEARCH;
+        }
+
+        /*
         switch (BattleInfo.rule)
         {
             case Rule.BATTLE_ROYAL:
@@ -208,6 +233,7 @@ public class FighterArray : MonoBehaviour
                 }
                 break;
         }
+        */
     }
 
     void OnEachCondition()

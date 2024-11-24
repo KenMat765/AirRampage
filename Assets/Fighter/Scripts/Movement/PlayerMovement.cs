@@ -251,7 +251,7 @@ public class PlayerMovement : Movement
         if (IsOwner)
         {
             int no = fighterCondition.fighterNo.Value;
-            SpawnPointFighter point = BattleConductor.spawnPointManager.GetSpawnPointFighter(no);
+            SpawnPointFighter point = SpawnPointManager.I.GetSpawnPointFighter(no);
             Transform point_trans = point.transform;
             transform.position = point_trans.position;
             transform.rotation = point_trans.rotation;

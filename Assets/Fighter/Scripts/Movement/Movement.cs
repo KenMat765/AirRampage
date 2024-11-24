@@ -174,7 +174,7 @@ public abstract class Movement : NetworkBehaviour
     ParticleSystem explosion1, explosion2, explosionTrail;
 
     // Must be called at every clients.
-    protected virtual void OnDeath(int killer_no, string cause_of_death)
+    protected virtual void OnDeath(int killed_no, int killer_no, Team killed_team, string cause_of_death)
     {
         ready4action = false;
         StartCoroutine(DeathAnimation());

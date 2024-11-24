@@ -200,7 +200,7 @@ public class ZoneController : MonoBehaviour
         cp += cp_obtained * cp_bonus;
     }
 
-    void OnDeath(int killer_no, string cause_of_death)
+    void OnDeath(int killed_no, int killer_no, Team killed_team, string cause_of_death)
     {
         bool maintain_cp = true;
         ResetCp(maintain_cp);

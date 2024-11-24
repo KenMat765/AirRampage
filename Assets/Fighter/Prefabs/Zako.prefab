@@ -21784,7 +21784,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8282206529418648993, guid: 93ee664c5c3a5481180fa946eb6dcd5b, type: 3}
       propertyPath: MinDistance
-      value: 100
+      value: 120
       objectReference: {fileID: 0}
     - target: {fileID: 8282206529418648993, guid: 93ee664c5c3a5481180fa946eb6dcd5b, type: 3}
       propertyPath: m_audioClip
@@ -21796,7 +21796,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8282243559054926549, guid: 93ee664c5c3a5481180fa946eb6dcd5b, type: 3}
       propertyPath: m_Volume
-      value: 0.9
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8282243559054926549, guid: 93ee664c5c3a5481180fa946eb6dcd5b, type: 3}
       propertyPath: MaxDistance
@@ -21804,7 +21804,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8282243559054926549, guid: 93ee664c5c3a5481180fa946eb6dcd5b, type: 3}
       propertyPath: MinDistance
-      value: 100
+      value: 120
       objectReference: {fileID: 0}
     - target: {fileID: 8342147583372469503, guid: 93ee664c5c3a5481180fa946eb6dcd5b, type: 3}
       propertyPath: m_LocalScale.x

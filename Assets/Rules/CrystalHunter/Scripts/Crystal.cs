@@ -2,41 +2,52 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using NaughtyAttributes;
-using System.Linq;
 
 public class Crystal : MonoBehaviour
 {
-    public int id;
+    // This is set in CrystalManager.InitCrystals
+    CrystalManager crystalManager;
 
     [ShowNativeProperty]
-    public Team team { get; private set; } = Team.NONE;
-
-    public enum State { PLACED, CARRIED, RETURNING }
-
-    [ShowNativeProperty]
-    public State state { get; private set; } = State.PLACED;
-
-    public Vector3 placementPos { get; set; }
+    public int id { get; private set; }
 
     [SerializeField] float yOffset = 13.5f;
     [SerializeField] float maxReturnSpeed, maxChaseSpeed;
+    [SerializeField] int score;
     [SerializeField] float hpDecreaseSpeed;
     [SerializeField] GameObject crystalRed, crystalBlue;
     [SerializeField] ParticleSystem getEffectRed, getEffectBlue;
+
+    public int GetScore() { return score; }
 
     // Fighter Properties.
     FighterCondition fighterCondition;
     Transform bodyTrans;
     Receiver receiver;
     SkillController skillController;
-
-    [Button]
-    void InitCrystal()
+    public int GetCarrierNo()
     {
-        crystalRed = transform.Find("Red").gameObject;
-        crystalBlue = transform.Find("Blue").gameObject;
-        getEffectRed = crystalRed.transform.Find("Crystal_Get").GetComponent<ParticleSystem>();
-        getEffectBlue = crystalBlue.transform.Find("Crystal_Get").GetComponent<ParticleSystem>();
+        return fighterCondition ? fighterCondition.fighterNo.Value : -1;
+    }
+
+
+    // Called in CrystalManager.InitCrystals
+    public void Init(CrystalManager manager, int id, Vector3 default_homePos)
+    {
+        crystalManager = manager;
+        this.id = id;
+
+        Transform trans = transform;
+        crystalRed = trans.Find("Red").gameObject;
+        crystalBlue = trans.Find("Blue").gameObject;
+        getEffectRed = trans.Find("Crystal_Get_Red").GetComponent<ParticleSystem>();
+        getEffectBlue = trans.Find("Crystal_Get_Blue").GetComponent<ParticleSystem>();
+
+        // Call this to change appearance of crystal.
+        SetTeam(team);
+
+        SetHome(default_homePos);
+        GoToTarget(homePos, -1);    // Moves immediately when second arg is negative.
     }
 
 
@@ -70,7 +81,7 @@ public class Crystal : MonoBehaviour
 
             // Return if the fighter is already carring other crystal.
             int fighter_no = fighter_condition.fighterNo.Value;
-            if (CrystalManager.I.carrierNos.Contains(fighter_no))
+            if (crystalManager.IsFighterCarryingCrystal(fighter_no))
             {
                 return;
             }
@@ -92,6 +103,11 @@ public class Crystal : MonoBehaviour
                 break;
 
             case State.CARRIED:
+                if (fighterCondition.isDead)
+                {
+                    ReleaseCrystal();
+                    break;
+                }
                 Vector3 body_pos = bodyTrans.position;
                 Vector3 target_pos = body_pos + Vector3.up * yOffset;
                 GoToTarget(target_pos, maxChaseSpeed);
@@ -100,8 +116,8 @@ public class Crystal : MonoBehaviour
                 break;
 
             case State.RETURNING:
-                GoToTarget(placementPos, maxReturnSpeed);
-                if (transform.position == placementPos)
+                GoToTarget(homePos, maxReturnSpeed);
+                if (transform.position == homePos)
                 {
                     state = State.PLACED;
                 }
@@ -109,18 +125,29 @@ public class Crystal : MonoBehaviour
         }
     }
 
+
+    /// <param name="max_speed">Goes to target immediately when negative</param>
     void GoToTarget(Vector3 target_pos, float max_speed)
     {
         Vector3 relative_pos = target_pos - transform.position;
         Vector3 dir = relative_pos.normalized;
         float dist = relative_pos.magnitude;
         float return_dist = dist;
-        return_dist = Mathf.Clamp(return_dist, 0, max_speed * Time.deltaTime);
+        if (max_speed >= 0)
+        {
+            return_dist = Mathf.Clamp(return_dist, 0, max_speed * Time.deltaTime);
+        }
         transform.position += dir * return_dist;
     }
 
 
-    // Set state of crystal via these methods.
+
+    // State /////////////////////////////////////////////////////////////////////////////////////
+    public enum State { PLACED, CARRIED, RETURNING }
+
+    [ShowNativeProperty]
+    public State state { get; private set; } = State.PLACED;
+
     public void CarryCrystal(FighterCondition fighter_condition)
     {
         state = State.CARRIED;
@@ -129,7 +156,6 @@ public class Crystal : MonoBehaviour
         receiver = fighter_condition.GetComponentInChildren<Receiver>();
         skillController = fighter_condition.GetComponentInChildren<SkillController>();
         skillController.LockAllSkills(true);
-        CrystalManager.I.carrierNos[id] = fighter_condition.fighterNo.Value;
         switch (team)
         {
             case Team.RED:
@@ -150,14 +176,20 @@ public class Crystal : MonoBehaviour
         bodyTrans = null;
         receiver = null;
         skillController = null;
-        CrystalManager.I.carrierNos[id] = -1;
     }
 
 
-    // Set team of crystal via this method.
-    public void ChangeTeam(Team new_team)
+
+    // Team /////////////////////////////////////////////////////////////////////////////////////
+    [SerializeField] Team team;
+
+    public Team GetTeam()
     {
-        team = new_team;
+        return team;
+    }
+
+    public void SetTeam(Team new_team)
+    {
         switch (new_team)
         {
             case Team.RED:
@@ -176,5 +208,15 @@ public class Crystal : MonoBehaviour
                 Debug.LogWarning("Crystal team was set to NONE!!", gameObject);
                 break;
         }
+        team = new_team;
+    }
+
+
+
+    // Home position /////////////////////////////////////////////////////////////////////////////////////
+    Vector3 homePos;    // Position where this crystal returns.
+    public void SetHome(Vector3 new_homePos)
+    {
+        homePos = new_homePos;
     }
 }
