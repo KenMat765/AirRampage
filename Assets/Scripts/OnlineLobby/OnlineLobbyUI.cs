@@ -7,6 +7,7 @@ using TMPro;
 using Unity.Netcode;
 using Cysharp.Threading.Tasks;
 using System;
+using UnityEngine.Diagnostics;
 
 public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
 {
@@ -504,6 +505,8 @@ public class OnlineLobbyUI : Singleton<OnlineLobbyUI>
     #region On Button Pressed Callbacks
     public void Host()
     {
+        // UnityEngine.Diagnostics.Utils.ForceCrash(ForcedCrashCategory.Abort);
+
         selectedHost = true;
         SetPage(Page.PUBLIC_PRIVATE);
     }
