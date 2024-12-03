@@ -43,7 +43,7 @@ public class RoyalManager : RuleManager
         // If killer is Fighter.
         else if (0 <= killer_no && killer_no < GameInfo.MAX_PLAYER_COUNT)
         {
-            ScoreManager.I.individualScores[killer_no] += my_score;
+            ScoreManager.I.AddIndividualScore(killer_no, my_score);
         }
 
         // If killer is Zako.
@@ -54,11 +54,11 @@ public class RoyalManager : RuleManager
             switch (destroyer_team)
             {
                 case Team.RED:
-                    ScoreManager.I.individualScores[GameInfo.MAX_PLAYER_COUNT] += my_score;
+                    ScoreManager.I.AddIndividualScore(GameInfo.MAX_PLAYER_COUNT, my_score);
                     break;
 
                 case Team.BLUE:
-                    ScoreManager.I.individualScores[GameInfo.MAX_PLAYER_COUNT + 1] += my_score;
+                    ScoreManager.I.AddIndividualScore(GameInfo.MAX_PLAYER_COUNT + 1, my_score);
                     break;
 
                 default:
