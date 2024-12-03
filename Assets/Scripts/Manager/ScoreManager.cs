@@ -137,5 +137,19 @@ public class ScoreManager : NetworkSingleton<ScoreManager>
 
 
     // Scores of each fighers & zakos of each team.
-    public NetworkList<int> individualScores;
+    NetworkList<int> individualScores;
+
+    public int GetIndividualScore(int idx) => individualScores[idx];
+
+    public void SetIndividualScore(int idx, int value)
+    {
+        if (!NetworkManager.Singleton.IsHost) return;
+        individualScores[idx] = value;
+    }
+
+    public void AddIndividualScore(int idx, int delta)
+    {
+        if (!NetworkManager.Singleton.IsHost) return;
+        individualScores[idx] += delta;
+    }
 }

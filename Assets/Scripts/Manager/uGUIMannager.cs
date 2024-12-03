@@ -795,7 +795,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
                     {
                         // Just set scores to UI.
                         int zako_no = no;
-                        seq.Join(DOTween.To(() => scores_float[zako_no], (value) => scores_float[zako_no] = value, ScoreManager.I.individualScores[zako_no], score_update_duration)
+                        seq.Join(DOTween.To(() => scores_float[zako_no], (value) => scores_float[zako_no] = value, ScoreManager.I.GetIndividualScore(zako_no), score_update_duration)
                             .OnUpdate(() => fighter_scores[zako_no].text = Mathf.CeilToInt(scores_float[zako_no]).ToString()));
                         continue;
                     }
@@ -822,7 +822,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
 
                     // Set individual scores to UI.
                     int fighter_no = no;
-                    seq.Join(DOTween.To(() => scores_float[fighter_no], (value) => scores_float[fighter_no] = value, ScoreManager.I.individualScores[fighter_no], score_update_duration)
+                    seq.Join(DOTween.To(() => scores_float[fighter_no], (value) => scores_float[fighter_no] = value, ScoreManager.I.GetIndividualScore(fighter_no), score_update_duration)
                         .OnUpdate(() => fighter_scores[ui_idx].text = Mathf.CeilToInt(scores_float[fighter_no]).ToString()));
                 }
                 break;
