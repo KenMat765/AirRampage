@@ -22,7 +22,7 @@ public class ZoneEffect : MonoBehaviour
 
     public void PlayEffect()
     {
-        if (animTween != null && animTween.IsPlaying())
+        if (animTween.IsActive() && animTween.IsPlaying())
             animTween.Kill();
         animTween = aura.DOScale(1, animDuration)
                         .SetEase(Ease.OutElastic);
@@ -36,7 +36,7 @@ public class ZoneEffect : MonoBehaviour
     /// <param name="immediate">trueにするとアニメーションなしでエフェクトが停止</param>
     public void StopEffect(bool immediate = false)
     {
-        if (animTween != null && animTween.IsPlaying())
+        if (animTween.IsActive() && animTween.IsPlaying())
             animTween.Kill();
         animTween = aura.DOScale(0, animDuration)
                         .SetEase(Ease.OutBack);
