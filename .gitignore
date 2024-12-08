@@ -74,3 +74,6 @@ crashlytics-build.properties
 # Unnecessary Large Files
 Assets/LevelDesign/Environment/
 Assets/TerrainDemoScene_URP/
+
+# For MacBook
+.DS_Store
