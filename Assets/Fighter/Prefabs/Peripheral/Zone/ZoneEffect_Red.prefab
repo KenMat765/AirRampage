@@ -7161,6 +7161,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animDuration: 1
+  enterSound: {fileID: 0}
+  staySound: {fileID: 0}
+  exitSound: {fileID: 0}
 --- !u!1 &8513697200081534793
 GameObject:
   m_ObjectHideFlags: 0

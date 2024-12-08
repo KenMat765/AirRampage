@@ -61,6 +61,7 @@ public class ZoneController : MonoBehaviour
     public bool has_comboBoostS { get; set; } = false;
 
     [SerializeField] ZoneEffect zoneEffect;
+    [SerializeField] ZoneAudio zoneAudio;
 
 
     protected virtual void Start()
@@ -175,6 +176,7 @@ public class ZoneController : MonoBehaviour
         zoneTimer = zoneDuration;
         cp = cpToEnterZone;
         zoneEffect.PlayEffect();
+        zoneAudio.PlayEnterAndStaySound(1.2f);
     }
 
     protected virtual void EndZone()
@@ -183,6 +185,8 @@ public class ZoneController : MonoBehaviour
         zoneTimer = zoneDuration;
         cp = 0;
         zoneEffect.StopEffect();
+        zoneAudio.FadeOutStaySound();
+        zoneAudio.PlayExitSound();
     }
 
 
