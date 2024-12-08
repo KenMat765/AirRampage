@@ -60,6 +60,8 @@ public class ZoneController : MonoBehaviour
     public bool has_comboBoostD { get; set; } = false;
     public bool has_comboBoostS { get; set; } = false;
 
+    [SerializeField] ZoneEffect zoneEffect;
+
 
     protected virtual void Start()
     {
@@ -67,6 +69,7 @@ public class ZoneController : MonoBehaviour
         attack = GetComponentInChildren<Attack>();
         attack.OnKillCallback += OnKill;
         attack.fighterCondition.OnDeathCallback += OnDeath;
+        zoneEffect.StopEffect(true);
     }
 
     protected virtual void FixedUpdate()
@@ -171,6 +174,7 @@ public class ZoneController : MonoBehaviour
         isZone = true;
         zoneTimer = zoneDuration;
         cp = cpToEnterZone;
+        zoneEffect.PlayEffect();
     }
 
     protected virtual void EndZone()
@@ -178,6 +182,7 @@ public class ZoneController : MonoBehaviour
         isZone = false;
         zoneTimer = zoneDuration;
         cp = 0;
+        zoneEffect.StopEffect();
     }
 
 
