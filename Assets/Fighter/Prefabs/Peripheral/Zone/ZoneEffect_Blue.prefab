@@ -9711,6 +9711,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7773991611626213022}
   - component: {fileID: 8334374687923224424}
+  - component: {fileID: -1350079827417559020}
   m_Layer: 0
   m_Name: ZoneEffect_Blue
   m_TagString: Untagged
@@ -9748,9 +9749,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animDuration: 1
-  enterSound: {fileID: 0}
-  staySound: {fileID: 0}
-  exitSound: {fileID: 0}
+--- !u!114 &-1350079827417559020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7773991611626213023}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 796e6ae97ea774c8e974eead639920a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  xRot: 1
+  yRot: 0
+  zRot: 1
+  uturn_dependent: 0
 --- !u!1 &9121269113731584125
 GameObject:
   m_ObjectHideFlags: 0
