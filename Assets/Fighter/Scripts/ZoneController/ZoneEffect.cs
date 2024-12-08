@@ -5,48 +5,46 @@ using DG.Tweening;
 
 public class ZoneEffect : MonoBehaviour
 {
-    Material material;
-    ParticleSystem particle;
-
-    [SerializeField] float animDuration;
+    ParticleSystem[] particles;
+    Transform aura;
 
     Tween animTween;
-    const string ALPHA_PROPERTY = "_Alpha";
+    [SerializeField] float animDuration;
 
 
     void Awake()
     {
-        material = GetComponent<Renderer>().material;
-        particle = GetComponentInChildren<ParticleSystem>();
+        particles = GetComponentsInChildren<ParticleSystem>();
+        aura = transform.Find("Aura");
+        animTween = aura.DOScale(0, 0);
     }
 
 
-    /// <param name="immediate">trueにするとアニメーションなしでエフェクトが再生</param>
-    public void PlayEffect(bool immediate = false)
+    public void PlayEffect()
     {
         if (animTween != null && animTween.IsPlaying())
-            animTween.Kill(true);
+            animTween.Kill();
+        animTween = aura.DOScale(1, animDuration)
+                        .SetEase(Ease.OutElastic);
 
-        float duration = immediate ? 0 : animDuration;
-        animTween = material.DOFloat(1, ALPHA_PROPERTY, duration);
-        particle.Play();
+        foreach (ParticleSystem particle in particles)
+        {
+            particle.Play();
+        }
     }
 
     /// <param name="immediate">trueにするとアニメーションなしでエフェクトが停止</param>
     public void StopEffect(bool immediate = false)
     {
         if (animTween != null && animTween.IsPlaying())
-            animTween.Kill(true);
+            animTween.Kill();
+        animTween = aura.DOScale(0, animDuration)
+                        .SetEase(Ease.OutBack);
 
-        if (immediate)
+        ParticleSystemStopBehavior stopBehavior = immediate ? ParticleSystemStopBehavior.StopEmittingAndClear : ParticleSystemStopBehavior.StopEmitting;
+        foreach (ParticleSystem particle in particles)
         {
-            animTween = material.DOFloat(0, ALPHA_PROPERTY, 0);
-            particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-        }
-        else
-        {
-            animTween = material.DOFloat(0, ALPHA_PROPERTY, animDuration);
-            particle.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+            particle.Stop(true, stopBehavior);
         }
     }
 }
