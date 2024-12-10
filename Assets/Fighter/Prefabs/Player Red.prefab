@@ -399,11 +399,11 @@ MonoBehaviour:
   - audio: {fileID: 2217609224400259453}
     volume: 1
   - audio: {fileID: 8332030157018665567}
-    volume: 1
+    volume: 0.8
   - audio: {fileID: 8083534345286581808}
-    volume: 1
+    volume: 0.8
   - audio: {fileID: 1159601743698184531}
-    volume: 1
+    volume: 0.8
 --- !u!114 &1314240857826305838
 MonoBehaviour:
   m_ObjectHideFlags: 0
