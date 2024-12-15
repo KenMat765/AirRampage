@@ -4737,7 +4737,6 @@ MonoBehaviour:
   penetrate: 0
   attackRange: 0
   rangeRadius: 0
-  lockonType: 0
   blastImpact: {fileID: 0}
   hitEffect: {fileID: 902952762661376473}
   hitDuration: 0.5
@@ -13959,7 +13958,7 @@ AudioSource:
   m_GameObject: {fileID: 902952762661376473}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -7956365116955946873, guid: e32b22a8fde8145f5b176d9d837e9cf3, type: 2}
   m_audioClip: {fileID: 8300000, guid: 03453c9e4532b439cac9b2e2f5103ced, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0.3

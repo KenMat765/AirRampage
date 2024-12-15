@@ -38,12 +38,34 @@ public class PlayerZoneController : ZoneController
     protected override void StartZone()
     {
         base.StartZone();
-        uGUIMannager.I.StartZoneAnim();
+
+        if (attack.IsOwner)
+        {
+            uGUIMannager.I.StartZoneAnim();
+
+            float volume_magnif = 1.6f;
+            AudioMixerManager.I.SetParam(AudioGroup.BGM, AudioParam.Volume, AudioUtilities.Magnif2DB(volume_magnif));
+            AudioMixerManager.I.SetParam(AudioGroup.SE, AudioParam.Volume, AudioUtilities.Magnif2DB(volume_magnif));
+
+            float cutoff_freq = 500;
+            AudioMixerManager.I.SetParam(AudioGroup.BGM, AudioParam.Lowpass_CutoffFreq, cutoff_freq);
+            AudioMixerManager.I.SetParam(AudioGroup.SE, AudioParam.Lowpass_CutoffFreq, cutoff_freq);
+        }
     }
 
     protected override void EndZone()
     {
         base.EndZone();
-        uGUIMannager.I.EndZoneAnim();
+
+        if (attack.IsOwner)
+        {
+            uGUIMannager.I.EndZoneAnim();
+
+            AudioMixerManager.I.SetParam(AudioGroup.BGM, AudioParam.Volume, AudioUtilities.Magnif2DB(1.0f));
+            AudioMixerManager.I.SetParam(AudioGroup.SE, AudioParam.Volume, AudioUtilities.Magnif2DB(1.0f));
+
+            AudioMixerManager.I.SetParam(AudioGroup.BGM, AudioParam.Lowpass_CutoffFreq, AudioMixerManager.FILTER_MAX_FREQ);
+            AudioMixerManager.I.SetParam(AudioGroup.SE, AudioParam.Lowpass_CutoffFreq, AudioMixerManager.FILTER_MAX_FREQ);
+        }
     }
 }

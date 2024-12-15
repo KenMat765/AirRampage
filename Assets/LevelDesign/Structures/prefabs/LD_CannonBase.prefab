@@ -81,7 +81,6 @@ MonoBehaviour:
   penetrate: 0
   attackRange: 0
   rangeRadius: 0
-  lockonType: 0
   blastImpact: {fileID: 5506684063116087124}
   hitEffect: {fileID: 7389493931939756695}
   hitDuration: 0.5
@@ -4844,16 +4843,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb71057fcc3664453a5d6fcf02117218, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  body: {fileID: 0}
-  movement: {fileID: 0}
-  attack: {fileID: 2387120010496438759}
-  receiver: {fileID: 0}
-  radarIcon: {fileID: 0}
   Hp: 0
   defaultHp: 1000
   defaultSpeed: 0
   defaultPower: 1
   defaultDefence: 1
+  revivalTime: 0
   team: 0
 --- !u!1 &2938700569631081275
 GameObject:
@@ -9468,7 +9463,7 @@ AudioSource:
   m_GameObject: {fileID: 5506684063116087124}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -7956365116955946873, guid: e32b22a8fde8145f5b176d9d837e9cf3, type: 2}
   m_audioClip: {fileID: 8300000, guid: b4b6a720b0ba76d40aa26206b1f17218, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0.4
@@ -16731,6 +16726,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ace0acc9c234846ed8ebdbdb0075c545, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attackable: 0
   lockonAngle: 180
   lockonDistance: 350
   originalNormalBullet: {fileID: 749786050208294807}
@@ -16739,6 +16735,7 @@ MonoBehaviour:
   bulletPower: 1.5
   bulletSpeed: 350
   bulletLifespan: 1
+  blastInterval: 0
   rotationSpeed: 10
   rapidInterval: 0.3
   bulletRed:
