@@ -9889,6 +9889,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Circle_Impact
       objectReference: {fileID: 0}
+    - target: {fileID: 3651827036389512028, guid: d0739b8a1ad45fd42b50a684a17f1198, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6299519950959870738, guid: d0739b8a1ad45fd42b50a684a17f1198, type: 3}
       propertyPath: m_RootOrder
       value: 2

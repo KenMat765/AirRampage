@@ -17,6 +17,7 @@ public class StarGazer : SkillAttack
     }
 
     GameObject gazer_root;
+    AudioSource[] hit_audios;
     bool generating = false;
     float timer;
     Tweener root_tweener;
@@ -41,6 +42,8 @@ public class StarGazer : SkillAttack
         gazer_root.transform.localPosition = Vector3.zero;
         // rotationは発射時に毎回補正する
         gazer_root.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
+
+        hit_audios = gazer_root.transform.Find("HitAudio").GetComponents<AudioSource>();
 
         // prefabs、weaponsの初期設定
         original_prefab = gazer_root.transform.Find("Projectile_StarGazer").gameObject;
@@ -82,6 +85,12 @@ public class StarGazer : SkillAttack
     {
         float fighter_power = skillController.fighterCondition.power.value;
         const float interval = 0.03f;
+
+        foreach (AudioSource hit_audio in hit_audios)
+        {
+            hit_audio.Play();
+        }
+
         while (generating)
         {
             int index = GetPrefabIndex(gazer_root.transform);
@@ -106,6 +115,11 @@ public class StarGazer : SkillAttack
         gazer_root.SetActive(false);
         gazer_root.transform.parent = transform;
         gazer_root.transform.localPosition = Vector3.zero;
+
+        foreach (AudioSource hit_audio in hit_audios)
+        {
+            hit_audio.Stop();
+        }
     }
 
     public override void ForceTermination(bool maintain_charge)
