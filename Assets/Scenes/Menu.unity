@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 1164104880}
-  m_IndirectSpecularColor: {r: 0.017664777, g: 0.049372867, b: 0.121102326, a: 1}
+  m_IndirectSpecularColor: {r: 0.00983632, g: 0.029278176, b: 0.08882096, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -3741,7 +3741,7 @@ GameObject:
   - component: {fileID: 355507335}
   - component: {fileID: 355507334}
   m_Layer: 5
-  m_Name: Volume_Low
+  m_Name: SE_Low
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13064,7 +13064,7 @@ GameObject:
   - component: {fileID: 820149550}
   - component: {fileID: 820149551}
   m_Layer: 5
-  m_Name: Volume_Slider
+  m_Name: SE_Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13146,7 +13146,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1695466807}
         m_TargetAssemblyTypeName: SettingsCapsule, Assembly-CSharp
-        m_MethodName: OnVolumeSlider
+        m_MethodName: OnSESlider
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -24299,7 +24299,7 @@ GameObject:
   m_Component:
   - component: {fileID: 981081239}
   m_Layer: 5
-  m_Name: Volume
+  m_Name: SE
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26659,7 +26659,7 @@ AudioSource:
   m_GameObject: {fileID: 1196848836}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 601254978698319804, guid: e32b22a8fde8145f5b176d9d837e9cf3, type: 2}
   m_audioClip: {fileID: 8300000, guid: af48ac2773920ac438587cfe3576e048, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.5
@@ -32076,7 +32076,7 @@ GameObject:
   - component: {fileID: 1571247037}
   - component: {fileID: 1571247036}
   m_Layer: 5
-  m_Name: Volume_High
+  m_Name: SE_High
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32735,7 +32735,7 @@ GameObject:
   - component: {fileID: 1629953539}
   - component: {fileID: 1629953538}
   m_Layer: 5
-  m_Name: Volume_Text
+  m_Name: SE_Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32781,7 +32781,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: volume
+  m_text: se
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0c4dedfa293ef424d869cfda410bb63e, type: 2}
   m_sharedMaterial: {fileID: -8354251792819549299, guid: 0c4dedfa293ef424d869cfda410bb63e, type: 2}
@@ -33729,7 +33729,7 @@ AudioSource:
   m_GameObject: {fileID: 1726571387}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -7956365116955946873, guid: e32b22a8fde8145f5b176d9d837e9cf3, type: 2}
   m_audioClip: {fileID: 8300000, guid: 4cc0b1f673f7c334d967c1ee44742752, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
@@ -33825,7 +33825,7 @@ AudioSource:
   m_GameObject: {fileID: 1726571387}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -7956365116955946873, guid: e32b22a8fde8145f5b176d9d837e9cf3, type: 2}
   m_audioClip: {fileID: 8300000, guid: cfc679a6db74bee4ea01a21fd9eea684, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1

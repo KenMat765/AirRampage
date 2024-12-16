@@ -148,19 +148,19 @@ public class PlayerInfo
     public bool[] abi_unlock =
     {
         true, true, true, true, true, true,
-        false, false, false, false, false, false,
         true, true, true, true, true, true,
-        false, false, false, false, false, false,
+        true, true, true, true, true, true,
+        true, true, true, true, true, true,
         true, true, true, true,
     };
 
     public bool[] abi_equip =
     {
-        false, false, false, false, false, false,
-        false, false, false, false, false, false,
-        false, false, false, false, false, false,
-        false, false, false, false, false, false,
-        false, false, false, false,
+        true, true, true, true, true, true,
+        true, true, true, true, true, true,
+        true, true, true, true, true, true,
+        true, true, true, true, true, true,
+        true, true, true, true,
     };
 
 
@@ -176,7 +176,7 @@ public class PlayerInfo
     public bool postprocess = true;
 
     // Audio
-    public float volume = 1.0f;
+    public float seRatio = 1.0f;
     public float bgmRatio = 1.0f;
 
 

@@ -26,7 +26,7 @@ public class SettingsCapsule : MonoBehaviour
 
     // Audio
     Slider bgmSlider;
-    Slider volumeSlider;
+    Slider seSlider;
 
 
     void Start()
@@ -58,7 +58,7 @@ public class SettingsCapsule : MonoBehaviour
         postprocessToggle = graphicsRect.Find("Postprocess/Toggle").GetComponent<Toggle>();
         // Audio
         bgmSlider = audioRect.Find("BGM/BGM_Slider").GetComponent<Slider>();
-        volumeSlider = audioRect.Find("Volume/Volume_Slider").GetComponent<Slider>();
+        seSlider = audioRect.Find("SE/SE_Slider").GetComponent<Slider>();
 
 
         AdjustToPlayerInfo();
@@ -90,7 +90,7 @@ public class SettingsCapsule : MonoBehaviour
 
         // Audio
         bgmSlider.value = PlayerInfo.I.bgmRatio;
-        volumeSlider.value = PlayerInfo.I.volume;
+        seSlider.value = PlayerInfo.I.seRatio;
     }
 
     void SetInteractableAll(bool interactable)
@@ -101,7 +101,7 @@ public class SettingsCapsule : MonoBehaviour
         fpsRadio.Interactable(interactable);
         postprocessToggle.interactable = interactable;
         bgmSlider.interactable = interactable;
-        volumeSlider.interactable = interactable;
+        seSlider.interactable = interactable;
     }
 
 
@@ -232,11 +232,11 @@ public class SettingsCapsule : MonoBehaviour
 
 
     // ===== Audio ===== //
-    public void OnVolumeSlider()
+    public void OnSESlider()
     {
-        float volume = volumeSlider.value;
-        PlayerInfo.I.volume = volume;
-        AppSetup.SetVolume(volume);
+        float se = seSlider.value;
+        PlayerInfo.I.seRatio = se;
+        AppSetup.SetSE(se);
     }
 
     public void OnBGMSlider()

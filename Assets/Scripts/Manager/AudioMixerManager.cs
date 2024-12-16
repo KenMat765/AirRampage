@@ -39,6 +39,9 @@ public class AudioMixerManager : Singleton<AudioMixerManager>
     }
 
 
+    /// <summary>ボリュームの最小DB (音が消える)</summary>
+    public const float VOLUME_MIN_DB = -80.0f;
+
     /// <summary>ローパスフィルタにこの値をセットすれば、実質フィルターをOFFにすることができる</summary>
     public const float FILTER_MAX_FREQ = 22000.0f;
 }

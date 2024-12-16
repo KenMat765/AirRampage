@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class AppSetup
 {
@@ -9,7 +10,7 @@ public class AppSetup
     {
         LoadPlayerInfo();
         SetFPS(PlayerInfo.I.fps);
-        SetVolume(PlayerInfo.I.volume);
+        SetSE(PlayerInfo.I.seRatio);
         SetBGM(PlayerInfo.I.bgmRatio);
     }
 
@@ -19,14 +20,19 @@ public class AppSetup
         Application.targetFrameRate = fps;
     }
 
-    public static void SetVolume(float volume)
+    public static void SetSE(float se)
     {
-        AudioListener.volume = volume;
+        float se_db = 20 * Mathf.Log10(se);
+        se_db = Mathf.Clamp(se_db, AudioMixerManager.VOLUME_MIN_DB, 0);
+        AudioMixerManager.I.SetParam(AudioGroup.SE, AudioParam.Volume, se_db);
+        AudioMixerManager.I.SetParam(AudioGroup.Zone, AudioParam.Volume, se_db);
     }
 
     public static void SetBGM(float bgm)
     {
-        BGMManager.I.SetBGMVolume(bgm);
+        float bgm_db = 20 * Mathf.Log10(bgm);
+        bgm_db = Mathf.Clamp(bgm_db, AudioMixerManager.VOLUME_MIN_DB, 0);
+        AudioMixerManager.I.SetParam(AudioGroup.BGM, AudioParam.Volume, bgm_db);
     }
 
     static void LoadPlayerInfo()
