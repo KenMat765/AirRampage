@@ -10,12 +10,6 @@ public class PlayerZoneController : ZoneController
         uGUIMannager.I.default_combo_disp_timer = comboTimeout;
     }
 
-    protected override void UpdateCp()
-    {
-        if (uGUIMannager.I.animating_zone) return;
-        base.UpdateCp();
-    }
-
     protected override void OnKill(int killed_no)
     {
         if (!attack.IsOwner) return;

@@ -70,7 +70,6 @@ public class ZoneController : MonoBehaviour
         attack = GetComponentInChildren<Attack>();
         attack.OnKillCallback += OnKill;
         attack.fighterCondition.OnDeathCallback += OnDeath;
-        zoneEffect.StopEffect(true);
     }
 
     protected virtual void FixedUpdate()
@@ -177,6 +176,12 @@ public class ZoneController : MonoBehaviour
         cp = cpToEnterZone;
         zoneEffect.PlayEffect();
         zoneAudio.PlayEnterAndStaySound(1.2f);
+
+        FighterCondition condition = attack.fighterCondition;
+        condition.power.Grade(6, zoneDuration);
+        condition.defence.Grade(6, zoneDuration);
+        condition.speed.Grade(6, zoneDuration);
+        condition.HPDecreaser(-100);
     }
 
     protected virtual void EndZone()
@@ -213,6 +218,7 @@ public class ZoneController : MonoBehaviour
     {
         bool maintain_cp = true;
         ResetCp(maintain_cp);
-        EndZone();
+        if (isZone)
+            EndZone();
     }
 }

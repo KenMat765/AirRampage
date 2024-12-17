@@ -27,6 +27,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
     TextMeshProUGUI zone_text;
     public bool animating_zone { get; private set; } = false;
     Tween blink_zone_meter;
+    float cp_remain_on_anim_end;
     #endregion
 
     #region Status
@@ -969,6 +970,7 @@ public class uGUIMannager : Singleton<uGUIMannager>
         zone_anim.OnComplete(() =>
         {
             animating_zone = false;
+            cp_remain_on_anim_end = playerZoneCtrl.Cp;
         });
         // === Animation === //
 
@@ -990,14 +992,14 @@ public class uGUIMannager : Singleton<uGUIMannager>
         if (animating_zone) return;
 
         float cp = playerZoneCtrl.Cp;
-        float cp_to_enter_zone = playerZoneCtrl.CpToEnterZone;
-        cp_meter.fillAmount = cp / cp_to_enter_zone;
         if (playerZoneCtrl.isZone)
         {
-            zone_meter.fillAmount = cp / cp_to_enter_zone;
+            cp_meter.fillAmount = cp / cp_remain_on_anim_end;
+            zone_meter.fillAmount = cp / cp_remain_on_anim_end;
         }
         else
         {
+            cp_meter.fillAmount = cp / playerZoneCtrl.CpToEnterZone;
             zone_meter.fillAmount = 0;
         }
     }
