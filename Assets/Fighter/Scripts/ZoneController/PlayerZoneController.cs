@@ -37,11 +37,11 @@ public class PlayerZoneController : ZoneController
         {
             uGUIMannager.I.StartZoneAnim();
 
-            float volume_magnif = 1.6f;
+            float volume_magnif = 1.2f;
             AudioMixerManager.I.SetParam(AudioGroup.BGM, AudioParam.Volume, AudioUtilities.Magnif2DB(volume_magnif));
             AudioMixerManager.I.SetParam(AudioGroup.SE, AudioParam.Volume, AudioUtilities.Magnif2DB(volume_magnif));
 
-            float cutoff_freq = 500;
+            float cutoff_freq = 800;
             AudioMixerManager.I.SetParam(AudioGroup.BGM, AudioParam.Lowpass_CutoffFreq, cutoff_freq);
             AudioMixerManager.I.SetParam(AudioGroup.SE, AudioParam.Lowpass_CutoffFreq, cutoff_freq);
         }

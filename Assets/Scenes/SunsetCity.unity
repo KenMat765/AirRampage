@@ -8958,10 +8958,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 346867806}
-  - component: {fileID: 346867805}
   - component: {fileID: 346867804}
   m_Layer: 0
-  m_Name: StageAudio
+  m_Name: BGM
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9063,20 +9062,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &346867805
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 346867803}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cae9a987aef934e60992d9f32b35ab34, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bgmAudio: {fileID: 346867804}
-  maxVolume: 0.8
 --- !u!4 &346867806
 Transform:
   m_ObjectHideFlags: 0
