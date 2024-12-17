@@ -5,7 +5,8 @@ using DG.Tweening;
 
 public class ZoneEffect : MonoBehaviour
 {
-    ParticleSystem[] particles;
+    ParticleSystem aura_particle;
+    ParticleSystem end_particle;
     Transform aura;
 
     Tween animTween;
@@ -14,8 +15,9 @@ public class ZoneEffect : MonoBehaviour
 
     void Awake()
     {
-        particles = GetComponentsInChildren<ParticleSystem>();
         aura = transform.Find("Aura");
+        aura_particle = aura.GetComponent<ParticleSystem>();
+        end_particle = transform.Find("EndEffect").GetComponent<ParticleSystem>();
         animTween = aura.DOScale(0, 0);
     }
 
@@ -27,10 +29,7 @@ public class ZoneEffect : MonoBehaviour
         animTween = aura.DOScale(1, animDuration)
                         .SetEase(Ease.OutElastic);
 
-        foreach (ParticleSystem particle in particles)
-        {
-            particle.Play();
-        }
+        aura_particle.Play(true);
     }
 
     /// <param name="immediate">trueにするとアニメーションなしでエフェクトが停止</param>
@@ -42,9 +41,9 @@ public class ZoneEffect : MonoBehaviour
                         .SetEase(Ease.OutBack);
 
         ParticleSystemStopBehavior stopBehavior = immediate ? ParticleSystemStopBehavior.StopEmittingAndClear : ParticleSystemStopBehavior.StopEmitting;
-        foreach (ParticleSystem particle in particles)
-        {
-            particle.Stop(true, stopBehavior);
-        }
+        aura_particle.Stop(true, stopBehavior);
+
+        if (!immediate)
+            end_particle.Play(true);
     }
 }
